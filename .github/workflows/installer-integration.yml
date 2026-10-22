@@ -1,0 +1,118 @@
+name: Installer integration
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/install/**'
+      - 'src/nicx/cli/**'
+      - 'tests/install/**'
+      - '.github/workflows/installer-integration.yml'
+  schedule:
+    - cron: '0 6 * * *'
+
+jobs:
+  container-matrix:
+    name: ${{ matrix.image }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - ubuntu:22.04
+          - ubuntu:24.04
+          - fedora:40
+
+    container: ${{ matrix.image }}
+
+    steps:
+      - name: Install prereqs (Ubuntu/Debian)
+        if: contains(matrix.image, 'ubuntu') || contains(matrix.image, 'debian')
+        run: |
+          apt-get update
+          apt-get install -y curl git python3 sudo
+
+      - name: Install prereqs (Fedora)
+        if: contains(matrix.image, 'fedora')
+        run: |
+          dnf install -y curl git python3 sudo
+
+      - name: Create non-root user
+        run: useradd -m -s /bin/bash testuser
+
+      - uses: actions/checkout@v7
+        with:
+          path: nicx-src
+
+      - name: Install Ollama mock
+        run: install -m 755 "$GITHUB_WORKSPACE/nicx-src/tests/install/bash/stubs/ollama-mock" /usr/local/bin/ollama
+
+      - name: Run installer
+        run: |
+          chown -R testuser:testuser /home/testuser "$GITHUB_WORKSPACE/nicx-src"
+          su testuser -c '
+            export NICX_REPO_URL=file://'"$GITHUB_WORKSPACE"'/nicx-src
+            cd '"$GITHUB_WORKSPACE"'/nicx-src
+            bash scripts/install/install.sh --no-bg-orchestrator
+          '
+
+      - name: Verify install state
+        run: |
+          su testuser -c '
+            test -d ~/.nicx/src
+            test -d ~/.nicx/.venv
+            test -f ~/.nicx/config.toml
+            test -f ~/.nicx/.state/install-state.json
+            test -L ~/.local/bin/nicx
+          '
+
+      - name: Verify nicx --version
+        run: su testuser -c '~/.local/bin/nicx --version'
+
+      - name: Verify nicx doctor exits 0
+        run: su testuser -c '~/.local/bin/nicx doctor'
+
+      - name: Verify uninstall is clean
+        run: |
+          su testuser -c '
+            ~/.local/bin/nicx-uninstall --yes
+            test ! -d ~/.nicx
+            test ! -L ~/.local/bin/nicx
+          '
+
+  macos:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-15]
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Ollama mock
+        run: sudo install -m 755 tests/install/bash/stubs/ollama-mock /usr/local/bin/ollama
+
+      - name: Run installer
+        run: |
+          export NICX_REPO_URL=file://$(pwd)
+          bash scripts/install/install.sh --no-bg-orchestrator
+
+      - name: Verify install state
+        run: |
+          test -d ~/.nicx/src
+          test -d ~/.nicx/.venv
+          test -f ~/.nicx/config.toml
+          test -L ~/.local/bin/nicx
+
+      - name: Verify nicx --version
+        run: ~/.local/bin/nicx --version
+
+      - name: Verify nicx doctor exits 0
+        run: ~/.local/bin/nicx doctor
+
+      - name: Verify uninstall is clean
+        run: |
+          ~/.local/bin/nicx-uninstall --yes
+          test ! -d ~/.nicx
+          test ! -L ~/.local/bin/nicx
