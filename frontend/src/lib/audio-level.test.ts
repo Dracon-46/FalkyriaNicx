@@ -71,11 +71,22 @@ describe('SilenceDetector', () => {
   it('ends an utterance after speech and then silence', () => {
     const vad = new SilenceDetector({ silenceMs: 300, noSpeechMs: 5000 });
     expect(vad.push(0.001, 100)).toBeNull();
-    expect(vad.push(0.2, 100)).toBeNull();
+    for (let i = 0; i < 3; i++) expect(vad.push(0.2, 100)).toBeNull();
     expect(vad.spoke).toBe(true);
     expect(vad.push(0.001, 100)).toBeNull();
     expect(vad.push(0.001, 100)).toBeNull();
     expect(vad.push(0.001, 100)).toBe('speech-ended');
+  });
+
+  it('does not take short noises (clicks, keys, an echo tail) for speech', () => {
+    const vad = new SilenceDetector({ noSpeechMs: 3000 });
+    let result = null;
+    for (let i = 0; i < 30 && !result; i++) {
+      // A 100 ms bang every second.
+      result = vad.push(i % 10 === 0 ? 0.3 : 0.001, 100);
+    }
+    expect(vad.spoke).toBe(false);
+    expect(result).toBe('no-speech');
   });
 
   it('gives up when nobody speaks', () => {

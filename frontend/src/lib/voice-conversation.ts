@@ -38,6 +38,11 @@ export const SILENCE_MS = 1300;
 export const ROUND_MS = 15000;
 /** Silent rounds in a row (about a minute) before the mode switches itself off. */
 export const MAX_IDLE_ROUNDS = 4;
+/**
+ * Pause after Nicx speaks before the microphone opens again: without a
+ * headset, the laptop mic picks up the end of its own voice from the speakers.
+ */
+export const ECHO_SETTLE_MS = 600;
 
 /** Resolve once the shared voice output is no longer busy with message `id`. */
 function waitForSpeechToEnd(id: string): Promise<void> {
@@ -175,6 +180,7 @@ export class VoiceConversation {
           void tts.speak(reply.id, spoken);
         }
         await waitForSpeechToEnd(reply.id);
+        await new Promise((resolve) => setTimeout(resolve, ECHO_SETTLE_MS));
       }
     }
 

@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { ComponentProps } from 'react';
 import { X, Mic } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { toast } from 'sonner';
 import { NicxMascot } from '../components/Mascot/NicxMascot';
 import { Toaster } from '../components/ui/sonner';
@@ -20,6 +23,21 @@ import {
 
 /** Longest goodbye wait before the window closes anyway. */
 const GOODBYE_MS = 5000;
+
+type WithNode<T extends 'p' | 'ul' | 'ol'> = ComponentProps<T> & { node?: unknown };
+
+// Compact markdown: the first paragraph continues the "Nicx: " label.
+const replyComponents = {
+  p: ({ node: _node, ...props }: WithNode<'p'>) => (
+    <p {...props} className="mt-1.5 first-of-type:mt-0 first-of-type:inline" />
+  ),
+  ul: ({ node: _node, ...props }: WithNode<'ul'>) => (
+    <ul {...props} className="mt-1 list-disc pl-4" />
+  ),
+  ol: ({ node: _node, ...props }: WithNode<'ol'>) => (
+    <ol {...props} className="mt-1 list-decimal pl-4" />
+  ),
+};
 
 function waitForTtsIdle(timeoutMs: number): Promise<void> {
   return new Promise((resolve) => {
@@ -190,10 +208,12 @@ export default function FloatingPage() {
             </p>
           )}
           {replyText && (
-            <p style={{ color: 'var(--color-text)' }}>
+            <div style={{ color: 'var(--color-text)' }} data-testid="floating-reply">
               <span style={{ color: 'var(--color-text-tertiary)' }}>Nicx: </span>
-              {replyText}
-            </p>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={replyComponents}>
+                {replyText}
+              </ReactMarkdown>
+            </div>
           )}
           {!lastUser && !ended && (
             <p className="text-center" style={{ color: 'var(--color-text-tertiary)' }}>

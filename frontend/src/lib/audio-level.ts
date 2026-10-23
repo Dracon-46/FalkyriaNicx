@@ -122,12 +122,19 @@ export interface SilenceOptions {
   maxMs?: number;
   /** Lowest RMS counted as speech, whatever the noise floor. */
   minThreshold?: number;
+  /**
+   * Loud time needed before it counts as speech. A click, a key press or the
+   * tail of Nicx's own voice is shorter than this.
+   */
+  minSpeechMs?: number;
 }
 
 export class SilenceDetector {
   private readonly opts: SilenceOptions;
   private noise = 0.005;
   private heardSpeech = false;
+  private voicedMs = 0;
+  private gapMs = 0;
   private quietMs = 0;
   private elapsedMs = 0;
 
@@ -140,16 +147,21 @@ export class SilenceDetector {
     const silenceMs = this.opts.silenceMs ?? 1300;
     const noSpeechMs = this.opts.noSpeechMs ?? 15000;
     const maxMs = this.opts.maxMs ?? 30000;
+    const minSpeechMs = this.opts.minSpeechMs ?? 300;
     const threshold = Math.max(this.opts.minThreshold ?? 0.015, this.noise * 3);
 
     this.elapsedMs += dtMs;
     if (value > threshold) {
-      this.heardSpeech = true;
+      this.voicedMs += dtMs;
+      this.gapMs = 0;
+      if (this.voicedMs >= minSpeechMs) this.heardSpeech = true;
       this.quietMs = 0;
     } else {
       // Track the noise floor only from quiet frames, slowly.
       this.noise = this.noise * 0.95 + value * 0.05;
       if (this.heardSpeech) this.quietMs += dtMs;
+      // Short noises far apart never add up to speech.
+      else if ((this.gapMs += dtMs) >= 500) this.voicedMs = 0;
     }
 
     if (this.heardSpeech && (this.quietMs >= silenceMs || this.elapsedMs >= maxMs)) {
