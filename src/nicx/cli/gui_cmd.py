@@ -578,7 +578,11 @@ def gui(frontend_port: int, api_port: int, no_server: bool, no_browser: bool) ->
             # may take a while: it loads the speech models on startup.
             console.print("Esperando o servidor do Nicx ficar pronto...")
             deadline = time.monotonic() + _API_READY_TIMEOUT_SECONDS
-            while not _api_healthy(api_port, timeout=2.0):
+            while not _api_healthy(api_port, 2.0):
+                if not _daemon_pid_alive(api_port):
+                    # The server died while starting; the monitor loop below
+                    # reports it and shuts the frontend down.
+                    break
                 if time.monotonic() > deadline:
                     console.print(
                         "[yellow]O servidor ainda não respondeu; abrindo a "

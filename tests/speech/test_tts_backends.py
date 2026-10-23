@@ -862,6 +862,8 @@ def test_kokoro_defaults_to_brazilian_portuguese_voice():
     """Nicx speaks PT-BR: an empty voice ID resolves to a ``p*`` voice."""
     from unittest.mock import MagicMock
 
+    pytest.importorskip("soundfile", reason="voice extra not installed")
+
     from nicx.speech.kokoro_tts import _DEFAULT_VOICE_ID, KokoroTTSBackend
 
     assert _DEFAULT_VOICE_ID.startswith("p")
