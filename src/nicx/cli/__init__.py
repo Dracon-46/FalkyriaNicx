@@ -132,6 +132,7 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     from nicx.cli.telemetry_cmd import telemetry
     from nicx.cli.tool_cmd import tool
     from nicx.cli.vault_cmd import vault
+    from nicx.cli.wake_cmd import escuta, mascote
     from nicx.cli.workflow_cmd import workflow
 
     cli.add_command(init, "init")
@@ -167,6 +168,9 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     cli.add_command(compose, "compose")
     cli.add_command(gateway, "gateway")
     cli.add_command(gui, "gui")
+    cli.add_command(escuta, "escuta")
+    cli.add_command(escuta, "wake")
+    cli.add_command(mascote, "mascote")
     cli.add_command(tool, "tool")
     cli.add_command(registry, "registry")
     cli.add_command(config, "config")

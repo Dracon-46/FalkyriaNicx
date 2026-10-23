@@ -120,6 +120,25 @@ export function InputArea() {
   const sendSpokenRef = useRef<(text: string) => Promise<SendOutcome>>(async () => 'not-sent');
   const conversation = useVoiceConversation(speech, (text) => sendSpokenRef.current(text));
 
+  // "Nicx, ligar" without a window of its own opens the interface with
+  // ?voz=1: start the hands-free conversation as soon as the voice is ready.
+  const voiceParamHandled = useRef(false);
+  const startConversation = conversation.start;
+  useEffect(() => {
+    if (voiceParamHandled.current || !speechEnabled || !speechAvailable) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('voz') !== '1') return;
+    voiceParamHandled.current = true;
+    params.delete('voz');
+    const query = params.toString();
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`,
+    );
+    startConversation();
+  }, [speechEnabled, speechAvailable, startConversation]);
+
   // Abort in-flight stream when the user switches models mid-generation.
   // This prevents errors from trying to continue a stream with a stale model.
   const prevModelRef = useRef(selectedModel);

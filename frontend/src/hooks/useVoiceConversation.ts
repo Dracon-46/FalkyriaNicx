@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import {
   CONVERSATION_PHASE_LABEL,
@@ -7,6 +7,7 @@ import {
   type SendOutcome,
   type SpeechControls,
 } from '../lib/voice-conversation';
+import { useVoiceActivity } from '../lib/voice-busy';
 
 export type { ConversationPhase, SendOutcome } from '../lib/voice-conversation';
 
@@ -38,9 +39,17 @@ export function useVoiceConversation(
   // Leaving the chat ends the conversation and releases the microphone.
   useEffect(() => () => controller.stop(), [controller]);
 
+  // While it runs, the background "Nicx, ligar" listener stays quiet.
+  const owner = useId();
+  const active = phase !== 'off';
+  useEffect(() => {
+    useVoiceActivity.getState().setConversationActive(owner, active);
+  }, [owner, active]);
+  useEffect(() => () => useVoiceActivity.getState().setConversationActive(owner, false), [owner]);
+
   return {
     phase,
-    active: phase !== 'off',
+    active,
     label: CONVERSATION_PHASE_LABEL[phase],
     start: () => controller.start(),
     stop: () => controller.stop(),
