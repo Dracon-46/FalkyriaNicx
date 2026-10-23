@@ -57,7 +57,11 @@ const getSettingsApiUrl = (): string => {
     const raw = localStorage.getItem('nicx-settings');
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed.apiUrl) return parsed.apiUrl.replace(/\/+$/, '');
+      // Only a real http(s) address counts; anything else typed here (e.g. an
+      // email) would turn every request into a broken relative path.
+      if (typeof parsed.apiUrl === 'string' && /^https?:\/\/[^\s/]+/i.test(parsed.apiUrl.trim())) {
+        return parsed.apiUrl.trim().replace(/\/+$/, '');
+      }
     }
   } catch {}
   return '';
@@ -446,6 +450,59 @@ export async function fetchSpeechHealth(): Promise<SpeechHealth> {
   const res = await apiFetch(`/v1/speech/health`);
   if (!res.ok) return { available: false };
   return res.json();
+}
+
+/** "Nicx, ligar": the local background listener (`nicx escuta`). */
+export interface WakeStatus {
+  enabled: boolean;
+  running: boolean;
+  /** "escutando", "pausado", "mascote aberto" or "parado". */
+  state: string;
+  phrases: string[];
+  autostart: boolean;
+  autostart_supported: boolean;
+  window_supported: boolean;
+  busy: boolean;
+}
+
+async function wakeResponse(res: Response): Promise<WakeStatus> {
+  if (!res.ok) {
+    let detail = '';
+    try {
+      detail = (await res.json())?.detail ?? '';
+    } catch {
+      // Status-only message below.
+    }
+    throw new Error(detail || `Falha na escuta: ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function fetchWakeStatus(): Promise<WakeStatus> {
+  return wakeResponse(await apiFetch(`/v1/speech/wake`));
+}
+
+export async function updateWake(change: { enabled?: boolean; autostart?: boolean }): Promise<WakeStatus> {
+  return wakeResponse(
+    await apiFetch(`/v1/speech/wake`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(change),
+    }),
+  );
+}
+
+/**
+ * Tell the background listener that Nicx is in a voice conversation or
+ * talking, so it never wakes up on its own voice. `ttl` makes a closed tab
+ * stop counting by itself.
+ */
+export async function reportVoiceBusy(source: string, busy: boolean, ttl = 10): Promise<void> {
+  await apiFetch(`/v1/speech/wake/busy`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ source, busy, ttl }),
+  });
 }
 
 // ---------------------------------------------------------------------------

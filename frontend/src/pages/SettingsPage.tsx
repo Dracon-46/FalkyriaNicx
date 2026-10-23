@@ -24,6 +24,8 @@ import {
   checkHealth,
   fetchSpeechHealth,
   fetchTtsHealth,
+  fetchWakeStatus,
+  updateWake,
   getMemoryStats,
   getInferenceSource,
   setInferenceSource,
@@ -35,6 +37,7 @@ import {
   isTauri,
   type InferenceSource,
   type MemoryStats,
+  type WakeStatus,
 } from '../lib/api';
 
 const CLOUD_KEY_STATUS_CHANGED = 'nicx-cloud-key-status-changed';
@@ -226,6 +229,149 @@ function SettingRow({ label, description, children }: { label: string; descripti
       </div>
       <div>{children}</div>
     </div>
+  );
+}
+
+
+function Toggle({
+  on,
+  onClick,
+  disabled = false,
+  label,
+}: {
+  on: boolean;
+  onClick: () => void;
+  disabled?: boolean;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      aria-label={label}
+      onClick={onClick}
+      disabled={disabled}
+      className="relative w-11 h-6 rounded-full transition-colors cursor-pointer disabled:cursor-default"
+      style={{
+        background: on ? 'var(--color-accent)' : 'var(--color-bg-tertiary)',
+        opacity: disabled ? 0.4 : 1,
+      }}
+    >
+      <span
+        className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform bg-white"
+        style={{
+          transform: on ? 'translateX(20px)' : 'translateX(0)',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+        }}
+      />
+    </button>
+  );
+}
+
+const WAKE_STATE_LABEL: Record<string, string> = {
+  escutando: 'Escutando em segundo plano',
+  pausado: 'Pausada (ícone da bandeja)',
+  'mascote aberto': 'Mascote aberto',
+  parado: 'Parada',
+};
+
+/** "Nicx, ligar": opt-in background listener that brings the mascot up. */
+export function WakeWordSettings({ onSaved }: { onSaved: () => void }) {
+  const [status, setStatus] = useState<WakeStatus | null>(null);
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const refresh = () =>
+      fetchWakeStatus()
+        .then((s) => {
+          if (!cancelled) {
+            setStatus(s);
+            setError('');
+          }
+        })
+        .catch(() => {
+          if (!cancelled) setError('Servidor do Nicx indisponível');
+        });
+    void refresh();
+    const timer = setInterval(refresh, 5000);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, []);
+
+  const change = async (update: { enabled?: boolean; autostart?: boolean }) => {
+    setSaving(true);
+    setError('');
+    try {
+      setStatus(await updateWake(update));
+      onSaved();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Não foi possível salvar');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const enabled = status?.enabled ?? false;
+  const stateLabel = !status
+    ? error || 'Verificando...'
+    : enabled && !status.running
+      ? 'Iniciando...'
+      : WAKE_STATE_LABEL[status.state] ?? status.state;
+
+  return (
+    <>
+      <SettingRow
+        label="Ativar “Nicx, ligar” (escuta em segundo plano)"
+        description="Diga “Nicx, ligar” (ou “Ei Nicx”) e o mascote aparece pronto para conversar por voz. O microfone fica aberto só neste computador: nada é gravado nem enviado."
+      >
+        <Toggle
+          on={enabled}
+          disabled={!status || saving}
+          label="Ativar “Nicx, ligar”"
+          onClick={() => void change({ enabled: !enabled })}
+        />
+      </SettingRow>
+      <SettingRow
+        label="Escuta"
+        description={
+          status && !status.window_supported
+            ? 'Sem janela flutuante neste computador: a interface abre no navegador.'
+            : 'Diga “tchau” ou “desligar” para o mascote sair; ele também some após 1 minuto em silêncio.'
+        }
+      >
+        <div className="flex items-center gap-2">
+          <span
+            className="w-2 h-2 rounded-full"
+            style={{
+              background: status?.running ? 'var(--color-success)' : 'var(--color-text-tertiary)',
+            }}
+          />
+          <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }} data-testid="wake-state">
+            {stateLabel}
+          </span>
+        </div>
+      </SettingRow>
+      {status?.autostart_supported && (
+        <SettingRow label="Iniciar com o Windows" description="Começa a escutar quando você entra no Windows (só se a opção acima estiver ativada)">
+          <Toggle
+            on={status.autostart}
+            disabled={saving}
+            label="Iniciar com o Windows"
+            onClick={() => void change({ autostart: !status.autostart })}
+          />
+        </SettingRow>
+      )}
+      {error && status && (
+        <div className="text-xs mt-2 px-1" style={{ color: 'var(--color-error, #d33)' }}>
+          {error}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -510,12 +656,20 @@ export function SettingsPage() {
                 </span>
               </div>
             </SettingRow>
-            <SettingRow label="API URL" description="Set if backend runs on a different port or host">
+            <SettingRow
+              label="Endereço do servidor"
+              description={
+                settings.apiUrl && !/^https?:\/\/[^\s/]+/i.test(settings.apiUrl.trim())
+                  ? 'Isso não é um endereço (precisa começar com http://). Deixe em branco para usar o padrão.'
+                  : 'Deixe em branco. Só mude se o servidor do Nicx rodar em outra porta ou máquina.'
+              }
+            >
               <input
-                type="text"
+                type="url"
                 value={settings.apiUrl}
                 onChange={(e) => { updateSettings({ apiUrl: e.target.value }); showSaved(); }}
-                placeholder="http://localhost:8000"
+                placeholder="em branco = padrão"
+                aria-invalid={Boolean(settings.apiUrl) && !/^https?:\/\/[^\s/]+/i.test(settings.apiUrl.trim())}
                 className="text-sm px-3 py-1.5 rounded-lg outline-none w-56"
                 style={{
                   background: 'var(--color-bg-secondary)',
@@ -817,6 +971,7 @@ export function SettingsPage() {
                 />
               </button>
             </SettingRow>
+            <WakeWordSettings onSaved={showSaved} />
             <SettingRow label="Voz do Nicx" description="Mecanismo e voz usados nas respostas faladas">
               <div className="flex items-center gap-2">
                 <span
