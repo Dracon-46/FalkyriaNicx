@@ -129,6 +129,9 @@ class FasterWhisperBackend(SpeechBackend):
                 self._model_size,
                 device=self._device,
                 compute_type=compute_type,
+                # CTranslate2 defaults to 4 threads; "small" with 8 was ~15%
+                # faster here (12 cores), more brings little.
+                cpu_threads=min(8, os.cpu_count() or 4),
             )
         self._last_error = None
         return self._model

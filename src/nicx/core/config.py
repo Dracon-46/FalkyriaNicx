@@ -1641,10 +1641,12 @@ class SpeechConfig:
     """
 
     backend: str = "auto"  # "auto", "faster-whisper", "openai", "deepgram"
-    # Whisper model size: tiny, base, small, medium, large-v3. On CPU, "base"
-    # transcribes a 4 s phrase in ~1 s; "small" is a bit more accurate on
-    # real-world speech but ~3x slower and needs ~2x the RAM.
-    model: str = "base"
+    # Whisper model size: tiny, base, small, medium, large-v3. On a laptop mic
+    # "base" mangled names and short questions ("Nicx, que horas são?" came out
+    # as "Nicx Falkyria"); "small" got them right at ~3.5 s per phrase on CPU,
+    # small next to the model's reply time. The "Nicx, ligar" listener keeps
+    # its own, faster "base" ([speech] wake_model).
+    model: str = "small"
     language: str = "pt"  # ISO 639-1 code; empty = auto-detect
     device: str = "auto"  # "auto", "cpu", "cuda"
     # "int8" runs on every CPU (and on CUDA); "float16" needs a GPU.

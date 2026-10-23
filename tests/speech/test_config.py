@@ -7,7 +7,7 @@ def test_speech_config_defaults():
     """Defaults target Brazilian Portuguese on a CPU-only machine."""
     cfg = SpeechConfig()
     assert cfg.backend == "auto"
-    assert cfg.model == "base"
+    assert cfg.model == "small"
     assert cfg.language == "pt"
     assert cfg.device == "auto"
     assert cfg.compute_type == "int8"
