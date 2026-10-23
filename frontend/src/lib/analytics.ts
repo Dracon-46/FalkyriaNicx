@@ -210,6 +210,9 @@ export async function fetchLegalDocument(name: LegalDocument): Promise<string> {
     throw new Error(await errorDetail(response, 'Não foi possível carregar o documento.'));
   }
   const text = await response.text();
+  if (/^\s*</.test(text)) {
+    throw new Error('Não foi possível carregar o documento. Verifique se o Nicx está rodando.');
+  }
   legalCache.set(name, text);
   return text;
 }

@@ -112,7 +112,16 @@ export const apiFetch = (
   const headers = authHeaders(
     (init.headers as Record<string, string> | undefined) ?? {},
   );
-  return fetch(`${getBase()}${path}`, { ...init, headers });
+  return fetch(`${getBase()}${path}`, { ...init, headers }).then((response) => {
+    // The API never answers with HTML. If it does, a dev server answered for
+    // the backend (e.g. Vite's SPA fallback while the backend is still
+    // starting): treat it as unreachable instead of as a successful reply.
+    const type = response.headers.get('content-type') ?? '';
+    if (type.includes('text/html')) {
+      throw new TypeError('Nicx server unavailable (HTML response from the API)');
+    }
+    return response;
+  });
 };
 
 async function tauriInvoke<T>(command: string, args: Record<string, unknown> = {}): Promise<T> {

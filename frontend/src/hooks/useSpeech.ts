@@ -53,11 +53,26 @@ export function useSpeech() {
   const streamRef = useRef<MediaStream | null>(null);
   const meterRef = useRef<Meter | null>(null);
 
-  // Check if speech backend is available on mount
+  // Check if the speech backend is available, and keep checking while it is
+  // not: the server may still be starting (it loads the voice models).
   useEffect(() => {
-    fetchSpeechHealth()
-      .then((health) => setAvailable(health.available))
-      .catch(() => setAvailable(false));
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const check = () => {
+      fetchSpeechHealth()
+        .then((health) => health.available)
+        .catch(() => false)
+        .then((ok) => {
+          if (cancelled) return;
+          setAvailable(ok);
+          if (!ok) timer = setTimeout(check, 5000);
+        });
+    };
+    check();
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   const stopMeter = useCallback(() => {
