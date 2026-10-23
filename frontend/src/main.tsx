@@ -9,6 +9,15 @@ import { initApiBase } from './lib/api';
 import { initAnalytics } from './lib/analytics';
 import './index.css';
 
+// "localhost" and "127.0.0.1" are different origins with separate storage, so
+// settings and conversations would seem to vanish when switching between them.
+// Always use 127.0.0.1, the address `nicx gui` and `nicx start` open.
+if (window.location.hostname === 'localhost') {
+  const url = new URL(window.location.href);
+  url.hostname = '127.0.0.1';
+  window.location.replace(url.toString());
+}
+
 function applyTheme() {
   try {
     const raw = localStorage.getItem('nicx-settings');

@@ -1146,6 +1146,31 @@ async def list_models(request: Request) -> ModelListResponse:
     )
 
 
+def _ollama_host(engine) -> str | None:
+    """Find the Ollama engine behind wrappers and multi-engine routing.
+
+    The served engine is usually wrapped (security guardrails, telemetry) and,
+    with several engines available, is a ``MultiEngine``; a plain
+    ``engine_id`` check would miss the Ollama engine inside.
+    """
+    from nicx.engine._stubs import InferenceEngine
+
+    stack, seen = [engine], set()
+    while stack:
+        current = stack.pop()
+        if current is None or id(current) in seen:
+            continue
+        seen.add(id(current))
+        if getattr(current, "engine_id", "") == "ollama":
+            return getattr(current, "_host", None) or "http://localhost:11434"
+        inner = [getattr(current, attr, None) for attr in ("_engine", "_inner")]
+        engines = getattr(current, "_engines", None)
+        if isinstance(engines, (list, tuple)):
+            inner += [item[1] if isinstance(item, tuple) else item for item in engines]
+        stack.extend(e for e in inner if isinstance(e, InferenceEngine))
+    return None
+
+
 @router.post("/v1/models/pull")
 async def pull_model(request: Request):
     """Pull / download a model from the Ollama registry."""
@@ -1154,10 +1179,9 @@ async def pull_model(request: Request):
     if not model_name:
         raise HTTPException(status_code=400, detail="'model' field is required")
 
-    engine = request.app.state.engine
-    engine_name = getattr(request.app.state, "engine_name", "")
     # Only Ollama supports pulling
-    if engine_name != "ollama" and getattr(engine, "engine_id", "") != "ollama":
+    host = _ollama_host(request.app.state.engine)
+    if host is None:
         raise HTTPException(
             status_code=501,
             detail="Model pulling is only supported with the Ollama engine",
@@ -1165,7 +1189,6 @@ async def pull_model(request: Request):
 
     import httpx as _httpx
 
-    host = getattr(engine, "_host", "http://localhost:11434")
     try:
         async with _httpx.AsyncClient(base_url=host, timeout=600.0) as client:
             resp = await client.post(
@@ -1187,14 +1210,12 @@ async def pull_model(request: Request):
 @router.delete("/v1/models/{model_name:path}")
 async def delete_model(model_name: str, request: Request):
     """Delete a model from Ollama."""
-    engine = request.app.state.engine
-    engine_name = getattr(request.app.state, "engine_name", "")
-    if engine_name != "ollama" and getattr(engine, "engine_id", "") != "ollama":
+    host = _ollama_host(request.app.state.engine)
+    if host is None:
         raise HTTPException(status_code=501, detail="Only supported with Ollama engine")
 
     import httpx as _httpx
 
-    host = getattr(engine, "_host", "http://localhost:11434")
     try:
         async with _httpx.AsyncClient(base_url=host, timeout=30.0) as client:
             resp = await client.request(

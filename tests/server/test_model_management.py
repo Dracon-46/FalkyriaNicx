@@ -313,3 +313,27 @@ class TestModelsEndpointExtended:
         assert resp.status_code == 200
         assert [m["id"] for m in resp.json()["data"]] == ["qwen3.5:4b"]
         mock_to_thread.assert_awaited_once_with(engine.list_models)
+
+
+class TestOllamaBehindWrappers:
+    """The served engine is usually a guarded MultiEngine; pulls must still work."""
+
+    def test_pull_finds_ollama_inside_guarded_multi_engine(self):
+        from nicx.engine.multi import MultiEngine
+        from nicx.engine.ollama import OllamaEngine
+        from nicx.security.guardrails import GuardrailsEngine
+
+        ollama = OllamaEngine(host="http://ollama.test:11434")
+        with patch.object(OllamaEngine, "list_models", return_value=["qwen3.5:4b"]):
+            multi = MultiEngine([("ollama", ollama)])
+        guarded = GuardrailsEngine(multi, scanners=[])
+        client = TestClient(_app(guarded, engine_name="multi"))
+
+        mock_resp = MagicMock(status_code=200, raise_for_status=MagicMock())
+        with patch("httpx.AsyncClient") as MockClient:
+            instance = MockClient.return_value.__aenter__.return_value
+            instance.post = AsyncMock(return_value=mock_resp)
+            resp = client.post("/v1/models/pull", json={"model": "qwen3.5:0.8b"})
+
+        assert resp.status_code == 200, resp.text
+        assert MockClient.call_args.kwargs["base_url"] == "http://ollama.test:11434"

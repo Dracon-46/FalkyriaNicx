@@ -21,7 +21,7 @@ programa de linha de comando, o app desktop e a interface no navegador.
 A **Falkyria** é a controladora dos dados descritos nesta política, nos termos
 da Lei Geral de Proteção de Dados (Lei nº 13.709/2018, "LGPD").
 
-Contato para assuntos de privacidade: **[definir e-mail de contato da Falkyria]**.
+Contato para assuntos de privacidade: **arthurgaspare@gmail.com**.
 
 ## 2. O que fica apenas no seu computador
 

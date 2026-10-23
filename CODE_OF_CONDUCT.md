@@ -40,8 +40,7 @@ nacionalidade, religião ou condição socioeconômica.
 
 ## Como relatar
 
-Se você presenciar ou sofrer uma violação, relate a **[definir e-mail de
-contato da Falkyria]**. Todos os relatos serão tratados com sigilo, analisados
+Se você presenciar ou sofrer uma violação, relate a **arthurgaspare@gmail.com**. Todos os relatos serão tratados com sigilo, analisados
 com seriedade e respondidos o mais rápido possível. Não haverá retaliação
 contra quem relatar de boa-fé.
 

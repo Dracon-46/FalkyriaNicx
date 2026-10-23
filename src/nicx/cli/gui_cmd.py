@@ -33,6 +33,8 @@ _FRONTEND_STATE_FILE = DEFAULT_CONFIG_DIR / "frontend.json"
 
 # How often to re-check that the API is still up while the frontend runs.
 _API_POLL_SECONDS = 5.0
+# How long to wait for the API before opening the browser anyway.
+_API_READY_TIMEOUT_SECONDS = 120.0
 
 # How many consecutive failed probes mean the API is really gone. A single
 # failure proves nothing: a loopback connect to a busy server intermittently
@@ -570,6 +572,20 @@ def gui(frontend_port: int, api_port: int, no_server: bool, no_browser: bool) ->
                 "The graphical frontend did not start on the requested port."
             )
         owner.refresh()
+        if not no_server:
+            # Opening the page before the API answers makes the app cache a
+            # "server unavailable" state (voice, consent, models). The server
+            # may take a while: it loads the speech models on startup.
+            console.print("Esperando o servidor do Nicx ficar pronto...")
+            deadline = time.monotonic() + _API_READY_TIMEOUT_SECONDS
+            while not _api_healthy(api_port, timeout=2.0):
+                if time.monotonic() > deadline:
+                    console.print(
+                        "[yellow]O servidor ainda não respondeu; abrindo a "
+                        "interface assim mesmo.[/yellow]"
+                    )
+                    break
+                time.sleep(1.0)
         url = f"http://127.0.0.1:{frontend_port}"
         console.print(f"[green]Nicx graphical mode is ready:[/green] {url}")
         if not no_browser:
