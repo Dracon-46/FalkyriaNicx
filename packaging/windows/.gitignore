@@ -1,0 +1,3 @@
+# Saídas do build-installer.ps1 (wheels, imagens geradas, NicxSetup.exe)
+/build/
+/dist/
