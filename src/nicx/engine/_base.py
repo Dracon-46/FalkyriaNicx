@@ -26,6 +26,31 @@ class EngineContextLengthError(EngineConnectionError):
     is_context_length_error: bool = True
 
 
+class EngineRequestError(EngineConnectionError, RuntimeError):
+    """The engine was reached but failed the request (an HTTP error status).
+
+    Both an ``EngineConnectionError`` and a ``RuntimeError`` (what engines
+    raised for these before), so handlers written for either keep catching
+    it. The engine's raw error body is kept in ``detail``.
+    """
+
+    def __init__(
+        self, message: str, *, status: int | None = None, detail: str = ""
+    ) -> None:
+        super().__init__(message)
+        self.status = status
+        self.detail = detail
+
+
+class EngineOutOfMemoryError(EngineRequestError):
+    """The engine could not allocate memory to load or run the model.
+
+    The message is meant for the user and says what to do about it.
+    """
+
+    is_out_of_memory_error: bool = True
+
+
 # Substrings that identify an error body as a context-window overflow (vLLM,
 # SGLang, and OpenAI-compatible servers phrase this a few different ways).
 # Every marker is anchored on "context" on purpose: generic phrases like
@@ -123,6 +148,8 @@ __all__ = [
     "CONTEXT_LENGTH_MARKERS",
     "EngineConnectionError",
     "EngineContextLengthError",
+    "EngineOutOfMemoryError",
+    "EngineRequestError",
     "InferenceEngine",
     "estimate_prompt_tokens",
     "looks_like_context_length_error",

@@ -338,6 +338,18 @@ _SPECS: tuple[EventSpec, ...] = (
             "setting_key": _is_short_str,
         },
     ),
+    # -- Consent ----------------------------------------------------------
+    EventSpec(
+        name="analytics_consent",
+        description=(
+            "The user granted or revoked analytics consent. Proof of consent "
+            "for LGPD; records the privacy policy version shown."
+        ),
+        properties={
+            "granted": _is_bool,
+            "policy_version": _is_short_str,
+        },
+    ),
     # -- Daily rollup ------------------------------------------------------
     EventSpec(
         name="usage_daily_summary",

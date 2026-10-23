@@ -46,7 +46,7 @@ def test_terminal_choice(monkeypatch, capsys, answer: str, enabled: bool) -> Non
     stream = TerminalInput(answer)
     use_input(monkeypatch, stream)
     assert _analytics_consent.ask_analytics_consent() is enabled
-    assert "Press Enter or Y to consent, or N to decline" in capsys.readouterr().err
+    assert _analytics_consent.PROMPT.strip() in capsys.readouterr().err
 
 
 def test_redirected_input_never_consents(monkeypatch) -> None:

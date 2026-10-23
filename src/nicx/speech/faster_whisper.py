@@ -34,10 +34,19 @@ class FasterWhisperBackend(SpeechBackend):
         model_size: str = "base",
         device: str = "auto",
         compute_type: str = "float16",
+        *,
+        vad_filter: bool = False,
+        hotwords: str = "",
     ) -> None:
         self._model_size = model_size
         self._device = device
         self._compute_type = compute_type
+        # Silero VAD drops silent stretches before decoding. Without it Whisper
+        # can spend 10+ s on a silent clip, or invent text for it.
+        self._vad_filter = vad_filter
+        # Proper nouns the model should prefer when it hears something close
+        # (e.g. "Nicx" instead of "Unix").
+        self._hotwords = hotwords.strip()
         self._model: Optional[WhisperModel] = None
         self._last_error: Optional[str] = None
 
@@ -116,9 +125,13 @@ class FasterWhisperBackend(SpeechBackend):
                 with tmp:
                     tmp.write(audio)
 
-                kwargs = {}
+                kwargs: dict = {}
                 if language:
                     kwargs["language"] = language
+                if self._vad_filter:
+                    kwargs["vad_filter"] = True
+                if self._hotwords:
+                    kwargs["hotwords"] = self._hotwords
 
                 segments_iter, info = model.transcribe(tmp.name, **kwargs)
                 segments_list = list(segments_iter)

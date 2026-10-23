@@ -56,11 +56,12 @@ def test_identity_gates_frontend_and_id_creation(
 
 
 def test_enabled_without_destination_sends_nothing(tmp_path, monkeypatch) -> None:
-    """Nicx ships with no analytics destination: consent alone never sends."""
+    """Consent alone never sends when no destination is configured."""
     init_sdk = MagicMock()
     monkeypatch.setattr(AnalyticsClient, "_init_sdk", init_sdk)
-    cfg = AnalyticsConfig(enabled=True, anon_id_path=str(tmp_path / "anon_id"))
-    assert cfg.host == "" and cfg.key == ""
+    cfg = AnalyticsConfig(
+        enabled=True, host="", key="", anon_id_path=str(tmp_path / "anon_id")
+    )
     client = AnalyticsClient(cfg)
     client.capture("app_opened", {"platform": "cli"})
     assert not client.enabled

@@ -12,6 +12,8 @@ import nicx.engine.openai_compat_engines  # noqa: F401
 from nicx.engine._base import (
     EngineConnectionError,
     EngineContextLengthError,
+    EngineOutOfMemoryError,
+    EngineRequestError,
     InferenceEngine,
     looks_like_context_length_error,
     messages_to_dicts,
@@ -41,6 +43,8 @@ _register_optional_engines()
 __all__ = [
     "EngineConnectionError",
     "EngineContextLengthError",
+    "EngineOutOfMemoryError",
+    "EngineRequestError",
     "InferenceEngine",
     "discover_engines",
     "discover_models",

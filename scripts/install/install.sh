@@ -249,15 +249,14 @@ fi
 
 # ---- analytics consent and install beacons ----
 #
-# Posts a small JSON event to PostHog at each install stage so the
-# Nicx team can see where users drop off during install.
-# Install payloads contain OS, arch, elapsed time, stage name, and a
-# random installation ID. Beacons are disabled until consent is given.
-#
-# Nicx ships with no analytics destination: without both values set there
-# is no prompt and nothing is sent.
-ANALYTICS_HOST="${NICX_ANALYTICS_HOST:-}"
-ANALYTICS_KEY="${NICX_ANALYTICS_KEY:-}"
+# Posts a small JSON event to Falkyria's Supabase at each install stage so
+# the team can see where installs fail. Payloads contain OS, arch, elapsed
+# time, stage name, and a random installation ID. Beacons are disabled
+# until consent is given; without a destination there is no prompt at all.
+# The publishable key is public by design: row level security only lets it
+# insert events.
+ANALYTICS_HOST="${NICX_ANALYTICS_HOST-https://xcazupxhoeoogcksymzg.supabase.co}"
+ANALYTICS_KEY="${NICX_ANALYTICS_KEY-sb_publishable_udh4J44z3XxDaXlGTYbaIA_iT9NcTQD}"
 ANON_ID_FILE="$NICX_HOME/anon_id"
 INSTALL_START_EPOCH="$(date +%s)"
 CURRENT_STAGE=""
@@ -277,37 +276,41 @@ choose_analytics() {
         --no-analytics) return ;;
     esac
     if [[ ! -t 2 ]] || ! { exec 3<> /dev/tty; } 2>/dev/null; then
-        echo "Analytics are off (no interactive terminal). Use --analytics to opt in." >&2
+        echo "Estatísticas desligadas (sem terminal interativo). Use --analytics para aceitar." >&2
         return
     fi
 
     cat >&3 <<'EOF'
 
-Help improve Nicx by sharing optional install and usage statistics.
-Data includes installation and feature usage, timings, token counts, error
-categories, environment metadata, and a random installation ID.
-Recipient: the Nicx team's PostHog analytics endpoint.
-Privacy details: https://github.com/Dracon-46/FalkyriaNicx/blob/main/docs/telemetry.md
-You can disable sharing later: nicx config set analytics.enabled false
-(then restart the server and reload the app).
-Declining does not change Nicx functionality.
+Ajude a melhorar o Nicx
+
+Com a sua permissão, o Nicx envia à Falkyria estatísticas anônimas de uso:
+quais recursos você usa, tempos de resposta, contagem de tokens, tipos de erro,
+versão e sistema operacional, ligados a um código aleatório desta instalação.
+
+Nunca enviamos suas conversas, arquivos, nome ou e-mail. Os dados ficam em
+servidores no Brasil e são apagados após 24 meses.
+
+É opcional: recusar não muda nada no Nicx. Para mudar depois:
+nicx config set analytics.enabled false
+Política de privacidade completa: nicx legal privacidade
 EOF
-    printf 'Analytics destination: %s\n' "$ANALYTICS_HOST" >&3
+    printf 'Destino dos dados: %s\n' "$ANALYTICS_HOST" >&3
     local answer
     while true; do
-        printf 'Press Enter or Y to consent, or N to decline: ' >&3
+        printf 'Aperte Enter ou S para aceitar, ou N para recusar: ' >&3
         if ! IFS= read -r answer <&3; then
-            printf '\nAnalytics are off (no answer received).\n' >&3
+            printf '\nEstatísticas desligadas (nenhuma resposta).\n' >&3
             break
         fi
         case "$answer" in
-            ""|y|Y|yes|YES|Yes)
+            ""|s|S|sim|SIM|Sim|y|Y|yes|YES|Yes)
                 ANALYTICS_ENABLED=1
                 ANALYTICS_CHOICE="--analytics"
                 break
                 ;;
-            n|N|no|NO|No) ANALYTICS_CHOICE="--no-analytics"; break ;;
-            *) printf 'Please press Enter, type Y, or type N.\n' >&3 ;;
+            n|N|nao|NAO|Nao|não|Não|NÃO|no|NO|No) ANALYTICS_CHOICE="--no-analytics"; break ;;
+            *) printf 'Aperte Enter, digite S ou digite N.\n' >&3 ;;
         esac
     done
     exec 3>&-
@@ -443,17 +446,27 @@ beacon() {
     fi
 
     local payload
-    payload="{\"api_key\":\"$ANALYTICS_KEY\",\"event\":\"$event\",\"distinct_id\":\"$anon_id\",\"properties\":{$props}}"
+    payload="{\"anon_id\":\"$anon_id\",\"event\":\"$event\",\"properties\":{$props},\"platform\":\"installer\",\"os\":\"$os\",\"arch\":\"$arch\",\"app_version\":\"installer-0.1.1\"}"
+
+    # Legacy anon keys are JWTs and also go in the bearer header; the newer
+    # sb_publishable_ keys must not.
+    local auth=()
+    if [[ "$ANALYTICS_KEY" == eyJ* ]]; then
+        auth=(-H "Authorization: Bearer $ANALYTICS_KEY")
+    fi
 
     # Fire and forget. `|| true` is load-bearing: the script runs under
-    # `set -e` via the ERR trap, and we never want a flaky PostHog post
+    # `set -e` via the ERR trap, and we never want a flaky analytics post
     # to abort an install. The trap is already installed; without the
     # explicit `|| true` a 5xx or DNS failure would tickle it.
     curl -s -X POST \
         -H 'Content-Type: application/json' \
+        -H "apikey: $ANALYTICS_KEY" \
+        -H 'Prefer: return=minimal' \
+        "${auth[@]}" \
         -d "$payload" \
         --max-time 5 \
-        "${ANALYTICS_HOST}/i/v0/e/" \
+        "${ANALYTICS_HOST}/rest/v1/nicx_events" \
         >/dev/null 2>&1 || true
 }
 

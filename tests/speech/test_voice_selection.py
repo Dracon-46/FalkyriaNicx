@@ -61,7 +61,7 @@ def test_cartesia_voice_routes_back_to_cartesia_only():
     session = _session(tts_backend="cartesia", voice_id="a-cartesia-uuid")
     assert session.voice_for_backend(_Backend("cartesia"))[0] == "a-cartesia-uuid"
     # ...and must not be handed to Kokoro, which would mis-map its lang code.
-    assert session.voice_for_backend(_Backend("kokoro"))[0] == "bm_george"
+    assert session.voice_for_backend(_Backend("kokoro"))[0] == "pf_dora"
 
 
 def test_zero_speed_is_not_silently_rewritten():
@@ -142,7 +142,41 @@ def test_synthesis_failure_falls_back_without_retrying_or_leaking_voice(monkeypa
     assert checked == ["openai_tts", "kokoro"]
     assert spoken == [
         ("openai_tts", "nova"),
-        ("kokoro", "bm_george"),
-        ("kokoro", "bm_george"),
+        ("kokoro", "pf_dora"),
+        ("kokoro", "pf_dora"),
     ]
     assert played == [b"wav", b"wav"]
+
+
+def test_prewarm_loads_backends_once_in_the_background(monkeypatch):
+    import threading
+
+    import nicx.speech._discovery as stt_discovery
+    import nicx.speech._tts_discovery as tts_discovery
+
+    release = threading.Event()
+    calls = {"stt": 0, "tts": 0}
+
+    def slow_stt(config):
+        calls["stt"] += 1
+        return _Backend("faster-whisper")
+
+    def slow_tts(preferred, *, attempted=None):
+        calls["tts"] += 1
+        release.wait(5)
+        return _Backend(preferred)
+
+    monkeypatch.setattr(stt_discovery, "get_speech_backend", slow_stt)
+    monkeypatch.setattr(tts_discovery, "get_tts_backend", slow_tts)
+
+    session = _session()
+    session.prewarm()
+    # The chat loop asking meanwhile waits for the same load, not a second one.
+    waiter = threading.Thread(target=session.get_tts_backend)
+    waiter.start()
+    release.set()
+    waiter.join(5)
+
+    assert session.get_tts_backend().backend_id == "kokoro"
+    assert session.get_stt_backend().backend_id == "faster-whisper"
+    assert calls == {"stt": 1, "tts": 1}

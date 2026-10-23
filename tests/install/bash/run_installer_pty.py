@@ -51,7 +51,9 @@ def main() -> int:
                     break
                 output.extend(chunk)
                 prompts = output.count(
-                    b"Press Enter or Y to consent, or N to decline: "
+                    "Aperte Enter ou S para aceitar, ou N para recusar: ".encode(
+                        "utf-8"
+                    )
                 )
                 if prompts > answered and answered < len(answers):
                     os.write(master, answers[answered].encode())

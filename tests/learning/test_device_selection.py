@@ -11,14 +11,14 @@ class TestSelectTorchDevice:
     returns None when torch is absent).
     """
 
-    def test_no_torch_returns_none(self):
+    def test_no_torch_returns_none(self, monkeypatch):
         """Without torch, _select_torch_device returns None."""
-        from nicx.learning.intelligence.orchestrator.sft_trainer import (
-            _select_torch_device,
-        )
+        from nicx.learning.intelligence.orchestrator import sft_trainer
 
-        # torch is not installed in test env, so HAS_TORCH is False
-        assert _select_torch_device() is None
+        # torch may be installed (the voice extra brings it), so simulate
+        # its absence instead of relying on the environment.
+        monkeypatch.setattr(sft_trainer, "HAS_TORCH", False)
+        assert sft_trainer._select_torch_device() is None
 
     def test_cuda_preferred(self):
         """CUDA is selected when available (logic test)."""

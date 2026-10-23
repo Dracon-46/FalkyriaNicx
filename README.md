@@ -1,4 +1,6 @@
 <div align="center">
+  <img alt="Nicx, o slime ciano com um núcleo azul" src="assets/nicx-mascot.svg" width="180">
+  <br>
   <img alt="Nicx" src="assets/Nicx_Horizontal_Logo.png" width="400">
 
   <p><i>A inteligência artificial da Falkyria.</i></p>

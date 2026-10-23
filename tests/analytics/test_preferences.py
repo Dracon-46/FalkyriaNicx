@@ -31,7 +31,7 @@ def preference_app(tmp_path: Path, monkeypatch):
     cfg.analytics.key = "phc_test"
 
     def fake_sdk(client):
-        client._posthog = MagicMock()
+        client._sink = MagicMock()
 
     monkeypatch.setattr(AnalyticsClient, "_init_sdk", fake_sdk)
     app = FastAPI()
@@ -53,16 +53,19 @@ def test_enable_and_disable_apply_immediately_and_survive_reload(preference_app)
     assert response.json()["enabled"] is True
     assert response.json()["choice_recorded"] is True
     assert response.json()["key"]
-    sdk = app.state.analytics_client._posthog
+    sdk = app.state.analytics_client._sink
     closed = threading.Event()
     sdk.shutdown.side_effect = closed.set
     # Re-saving an enabled choice must not replace a working sender.
     assert (
         http.post("/v1/analytics/preference", json={"enabled": True}).status_code == 200
     )
-    assert app.state.analytics_client._posthog is sdk
+    assert app.state.analytics_client._sink is sdk
     app.state.bus.publish(EventType.FEEDBACK_RECEIVED, {"rating": 1})
-    assert sdk.capture.call_count == 1
+    # The consent record comes first, then the feedback event.
+    events = [call.args[1] for call in sdk.capture.call_args_list]
+    assert events == ["analytics_consent", "feedback_submitted"]
+    assert sdk.capture.call_args_list[0].args[2]["granted"] is True
 
     response = http.post("/v1/analytics/preference", json={"enabled": False})
     assert response.status_code == 200
@@ -74,7 +77,10 @@ def test_enable_and_disable_apply_immediately_and_survive_reload(preference_app)
     assert closed.wait(timeout=2)
     sdk.shutdown.assert_called_once()
     app.state.bus.publish(EventType.FEEDBACK_RECEIVED, {"rating": 2})
-    assert sdk.capture.call_count == 1
+    # Only the revocation record is sent after the choice; nothing afterwards.
+    events = [call.args[1] for call in sdk.capture.call_args_list]
+    assert events == ["analytics_consent", "feedback_submitted", "analytics_consent"]
+    assert sdk.capture.call_args_list[-1].args[2]["granted"] is False
     loaded = load_config(path)
     assert loaded.analytics.enabled is False
     assert loaded.analytics.choice_recorded is True
@@ -144,7 +150,7 @@ def test_decline_does_not_wait_for_an_unreachable_analytics_server(preference_ap
     assert (
         http.post("/v1/analytics/preference", json={"enabled": True}).status_code == 200
     )
-    sdk = app.state.analytics_client._posthog
+    sdk = app.state.analytics_client._sink
     release = threading.Event()
     sdk.flush.side_effect = lambda: release.wait(5)
     try:

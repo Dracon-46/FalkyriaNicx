@@ -32,12 +32,12 @@ export function SpeakMessageButton({ messageId, content }: Props) {
         title={
           messageError ||
           (isMine && state === 'loading'
-            ? 'Synthesizing...'
+            ? 'Gerando a voz...'
             : isMine && state === 'speaking'
-              ? 'Stop'
-              : 'Read aloud')
+              ? 'Parar'
+              : 'Ler em voz alta')
         }
-        aria-label={busy ? 'Stop reading message' : 'Read message aloud'}
+        aria-label={busy ? 'Parar a leitura' : 'Ler a mensagem em voz alta'}
       >
         {busy ? <Square size={14} /> : <Volume2 size={14} />}
       </button>

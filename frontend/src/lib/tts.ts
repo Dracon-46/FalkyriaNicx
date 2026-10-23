@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { synthesizeSpeech, fetchTtsHealth } from './api';
 import { toSpeakableText } from './message-text';
+import { useMascot } from './mascot';
+import { LEVEL_FPS, LEVEL_INTERVAL_MS, wavEnvelope } from './audio-level';
 
 export type TtsState = 'idle' | 'loading' | 'speaking';
 
@@ -35,6 +37,50 @@ let objectUrl: string | null = null;
 let controller: AbortController | null = null;
 let token = 0;
 let healthProbe: Promise<void> | null = null;
+let levelTimer: ReturnType<typeof setInterval> | null = null;
+
+/**
+ * While an utterance plays, the mascot is `speaking` and its level follows the
+ * audio: the WAV's loudness envelope is precomputed and looked up from
+ * `currentTime`, so playback never has to go through Web Audio. Until the
+ * envelope is ready (or if the audio is not a readable WAV) a gentle wobble
+ * stands in.
+ */
+function startSpeakingMood(el: HTMLAudioElement, blob: Blob, mine: number): void {
+  stopSpeakingLevels();
+  useMascot.getState().setMood('speaking');
+
+  let envelope: number[] | null = null;
+  blob
+    .arrayBuffer()
+    .then((buf) => {
+      if (mine === token) envelope = wavEnvelope(buf);
+    })
+    .catch(() => {});
+
+  const started = Date.now();
+  levelTimer = setInterval(() => {
+    const t = Number.isFinite(el.currentTime) ? el.currentTime : (Date.now() - started) / 1000;
+    const level = envelope
+      ? (envelope[Math.floor(t * LEVEL_FPS)] ?? 0)
+      : 0.35 + 0.25 * Math.sin(t * 14) * Math.sin(t * 3.1);
+    useMascot.getState().setLevel(level);
+  }, LEVEL_INTERVAL_MS);
+}
+
+function stopSpeakingLevels(): void {
+  if (levelTimer) {
+    clearInterval(levelTimer);
+    levelTimer = null;
+  }
+}
+
+/** Leave the mascot alone if the chat flow changed its mood meanwhile. */
+function endSpeakingMood(): void {
+  stopSpeakingLevels();
+  const mascot = useMascot.getState();
+  if (mascot.mood === 'speaking') mascot.setMood('idle');
+}
 
 /** Only a stream ending in the active conversation may trigger autoplay. */
 export function shouldAutoplayFinishedReply(
@@ -53,6 +99,7 @@ export function shouldAutoplayFinishedReply(
 }
 
 function teardown(): void {
+  endSpeakingMood();
   if (audio) {
     // Detach first: clearing src re-runs the media load algorithm, which fails
     // on an empty source and dispatches an `error` event. With the handler
@@ -129,11 +176,14 @@ export const useTtsStore = create<TtsStore>((set, get) => ({
       el.onerror = () => {
         if (mine !== token) return;
         teardown();
-        set({ state: 'idle', speakingId: null, error: 'Playback failed', errorId: id });
+        set({ state: 'idle', speakingId: null, error: 'Falha ao reproduzir o áudio', errorId: id });
       };
 
       await el.play();
-      if (mine === token) set({ state: 'speaking', speakingId: id });
+      if (mine === token) {
+        set({ state: 'speaking', speakingId: id });
+        startSpeakingMood(el, blob, mine);
+      }
     } catch (err) {
       if (mine !== token) return;
       if (err instanceof DOMException && err.name === 'AbortError') return;
@@ -141,7 +191,7 @@ export const useTtsStore = create<TtsStore>((set, get) => ({
       set({
         state: 'idle',
         speakingId: null,
-        error: err instanceof Error ? err.message : 'Speech synthesis failed',
+        error: err instanceof Error ? err.message : 'Falha ao sintetizar a voz',
         errorId: id,
       });
     }

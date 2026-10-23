@@ -323,8 +323,25 @@
     margin-bottom: 0.75em;
   }
 
+  /* Tailwind's preflight removes list markers; restore them for Markdown. */
+  .prose ul {
+    list-style: disc;
+  }
+
+  .prose ol {
+    list-style: decimal;
+  }
+
+  .prose ul ul {
+    list-style: circle;
+  }
+
   .prose li {
     margin-bottom: 0.25em;
+  }
+
+  .prose li::marker {
+    color: var(--color-text-tertiary);
   }
 
   .prose blockquote {

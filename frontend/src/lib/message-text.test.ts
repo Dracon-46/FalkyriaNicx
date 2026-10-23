@@ -21,7 +21,7 @@ describe('toSpeakableText', () => {
 
   it('replaces code blocks and removes emoji and think tags', () => {
     const out = toSpeakableText('<think>hmm</think>Done 😀\n```py\nprint(1)\n```');
-    expect(out).toContain('code block omitted');
+    expect(out).toContain('bloco de código omitido');
     expect(out).not.toMatch(/print|😀|think|hmm/);
   });
 

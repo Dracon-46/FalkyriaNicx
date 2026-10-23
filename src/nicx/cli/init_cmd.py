@@ -491,12 +491,12 @@ def init(
 [digest]
 enabled = true
 schedule = "0 7 * * *"
-timezone = "America/Los_Angeles"
+timezone = "America/Sao_Paulo"
 persona = "nicx"
 honorific = "sir"
-tts_backend = "cartesia"
-voice_id = "c8f7835e-28a3-4f0c-80d7-c1302ac62aae"
-voice_speed = 1.2
+tts_backend = "kokoro"
+voice_id = "pf_dora"
+voice_speed = 1.0
 sections = ["health", "messages", "calendar", "world"]
 
 [digest.health]

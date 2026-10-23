@@ -68,6 +68,56 @@ class TestOllamaGenerate:
                 )
 
 
+_OLLAMA_OOM_BODY = (
+    '{"error":"llama-server reported out-of-memory: failed to allocate '
+    'buffer of size 675551232"}'
+)
+
+
+@requires_respx
+class TestOllamaErrors:
+    def test_generate_out_of_memory_is_explained(
+        self, engine: OllamaEngine, monkeypatch
+    ) -> None:
+        from nicx.engine._base import EngineOutOfMemoryError
+
+        monkeypatch.setenv("NICX_NUM_CTX", "8192")
+        with respx.mock:
+            respx.post("http://testhost:11434/api/chat").mock(
+                return_value=httpx.Response(500, text=_OLLAMA_OOM_BODY)
+            )
+            with pytest.raises(EngineOutOfMemoryError) as excinfo:
+                engine.generate(
+                    [Message(role=Role.USER, content="Oi")], model="qwen3.5:4b"
+                )
+        err = excinfo.value
+        # Old handlers keep working: it is still a RuntimeError and an
+        # EngineConnectionError.
+        assert isinstance(err, RuntimeError)
+        assert isinstance(err, EngineConnectionError)
+        assert err.status == 500
+        assert "out-of-memory" in err.detail
+        message = str(err)
+        assert "memória" in message
+        assert "num_ctx" in message
+        assert "8192" in message and "4096" in message
+
+    def test_generate_other_http_error_is_engine_request_error(
+        self, engine: OllamaEngine
+    ) -> None:
+        from nicx.engine._base import EngineOutOfMemoryError, EngineRequestError
+
+        with respx.mock:
+            respx.post("http://testhost:11434/api/chat").mock(
+                return_value=httpx.Response(404, text='{"error":"model not found"}')
+            )
+            with pytest.raises(EngineRequestError) as excinfo:
+                engine.generate([Message(role=Role.USER, content="Oi")], model="nope")
+        assert not isinstance(excinfo.value, EngineOutOfMemoryError)
+        assert isinstance(excinfo.value, RuntimeError)
+        assert "Ollama returned 404" in str(excinfo.value)
+
+
 @requires_respx
 class TestOllamaListModels:
     def test_list_models(self, engine: OllamaEngine) -> None:
@@ -456,6 +506,20 @@ class TestOllamaStreamHttpErrorMapping:
         assert not isinstance(excinfo.value, httpx.HTTPStatusError)
         assert "500" in str(excinfo.value)
         assert "internal boom" in str(excinfo.value)
+
+    @pytest.mark.asyncio
+    async def test_stream_out_of_memory_is_explained(self) -> None:
+        from nicx.engine._base import EngineOutOfMemoryError
+
+        engine = OllamaEngine(host="http://localhost:11434")
+        engine._async_transport = self._status_transport(500, text=_OLLAMA_OOM_BODY)
+        with pytest.raises(EngineOutOfMemoryError) as excinfo:
+            async for _ in engine.stream_full(
+                [Message(role=Role.USER, content="Oi")], model="qwen3.5:4b"
+            ):
+                pass
+        assert "memória" in str(excinfo.value)
+        assert "675551232" in excinfo.value.detail
 
     @pytest.mark.asyncio
     async def test_stream_3xx_maps_to_connection_error_not_silent(self) -> None:

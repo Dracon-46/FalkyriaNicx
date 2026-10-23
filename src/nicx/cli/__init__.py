@@ -116,6 +116,7 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     from nicx.cli.gui_cmd import gui
     from nicx.cli.host_cmd import host
     from nicx.cli.init_cmd import init
+    from nicx.cli.legal_cmd import legal
     from nicx.cli.memory_cmd import memory
     from nicx.cli.mine_cmd import mine
     from nicx.cli.model import model
@@ -134,6 +135,7 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     from nicx.cli.workflow_cmd import workflow
 
     cli.add_command(init, "init")
+    cli.add_command(legal, "legal")
     cli.add_command(ask, "ask")
     cli.add_command(chat, "chat")
     cli.add_command(serve, "serve")

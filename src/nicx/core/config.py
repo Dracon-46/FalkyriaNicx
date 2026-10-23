@@ -369,6 +369,11 @@ class OllamaEngineConfig:
     """Per-engine config for Ollama."""
 
     host: str = ""
+    # Context window (tokens) requested when a caller does not choose one.
+    # The KV cache grows with it: qwen3.5:4b on CPU takes ~3.1 GB at 4096,
+    # ~3.4 GB at 8192, ~3.7 GB at 16384 and ~4.2 GB at 32768. 8192 fits a
+    # 16 GB machine with other apps open. ``NICX_NUM_CTX`` overrides it.
+    num_ctx: int = 8192
 
 
 @dataclass(slots=True)
@@ -1216,24 +1221,24 @@ class TelemetryConfig:
 
 @dataclass(slots=True)
 class AnalyticsConfig:
-    """External anonymous usage analytics (PostHog).
+    """External anonymous usage analytics, sent to Falkyria's Supabase.
 
     Separate concern from :class:`TelemetryConfig`, which stores local
     FLOPs/energy/inference metrics in SQLite. This controls anonymized
-    usage events sent to the Nicx team's PostHog instance to
-    measure setup success, retention, feature usage, and churn.
+    usage events sent, only after the user consents, to measure setup
+    success, retention, feature usage, and errors.
 
-    Backend properties are limited to declared usage metadata; external
-    SDKs may add environment metadata. See ``docs/telemetry.md`` for the
-    safeguards, destination, and sharing controls.
+    Properties are limited to the catalog in ``nicx.analytics.events``.
+    See ``docs/telemetry.md`` and ``docs/legal/politica-de-privacidade.md``.
     """
 
     enabled: bool = False
     choice_recorded: bool = False
-    # Nicx ships with no analytics destination: company data must not leave
-    # the machine. Set host/key in config.toml to point at your own instance.
-    host: str = ""
-    key: str = ""
+    # Falkyria's Supabase project. Nothing is sent until the user consents
+    # (``enabled``). The publishable key is public by design: row level
+    # security only lets it insert events (supabase/migrations/).
+    host: str = "https://xcazupxhoeoogcksymzg.supabase.co"
+    key: str = "sb_publishable_udh4J44z3XxDaXlGTYbaIA_iT9NcTQD"
     anon_id_path: str = field(default_factory=lambda: str(get_config_dir() / "anon_id"))
     flush_interval_seconds: int = 30
     flush_at_size: int = 100
@@ -1630,20 +1635,33 @@ class OperatorsConfig:
 
 @dataclass(slots=True)
 class SpeechConfig:
-    """Speech-to-text settings."""
+    """Speech settings: speech-to-text (Whisper) and text-to-speech (Kokoro).
+
+    Defaults target Brazilian Portuguese on a CPU-only machine.
+    """
 
     backend: str = "auto"  # "auto", "faster-whisper", "openai", "deepgram"
-    model: str = "base"  # Whisper model size: tiny, base, small, medium, large-v3
-    language: str = ""  # Empty = auto-detect
+    # Whisper model size: tiny, base, small, medium, large-v3. On CPU, "base"
+    # transcribes a 4 s phrase in ~1 s; "small" is a bit more accurate on
+    # real-world speech but ~3x slower and needs ~2x the RAM.
+    model: str = "base"
+    language: str = "pt"  # ISO 639-1 code; empty = auto-detect
     device: str = "auto"  # "auto", "cpu", "cuda"
-    compute_type: str = "float16"  # "float16", "int8", "float32"
+    # "int8" runs on every CPU (and on CUDA); "float16" needs a GPU.
+    compute_type: str = "int8"  # "int8", "float16", "float32"
+    # Skip silence before transcribing (Silero VAD): a silent clip takes
+    # ~0.1 s instead of 10+ s, and Whisper does not invent text for it.
+    vad_filter: bool = True
+    # Names Whisper should favor when it hears something close to them.
+    hotwords: str = "Nicx Falkyria"
     # Text-to-speech. ``voice_id`` is interpreted by ``tts_backend`` only --
     # voice IDs are not portable between backends, so if voice output falls
     # back to a different backend that backend's own default voice is used.
-    # Kokoro IDs: bm_george / bm_lewis (British male), bf_emma / bf_isabella
-    # (British female), af_* / am_* (American).
+    # Kokoro IDs: pf_dora (Brazilian Portuguese, female), pm_alex / pm_santa
+    # (Brazilian Portuguese, male); bf_* / bm_* (British), af_* / am_*
+    # (American), ef_* / em_* (Spanish), ff_siwis (French).
     tts_backend: str = "kokoro"  # "kokoro", "openai_tts", "cartesia", "elevenlabs"
-    voice_id: str = "bm_george"
+    voice_id: str = "pf_dora"
     voice_speed: float = 1.0
 
 
@@ -1758,7 +1776,7 @@ class DigestConfig:
     honorific: str = "sir"
     voice_id: str = ""
     voice_speed: float = 1.0
-    tts_backend: str = "cartesia"
+    tts_backend: str = "kokoro"  # local and free; voice_id "" = Kokoro default
     messages: DigestSectionConfig = field(
         default_factory=lambda: DigestSectionConfig(
             sources=["gmail", "slack", "google_tasks"]

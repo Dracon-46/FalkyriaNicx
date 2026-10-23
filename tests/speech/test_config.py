@@ -4,12 +4,18 @@ from nicx.core.config import NicxConfig, SpeechConfig
 
 
 def test_speech_config_defaults():
+    """Defaults target Brazilian Portuguese on a CPU-only machine."""
     cfg = SpeechConfig()
     assert cfg.backend == "auto"
     assert cfg.model == "base"
-    assert cfg.language == ""
+    assert cfg.language == "pt"
     assert cfg.device == "auto"
-    assert cfg.compute_type == "float16"
+    assert cfg.compute_type == "int8"
+    assert cfg.vad_filter is True
+    assert "Nicx" in cfg.hotwords
+    assert cfg.tts_backend == "kokoro"
+    # Kokoro's Brazilian Portuguese voices start with "p".
+    assert cfg.voice_id == "pf_dora"
 
 
 def test_nicx_config_has_speech():

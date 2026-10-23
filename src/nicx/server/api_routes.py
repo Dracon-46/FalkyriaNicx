@@ -1003,6 +1003,12 @@ async def transcribe_speech(request: Request):
 
     audio_bytes = await audio_file.read()
     language = form.get("language")
+    if not language:
+        # The desktop app and the web UI upload audio without a language, so
+        # use the configured one (Nicx defaults to "pt"); empty = auto-detect.
+        config = getattr(request.app.state, "config", None)
+        speech_cfg = getattr(config, "speech", None)
+        language = (getattr(speech_cfg, "language", "") or "").strip()
 
     # Detect format from filename
     filename = getattr(audio_file, "filename", "audio.wav")

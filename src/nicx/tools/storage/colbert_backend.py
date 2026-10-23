@@ -11,8 +11,19 @@ Requires the ``colbert-ai`` and ``torch`` packages::
 
 from __future__ import annotations
 
+import importlib.util
 import uuid
 from typing import Any, Dict, List, Optional, Tuple
+
+# Check for colbert-ai before importing torch: torch is also installed by the
+# voice extra (Kokoro), and importing it here would make every `nicx` command
+# load torch and numpy just to find out that colbert-ai is missing.
+if importlib.util.find_spec("colbert") is None:
+    raise ImportError(
+        "The 'colbert-ai' package is required for the ColBERT "
+        "memory backend. Install it with:\n\n"
+        "    pip install colbert-ai\n"
+    )
 
 try:
     import torch  # noqa: F401

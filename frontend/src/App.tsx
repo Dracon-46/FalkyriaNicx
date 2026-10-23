@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router';
 import { Layout } from './components/Layout';
 import { ChatPage } from './pages/ChatPage';
@@ -12,8 +12,13 @@ import { CommandPalette } from './components/CommandPalette';
 import { SetupScreen } from './components/SetupScreen';
 import { Toaster } from './components/ui/sonner';
 import { useAppStore } from './lib/store';
+import { bindMascotToChat } from './lib/mascot-chat';
 import { fetchModels, fetchServerInfo, fetchSavings, isTauri } from './lib/api';
 import { track, hashId } from './lib/analytics';
+import { ConsentGate } from './components/Privacy/ConsentDialog';
+
+// Loaded on demand: brings supabase-js and the charts only when opened.
+const PainelPage = lazy(() => import('./pages/PainelPage'));
 
 export default function App() {
   const [setupDone, setSetupDone] = useState(!isTauri());
@@ -43,6 +48,9 @@ export default function App() {
     if (settings.theme === 'dark') root.classList.add('dark');
     else if (settings.theme === 'light') root.classList.add('light');
   }, [settings.theme]);
+
+  // The mascot thinks while a reply streams, then cheers or frowns.
+  useEffect(() => bindMascotToChat(), []);
 
   // Sync overlay conversations into the main app
   const importOverlay = useAppStore((s) => s.importOverlayConversation);
@@ -100,8 +108,8 @@ export default function App() {
   }, [selectedModel]);
 
   // app_opened — one-shot per app launch, fires after analytics has had
-  // a chance to initialize. platform + version are super-properties
-  // registered in analytics.ts initAnalytics, so no per-call props needed.
+  // a chance to initialize. track() adds platform + version itself, so no
+  // per-call props needed (and sends nothing without consent).
   useEffect(() => {
     const t = setTimeout(() => {
       track('app_opened', {});
@@ -143,10 +151,19 @@ export default function App() {
           <Route path="data-sources" element={<DataSourcesPage />} />
           <Route path="agents" element={<AgentsPage />} />
           <Route path="logs" element={<LogsPage />} />
+          <Route
+            path="painel"
+            element={
+              <Suspense fallback={null}>
+                <PainelPage />
+              </Suspense>
+            }
+          />
         </Route>
       </Routes>
       <Toaster position="bottom-right" />
       {commandPaletteOpen && <CommandPalette />}
+      <ConsentGate />
     </>
   );
 }

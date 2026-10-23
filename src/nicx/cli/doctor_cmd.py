@@ -269,10 +269,12 @@ def _check_speech_backend() -> CheckResult:
             )
 
         if backend.health():
+            speech = getattr(config, "speech", None)
+            language = str(getattr(speech, "language", "") or "auto")
             return CheckResult(
                 "Speech backend",
                 "ok",
-                f"{backend.backend_id} ready",
+                f"{backend.backend_id} ready (language: {language})",
             )
 
         details = None
@@ -292,6 +294,50 @@ def _check_speech_backend() -> CheckResult:
             "warn",
             f"Could not check: {exc}",
         )
+
+
+_KOKORO_LANGUAGES = {
+    "p": "Brazilian Portuguese",
+    "a": "American English",
+    "b": "British English",
+    "e": "Spanish",
+    "f": "French",
+    "i": "Italian",
+    "h": "Hindi",
+    "j": "Japanese",
+    "z": "Mandarin",
+}
+
+
+def _check_tts_backend() -> CheckResult:
+    """Check the configured voice output without loading its model.
+
+    Loading Kokoro takes seconds and over 1 GB of RAM, so this only confirms
+    the package is importable and reports the voice that will be used.
+    """
+    name = "Voice output (TTS)"
+    try:
+        import importlib.util
+
+        from nicx.speech._tts_discovery import voice_preferences
+
+        backend, voice_id, _ = voice_preferences(_get_config())
+        if backend != "kokoro":
+            return CheckResult(name, "ok", f"{backend} configured")
+        if importlib.util.find_spec("kokoro") is None:
+            return CheckResult(
+                name,
+                "warn",
+                "kokoro not installed",
+                details="Install it with `uv sync --extra voice`.",
+            )
+        from nicx.speech.kokoro_tts import _DEFAULT_VOICE_ID
+
+        voice = voice_id or _DEFAULT_VOICE_ID
+        language = _KOKORO_LANGUAGES.get(voice[:1], "unknown language")
+        return CheckResult(name, "ok", f"kokoro, voice {voice} ({language})")
+    except Exception as exc:
+        return CheckResult(name, "warn", f"Could not check: {exc}")
 
 
 def _check_security_profile() -> CheckResult:
@@ -379,6 +425,7 @@ def _run_all_checks() -> List[CheckResult]:
     checks.append(_check_default_model(engine_probes))
     checks.extend(_check_optional_deps())
     checks.append(_check_speech_backend())
+    checks.append(_check_tts_backend())
     checks.append(_check_nodejs())
     checks.append(_check_security_profile())
     return checks

@@ -1,0 +1,115 @@
+/*
+ * Chart roles for the Painel Falkyria, in the Falkyria palette.
+ * Validated with the dataviz checks (categorical + ordinal, light and dark):
+ *   light  series #1c5cab / #eda100 on #fcfcfb  (amber < 3:1 → legend + table view)
+ *   dark   series #3987e5 / #c98500 on #1a1a19
+ *   funnel ordinal ramps: light 650→250, dark 200→600 of the Falkyria blue.
+ */
+.painel {
+  --viz-surface: var(--color-surface);
+  --viz-series-1: #1c5cab;
+  --viz-series-1-wash: rgba(28, 92, 171, 0.1);
+  --viz-series-2: #eda100;
+  --viz-grid: #e1e0d9;
+  --viz-axis: #c3c2b7;
+  --viz-tick: var(--color-text-secondary);
+  --viz-hover: rgba(11, 11, 11, 0.045);
+  --viz-ord-1: #104281;
+  --viz-ord-2: #1c5cab;
+  --viz-ord-3: #2a78d6;
+  --viz-ord-4: #5598e7;
+  --viz-ord-5: #86b6ef;
+  --viz-track: rgba(28, 92, 171, 0.08);
+}
+
+.dark .painel {
+  --viz-series-1: #3987e5;
+  --viz-series-1-wash: rgba(57, 135, 229, 0.12);
+  --viz-series-2: #c98500;
+  --viz-grid: #2c2c2a;
+  --viz-axis: #383835;
+  --viz-hover: rgba(255, 255, 255, 0.05);
+  --viz-ord-1: #9ec5f4;
+  --viz-ord-2: #6da7ec;
+  --viz-ord-3: #3987e5;
+  --viz-ord-4: #256abf;
+  --viz-ord-5: #184f95;
+  --viz-track: rgba(134, 182, 239, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) .painel {
+    --viz-series-1: #3987e5;
+    --viz-series-1-wash: rgba(57, 135, 229, 0.12);
+    --viz-series-2: #c98500;
+    --viz-grid: #2c2c2a;
+    --viz-axis: #383835;
+    --viz-hover: rgba(255, 255, 255, 0.05);
+    --viz-ord-1: #9ec5f4;
+    --viz-ord-2: #6da7ec;
+    --viz-ord-3: #3987e5;
+    --viz-ord-4: #256abf;
+    --viz-ord-5: #184f95;
+    --viz-track: rgba(134, 182, 239, 0.08);
+  }
+}
+
+.painel .recharts-cartesian-axis-tick-value,
+.painel .recharts-text {
+  font-variant-numeric: tabular-nums;
+}
+
+.painel .recharts-surface:focus,
+.painel .recharts-wrapper:focus {
+  outline: none;
+}
+
+.painel .recharts-wrapper:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.painel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.painel-table th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.painel-table td {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+  color: var(--color-text);
+  vertical-align: top;
+}
+
+.painel-table td.num,
+.painel-table th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.painel-table tbody tr:hover td {
+  background: var(--viz-hover);
+}
+
+.painel-refreshing {
+  opacity: 0.55;
+  transition: opacity 150ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .painel-refreshing {
+    transition: none;
+  }
+}

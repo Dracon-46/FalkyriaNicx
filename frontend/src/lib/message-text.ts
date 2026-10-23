@@ -14,7 +14,7 @@ export function stripThinkTags(text: string): string {
  */
 export function toSpeakableText(text: string): string {
   let t = stripThinkTags(text);
-  t = t.replace(/```[\s\S]*?```/g, ' (code block omitted). ');
+  t = t.replace(/```[\s\S]*?```/g, ' (bloco de código omitido). ');
   t = t.replace(/`([^`]*)`/g, '$1');
   t = t.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
   t = t.replace(/https?:\/\/\S+/g, '');

@@ -1,13 +1,13 @@
-"""PostHog client wrapper.
+"""Analytics client.
 
-A thin adapter over the official ``posthog`` SDK that:
+A thin adapter over :class:`~nicx.analytics.supabase_sink.SupabaseSink` that:
   - Initialises lazily and only if analytics is enabled.
   - Pipes every capture through :mod:`redaction` and :mod:`events` for
     PII stripping and structural validation.
   - Fails silently — analytics must never break the host application.
 
-The underlying SDK handles batching, async send on a background
-thread, retries, and silent failure on network errors. We layer
+The sink handles batching, async send on a background thread, and
+silent failure on network errors. We layer
 "never crash the app" on top by wrapping every call in try/except.
 """
 
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 class AnalyticsClient:
-    """Send anonymized usage events to PostHog.
+    """Send anonymized usage events to Falkyria's Supabase project.
 
     Construct once at server / CLI startup, share for the process
     lifetime, call :meth:`shutdown` on exit to flush pending events.
@@ -44,39 +44,35 @@ class AnalyticsClient:
             else ""
         )
         self._lock = threading.Lock()
-        self._posthog: Any = None
+        self._sink: Any = None
         if self._enabled:
             self._init_sdk()
 
     def _init_sdk(self) -> None:
         try:
-            from posthog import Posthog
+            import nicx
+            from nicx.analytics.supabase_sink import SupabaseSink, install_context
 
-            self._posthog = Posthog(
-                project_api_key=self.config.key,
-                host=self.config.host,
-                # The SDK queues events and flushes on a background
-                # thread; these knobs just tune the batch size/cadence.
-                max_queue_size=10_000,
+            self._sink = SupabaseSink(
+                url=self.config.host,
+                key=self.config.key,
+                context=install_context(nicx.__version__),
                 flush_at=self.config.flush_at_size,
                 flush_interval=self.config.flush_interval_seconds,
-                # Don't sample or auto-capture anything beyond what we
-                # explicitly send.
-                disable_geoip=True,
             )
             logger.debug(
-                "PostHog analytics initialised host=%s anon_id=%s…",
+                "Analytics initialised host=%s anon_id=%s…",
                 self.config.host,
                 self.anon_id[:8],
             )
         except Exception as exc:
-            logger.debug("Analytics SDK init failed (%s); analytics disabled", exc)
-            self._posthog = None
+            logger.debug("Analytics init failed (%s); analytics disabled", exc)
+            self._sink = None
             self._enabled = False
 
     @property
     def enabled(self) -> bool:
-        return self._enabled and self._posthog is not None
+        return self._enabled and self._sink is not None
 
     def capture(
         self,
@@ -97,20 +93,16 @@ class AnalyticsClient:
             if validated is None:
                 logger.debug("Dropped unknown analytics event: %s", event_name)
                 return
-            self._posthog.capture(
-                distinct_id=self.anon_id,
-                event=event_name,
-                properties=validated,
-            )
+            self._sink.capture(self.anon_id, event_name, validated)
         except Exception as exc:
             logger.debug("Analytics capture failed for %s: %s", event_name, exc)
 
     def flush(self) -> None:
         """Force-flush queued events. Safe to call repeatedly."""
-        if self._posthog is None:
+        if self._sink is None:
             return
         try:
-            self._posthog.flush()
+            self._sink.flush()
         except Exception:
             pass
 
@@ -122,8 +114,8 @@ class AnalyticsClient:
     def shutdown(self, *, wait: bool = True) -> None:
         """Close the SDK, optionally moving network cleanup off the caller."""
         with self._lock:
-            sdk = self._posthog
-            self._posthog = None
+            sdk = self._sink
+            self._sink = None
             self._enabled = False
         if sdk is None:
             return

@@ -294,11 +294,13 @@ def chat(
     # Keep voice state outside the core chat path so picker/runtime changes can
     # be layered independently. Loaded speech models live for this session.
     voice_session = VoiceSession(config) if voice_mode else None
+    if voice_session is not None:
+        voice_session.prewarm()
 
     # Print banner
     voice_hint = (
-        "  [magenta]Voice mode ON[/magenta] — type normally, or press Enter "
-        "to speak; silence stops recording.\n"
+        "  [magenta]Modo voz LIGADO[/magenta] — digite normalmente, ou tecle "
+        "Enter para falar; o silêncio encerra a gravação.\n"
         if voice_mode
         else ""
     )
@@ -511,7 +513,9 @@ def chat(
         except KeyboardInterrupt:
             console.print("\n[dim]Generation interrupted.[/dim]")
         except Exception as exc:
-            console.print(f"\n[red]Error: {exc}[/red]\n")
+            # escape(): engine messages may contain "[section]" text that Rich
+            # would otherwise parse as markup.
+            console.print(f"\n[red]Erro: {escape(str(exc))}[/red]\n")
 
     if memory_service is not None:
         memory_service.stop()

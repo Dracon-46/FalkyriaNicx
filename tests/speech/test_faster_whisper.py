@@ -183,3 +183,44 @@ def test_faster_whisper_supported_formats():
         assert "wav" in formats
         assert "mp3" in formats
         assert "webm" in formats
+
+
+def test_faster_whisper_forwards_vad_filter_and_hotwords():
+    """VAD and hotwords reach the model only when configured."""
+    mock_info = MagicMock(language="pt", language_probability=0.99, duration=2.0)
+    mock_model = MagicMock()
+    mock_model.transcribe.return_value = (iter(()), mock_info)
+
+    with patch(
+        "nicx.speech.faster_whisper.WhisperModel",
+        return_value=mock_model,
+    ):
+        plain = FasterWhisperBackend(model_size="base", device="cpu")
+        plain.transcribe(b"audio", language="pt")
+        assert mock_model.transcribe.call_args.kwargs == {"language": "pt"}
+
+        tuned = FasterWhisperBackend(
+            model_size="base",
+            device="cpu",
+            vad_filter=True,
+            hotwords=" Nicx Falkyria ",
+        )
+        tuned.transcribe(b"audio", language="pt")
+        assert mock_model.transcribe.call_args.kwargs == {
+            "language": "pt",
+            "vad_filter": True,
+            "hotwords": "Nicx Falkyria",
+        }
+
+
+def test_discovery_passes_speech_config_to_faster_whisper():
+    from nicx.core.config import NicxConfig
+    from nicx.speech._discovery import _create_backend
+
+    cfg = NicxConfig()
+    backend = _create_backend("faster-whisper", cfg)
+
+    assert isinstance(backend, FasterWhisperBackend)
+    assert backend._compute_type == "int8"
+    assert backend._vad_filter is True
+    assert backend._hotwords == cfg.speech.hotwords

@@ -1,0 +1,35 @@
+/* Nicx mascot: theme tweaks. Colors in the SVG itself are fixed (it is the
+   same slime everywhere); only the outline and the ground adapt to the theme. */
+
+.nicx-mascot {
+  display: inline-block;
+  flex-shrink: 0;
+  overflow: visible;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nicx-mascot--interactive {
+  cursor: pointer;
+}
+
+.dark .nicx-mascot .nm-outline {
+  stroke: #9ff6ff;
+  stroke-opacity: 0.38;
+}
+
+.dark .nicx-mascot .nm-ground-glow {
+  opacity: 0.55;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) .nicx-mascot .nm-outline {
+    stroke: #9ff6ff;
+    stroke-opacity: 0.38;
+  }
+
+  :root:not(.light) .nicx-mascot .nm-ground-glow {
+    opacity: 0.55;
+  }
+}

@@ -1,23 +1,25 @@
 # Telemetry
 
-Nicx offers **optional external usage analytics** so whoever operates
-an analytics endpoint can see where the product breaks, what features
-people actually use, and how to make it better. This page documents exactly what is and isn't
+Nicx offers **optional external usage analytics** so Falkyria can see
+where the product breaks, what features people actually use, and how to
+make it better. The legally binding text is the privacy policy bundled with
+Nicx (`nicx legal privacidade`, or Settings → Privacidade in the app). This page documents exactly what is and isn't
 collected, where the data goes, and how to enable or disable it.
 
 ## TL;DR
 
 - **Off until you choose to share.** In an interactive Bash installation or
-  `nicx init`, the dedicated prompt says: **Press Enter or Y to consent,
-  or N to decline**. Enter at that prompt enables sharing; EOF, cancellation,
-  or an unattended run does not.
+  `nicx init`, the dedicated prompt says: **Aperte Enter ou S para aceitar,
+  ou N para recusar**. The desktop and browser app ask once on first launch.
+  Enter or S enables sharing; EOF, cancellation, or an unattended run does not.
 - **Installation ID** — one random UUID links install and usage events.
   A random identifier is not a guarantee of legal anonymity.
 - **No chat content, ever.** Only counts, timings, and feature names.
-- **No default destination.** Nothing is sent unless you configure your
-  own PostHog-compatible endpoint (host + key); see below.
-- **Documented retention policy: 365 days.** Enforcement is configured on
-  the receiving service, rather than in the client.
+- **Destination: Falkyria's Supabase project in São Paulo, Brazil** — only
+  after consent; see below.
+- **Retention: 24 months**, enforced by a nightly job on the server.
+- **Right to deletion**: Settings → Privacidade → "Apagar meus dados" erases
+  every event of this installation on the server.
 
 ## Choosing whether to share
 
@@ -49,9 +51,10 @@ An existing, explicitly configured `enabled = true` remains enabled until
 changed. Configurations without an analytics setting default to off.
 Local performance telemetry is a separate setting.
 
-Even with `enabled = true`, events are only sent when both
-`[analytics] host` and `[analytics] key` are set. Nicx ships with both
-empty, so out of the box no analytics data leaves the machine.
+Events are sent only when `enabled = true` and both `[analytics] host` and
+`[analytics] key` are set. Nicx ships with Falkyria's destination as the
+default, so consent alone decides; set `host = ""` to disable sending
+entirely regardless of consent.
 
 ## What we collect
 
@@ -115,27 +118,33 @@ Two independent filters run before backend event properties are sent:
 Any failure at either layer → the event or property is silently
 dropped. Tests covering the patterns: [`tests/analytics/test_redaction.py`](../tests/analytics/test_redaction.py).
 
-The frontend sends directly through `posthog-js`. Its wrapper restricts event
-names but does not use these backend property filters. The SDK can add browser
-and page metadata, including the current URL. Autocapture, pageviews, and session
-recording are disabled. Installer beacons use fixed fields assembled separately.
+The frontend never talks to the analytics destination directly: it posts
+each event to the local backend (`POST /v1/analytics/capture`), which runs
+it through the same two layers. Installer beacons use fixed fields
+assembled separately.
 
 ## Where the data goes
 
-- There is **no default endpoint**. The runtime reads `[analytics] host`
-  and `[analytics] key` from `config.toml`; installer deployments read
-  `NICX_ANALYTICS_HOST` and `NICX_ANALYTICS_KEY`. Point them at a PostHog
-  instance you control. A configured endpoint alone does not establish its
-  hosting provider or server logging settings.
+- Events go to the `nicx_events` table of Falkyria's **Supabase** project
+  (region `sa-east-1`, São Paulo), via its REST API. The schema, row level
+  security and retention job live in `supabase/migrations/`.
+- The app ships Supabase's **publishable** key. Row level security only lets
+  it insert well-formed events: it cannot read, change or delete anything.
+  Only Falkyria administrators with a confirmed email can read the data
+  (the analytics dashboard in the app, "Painel Falkyria").
+- The runtime reads `[analytics] host` and `[analytics] key` from
+  `config.toml`; the installer reads `NICX_ANALYTICS_HOST` and
+  `NICX_ANALYTICS_KEY` (set them to empty strings to disable).
 - **Never** sold, shared with advertisers, or used for anything other
   than improving Nicx.
 
 ## Retention
 
-- The documented retention policy is **365 days**. The receiving service
-  must be configured to enforce it; client code does not delete remote events.
-- Replacing the local installation ID changes the identifier used for future
-  events. It does not delete previously collected events.
+- Events older than **24 months** are deleted every night by a `pg_cron`
+  job on the server.
+- "Apagar meus dados" (Settings → Privacidade, or `POST /v1/analytics/forget`)
+  deletes every event of this installation on the server and then rotates the
+  local installation ID.
 
 ## How identity works
 
@@ -144,9 +153,8 @@ A single UUID v4 is generated when sharing is first enabled and stored at
 read the same file so events across the lifecycle can be linked to the
 same installation.
 
-Delete the file (`rm ~/.nicx/anon_id`) and a fresh UUID will be
-generated next time analytics are enabled. Events associated with the
-previous UUID remain on the receiving service until deleted there.
+Deleting the file only changes the identifier used for future events; to
+erase what was already sent, use "Apagar meus dados" first.
 
 ## For researchers and contributors
 

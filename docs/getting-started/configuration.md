@@ -121,6 +121,7 @@ host = "http://localhost:30000"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `host` | string | `http://localhost:11434` | Base URL for the Ollama API server. |
+| `num_ctx` | int | `8192` | Context window (tokens) requested from Ollama when a request does not set one. Larger windows cost RAM even when unused: `qwen3.5:4b` on CPU takes about 3.1 GB at 4096, 3.4 GB at 8192, 3.7 GB at 16384 and 4.2 GB at 32768. Lower it if Ollama reports out-of-memory. The `NICX_NUM_CTX` environment variable overrides it. |
 
 **`[engine.vllm]`:**
 
@@ -669,6 +670,46 @@ enforce_tool_confirmation = true
 
 ---
 
+### `[speech]` — Voice Input and Output
+
+Nicx listens with faster-whisper and speaks with Kokoro, both running locally. The defaults target
+Brazilian Portuguese on a CPU-only machine. Install the voice extras with
+`uv sync --extra speech --extra voice` (plus the extras you already use: `uv sync` removes the ones
+you leave out).
+
+```toml
+[speech]
+backend = "auto"          # "auto" picks faster-whisper when installed
+model = "base"
+language = "pt"
+device = "auto"
+compute_type = "int8"
+vad_filter = true
+hotwords = "Nicx Falkyria"
+tts_backend = "kokoro"
+voice_id = "pf_dora"
+voice_speed = 1.0
+```
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `backend` | string | `"auto"` | Speech-to-text backend: `auto`, `faster-whisper`, `openai`, `deepgram`. `auto` tries the local backend first. |
+| `model` | string | `"base"` | Whisper model size: `tiny`, `base`, `small`, `medium`, `large-v3`. On a laptop CPU, `base` transcribes a 4-second phrase in about 1 s; `small` makes fewer mistakes on real speech but is about 3x slower and uses about twice the RAM. |
+| `language` | string | `"pt"` | ISO 639-1 language code used for transcription when the client does not send one. Empty means auto-detect. |
+| `device` | string | `"auto"` | `auto`, `cpu` or `cuda`. |
+| `compute_type` | string | `"int8"` | CTranslate2 precision. `int8` runs on any CPU (and on CUDA); `float16` needs a GPU and falls back automatically when unsupported. |
+| `vad_filter` | bool | `true` | Drop silence before transcribing (Silero VAD). A silent clip then takes about 0.1 s instead of 10+ s, and Whisper does not invent text for it. |
+| `hotwords` | string | `"Nicx Falkyria"` | Words Whisper should favor when it hears something close, for proper nouns it would otherwise misspell. |
+| `tts_backend` | string | `"kokoro"` | Text-to-speech backend. `kokoro` is local; the others are paid cloud services. |
+| `voice_id` | string | `"pf_dora"` | Voice for `tts_backend`. Kokoro's Brazilian Portuguese voices are `pf_dora` (female), `pm_alex` and `pm_santa` (male); the first letter picks the language (`p` = pt-BR, `a`/`b` = American/British English, `e` = Spanish, `f` = French). |
+| `voice_speed` | float | `1.0` | Speaking rate. |
+
+Kokoro's non-English voices use espeak-ng for pronunciation; the `espeakng-loader` package that
+Kokoro installs ships it, so no separate install is needed. The models (Whisper `base` ~140 MB,
+Kokoro ~310 MB) download from Hugging Face on first use.
+
+---
+
 ## Hardware Auto-Detection
 
 When you run `nicx init`, Nicx probes your system to detect available hardware. The detection runs in this order:
@@ -1162,6 +1203,7 @@ Nicx respects the following environment variables:
 | `FIRECRAWL_API_KEY` | API key for the Firecrawl web search engine. Optional. When set and no other search key is, `auto` engine selection prefers Firecrawl over the keyless tier, and URL queries return the page or PDF as markdown. Keys: [firecrawl.dev](https://www.firecrawl.dev/app/api-keys). |
 | `FIRECRAWL_API_URL` | Base URL of the Firecrawl API, for example a [self-hosted Firecrawl](https://docs.firecrawl.dev/contributing/self-host). Optional. Defaults to `https://api.firecrawl.dev`. Any other URL enables the Firecrawl engine without a key, for instances that run without auth. |
 | `NICX_WEB_SEARCH_ENGINE` | Web search engine for the `web_search` tool: `auto` (default), `youcom`, `tavily`, `serply`, `firecrawl`, or `duckduckgo`. |
+| `NICX_NUM_CTX` | Context window (tokens) sent to Ollama, overriding `[engine.ollama] num_ctx`. |
 
 In the desktop app, you can save `ATLASCLOUD_API_KEY` in **Cloud Models** or
 **Settings → API Keys** instead of setting an environment variable.

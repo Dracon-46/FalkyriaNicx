@@ -87,6 +87,41 @@ def test_transcribe_endpoint_offloads_backend_work(client, mock_speech_backend):
     assert response.json()["text"] == "Offloaded"
 
 
+def test_transcribe_uses_configured_language_when_upload_has_none(
+    app_with_speech, mock_speech_backend
+):
+    # The desktop app and the web UI never send a language field.
+    app_with_speech.state.config = SimpleNamespace(
+        speech=SimpleNamespace(language="pt")
+    )
+
+    response = TestClient(app_with_speech).post(
+        "/v1/speech/transcribe",
+        files={"file": ("rec.webm", b"fake audio data", "audio/webm")},
+    )
+
+    assert response.status_code == 200
+    kwargs = mock_speech_backend.transcribe.call_args.kwargs
+    assert kwargs == {"format": "webm", "language": "pt"}
+
+
+def test_transcribe_form_language_overrides_config(
+    app_with_speech, mock_speech_backend
+):
+    app_with_speech.state.config = SimpleNamespace(
+        speech=SimpleNamespace(language="pt")
+    )
+
+    response = TestClient(app_with_speech).post(
+        "/v1/speech/transcribe",
+        files={"file": ("test.wav", b"fake audio data", "audio/wav")},
+        data={"language": "en"},
+    )
+
+    assert response.status_code == 200
+    assert mock_speech_backend.transcribe.call_args.kwargs["language"] == "en"
+
+
 def test_transcribe_endpoint_surfaces_backend_error(client, mock_speech_backend):
     mock_speech_backend.transcribe.side_effect = RuntimeError("missing cublas64_12.dll")
 

@@ -290,3 +290,33 @@ class TestCheckNodejs:
         assert "Not found" in result.message
         assert result.details is not None
         assert "OpenClaw" not in result.details
+
+
+class TestCheckTtsBackend:
+    def test_reports_configured_portuguese_voice(self) -> None:
+        from nicx.cli.doctor_cmd import _check_tts_backend
+        from nicx.core.config import NicxConfig
+
+        config = NicxConfig()
+        with (
+            patch("nicx.cli.doctor_cmd._get_config", return_value=config),
+            patch("importlib.util.find_spec", return_value=object()),
+        ):
+            result = _check_tts_backend()
+
+        assert result.status == "ok"
+        assert "pf_dora" in result.message
+        assert "Brazilian Portuguese" in result.message
+
+    def test_warns_when_kokoro_missing(self) -> None:
+        from nicx.cli.doctor_cmd import _check_tts_backend
+        from nicx.core.config import NicxConfig
+
+        with (
+            patch("nicx.cli.doctor_cmd._get_config", return_value=NicxConfig()),
+            patch("importlib.util.find_spec", return_value=None),
+        ):
+            result = _check_tts_backend()
+
+        assert result.status == "warn"
+        assert "uv sync --extra voice" in (result.details or "")

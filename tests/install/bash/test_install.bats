@@ -109,24 +109,24 @@ PY
 @test "unattended install sends no analytics and persists disabled" {
     run bash "$SCRIPT" --no-bg-orchestrator --minimal
     [ "$status" -eq 0 ]
-    ! grep -q '/i/v0/e/' "$CURL_STUB_LOG"
+    ! grep -q '/rest/v1/nicx_events' "$CURL_STUB_LOG"
     [ ! -f "$NICX_HOME/anon_id" ]
     assert_analytics_preference "$NICX_HOME/config.toml" false false
 }
 
 @test "without a configured destination there is no prompt and no beacon" {
-    unset NICX_ANALYTICS_HOST NICX_ANALYTICS_KEY
+    export NICX_ANALYTICS_HOST="" NICX_ANALYTICS_KEY=""
     run python3 "$BATS_TEST_DIRNAME/run_installer_pty.py" "$SCRIPT" '["\n"]'
     [ "$status" -eq 0 ]
-    [[ "$output" != *"Press Enter or Y to consent"* ]]
-    ! grep -q '/i/v0/e/' "$CURL_STUB_LOG"
+    [[ "$output" != *"Aperte Enter ou S para aceitar"* ]]
+    ! grep -q '/rest/v1/nicx_events' "$CURL_STUB_LOG"
     [ ! -f "$NICX_HOME/anon_id" ]
 }
 
 @test "explicit analytics flag sends beacons and persists enabled" {
     run bash "$SCRIPT" --no-bg-orchestrator --minimal --analytics
     [ "$status" -eq 0 ]
-    grep -q '/i/v0/e/' "$CURL_STUB_LOG"
+    grep -q '/rest/v1/nicx_events' "$CURL_STUB_LOG"
     [ -s "$NICX_HOME/anon_id" ]
     assert_analytics_preference "$NICX_HOME/config.toml" true true
 }
@@ -134,7 +134,7 @@ PY
 @test "Enter at dedicated terminal prompt consents before the first beacon" {
     run python3 "$BATS_TEST_DIRNAME/run_installer_pty.py" "$SCRIPT" '["\n"]'
     [ "$status" -eq 0 ]
-    [[ "$output" == *"Press Enter or Y to consent, or N to decline"* ]]
+    [[ "$output" == *"Aperte Enter ou S para aceitar, ou N para recusar"* ]]
     grep -q '"event":"install_started"' "$CURL_STUB_LOG"
     assert_analytics_preference "$NICX_HOME/config.toml" true true
 }
@@ -142,7 +142,7 @@ PY
 @test "N at terminal prompt declines every installer beacon" {
     run python3 "$BATS_TEST_DIRNAME/run_installer_pty.py" "$SCRIPT" '["N\n"]'
     [ "$status" -eq 0 ]
-    ! grep -q '/i/v0/e/' "$CURL_STUB_LOG"
+    ! grep -q '/rest/v1/nicx_events' "$CURL_STUB_LOG"
     [ ! -f "$NICX_HOME/anon_id" ]
     assert_analytics_preference "$NICX_HOME/config.toml" false true
 }
@@ -151,13 +151,13 @@ PY
     run python3 "$BATS_TEST_DIRNAME/run_installer_pty.py" "$SCRIPT" '["invalid\n", "n\n"]'
     [ "$status" -eq 0 ]
     [[ "$output" == *"Please press Enter, type Y, or type N."* ]]
-    ! grep -q '/i/v0/e/' "$CURL_STUB_LOG"
+    ! grep -q '/rest/v1/nicx_events' "$CURL_STUB_LOG"
 }
 
 @test "terminal EOF is different from pressing Enter" {
     run python3 "$BATS_TEST_DIRNAME/run_installer_pty.py" "$SCRIPT" '["\u0004"]'
     [ "$status" -eq 0 ]
-    ! grep -q '/i/v0/e/' "$CURL_STUB_LOG"
+    ! grep -q '/rest/v1/nicx_events' "$CURL_STUB_LOG"
     [ ! -f "$NICX_HOME/anon_id" ]
     assert_analytics_preference "$NICX_HOME/config.toml" false false
 }
@@ -169,7 +169,7 @@ PY
     : > "$CURL_STUB_LOG"
     run bash "$SCRIPT" --no-bg-orchestrator --minimal --no-analytics
     [ "$status" -eq 0 ]
-    ! grep -q '/i/v0/e/' "$CURL_STUB_LOG"
+    ! grep -q '/rest/v1/nicx_events' "$CURL_STUB_LOG"
     ! grep -q '_bootstrap' "$NICX_STUB_LOG"
     assert_analytics_preference "$NICX_HOME/config.toml" false true
 }
@@ -224,7 +224,7 @@ TOML
 @test "contradictory analytics flags are rejected" {
     run bash "$SCRIPT" --analytics --no-analytics
     [ "$status" -eq 2 ]
-    ! grep -q '/i/v0/e/' "$CURL_STUB_LOG"
+    ! grep -q '/rest/v1/nicx_events' "$CURL_STUB_LOG"
 }
 
 @test "refuses to run as root" {

@@ -41,15 +41,16 @@ def test_messages_to_dicts_empty_images_treated_as_text() -> None:
 
 
 def test_default_num_ctx_default_and_override(monkeypatch) -> None:
+    # 8192 keeps a 4B model loadable on a CPU-only 16 GB machine.
     monkeypatch.delenv("NICX_NUM_CTX", raising=False)
-    assert ollama_mod._default_num_ctx() == 16384
+    assert ollama_mod._default_num_ctx() == 8192
 
     monkeypatch.setenv("NICX_NUM_CTX", "8000")
     assert ollama_mod._default_num_ctx() == 8000
 
     # A non-integer override must fall back to the safe default, not crash.
     monkeypatch.setenv("NICX_NUM_CTX", "not-an-int")
-    assert ollama_mod._default_num_ctx() == 16384
+    assert ollama_mod._default_num_ctx() == 8192
 
 
 def test_guardrails_preserves_images_when_sanitizing() -> None:

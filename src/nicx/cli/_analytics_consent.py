@@ -6,27 +6,31 @@ import click
 import tomlkit
 
 from nicx.core.config import AnalyticsConfig
+from nicx.legal import read_document
+
+PROMPT = "Aperte Enter ou S para aceitar, ou N para recusar: "
+
+
+def _consent_text() -> str:
+    """The bundled consent text, as plain terminal text."""
+    text = read_document("consentimento").replace("**", "").replace("## ", "")
+    return "\n" + text.strip()
 
 
 def ask_analytics_consent(host: str | None = None) -> bool:
-    """Ask once per init; a deliberate Enter/Y consents, EOF/cancellation does not."""
+    """Ask once per init; a deliberate Enter/S consents, EOF/cancellation does not."""
     stream = click.get_text_stream("stdin")
     if not stream.isatty():
         return False
+    click.echo(_consent_text(), err=True)
     click.echo(
-        "\nHelp improve Nicx by sharing optional usage statistics.\n"
-        "Data includes feature usage, timings, token counts, error categories,\n"
-        "environment metadata, and a random installation ID.\n"
-        "Recipient: the Nicx team's PostHog analytics endpoint.\n"
-        "Privacy details: https://github.com/Dracon-46/FalkyriaNicx/blob/main/docs/telemetry.md\n"
-        "You can disable sharing later: nicx config set analytics.enabled false\n"
-        "(then restart the server and reload the app).\n"
-        "Declining does not change Nicx functionality.",
+        "\nPolítica de privacidade completa: nicx legal privacidade\n"
+        "Para mudar depois: nicx config set analytics.enabled false",
         err=True,
     )
-    click.echo(f"Analytics destination: {host or AnalyticsConfig().host}", err=True)
+    click.echo(f"Destino dos dados: {host or AnalyticsConfig().host}", err=True)
     while True:
-        click.echo("Press Enter or Y to consent, or N to decline: ", nl=False, err=True)
+        click.echo(PROMPT, nl=False, err=True)
         try:
             answer = stream.readline()
         except (EOFError, KeyboardInterrupt):
@@ -35,11 +39,11 @@ def ask_analytics_consent(host: str | None = None) -> bool:
         if not answer:
             return False
         answer = answer.strip().lower()
-        if answer in ("", "y", "yes"):
+        if answer in ("", "s", "sim", "y", "yes"):
             return True
-        if answer in ("n", "no"):
+        if answer in ("n", "nao", "não", "no"):
             return False
-        click.echo("Please press Enter, type Y, or type N.", err=True)
+        click.echo("Aperte Enter, digite S ou digite N.", err=True)
 
 
 def apply_analytics_choice(content: str, choice: bool | None, *, prompt: bool) -> str:

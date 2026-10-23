@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Send, Square, Paperclip, Search } from 'lucide-react';
+import { Send, Square, Paperclip, Search, AudioLines } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppStore, generateId } from '../../lib/store';
 import { streamChat, streamResearch } from '../../lib/sse';
@@ -12,6 +12,8 @@ import {
 } from '../../lib/chat-telemetry';
 import { MicButton } from './MicButton';
 import { useSpeech } from '../../hooks/useSpeech';
+import { useVoiceConversation, type SendOutcome } from '../../hooks/useVoiceConversation';
+import { NicxMascot } from '../Mascot/NicxMascot';
 import type {
   ChatMessage,
   MessageTelemetry,
@@ -20,6 +22,9 @@ import type {
   TokenUsage,
   ToolCallInfo,
 } from '../../types';
+
+/** Size of the mascot perched on the composer, in px. */
+const PERCH_SIZE = 60;
 
 // While Deep Research is toggled on, poll connected sources for sync
 // progress so we can surface "Searching over N items — sync in progress"
@@ -103,13 +108,17 @@ export function InputArea() {
   const corpusSync = useResearchCorpusSync(deepResearch);
   const isCurrentChatStreaming = streamState.isStreaming && streamState.conversationId === activeId;
 
+  const speech = useSpeech();
   const {
     state: speechState,
     error: speechError,
     available: speechAvailable,
     startRecording,
     stopRecording,
-  } = useSpeech();
+  } = speech;
+  // Hands-free mode sends through sendMessage, which is defined further down.
+  const sendSpokenRef = useRef<(text: string) => Promise<SendOutcome>>(async () => 'not-sent');
+  const conversation = useVoiceConversation(speech, (text) => sendSpokenRef.current(text));
 
   // Abort in-flight stream when the user switches models mid-generation.
   // This prevents errors from trying to continue a stream with a stale model.
@@ -127,7 +136,8 @@ export function InputArea() {
     prevModelRef.current = selectedModel;
   }, [selectedModel, streamState.isStreaming, resetStream]);
 
-  const micDisabled = !speechEnabled || !speechAvailable || streamState.isStreaming;
+  const micDisabled =
+    !speechEnabled || !speechAvailable || streamState.isStreaming || conversation.active;
   const micReason: 'not-enabled' | 'no-backend' | 'streaming' | undefined =
     !speechEnabled ? 'not-enabled'
     : !speechAvailable ? 'no-backend'
@@ -171,15 +181,17 @@ export function InputArea() {
     resetStream();
   }, [resetStream]);
 
-  const sendMessage = useCallback(async () => {
-    const content = input.trim();
-    if (!content || streamState.isStreaming) return;
+  // `spoken` is a hands-free utterance: sent as is, leaving the typed draft alone.
+  const sendMessage = useCallback(async (spoken?: string): Promise<SendOutcome> => {
+    const content = (spoken ?? input).trim();
+    if (!content || streamState.isStreaming) return 'not-sent';
     if (!selectedModel) {
       toast.error('Pick a model first (⌘K)');
-      return;
+      return 'not-sent';
     }
 
-    setInput('');
+    if (spoken === undefined) setInput('');
+    let stopped = false;
 
     let convId = activeId;
     if (!convId) {
@@ -455,6 +467,7 @@ export function InputArea() {
       }
     } catch (err: any) {
       if (err.name === 'AbortError') {
+        stopped = true;
         // User cancelled or model switch — keep whatever was accumulated
         if (!accumulatedContent) accumulatedContent = '(Generation stopped)';
       } else {
@@ -539,6 +552,7 @@ export function InputArea() {
           .catch(() => {});
       }
     }
+    return stopped ? 'stopped' : 'done';
   }, [
     input,
     activeId,
@@ -553,6 +567,8 @@ export function InputArea() {
     temperature,
     maxTokens,
   ]);
+
+  sendSpokenRef.current = sendMessage;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -581,6 +597,49 @@ export function InputArea() {
             <Search size={12} />
             Deep Research
           </button>
+          {/* Hands-free: listen, send on silence, speak the reply, listen again. */}
+          <button
+            type="button"
+            onClick={conversation.toggle}
+            disabled={!conversation.active && (!speechEnabled || !speechAvailable)}
+            aria-pressed={conversation.active}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs transition-colors cursor-pointer disabled:cursor-default disabled:opacity-50"
+            style={{
+              background: conversation.active ? 'var(--color-accent-subtle)' : 'transparent',
+              border: `1px solid ${conversation.active ? 'var(--color-accent)' : 'var(--color-border)'}`,
+              color: conversation.active ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
+            }}
+            title={
+              conversation.active
+                ? 'Clique para encerrar a conversa por voz'
+                : !speechEnabled
+                  ? 'Ative a entrada de voz em Configurações'
+                  : !speechAvailable
+                    ? 'Reconhecimento de voz indisponível no servidor'
+                    : 'Fale e o Nicx responde em voz alta, sem tocar no teclado'
+            }
+          >
+            <AudioLines
+              size={12}
+              style={{ animation: conversation.phase === 'listening' ? 'pulse 1.5s ease-in-out infinite' : 'none' }}
+            />
+            {conversation.label}
+          </button>
+          {/* Nicx sits on the composer and shows what it is doing. The empty
+              chat already shows a big Nicx, so it only appears afterwards. */}
+          {(messages.length > 0 || isCurrentChatStreaming) && (
+            <NicxMascot
+              size={PERCH_SIZE}
+              interactive
+              className="ml-auto relative z-[1]"
+              style={{
+                // Feet on the composer's top border (the body's base is at
+                // 87.6% of the box); the empty top of the box overlaps upward.
+                marginTop: -PERCH_SIZE * 0.2,
+                marginBottom: -(8 + PERCH_SIZE * 0.124),
+              }}
+            />
+          )}
         </div>
         {deepResearch && corpusSync.syncing && corpusSync.itemsSynced > 0 && (
           <div
@@ -632,7 +691,7 @@ export function InputArea() {
               reason={micReason}
             />
             <button
-              onClick={sendMessage}
+              onClick={() => void sendMessage()}
               disabled={streamState.isStreaming || !input.trim() || modelLoading || !selectedModel}
               title={selectedModel ? 'Send message' : 'Pick a model first (⌘K)'}
               className="p-2 rounded-xl transition-colors shrink-0 cursor-pointer disabled:opacity-30 disabled:cursor-default"

@@ -22,8 +22,26 @@ from nicx.learning.routing.router import (
     HeuristicRouter,
     build_routing_context,
 )
-from nicx.learning.training.data import TrainingDataMiner
-from nicx.learning.training.lora import HAS_TORCH, LoRATrainer, LoRATrainingConfig
+
+# Training imports torch (seconds to load), so it is resolved on first use;
+# importing ``nicx.learning.routing`` (e.g. from ``nicx ask``) stays fast.
+_LAZY_TRAINING = {
+    "TrainingDataMiner": "nicx.learning.training.data",
+    "HAS_TORCH": "nicx.learning.training.lora",
+    "LoRATrainer": "nicx.learning.training.lora",
+    "LoRATrainingConfig": "nicx.learning.training.lora",
+}
+
+
+def __getattr__(name: str):
+    module = _LAZY_TRAINING.get(name)
+    if module is None:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    import importlib
+
+    value = getattr(importlib.import_module(module), name)
+    globals()[name] = value
+    return value
 
 
 def ensure_registered() -> None:

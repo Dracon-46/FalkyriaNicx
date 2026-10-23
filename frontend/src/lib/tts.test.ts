@@ -7,6 +7,7 @@ vi.mock('./api', () => ({
 
 import { synthesizeSpeech, fetchTtsHealth } from './api';
 import { useTtsStore, __resetTtsForTests, shouldAutoplayFinishedReply } from './tts';
+import { useMascot } from './mascot';
 
 const synth = vi.mocked(synthesizeSpeech);
 const health = vi.mocked(fetchTtsHealth);
@@ -122,6 +123,28 @@ describe('shared voice output', () => {
 
     expect(FakeAudio.instances).toHaveLength(1);
     expect(useTtsStore.getState().speakingId).toBe('m2');
+  });
+
+  it('puts the mascot in speaking mood while audio plays, then back to idle', async () => {
+    synth.mockResolvedValue(new Blob(['wav']));
+    useMascot.getState().setMood('idle');
+
+    await useTtsStore.getState().speak('m1', 'Olá');
+    expect(useMascot.getState().mood).toBe('speaking');
+
+    FakeAudio.instances[0].onended?.();
+    expect(useMascot.getState().mood).toBe('idle');
+  });
+
+  it('does not clobber a mood the chat flow set meanwhile', async () => {
+    synth.mockResolvedValue(new Blob(['wav']));
+
+    await useTtsStore.getState().speak('m1', 'Olá');
+    useMascot.getState().setMood('thinking');
+    useTtsStore.getState().stop();
+
+    expect(useMascot.getState().mood).toBe('thinking');
+    useMascot.getState().setMood('idle');
   });
 
   it('stop() halts playback and revokes the blob URL', async () => {

@@ -43,7 +43,9 @@ _VOICE_PREFIX_TO_LANG: Dict[str, str] = {
 }
 
 _DEFAULT_LANG_CODE = "a"
-_DEFAULT_VOICE_ID = "af_heart"
+# Nicx speaks Brazilian Portuguese by default (espeak-ng G2P, bundled with
+# Kokoro's dependencies through ``espeakng-loader``).
+_DEFAULT_VOICE_ID = "pf_dora"
 _IMPORT_LOCK = threading.RLock()
 
 
@@ -262,6 +264,9 @@ class KokoroTTSBackend(TTSBackend):
         import numpy as np
         import soundfile as sf
 
+        # Callers that forward an unset config value pass "" -- Kokoro would
+        # fail to load a voice with an empty name.
+        voice_id = voice_id or _DEFAULT_VOICE_ID
         lang_code = self._lang_for_voice(voice_id)
         with self._pipeline_lock:
             pipeline = self._ensure_pipeline(lang_code)
@@ -297,6 +302,10 @@ class KokoroTTSBackend(TTSBackend):
         # ask for and avoids voice IDs that have changed across Kokoro
         # releases.
         return [
+            # Brazilian Portuguese
+            "pf_dora",
+            "pm_alex",
+            "pm_santa",
             # American English
             "af_heart",
             "af_bella",

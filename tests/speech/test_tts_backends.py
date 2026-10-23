@@ -856,3 +856,25 @@ def test_elevenlabs_missing_key_raises(monkeypatch):
     monkeypatch.delenv("ELEVENLABS_API_KEY", raising=False)
     with pytest.raises(RuntimeError, match="ELEVENLABS_API_KEY"):
         ElevenLabsTTSBackend().synthesize("Hello")
+
+
+def test_kokoro_defaults_to_brazilian_portuguese_voice():
+    """Nicx speaks PT-BR: an empty voice ID resolves to a ``p*`` voice."""
+    from unittest.mock import MagicMock
+
+    from nicx.speech.kokoro_tts import _DEFAULT_VOICE_ID, KokoroTTSBackend
+
+    assert _DEFAULT_VOICE_ID.startswith("p")
+    voices = KokoroTTSBackend().available_voices()
+    for v in ("pf_dora", "pm_alex", "pm_santa"):
+        assert v in voices
+        assert KokoroTTSBackend._lang_for_voice(v) == "p"
+
+    backend = KokoroTTSBackend()
+    pipeline = MagicMock(return_value=iter(()))
+    with patch.object(backend, "_ensure_pipeline", return_value=pipeline) as ensure:
+        result = backend.synthesize("Olá", voice_id="")
+
+    ensure.assert_called_once_with("p")
+    assert pipeline.call_args.kwargs["voice"] == _DEFAULT_VOICE_ID
+    assert result.voice_id == _DEFAULT_VOICE_ID

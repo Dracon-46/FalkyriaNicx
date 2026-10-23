@@ -172,7 +172,7 @@ class TestVoiceInput:
             assert record_voice(console) is VOICE_EXIT
 
         record.assert_not_called()
-        assert "Nicx[speech]" in str(console.print.call_args)
+        assert "--extra speech" in str(console.print.call_args)
 
     def test_stt_backend_is_cached_for_the_chat_session(self) -> None:
         backend = MagicMock()
@@ -259,7 +259,7 @@ class TestVoiceInput:
         backend = MagicMock()
         session = VoiceSession(NicxConfig())
         output = StringIO()
-        console = Console(file=output, force_terminal=True)
+        console = Console(file=output, force_terminal=True, width=200)
         error = OSError(
             "[link=https://attacker.invalid]permission denied[/link]\x1b]8;;evil\x07"
         )
@@ -279,7 +279,7 @@ class TestVoiceInput:
         rendered = output.getvalue()
         plain = Text.from_ansi(rendered).plain
         assert result is VOICE_EXIT
-        assert "Mic error:" in plain
+        assert "Erro no microfone:" in plain
         assert "\x1b]8;" not in rendered
         assert "[link=https://attacker.invalid]permission denied[/link]" in plain
 

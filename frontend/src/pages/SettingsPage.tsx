@@ -18,6 +18,8 @@ import {
   Brain,
 } from 'lucide-react';
 import { useAppStore, type ThemeMode } from '../lib/store';
+import { NicxMascot } from '../components/Mascot/NicxMascot';
+import { PrivacySection } from '../components/Privacy/PrivacySection';
 import {
   checkHealth,
   fetchSpeechHealth,
@@ -760,8 +762,8 @@ export function SettingsPage() {
           </Section>
 
           {/* Speech */}
-          <Section title="Speech">
-            <SettingRow label="Speech-to-Text" description="Enable microphone input for voice dictation">
+          <Section title="Voz">
+            <SettingRow label="Entrada de voz" description="Usar o microfone para ditar e para a conversa por voz (reconhecimento local, em português)">
               <button
                 onClick={() => { updateSettings({ speechEnabled: !settings.speechEnabled }); showSaved(); }}
                 className="relative w-11 h-6 rounded-full transition-colors cursor-pointer"
@@ -778,7 +780,7 @@ export function SettingsPage() {
                 />
               </button>
             </SettingRow>
-            <SettingRow label="Text-to-Speech" description="Show a read-aloud button on assistant replies">
+            <SettingRow label="Saída de voz" description="Mostrar o botão para ouvir as respostas do Nicx">
               <button
                 onClick={() => { updateSettings({ voiceOutputEnabled: !settings.voiceOutputEnabled }); showSaved(); }}
                 className="relative w-11 h-6 rounded-full transition-colors cursor-pointer"
@@ -795,7 +797,7 @@ export function SettingsPage() {
                 />
               </button>
             </SettingRow>
-            <SettingRow label="Speak replies automatically" description="Read every assistant reply aloud as soon as it finishes">
+            <SettingRow label="Falar as respostas automaticamente" description="Ler cada resposta em voz alta assim que ela termina">
               <button
                 onClick={() => { updateSettings({ voiceAutoplay: !settings.voiceAutoplay }); showSaved(); }}
                 disabled={!settings.voiceOutputEnabled}
@@ -815,7 +817,7 @@ export function SettingsPage() {
                 />
               </button>
             </SettingRow>
-            <SettingRow label="Voice" description="Backend and voice used for spoken replies">
+            <SettingRow label="Voz do Nicx" description="Mecanismo e voz usados nas respostas faladas">
               <div className="flex items-center gap-2">
                 <span
                   className="w-2 h-2 rounded-full"
@@ -824,13 +826,13 @@ export function SettingsPage() {
                   }}
                 />
                 <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-                  {ttsBackend === null ? 'Checking...'
+                  {ttsBackend === null ? 'Verificando...'
                     : ttsBackend.available ? `${ttsBackend.backend}${ttsBackend.voice_id ? ` / ${ttsBackend.voice_id}` : ''}`
-                    : 'Not configured'}
+                    : 'Não configurado'}
                 </span>
               </div>
             </SettingRow>
-            <SettingRow label="Backend status" description="Requires Whisper, Deepgram, or another speech backend">
+            <SettingRow label="Reconhecimento de voz" description="Whisper rodando no seu computador">
               <div className="flex items-center gap-2">
                 <span
                   className="w-2 h-2 rounded-full"
@@ -841,9 +843,9 @@ export function SettingsPage() {
                   }}
                 />
                 <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-                  {speechBackendAvailable === null ? 'Checking...'
-                    : speechBackendAvailable ? 'Available'
-                    : 'Not configured'}
+                  {speechBackendAvailable === null ? 'Verificando...'
+                    : speechBackendAvailable ? 'Disponível'
+                    : 'Não configurado'}
                 </span>
               </div>
             </SettingRow>
@@ -896,21 +898,27 @@ export function SettingsPage() {
             </SettingRow>
           </Section>
 
+          {/* Privacidade */}
+          <PrivacySection />
+
           {/* About */}
           <Section title="About">
-            <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-              <p className="mb-2">
-                <span className="font-semibold" style={{ color: 'var(--color-text)' }}>Nicx</span> — a inteligência artificial da Falkyria.
-              </p>
-              <div className="flex gap-3 mt-3 text-xs">
-                <a
-                  href="https://github.com/Dracon-46/FalkyriaNicx"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: 'var(--color-accent)' }}
-                >
-                  Repositório
-                </a>
+            <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+              <NicxMascot size="md" interactive className="-mt-4" />
+              <div>
+                <p className="mb-2">
+                  <span className="font-semibold" style={{ color: 'var(--color-text)' }}>Nicx</span> — a inteligência artificial da Falkyria.
+                </p>
+                <div className="flex gap-3 mt-3 text-xs">
+                  <a
+                    href="https://github.com/Dracon-46/FalkyriaNicx"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: 'var(--color-accent)' }}
+                  >
+                    Repositório
+                  </a>
+                </div>
               </div>
             </div>
           </Section>

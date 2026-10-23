@@ -1,31 +1,32 @@
 /**
  * Frontend analytics client.
  *
- * Thin wrapper around posthog-js that:
- *   - Pulls its identity (anon_id, host, project key) from the backend
- *     via GET /v1/analytics/identity, so all backend / install.sh /
- *     frontend events tie to the same person.
- *   - Initializes posthog-js with autocapture, session replay, and
- *     pageviews disabled — we send only events we explicitly call out.
- *   - Registers the app version as a super-property so every event
- *     carries it uniformly (no per-event repetition needed).
- *   - Fails silently when the backend isn't reachable, when analytics
- *     is disabled, or when the SDK throws — must never break the UI.
+ * Nicx sends anonymous usage events to Falkyria only with the user's
+ * consent (LGPD). The frontend never talks to the analytics destination
+ * itself: every event goes through the local server
+ * (POST /v1/analytics/capture), which applies the same catalog and
+ * redaction rules as backend events and silently drops anything sent
+ * without consent.
  *
- * Opt-out matches the backend: if /identity returns enabled=false
- * (analytics disabled in config), the SDK is never
- * initialized and track() becomes a no-op.
+ *   - The identity (consent state, anonymous ID) comes from
+ *     GET /v1/analytics/identity and is cached in a small zustand store so
+ *     the consent dialog and the privacy settings stay in sync.
+ *   - track() is fire-and-forget: it posts only when the identity says
+ *     `enabled`, and never throws or blocks the UI.
+ *   - The consent, deletion and legal-text endpoints live here too, so all
+ *     analytics traffic has one owner.
  */
 
-import posthog from 'posthog-js';
+import { create } from 'zustand';
 import { apiFetch } from './api';
 
 /**
  * Mirror of the Python event catalog (src/nicx/analytics/events.py
  * REGISTRY). Anything not in this set is dropped with a console.warn at
- * track() time, so typos and unallowed events don't silently ship.
+ * track() time, so typos surface in development. `analytics_consent` is
+ * missing on purpose: the server records it when the user makes a choice.
  *
- * KEEP IN SYNC with the Python REGISTRY. CI could enforce this later.
+ * KEEP IN SYNC with the Python REGISTRY.
  */
 const KNOWN_EVENTS = new Set<string>([
   'install_started',
@@ -47,93 +48,197 @@ const KNOWN_EVENTS = new Set<string>([
   'usage_daily_summary',
 ]);
 
-// Hardcoded app version — should match the backend.
-// TODO: wire to Vite define() so this comes from package.json at build time.
-const APP_VERSION = '0.1.0';
+// Hardcoded app version — the server also stamps its own version on every
+// event, so this only fills the `version` property of `app_opened`.
+const APP_VERSION = '1.0.1';
 
-interface AnalyticsIdentity {
+export interface AnalyticsIdentity {
+  /** True only with consent and a configured destination. */
   enabled: boolean;
   anon_id: string;
   host: string;
   key: string;
+  /** False until the user answers the consent dialog (or the CLI prompt). */
+  choice_recorded: boolean;
+  /** Version of the privacy policy the choice refers to. */
+  policy_version: string;
 }
 
-let initialized = false;
-let enabledState = false;
-let cachedAnonId = '';
+export type LegalDocument = 'privacidade' | 'termos' | 'consentimento';
 
-async function fetchAnalyticsIdentity(): Promise<AnalyticsIdentity> {
-  const response = await apiFetch('/v1/analytics/identity');
-  if (!response.ok) throw new Error('Could not load the analytics setting.');
-  return response.json();
+export interface ForgetResult {
+  removed: number;
+  anon_id: string;
+}
+
+export interface DashboardConfig {
+  supabase_url: string;
+  supabase_key: string;
+  policy_version: string;
+}
+
+interface AnalyticsState {
+  identity: AnalyticsIdentity | null;
+}
+
+/** The last identity the server reported (null until the first load). */
+export const useAnalyticsIdentity = create<AnalyticsState>(() => ({ identity: null }));
+
+let pendingIdentity: Promise<AnalyticsIdentity | null> | null = null;
+let identityAttempt = 0;
+
+function normalizeIdentity(raw: Partial<AnalyticsIdentity> | null | undefined): AnalyticsIdentity {
+  return {
+    enabled: raw?.enabled === true,
+    anon_id: typeof raw?.anon_id === 'string' ? raw.anon_id : '',
+    host: typeof raw?.host === 'string' ? raw.host : '',
+    key: typeof raw?.key === 'string' ? raw.key : '',
+    choice_recorded: raw?.choice_recorded === true,
+    policy_version: typeof raw?.policy_version === 'string' ? raw.policy_version : '',
+  };
+}
+
+function storeIdentity(identity: AnalyticsIdentity, { supersede = false } = {}): AnalyticsIdentity {
+  if (supersede) identityAttempt++;
+  useAnalyticsIdentity.setState({ identity });
+  pendingIdentity = Promise.resolve(identity);
+  return identity;
+}
+
+/** Read the server's error `detail`, falling back to a fixed message. */
+async function errorDetail(response: Response, fallback: string): Promise<string> {
+  try {
+    const body = await response.json();
+    if (body && typeof body.detail === 'string' && body.detail.trim()) return body.detail;
+  } catch {
+    // Not JSON: keep the fallback.
+  }
+  return fallback;
 }
 
 /**
- * Fetch identity from the backend and initialize the SDK.
- * Idempotent — safe to call multiple times.
+ * Load the analytics identity once and share the result. Resolves to null
+ * when the server is unreachable; the next call then tries again.
  */
+export function loadAnalyticsIdentity({ force = false } = {}): Promise<AnalyticsIdentity | null> {
+  if (pendingIdentity && !force) return pendingIdentity;
+  const attempt = ++identityAttempt;
+  const request = (async (): Promise<AnalyticsIdentity | null> => {
+    const response = await apiFetch('/v1/analytics/identity');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const identity = normalizeIdentity(await response.json());
+    // A choice saved meanwhile is newer than this answer: keep it.
+    if (attempt !== identityAttempt) return useAnalyticsIdentity.getState().identity ?? identity;
+    return storeIdentity(identity);
+  })().catch(() => {
+    // Unreachable server: forget this attempt so the next call retries.
+    if (attempt === identityAttempt) pendingIdentity = null;
+    return null;
+  });
+  pendingIdentity = request;
+  return request;
+}
+
+/** Fetch the identity in the background. Idempotent; never throws. */
 export async function initAnalytics(): Promise<void> {
-  if (initialized) return;
-  initialized = true; // claim the slot even on failure paths
+  await loadAnalyticsIdentity();
+}
 
+export function isAnalyticsEnabled(): boolean {
+  return useAnalyticsIdentity.getState().identity?.enabled === true;
+}
+
+/** Record the user's choice. The server also logs it as proof of consent. */
+export async function setAnalyticsPreference(enabled: boolean): Promise<AnalyticsIdentity> {
+  let response: Response;
   try {
-    const identity = await fetchAnalyticsIdentity();
-    // No destination configured → stay off. The backend only reports
-    // enabled when both a host and a project key are set.
-    if (!identity.enabled || !identity.host || !identity.key || !identity.anon_id) {
-      return;
-    }
-
-    cachedAnonId = identity.anon_id;
-
-    await new Promise<void>((resolve) => {
-      posthog.init(identity.key, {
-        api_host: identity.host,
-        bootstrap: { distinctID: identity.anon_id },
-        // No surprise data collection — only events we call out by name.
-        autocapture: false,
-        capture_pageview: false,
-        capture_pageleave: false,
-        disable_session_recording: true,
-        // No /decide call for feature flags (saves a request, we don't use them yet).
-        advanced_disable_decide: true,
-        // No PostHog person profiles — we're not making accounts, just sending events.
-        person_profiles: 'never',
-        // Don't try to load IP geolocation; backend disables this too.
-        ip: false,
-        loaded: () => resolve(),
-      });
-    });
-    // Clear any opt-out the SDK persisted from an earlier session: the
-    // backend config is the single source of truth.
-    posthog.opt_in_capturing({ captureEventName: false });
-    enabledState = true;
-
-    // Set distinct_id explicitly in case bootstrap raced.
-    posthog.identify(identity.anon_id);
-
-    // Register version + platform as super-properties so they're attached
-    // to every event automatically, without per-call-site repetition.
-    posthog.register({
-      version: APP_VERSION,
-      platform: detectPlatform(),
+    response = await apiFetch('/v1/analytics/preference', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled }),
     });
   } catch {
-    // Any failure → analytics off, silently.
+    throw new Error('Não foi possível falar com o servidor do Nicx. Tente de novo.');
   }
+  if (!response.ok) {
+    throw new Error(
+      await errorDetail(response, 'Não foi possível salvar sua escolha. Tente de novo.'),
+    );
+  }
+  return storeIdentity(normalizeIdentity(await response.json()), { supersede: true });
 }
 
 /**
- * Send one event. Properties are passed through to PostHog; redaction
- * happens server-side for backend events. Unknown event names are
- * dropped here with a console.warn so typos surface in dev rather than
- * silently landing in the analytics warehouse.
+ * Delete this installation's events from Falkyria's servers and start a new
+ * anonymous ID (LGPD right to deletion).
  */
-export function track(
-  event: string,
-  properties: Record<string, unknown> = {},
-): void {
-  if (!enabledState) return;
+export async function forgetAnalyticsData(): Promise<ForgetResult> {
+  let response: Response;
+  try {
+    response = await apiFetch('/v1/analytics/forget', { method: 'POST' });
+  } catch {
+    throw new Error('Não foi possível falar com o servidor do Nicx. Tente de novo.');
+  }
+  if (!response.ok) {
+    throw new Error(
+      await errorDetail(response, 'Não foi possível apagar seus dados agora. Tente de novo.'),
+    );
+  }
+  const body = await response.json();
+  const result: ForgetResult = {
+    removed: Number.isFinite(body?.removed) ? Number(body.removed) : 0,
+    anon_id: typeof body?.anon_id === 'string' ? body.anon_id : '',
+  };
+  const current = useAnalyticsIdentity.getState().identity;
+  if (current?.enabled) storeIdentity({ ...current, anon_id: result.anon_id }, { supersede: true });
+  return result;
+}
+
+const legalCache = new Map<LegalDocument, string>();
+
+/** Markdown text of a legal document bundled with the server. */
+export async function fetchLegalDocument(name: LegalDocument): Promise<string> {
+  const cached = legalCache.get(name);
+  if (cached !== undefined) return cached;
+  let response: Response;
+  try {
+    response = await apiFetch(`/v1/analytics/legal/${name}`);
+  } catch {
+    throw new Error('Não foi possível carregar o documento. Verifique se o Nicx está rodando.');
+  }
+  if (!response.ok) {
+    throw new Error(await errorDetail(response, 'Não foi possível carregar o documento.'));
+  }
+  const text = await response.text();
+  legalCache.set(name, text);
+  return text;
+}
+
+/** Public settings the Falkyria dashboard needs to sign administrators in. */
+export async function fetchDashboardConfig(): Promise<DashboardConfig> {
+  let response: Response;
+  try {
+    response = await apiFetch('/v1/analytics/dashboard-config');
+  } catch {
+    throw new Error('Não foi possível falar com o servidor do Nicx.');
+  }
+  if (!response.ok) {
+    throw new Error(await errorDetail(response, 'Não foi possível ler a configuração do painel.'));
+  }
+  const body = await response.json();
+  return {
+    supabase_url: String(body?.supabase_url ?? ''),
+    supabase_key: String(body?.supabase_key ?? ''),
+    policy_version: String(body?.policy_version ?? ''),
+  };
+}
+
+/**
+ * Send one event through the local server. Fire-and-forget: posts only
+ * when the identity says analytics is enabled and never throws. Unknown
+ * event names are dropped here so typos surface during development.
+ */
+export function track(event: string, properties: Record<string, unknown> = {}): void {
   if (!KNOWN_EVENTS.has(event)) {
     if (import.meta.env.DEV) {
       console.warn(
@@ -144,39 +249,35 @@ export function track(
     }
     return;
   }
-  try {
-    posthog.capture(event, properties);
-  } catch {
-    // never throw
-  }
-}
+  const known = useAnalyticsIdentity.getState().identity;
+  if (known && !known.enabled) return;
 
-/** Force-flush queued events. Call on visibilitychange / pagehide. */
-export function flush(): void {
-  if (!enabledState) return;
-  try {
-    // posthog-js queues then flushes async; this is best-effort.
-    // The SDK doesn't expose a direct flush, but the page lifecycle
-    // hooks below cause a beacon-style flush automatically.
-  } catch {
-    // never throw
-  }
-}
-
-export function isAnalyticsEnabled(): boolean {
-  return enabledState;
-}
-
-export function getAnonId(): string {
-  return cachedAnonId;
+  void (async () => {
+    try {
+      const identity = known ?? (await loadAnalyticsIdentity());
+      if (!identity?.enabled) return;
+      // The server keeps only the properties each event declares, so the
+      // shared context below is dropped where it does not apply.
+      await apiFetch('/v1/analytics/capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event,
+          properties: { version: APP_VERSION, platform: detectPlatform(), ...properties },
+        }),
+        keepalive: true,
+      });
+    } catch {
+      // Analytics must never break the UI.
+    }
+  })();
 }
 
 /**
  * Hash an identifier to a 16-char sha256 hex prefix.
  *
  * Used for model / tool names that we want to cohort on without
- * actually shipping the raw value (e.g. proprietary model names a
- * power user has configured). Mirror of the backend's
+ * actually shipping the raw value. Mirror of the backend's
  * :func:`nicx.analytics.redaction.hash_id`.
  */
 export async function hashId(s: string): Promise<string> {

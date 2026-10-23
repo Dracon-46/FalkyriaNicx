@@ -84,6 +84,42 @@ class TestAskCommand:
         result = CliRunner().invoke(cli, ["ask", "Hello"])
         assert result.exit_code != 0
 
+    def test_out_of_memory_prints_advice_not_traceback(
+        self, monkeypatch, tmp_path: Path
+    ) -> None:
+        from nicx.engine._base import EngineOutOfMemoryError
+
+        _patch_ask(monkeypatch, tmp_path)
+        oom = EngineOutOfMemoryError(
+            "O Ollama não tem memória suficiente para carregar o modelo. "
+            "Reduza [engine.ollama] num_ctx.",
+            status=500,
+            detail="llama-server reported out-of-memory",
+        )
+        _ask_mod.get_engine()[1].generate.side_effect = oom
+        for args in (["ask", "Oi"], ["ask", "--agent", "", "Oi"]):
+            result = CliRunner().invoke(cli, args)
+            assert result.exit_code == 1
+            assert isinstance(result.exception, SystemExit)
+            assert "Sem memória" in result.output
+            # Rich must print the "[engine.ollama]" text, not eat it as markup.
+            assert "[engine.ollama] num_ctx" in result.output
+            assert "out-of-memory" in result.output
+
+    def test_engine_http_error_is_reported_cleanly(
+        self, monkeypatch, tmp_path: Path
+    ) -> None:
+        from nicx.engine._base import EngineRequestError
+
+        _patch_ask(monkeypatch, tmp_path)
+        _ask_mod.get_engine()[1].generate.side_effect = EngineRequestError(
+            "Ollama returned 404: model not found", status=404
+        )
+        result = CliRunner().invoke(cli, ["ask", "--agent", "", "Oi"])
+        assert result.exit_code == 1
+        assert isinstance(result.exception, SystemExit)
+        assert "model not found" in result.output
+
     def test_model_override(self, monkeypatch, tmp_path: Path) -> None:
         _patch_ask(monkeypatch, tmp_path)
         result = CliRunner().invoke(cli, ["ask", "-m", "custom-model", "Hello"])

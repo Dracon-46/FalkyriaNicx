@@ -24,3 +24,35 @@ def test_default_num_ctx_when_omitted(monkeypatch) -> None:  # noqa: ANN001
     )
     assert opts["num_ctx"] == 24576
     assert "num_gpu" not in opts
+
+
+def test_default_num_ctx_comes_from_config(monkeypatch, tmp_path) -> None:  # noqa: ANN001
+    """``[engine.ollama] num_ctx`` sets the default; NICX_NUM_CTX still wins."""
+    from nicx.core.config import load_config
+    from nicx.engine.ollama import _default_num_ctx
+
+    cfg = tmp_path / "config.toml"
+    cfg.write_text("[engine.ollama]\nnum_ctx = 4096\n", encoding="utf-8")
+    monkeypatch.setenv("NICX_CONFIG", str(cfg))
+    monkeypatch.delenv("NICX_NUM_CTX", raising=False)
+    load_config.cache_clear()
+
+    assert _default_num_ctx() == 4096
+    opts = _ollama_request_options(temperature=0.7, max_tokens=64, kwargs={})
+    assert opts["num_ctx"] == 4096
+
+    monkeypatch.setenv("NICX_NUM_CTX", "2048")
+    assert _default_num_ctx() == 2048
+
+
+def test_invalid_config_num_ctx_falls_back(monkeypatch, tmp_path) -> None:  # noqa: ANN001
+    from nicx.core.config import load_config
+    from nicx.engine.ollama import _default_num_ctx
+
+    cfg = tmp_path / "config.toml"
+    cfg.write_text("[engine.ollama]\nnum_ctx = 0\n", encoding="utf-8")
+    monkeypatch.setenv("NICX_CONFIG", str(cfg))
+    monkeypatch.delenv("NICX_NUM_CTX", raising=False)
+    load_config.cache_clear()
+
+    assert _default_num_ctx() == 8192

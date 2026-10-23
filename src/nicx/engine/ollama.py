@@ -6,7 +6,7 @@ import json
 import logging
 import os
 from collections.abc import AsyncIterator, Sequence
-from typing import Any, Dict, List
+from typing import Any, Dict, List, NoReturn
 
 import httpx
 
@@ -14,6 +14,8 @@ from nicx.core.registry import EngineRegistry
 from nicx.core.types import Message
 from nicx.engine._base import (
     EngineConnectionError,
+    EngineOutOfMemoryError,
+    EngineRequestError,
     InferenceEngine,
     estimate_prompt_tokens,
     messages_to_dicts,
@@ -70,17 +72,70 @@ def _is_control_token_only_args(raw_args: Any) -> bool:
     return saw_token
 
 
-def _default_num_ctx() -> int:
-    """Default context window (tokens). Override with ``NICX_NUM_CTX``.
+# Used when neither NICX_NUM_CTX nor ``[engine.ollama] num_ctx`` is usable.
+# Above Ollama's 4k default so an image plus a real conversation fit, and
+# small enough that a 4B model still loads on a CPU-only 16 GB machine.
+_FALLBACK_NUM_CTX = 8192
 
-    Raised above Ollama's 4k default so an image (which costs many tokens)
-    plus a real conversation fit. 16k is comfortable for small models on a
-    typical consumer GPU.
-    """
+
+def _configured_num_ctx() -> int | None:
+    """Return ``[engine.ollama] num_ctx`` from the user's config, if valid."""
     try:
-        return int(os.environ.get("NICX_NUM_CTX", "16384"))
-    except ValueError:
-        return 16384
+        from nicx.core.config import load_config
+
+        value = int(load_config().engine.ollama.num_ctx)
+    except Exception:  # noqa: BLE001 - a broken config must not block inference
+        return None
+    return value if value > 0 else None
+
+
+def _default_num_ctx() -> int:
+    """Default context window (tokens) sent to Ollama.
+
+    Priority: ``NICX_NUM_CTX`` env var > ``[engine.ollama] num_ctx`` in
+    ``config.toml`` > 8192. A bigger window costs RAM even when unused, and on
+    small machines that is the difference between loading and Ollama's
+    out-of-memory error.
+    """
+    raw = os.environ.get("NICX_NUM_CTX", "").strip()
+    if raw:
+        try:
+            value = int(raw)
+        except ValueError:
+            value = 0
+        if value > 0:
+            return value
+    return _configured_num_ctx() or _FALLBACK_NUM_CTX
+
+
+_OOM_MARKERS = (
+    "out of memory",
+    "out-of-memory",
+    "failed to allocate",
+    "unable to allocate",
+    "requires more system memory",
+    "insufficient memory",
+    "not enough memory",
+)
+
+
+def _looks_like_out_of_memory(detail: str) -> bool:
+    low = (detail or "").lower()
+    return any(marker in low for marker in _OOM_MARKERS)
+
+
+def _out_of_memory_error(detail: str, status: int) -> EngineOutOfMemoryError:
+    num_ctx = _default_num_ctx()
+    smaller = max(2048, num_ctx // 2)
+    return EngineOutOfMemoryError(
+        "O Ollama não tem memória suficiente para carregar o modelo. "
+        "Feche programas que consomem muita RAM (navegador, editores) e tente "
+        "de novo, ou reduza a janela de contexto em ~/.nicx/config.toml "
+        f"([engine.ollama] num_ctx, hoje {num_ctx}; experimente {smaller}) "
+        "ou use um modelo menor.",
+        status=status,
+        detail=detail,
+    )
 
 
 def _ollama_request_options(
@@ -112,6 +167,7 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
     # Ollama has no context-length overflow signal in its 400 bodies, so the
     # shared ``_raise_stream_http_error`` keeps its default (no
     # ``EngineContextLengthError`` branch, unlike the OpenAI-compat engines).
+    # Out-of-memory 500s are recognized first, see below.
 
     _DEFAULT_HOST = "http://localhost:11434"
 
@@ -137,6 +193,12 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
         self._client = httpx.Client(base_url=self._host, timeout=timeout)
         # Last stream usage — captured from Ollama's final chunk
         self._last_stream_usage: Dict[str, int] = {}
+
+    def _raise_stream_http_error(self, status: int, detail: str) -> NoReturn:
+        """Report Ollama's out-of-memory failures as such, not as unreachable."""
+        if _looks_like_out_of_memory(detail):
+            raise _out_of_memory_error((detail or "").strip()[:500], status)
+        super()._raise_stream_http_error(status, detail)
 
     def generate(
         self,
@@ -202,8 +264,11 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
             ) from exc
         except httpx.HTTPStatusError as exc:
             body = exc.response.text[:500] if exc.response else ""
-            raise RuntimeError(
-                f"Ollama returned {exc.response.status_code}: {body}"
+            status = exc.response.status_code
+            if _looks_like_out_of_memory(body):
+                raise _out_of_memory_error(body, status) from exc
+            raise EngineRequestError(
+                f"Ollama returned {status}: {body}", status=status, detail=body
             ) from exc
         data = resp.json()
         # prompt_eval_count = tokens actually evaluated (KV-cache-aware).

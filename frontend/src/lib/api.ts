@@ -367,7 +367,7 @@ export async function transcribeAudio(audioBlob: Blob, filename = 'recording.web
       });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      throw new Error(msg || 'Transcription failed');
+      throw new Error(msg || 'Falha na transcrição');
     }
   }
   const formData = new FormData();
@@ -384,7 +384,7 @@ export async function transcribeAudio(audioBlob: Blob, filename = 'recording.web
     } catch {
       // Keep the status-only message below when the body is not JSON.
     }
-    throw new Error(detail || `Transcription failed: ${res.status}`);
+    throw new Error(detail || `Falha na transcrição: ${res.status}`);
   }
   return res.json();
 }
@@ -415,7 +415,7 @@ export async function synthesizeSpeech(
     } catch {
       // Keep the status-only message below when the body is not JSON.
     }
-    throw new Error(detail || `Speech synthesis failed: ${res.status}`);
+    throw new Error(detail || `Falha ao sintetizar a voz: ${res.status}`);
   }
   return res.blob();
 }

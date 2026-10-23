@@ -10,6 +10,7 @@ import time
 
 import click
 from rich.console import Console
+from rich.markup import escape
 from rich.table import Table
 
 from nicx.cli._banner import print_banner
@@ -21,6 +22,8 @@ from nicx.core.types import Message, Role
 from nicx.engine import (
     EngineConnectionError,
     EngineContextLengthError,
+    EngineOutOfMemoryError,
+    EngineRequestError,
     discover_engines,
     discover_models,
     get_engine,
@@ -51,6 +54,22 @@ LOCAL_ENGINES = {
     "uzu",
     "vllm",
 }
+
+
+def _print_engine_request_error(console: Console, exc: EngineRequestError) -> None:
+    """Explain an engine failure in PT-BR, without a traceback.
+
+    The engine was reachable, so the "is the engine running?" hint would
+    mislead; out-of-memory errors already carry what to do about them.
+    """
+    if isinstance(exc, EngineOutOfMemoryError):
+        console.print(f"[red]Sem memória:[/red] {escape(str(exc))}")
+        if exc.detail:
+            console.print(f"[dim]Detalhe do Ollama: {escape(exc.detail)}[/dim]")
+        return
+    console.print(
+        f"[red]O motor de inferência falhou ao responder:[/red] {escape(str(exc))}"
+    )
 
 
 def _resolve_research_model(model_name: str | None, config: NicxConfig | None) -> str:
@@ -1139,6 +1158,9 @@ def ask(
             # config (hint_no_engine) would be misleading here.
             console.print(f"[red]{exc}[/red]")
             sys.exit(1)
+        except EngineRequestError as exc:
+            _print_engine_request_error(console, exc)
+            sys.exit(1)
         except EngineConnectionError as exc:
             console.print(f"[red]Engine error:[/red] {exc}")
             console.print(hint_no_engine())
@@ -1240,6 +1262,9 @@ def ask(
         # Not a reachability problem — pointing the user at server/host
         # config (hint_no_engine) would be misleading here.
         console.print(f"[red]{exc}[/red]")
+        sys.exit(1)
+    except EngineRequestError as exc:
+        _print_engine_request_error(console, exc)
         sys.exit(1)
     except EngineConnectionError as exc:
         console.print(f"[red]Engine error:[/red] {exc}")

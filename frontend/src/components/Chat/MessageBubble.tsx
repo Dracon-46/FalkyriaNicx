@@ -14,6 +14,7 @@ import { XRayFooter } from './XRayFooter';
 import { SpeakMessageButton } from './SpeakMessageButton';
 import type { ChatMessage } from '../../types';
 import { stripThinkTags } from '../../lib/message-text';
+import { NicxMascot } from '../Mascot/NicxMascot';
 
 interface Props {
   message: ChatMessage;
@@ -138,6 +139,15 @@ export function MessageBubble({ message, isLive = false }: Props) {
 
   return (
     <div className="group mb-6">
+      {/* Who is talking. The live reply's avatar shows Nicx's current mood as a
+          still pose; the mascot on the composer is the animated one. */}
+      <div className="flex items-center gap-2 mb-1.5">
+        <NicxMascot size="sm" animated={false} mood={isLive ? undefined : 'idle'} decorative />
+        <span className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>
+          Nicx
+        </span>
+      </div>
+
       {/* Deep Research timeline (steps + status) */}
       {(message.isResearch || (message.researchTraces && message.researchTraces.length > 0)) && (
         <ResearchTimeline
