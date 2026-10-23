@@ -38,6 +38,7 @@ import {
   type InferenceSource,
   type MemoryStats,
   type WakeStatus,
+  WakeUnsupportedError,
 } from '../lib/api';
 
 const CLOUD_KEY_STATUS_CHANGED = 'nicx-cloud-key-status-changed';
@@ -280,26 +281,36 @@ const WAKE_STATE_LABEL: Record<string, string> = {
 export function WakeWordSettings({ onSaved }: { onSaved: () => void }) {
   const [status, setStatus] = useState<WakeStatus | null>(null);
   const [error, setError] = useState('');
+  const [unsupported, setUnsupported] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const refresh = () =>
       fetchWakeStatus()
         .then((s) => {
-          if (!cancelled) {
-            setStatus(s);
-            setError('');
-          }
+          if (cancelled) return;
+          setStatus(s);
+          setError('');
+          setUnsupported(false);
+          timer = setTimeout(refresh, 5000);
         })
-        .catch(() => {
-          if (!cancelled) setError('Servidor do Nicx indisponível');
+        .catch((e) => {
+          if (cancelled) return;
+          // An older server: say so once and stop asking.
+          if (e instanceof WakeUnsupportedError) {
+            setUnsupported(true);
+            setError(e.message);
+            return;
+          }
+          setError('Servidor do Nicx indisponível');
+          timer = setTimeout(refresh, 10000);
         });
     void refresh();
-    const timer = setInterval(refresh, 5000);
     return () => {
       cancelled = true;
-      clearInterval(timer);
+      if (timer) clearTimeout(timer);
     };
   }, []);
 
@@ -310,6 +321,7 @@ export function WakeWordSettings({ onSaved }: { onSaved: () => void }) {
       setStatus(await updateWake(update));
       onSaved();
     } catch (e) {
+      if (e instanceof WakeUnsupportedError) setUnsupported(true);
       setError(e instanceof Error ? e.message : 'Não foi possível salvar');
     } finally {
       setSaving(false);
@@ -317,7 +329,9 @@ export function WakeWordSettings({ onSaved }: { onSaved: () => void }) {
   };
 
   const enabled = status?.enabled ?? false;
-  const stateLabel = !status
+  const stateLabel = unsupported
+    ? 'Reinicie o servidor do Nicx'
+    : !status
     ? error || 'Verificando...'
     : enabled && !status.running
       ? 'Iniciando...'
@@ -366,7 +380,7 @@ export function WakeWordSettings({ onSaved }: { onSaved: () => void }) {
           />
         </SettingRow>
       )}
-      {error && status && (
+      {error && (status || unsupported) && (
         <div className="text-xs mt-2 px-1" style={{ color: 'var(--color-error, #d33)' }}>
           {error}
         </div>

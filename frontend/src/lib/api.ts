@@ -465,7 +465,32 @@ export interface WakeStatus {
   busy: boolean;
 }
 
+/**
+ * A server older than "Nicx, ligar" answers 404 here. Remember that for a
+ * while so the interface neither shows errors nor keeps hitting the route
+ * (each failed request is a red line in the browser console).
+ */
+const WAKE_RETRY_MS = 5 * 60 * 1000;
+let wakeMissingSince = 0;
+
+/** The running server has no `/v1/speech/wake` (it needs a restart). */
+export class WakeUnsupportedError extends Error {
+  constructor() {
+    super('Este servidor do Nicx ainda não tem a escuta: reinicie-o para usar.');
+    this.name = 'WakeUnsupportedError';
+  }
+}
+
+function wakeKnownMissing(): boolean {
+  return wakeMissingSince > 0 && Date.now() - wakeMissingSince < WAKE_RETRY_MS;
+}
+
 async function wakeResponse(res: Response): Promise<WakeStatus> {
+  if (res.status === 404 || res.status === 405) {
+    wakeMissingSince = Date.now();
+    throw new WakeUnsupportedError();
+  }
+  wakeMissingSince = 0;
   if (!res.ok) {
     let detail = '';
     try {
@@ -479,6 +504,7 @@ async function wakeResponse(res: Response): Promise<WakeStatus> {
 }
 
 export async function fetchWakeStatus(): Promise<WakeStatus> {
+  if (wakeKnownMissing()) throw new WakeUnsupportedError();
   return wakeResponse(await apiFetch(`/v1/speech/wake`));
 }
 
@@ -495,14 +521,21 @@ export async function updateWake(change: { enabled?: boolean; autostart?: boolea
 /**
  * Tell the background listener that Nicx is in a voice conversation or
  * talking, so it never wakes up on its own voice. `ttl` makes a closed tab
- * stop counting by itself.
+ * stop counting by itself. Silently skipped on a server without the route.
  */
 export async function reportVoiceBusy(source: string, busy: boolean, ttl = 10): Promise<void> {
-  await apiFetch(`/v1/speech/wake/busy`, {
+  if (wakeKnownMissing()) return;
+  const res = await apiFetch(`/v1/speech/wake/busy`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ source, busy, ttl }),
   });
+  if (res.status === 404 || res.status === 405) wakeMissingSince = Date.now();
+}
+
+/** Test seam. */
+export function __resetWakeSupportForTests(): void {
+  wakeMissingSince = 0;
 }
 
 // ---------------------------------------------------------------------------

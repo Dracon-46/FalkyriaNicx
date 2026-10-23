@@ -1663,6 +1663,23 @@ class SpeechConfig:
     tts_backend: str = "kokoro"  # "kokoro", "openai_tts", "cartesia", "elevenlabs"
     voice_id: str = "pf_dora"
     voice_speed: float = 1.0
+    # "Nicx, ligar": escuta em segundo plano (``nicx escuta``) que faz o mascote
+    # aparecer. Desligada por padrão; o microfone fica aberto só localmente e
+    # nada é gravado nem enviado. O nome casa por pronúncia (Nix, Nics, Nick).
+    wake_word: bool = False
+    wake_phrases: List[str] = field(
+        default_factory=lambda: [
+            "Nicx, ligar",
+            "Nicx, acordar",
+            "Nicx, aparece",
+            "Nicx, abrir",
+            "Ei Nicx",
+            "Oi Nicx",
+        ]
+    )
+    # Whisper só para as falas curtas da escuta: "base" acerta bem o nome em
+    # ~0,9 s por frase nesta CPU; "tiny" leva ~0,4 s mas erra mais.
+    wake_model: str = "base"
 
 
 @dataclass(slots=True)

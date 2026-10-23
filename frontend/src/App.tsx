@@ -13,6 +13,7 @@ import { SetupScreen } from './components/SetupScreen';
 import { Toaster } from './components/ui/sonner';
 import { useAppStore } from './lib/store';
 import { bindMascotToChat } from './lib/mascot-chat';
+import { startVoiceBusyReporter } from './lib/voice-busy';
 import { fetchModels, fetchServerInfo, fetchSavings, isTauri } from './lib/api';
 import { track, hashId } from './lib/analytics';
 import { ConsentGate } from './components/Privacy/ConsentDialog';
@@ -51,6 +52,10 @@ export default function App() {
 
   // The mascot thinks while a reply streams, then cheers or frowns.
   useEffect(() => bindMascotToChat(), []);
+
+  // Keep the background "Nicx, ligar" listener quiet while Nicx talks or a
+  // voice conversation runs here.
+  useEffect(() => startVoiceBusyReporter(), []);
 
   // Sync overlay conversations into the main app
   const importOverlay = useAppStore((s) => s.importOverlayConversation);

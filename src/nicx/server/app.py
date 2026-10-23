@@ -27,6 +27,7 @@ from nicx.server.digest_routes import create_digest_router
 from nicx.server.research_router import router as research_router
 from nicx.server.routes import router
 from nicx.server.upload_router import router as upload_router
+from nicx.server.wake_routes import router as wake_router
 
 logger = logging.getLogger(__name__)
 _MANAGED_SHUTDOWN_GRACE_SECONDS = 0.25
@@ -482,6 +483,7 @@ def create_app(
     app.include_router(upload_router)
     app.include_router(research_router)
     app.include_router(analytics_router)
+    app.include_router(wake_router)
     include_all_routes(app)
 
     # Restore SendBlue channel bindings from database on startup

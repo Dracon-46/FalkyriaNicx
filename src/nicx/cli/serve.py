@@ -796,6 +796,15 @@ def serve(
             "authenticated requests to your instance."
         )
 
+    # "Nicx, ligar" ativado: garante a escuta em segundo plano rodando.
+    if getattr(config.speech, "wake_word", False):
+        try:
+            from nicx.wake.runtime import start_listener_process
+
+            start_listener_process(only_if_enabled=True)
+        except Exception as exc:
+            logger.debug("Escuta de 'Nicx, ligar' não iniciada: %s", exc)
+
     from nicx.server.daemon import run_server
 
     run_server(app, host=bind_host, port=bind_port, log_level="info")
