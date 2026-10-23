@@ -482,12 +482,17 @@ class WakeTranscriber:
         *,
         language: str = "pt",
         hotwords: str = "Nicx",
+        initial_prompt: str = "Nicx, ligar. Oi Nicx.",
         compute_type: str = "int8",
         cpu_threads: int = 4,
     ) -> None:
         self.model_size = model_size
         self.language = language or None
         self.hotwords = hotwords
+        # Contexto que puxa o Whisper para o nome: no microfone do notebook o
+        # base ouvia "Nix, rigor" e "Liga"; com ele acertou 5 de 5, sem falso
+        # positivo nas outras falas gravadas.
+        self.initial_prompt = initial_prompt
         self.compute_type = compute_type
         self.cpu_threads = cpu_threads
         self._model: Any = None
@@ -518,11 +523,16 @@ class WakeTranscriber:
             audio,
             language=self.language,
             hotwords=self.hotwords or None,
+            initial_prompt=self.initial_prompt or None,
             beam_size=1,
             temperature=0.0,
             condition_on_previous_text=False,
             without_timestamps=True,
             vad_filter=False,
+            # Frase de ativação é curta: corta alucinações em laço
+            # ("o que é o que é o que é...") em vez de transcrever 200 tokens.
+            max_new_tokens=24,
+            no_repeat_ngram_size=3,
         )
         return "".join(seg.text for seg in segments).strip()
 
