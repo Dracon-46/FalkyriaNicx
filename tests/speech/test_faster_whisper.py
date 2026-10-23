@@ -197,7 +197,10 @@ def test_faster_whisper_forwards_vad_filter_and_hotwords():
     ):
         plain = FasterWhisperBackend(model_size="base", device="cpu")
         plain.transcribe(b"audio", language="pt")
-        assert mock_model.transcribe.call_args.kwargs == {"language": "pt"}
+        assert mock_model.transcribe.call_args.kwargs == {
+            "condition_on_previous_text": False,
+            "language": "pt",
+        }
 
         tuned = FasterWhisperBackend(
             model_size="base",
@@ -207,6 +210,7 @@ def test_faster_whisper_forwards_vad_filter_and_hotwords():
         )
         tuned.transcribe(b"audio", language="pt")
         assert mock_model.transcribe.call_args.kwargs == {
+            "condition_on_previous_text": False,
             "language": "pt",
             "vad_filter": True,
             "hotwords": "Nicx Falkyria",
@@ -224,3 +228,37 @@ def test_discovery_passes_speech_config_to_faster_whisper():
     assert backend._compute_type == "int8"
     assert backend._vad_filter is True
     assert backend._hotwords == cfg.speech.hotwords
+
+
+def test_collapse_repeats_keeps_one_copy_of_a_loop():
+    from nicx.speech.faster_whisper import _collapse_repeats
+
+    assert _collapse_repeats("E aí? E aí? E aí?") == "E aí?"
+    assert (
+        _collapse_repeats("Oi. Tudo bem? tudo bem? Tudo bem? Fim.")
+        == "Oi. Tudo bem? Fim."
+    )
+    # Two in a row can be on purpose.
+    assert _collapse_repeats("Sim. Sim.") == "Sim. Sim."
+    assert _collapse_repeats("não, não, não") == "não, não, não"
+    assert _collapse_repeats("") == ""
+
+
+def test_faster_whisper_drops_segments_made_up_from_noise():
+    def seg(text, no_speech, logprob):
+        return MagicMock(
+            text=text, start=0.0, end=1.0, no_speech_prob=no_speech, avg_logprob=logprob
+        )
+
+    mock_info = MagicMock(language="pt", language_probability=0.9, duration=3.0)
+    mock_model = MagicMock()
+    mock_model.transcribe.return_value = (
+        iter([seg(" Nicx, que horas são?", 0.05, -0.3), seg(" E aí?", 0.8, -1.4)]),
+        mock_info,
+    )
+    with patch("nicx.speech.faster_whisper.WhisperModel", return_value=mock_model):
+        result = FasterWhisperBackend(model_size="base", device="cpu").transcribe(
+            b"audio"
+        )
+    assert result.text == "Nicx, que horas são?"
+    assert len(result.segments) == 1

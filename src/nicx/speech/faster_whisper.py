@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import tempfile
 from typing import List, Optional
 
@@ -21,6 +22,34 @@ except ImportError:
     ctranslate2 = None  # type: ignore[assignment]
 
 logger = logging.getLogger(__name__)
+
+_SENTENCE = re.compile(r"[^.!?…]+[.!?…]*")
+
+
+def _likely_not_speech(segment: object) -> bool:
+    """Whisper's own rule for text made up from noise or silence."""
+    no_speech = getattr(segment, "no_speech_prob", None)
+    logprob = getattr(segment, "avg_logprob", None)
+    if not isinstance(no_speech, (int, float)) or not isinstance(logprob, (int, float)):
+        return False
+    return no_speech > 0.6 and logprob < -1.0
+
+
+def _collapse_repeats(text: str, limit: int = 3) -> str:
+    """Keep one copy of a sentence repeated ``limit`` or more times in a row."""
+    sentences = [s.strip() for s in _SENTENCE.findall(text) if s.strip()]
+    out: list[str] = []
+    i = 0
+    while i < len(sentences):
+        j = i
+        while (
+            j + 1 < len(sentences) and sentences[j + 1].lower() == sentences[i].lower()
+        ):
+            j += 1
+        run = j - i + 1
+        out.extend(sentences[i : j + 1] if run < limit else [sentences[i]])
+        i = j + 1
+    return " ".join(out) if out else text
 
 
 @SpeechRegistry.register("faster-whisper")
@@ -125,7 +154,9 @@ class FasterWhisperBackend(SpeechBackend):
                 with tmp:
                     tmp.write(audio)
 
-                kwargs: dict = {}
+                # Each segment decoded on its own: carrying the previous text
+                # over is what makes Whisper loop ("E aí? E aí? E aí?").
+                kwargs: dict = {"condition_on_previous_text": False}
                 if language:
                     kwargs["language"] = language
                 if self._vad_filter:
@@ -134,7 +165,7 @@ class FasterWhisperBackend(SpeechBackend):
                     kwargs["hotwords"] = self._hotwords
 
                 segments_iter, info = model.transcribe(tmp.name, **kwargs)
-                segments_list = list(segments_iter)
+                segments_list = [s for s in segments_iter if not _likely_not_speech(s)]
             finally:
                 try:
                     os.unlink(tmp.name)
@@ -149,7 +180,7 @@ class FasterWhisperBackend(SpeechBackend):
             raise
 
         # Build result
-        text = "".join(seg.text for seg in segments_list).strip()
+        text = _collapse_repeats("".join(seg.text for seg in segments_list).strip())
         segments = [
             Segment(
                 text=seg.text.strip(),
