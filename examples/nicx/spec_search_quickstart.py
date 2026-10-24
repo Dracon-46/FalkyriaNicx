@@ -10,7 +10,7 @@ with no API keys and no Ollama / vLLM running. Every "swap this for production"
 hookpoint is called out inline.
 
 Configuration is read from ``configs/nicx/examples/spec-search-quickstart.toml``
-via the regular ``nicx.core.config.load_config`` machinery — you can copy
+via the regular ``nicx.nucleo.config.load_config`` machinery — you can copy
 that TOML to ``~/.nicx/config.toml`` and tune the gate / stagnation /
 reward knobs without editing this file.
 
@@ -30,19 +30,19 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock
 
-from nicx.core.config import SpecSearchLearningConfig
-from nicx.learning.spec_search.composite_reward import (
+from nicx.nucleo.config import SpecSearchLearningConfig
+from nicx.cerebro.roteamento.spec_search.composite_reward import (
     RewardWeights,
     TrainingSample,
     score_batch,
 )
-from nicx.learning.spec_search.models import (
+from nicx.cerebro.roteamento.spec_search.models import (
     BenchmarkSnapshot,
     FailureCluster,
 )
-from nicx.learning.spec_search.multi_session import SpecSearchLoop
-from nicx.learning.spec_search.orchestrator import SpecSearchOrchestrator
-from nicx.learning.spec_search.triggers import OnDemandTrigger
+from nicx.cerebro.roteamento.spec_search.multi_session import SpecSearchLoop
+from nicx.cerebro.roteamento.spec_search.orchestrator import SpecSearchOrchestrator
+from nicx.cerebro.roteamento.spec_search.triggers import OnDemandTrigger
 
 # ---------------------------------------------------------------------------
 # Fakes — replace these with real production components.
@@ -55,7 +55,7 @@ class FakeTeacherEngine:
 
     For production, use the registry::
 
-        from nicx.core.registry import EngineRegistry
+        from nicx.nucleo.registry import EngineRegistry
         engine_cls = EngineRegistry.get(cfg.teacher_engine)  # "cloud"
         engine = engine_cls(model=cfg.teacher_model)         # set ANTHROPIC_API_KEY
 
@@ -102,7 +102,7 @@ class FakeTeacherEngine:
 
 def _fake_diagnosis() -> Any:
     """A canned DiagnosisResult so the demo doesn't need a real teacher loop."""
-    from nicx.learning.spec_search.diagnose.runner import DiagnosisResult
+    from nicx.cerebro.roteamento.spec_search.diagnose.runner import DiagnosisResult
 
     return DiagnosisResult(
         diagnosis_md=(
@@ -222,7 +222,7 @@ def main() -> None:
     # For a self-contained demo we synthesize the spec-search config inline so the
     # script is runnable without copying any files. To use the prebuilt TOML:
     #
-    #     from nicx.core.config import load_config
+    #     from nicx.nucleo.config import load_config
     #     cfg = load_config().learning.spec_search
     #
     # (after copying ``configs/nicx/examples/spec-search-quickstart.toml``
@@ -260,7 +260,7 @@ def main() -> None:
 
     print("\n=== Single session (one diagnose / plan / execute / record) ===")
     with patch(
-        "nicx.learning.spec_search.orchestrator.DiagnosisRunner"
+        "nicx.cerebro.roteamento.spec_search.orchestrator.DiagnosisRunner"
     ) as MockDiag:
         MockDiag.return_value.run.return_value = _fake_diagnosis()
         session = orch.run(OnDemandTrigger())
@@ -289,7 +289,7 @@ def main() -> None:
         f"{cfg.stagnation_k}, max_total_cost = ${cfg.max_total_cost_usd}) ==="
     )
     with patch(
-        "nicx.learning.spec_search.orchestrator.DiagnosisRunner"
+        "nicx.cerebro.roteamento.spec_search.orchestrator.DiagnosisRunner"
     ) as MockDiag:
         MockDiag.return_value.run.return_value = _fake_diagnosis()
         result = loop.run()

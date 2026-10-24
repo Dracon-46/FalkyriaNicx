@@ -4,7 +4,7 @@
 Usage::
 
     python examples/code_companion/test_gen.py \
-        --module src/nicx/tools/calculator.py
+        --module src/nicx/ferramentas/calculator.py
     python examples/code_companion/test_gen.py \
         --module src/app/utils.py --framework unittest
     python examples/code_companion/test_gen.py \

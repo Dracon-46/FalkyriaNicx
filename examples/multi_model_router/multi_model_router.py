@@ -62,7 +62,7 @@ def main() -> None:
 
     try:
         from nicx import Nicx
-        from nicx.learning.routing.router import (
+        from nicx.cerebro.roteamento.router import (
             HeuristicRouter,
             build_routing_context,
         )
@@ -111,7 +111,7 @@ def main() -> None:
 
     # Select the model using the chosen strategy
     if args.strategy == "bandit":
-        from nicx.learning.routing.learned_router import LearnedRouterPolicy
+        from nicx.cerebro.roteamento.learned_router import LearnedRouterPolicy
 
         router = LearnedRouterPolicy()
         selected_model = router.select_model(context)
