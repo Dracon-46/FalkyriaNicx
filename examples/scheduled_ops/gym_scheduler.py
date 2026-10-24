@@ -109,8 +109,8 @@ def main(
 def _register_task(gym: str) -> None:
     """Register this script as a recurring scheduled task."""
     try:
-        from nicx.scheduler import TaskScheduler
-        from nicx.scheduler.store import SchedulerStore
+        from nicx.agenda import TaskScheduler
+        from nicx.agenda.store import SchedulerStore
 
         store = SchedulerStore()
         scheduler = TaskScheduler(store)

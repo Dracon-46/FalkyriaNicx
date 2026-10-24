@@ -98,7 +98,7 @@ turns.
   Thought-Action-Observation loop, or `native_openhands` for a CodeAct-style
   agent.
 - **Use the recipe programmatically** -- load the TOML with
-  `nicx.recipes.load_recipe("examples/deep_research/research.toml")` and
+  `nicx.cerebro.receitas.load_recipe("examples/deep_research/research.toml")` and
   pass the result to `SystemBuilder`.
 
 ## Further Reading
@@ -107,5 +107,5 @@ turns.
   `ToolUsingAgent`, `OrchestratorAgent`) and the `accepts_tools` mechanism.
 - [Architecture: Tools](../../docs/user-guide/tools.md) -- tool registry, MCP adapter, and
   the `ToolExecutor` dispatch pipeline.
-- [Recipes](../../src/nicx/recipes/) -- composable TOML configs that
+- [Recipes](../../src/nicx/cerebro/receitas/) -- composable TOML configs that
   wire all five pillars.

@@ -88,8 +88,8 @@ uv run python examples/scheduled_ops/gym_scheduler.py --register --gym "Planet F
 This uses `TaskScheduler` and `SchedulerStore` directly:
 
 ```python
-from nicx.scheduler import TaskScheduler
-from nicx.scheduler.store import SchedulerStore
+from nicx.agenda import TaskScheduler
+from nicx.agenda.store import SchedulerStore
 
 store = SchedulerStore()
 scheduler = TaskScheduler(store)
@@ -112,7 +112,7 @@ To send results to a Slack channel (or any other supported channel), pipe the ou
 uv run python examples/scheduled_ops/daily_digest.py | nicx channel send slack
 
 # Or add channel output inside the script:
-# from nicx.channels import ChannelRegistry
+# from nicx.canais import ChannelRegistry
 # channel = ChannelRegistry.create("slack", webhook_url="https://hooks.slack.com/...")
 # channel.send(response)
 ```

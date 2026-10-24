@@ -141,4 +141,4 @@ nicx scheduler create "Daily inbox summary" --type cron --value "0 17 * * *"
 ```
 
 Or use the operator recipe pattern to run a persistent triage agent on a
-schedule. See `src/nicx/recipes/data/operators/` for examples.
+schedule. See `src/nicx/cerebro/receitas/data/operators/` for examples.

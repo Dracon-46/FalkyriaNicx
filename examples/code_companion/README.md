@@ -75,14 +75,14 @@ python examples/code_companion/debugger.py \
 Generate pytest tests for a module:
 
 ```bash
-python examples/code_companion/test_gen.py --module src/nicx/tools/calculator.py
+python examples/code_companion/test_gen.py --module src/nicx/ferramentas/calculator.py
 ```
 
 Use unittest instead, and write to a specific file:
 
 ```bash
 python examples/code_companion/test_gen.py \
-    --module src/nicx/tools/calculator.py \
+    --module src/nicx/ferramentas/calculator.py \
     --framework unittest \
     --output tests/test_calculator_generated.py
 ```
@@ -120,7 +120,7 @@ python examples/code_companion/debugger.py --model claude-sonnet-4-20250514 --en
 To change which tools an agent can use, edit the `tools` list in the script.
 Available tools include `calculator`, `web_search`, `shell_exec`, `code_interpreter`,
 `memory_store`, `memory_search`, and more. Run `uv run nicx eval list` or
-inspect `src/nicx/tools/` for the full registry.
+inspect `src/nicx/ferramentas/` for the full registry.
 
 ### Prompts
 
