@@ -90,7 +90,7 @@ All agents extend the abstract `BaseAgent` class.
 
 ```python
 from abc import ABC, abstractmethod
-from nicx.agents._stubs import AgentContext, AgentResult
+from nicx.cerebro.agentes._stubs import AgentContext, AgentResult
 
 class BaseAgent(ABC):
     agent_id: str
@@ -233,7 +233,7 @@ Models may also return one complete JSON object, optionally inside a JSON code f
 **When to use:** For queries that benefit from explicit step-by-step reasoning with tool use, where you want visibility into the agent's thought process.
 
 !!! note "Backward compatibility"
-    The registry alias `"react"` maps to `NativeReActAgent`. The old import `from nicx.agents.react import ReActAgent` also still works.
+    The registry alias `"react"` maps to `NativeReActAgent`. The old import `from nicx.cerebro.agentes.react import ReActAgent` also still works.
 
 ---
 
@@ -428,7 +428,7 @@ The `ClaudeCodeAgent` wraps the `@anthropic-ai/claude-agent-sdk` package via a b
 **When to use:** For software engineering tasks where the Claude Agent SDK's built-in tools (code editing, bash execution, file operations) provide capabilities beyond what Nicx tool-calling agents support.
 
 ```python
-from nicx.agents.claude_code import ClaudeCodeAgent
+from nicx.cerebro.agentes.claude_code import ClaudeCodeAgent
 
 agent = ClaudeCodeAgent(
     engine=None,          # not used
@@ -481,7 +481,7 @@ The `OpenCodeAgent` delegates coding tasks to [opencode](https://opencode.ai), t
 | `timeout`           | `int`             | `600`            | HTTP timeout in seconds                                  |
 
 ```python
-from nicx.agents.opencode import OpenCodeAgent
+from nicx.cerebro.agentes.opencode import OpenCodeAgent
 
 agent = OpenCodeAgent(engine, "qwen3:8b", workspace="/path/to/project", agent="build")
 result = agent.run("Add type hints to utils.py and run the tests")
@@ -541,7 +541,7 @@ The `OperativeAgent` is a persistent, scheduled autonomous agent with built-in s
 **When to use:** For autonomous agents that run on a schedule (e.g., via `TaskScheduler`) and need to maintain state between invocations. The agent automatically manages session history and state persistence across ticks.
 
 ```python
-from nicx.agents.operative import OperativeAgent
+from nicx.cerebro.agentes.operative import OperativeAgent
 
 agent = OperativeAgent(
     engine,
@@ -608,7 +608,7 @@ The `MonitorOperativeAgent` is a long-horizon agent with four configurable strat
 **When to use:** For long-horizon benchmark evaluation and complex multi-step tasks that benefit from configurable strategies for memory management, context compression, and task decomposition. Particularly useful for benchmarks like GAIA, FRAMES, and LifelongAgent where strategy selection impacts performance.
 
 ```python
-from nicx.agents.monitor_operative import MonitorOperativeAgent
+from nicx.cerebro.agentes.monitor_operative import MonitorOperativeAgent
 
 agent = MonitorOperativeAgent(
     engine,
@@ -659,8 +659,8 @@ See also the [`ContainerRunner`](#containerrunner) reference below, which manage
 | `bus`                  | `EventBus`        | `None`       | Event bus for telemetry                           |
 
 ```python
-from nicx.sandbox import ContainerRunner, SandboxedAgent
-from nicx.agents.simple import SimpleAgent
+from nicx.ferramentas.sandbox import ContainerRunner, SandboxedAgent
+from nicx.cerebro.agentes.simple import SimpleAgent
 
 runner = ContainerRunner(
     image="nicx-sandbox:latest",
@@ -716,7 +716,7 @@ If `mount_allowlist_path` is not set, no root restriction is applied. Blocked pa
 Agents are registered via the `@AgentRegistry.register()` decorator. This makes them discoverable by name at runtime:
 
 ```python
-from nicx.core.registry import AgentRegistry
+from nicx.nucleo.registry import AgentRegistry
 
 # Check if an agent is registered
 AgentRegistry.contains("orchestrator")  # True

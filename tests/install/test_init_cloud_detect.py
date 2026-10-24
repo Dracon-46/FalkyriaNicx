@@ -6,7 +6,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-from nicx.cli.init_cmd import init
+from nicx.comandos.init_cmd import init
 
 
 def _clear_keys(monkeypatch) -> None:

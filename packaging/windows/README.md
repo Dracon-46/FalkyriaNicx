@@ -60,7 +60,7 @@ Opções úteis:
 | Opção | Efeito |
 |-------|--------|
 | `-Version 0.2.0` | Versão do pacote e do instalador (padrão: tag `vX.Y.Z` do commit, senão `0.1.0`) |
-| `-SkipFrontend` | Reaproveita a interface já compilada em `src/nicx/server/static` |
+| `-SkipFrontend` | Reaproveita a interface já compilada em `src/nicx/servidor/static` |
 | `-SkipRust` | Reaproveita o wheel `nicx_rust` mais recente (economiza ~4 min) |
 | `-UvExe <caminho>` | `uv.exe` a embutir (padrão: o do PATH) |
 

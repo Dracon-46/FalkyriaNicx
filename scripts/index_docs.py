@@ -21,7 +21,7 @@ import sys
 import time
 from pathlib import Path
 
-from nicx.tools.storage.dense import (
+from nicx.ferramentas.storage.dense import (
     DenseMemory,
     MdChunk,
     chunk_markdown,

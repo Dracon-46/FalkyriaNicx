@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from nicx.cli import _bg_state
-from nicx.cli._chat_banner import render_startup_banner
+from nicx.comandos import _bg_state
+from nicx.comandos._chat_banner import render_startup_banner
 
 
 def test_banner_empty_when_all_ready(tmp_nicx_home: Path) -> None:

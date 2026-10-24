@@ -49,7 +49,7 @@ COPY scripts/install scripts/install
 COPY deploy/windows deploy/windows
 
 # Copy built frontend into the server static directory
-COPY --from=frontend /src/nicx/server/static src/nicx/server/static/
+COPY --from=frontend /src/nicx/servidor/static src/nicx/servidor/static/
 
 # Install the project itself without re-resolving dependencies.
 RUN uv pip install --system --no-deps . && \

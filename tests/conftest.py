@@ -10,10 +10,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-# Set BEFORE importing nicx.core.config: DEFAULT_CONFIG_DIR /
+# Set BEFORE importing nicx.nucleo.config: DEFAULT_CONFIG_DIR /
 # DEFAULT_CONFIG_PATH are resolved once at import time (the install-script
 # model, where NICX_HOME is set before the process starts). Without
-# this, the very first import of nicx.core.config in the session --
+# this, the very first import of nicx.nucleo.config in the session --
 # this file imports it below, and it's transitively imported by nearly
 # everything -- permanently binds those constants (and the ~45 modules that
 # reference them) to the developer's real ~/.nicx for the rest of the
@@ -30,9 +30,9 @@ os.environ["NICX_HOME"] = str(_TEST_HOME)
 # it before config.py and its import-time constants are initialized.
 os.environ.pop("NICX_CONFIG", None)
 
-from nicx.core.config import GpuInfo, HardwareInfo, load_config  # noqa: E402
-from nicx.core.events import EventBus, reset_event_bus  # noqa: E402
-from nicx.core.registry import (  # noqa: E402
+from nicx.nucleo.config import GpuInfo, HardwareInfo, load_config  # noqa: E402
+from nicx.nucleo.events import EventBus, reset_event_bus  # noqa: E402
+from nicx.nucleo.registry import (  # noqa: E402
     AgentRegistry,
     BenchmarkRegistry,
     ChannelRegistry,

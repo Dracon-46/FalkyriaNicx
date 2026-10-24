@@ -332,7 +332,7 @@ from pathlib import Path
 
 import tomlkit
 
-from nicx.core.config import DEFAULT_CONFIG_PATH
+from nicx.nucleo.config import DEFAULT_CONFIG_PATH
 
 path = Path(os.environ.get("NICX_CONFIG") or DEFAULT_CONFIG_PATH).expanduser().resolve()
 path.parent.mkdir(parents=True, exist_ok=True)
@@ -762,7 +762,7 @@ detach_bg_orchestrator() {
     fi
     local models
     models=$("$VENV_DIR/bin/python" - <<'PYEOF' 2>/dev/null || true
-from nicx.core.config import detect_hardware, recommend_model
+from nicx.nucleo.config import detect_hardware, recommend_model
 hw = detect_hardware()
 tier = recommend_model(hw, "ollama")
 TIERS = ["qwen3.5:2b", "qwen3.5:4b", "qwen3.5:9b", "qwen3.5:27b"]

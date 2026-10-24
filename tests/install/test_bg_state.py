@@ -1,4 +1,4 @@
-"""Tests for nicx.cli._bg_state."""
+"""Tests for nicx.comandos._bg_state."""
 
 from __future__ import annotations
 
@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from nicx import _rust_bridge
-from nicx.cli import _bg_state
+from nicx.comandos import _bg_state
+from nicx.nucleo import rust as _rust_bridge
 
 
 def test_get_status_rust_importable_without_marker(

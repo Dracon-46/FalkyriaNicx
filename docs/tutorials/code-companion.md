@@ -137,11 +137,11 @@ The `test_gen.py` script reads a Python module, reasons about its public interfa
 ```bash title="Terminal"
 # Generate pytest tests for a module
 python examples/code_companion/test_gen.py \
-    --module src/nicx/tools/calculator.py
+    --module src/nicx/ferramentas/calculator.py
 
 # Use unittest and specify the output file
 python examples/code_companion/test_gen.py \
-    --module src/nicx/tools/calculator.py \
+    --module src/nicx/ferramentas/calculator.py \
     --framework unittest \
     --output tests/test_calculator_generated.py
 ```

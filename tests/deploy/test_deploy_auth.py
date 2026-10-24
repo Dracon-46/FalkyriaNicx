@@ -60,7 +60,7 @@ def test_launchd_plist_binds_loopback():
     ],
 )
 def test_check_bind_safety(host, api_key, should_exit):
-    from nicx.server.auth_middleware import check_bind_safety
+    from nicx.servidor.auth_middleware import check_bind_safety
 
     if should_exit:
         with pytest.raises(SystemExit):

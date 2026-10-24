@@ -6,10 +6,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from nicx.agents._stubs import AgentContext, AgentResult
-from nicx.core.events import EventBus, EventType
-from nicx.core.registry import AgentRegistry, RouterPolicyRegistry, ToolRegistry
-from nicx.core.types import (
+from nicx.cerebro.agentes._stubs import AgentContext, AgentResult
+from nicx.nucleo.events import EventBus, EventType
+from nicx.nucleo.registry import AgentRegistry, RouterPolicyRegistry, ToolRegistry
+from nicx.nucleo.types import (
     Conversation,
     Message,
     Role,
@@ -23,8 +23,8 @@ from nicx.core.types import (
 
 
 def _register_agents():
-    from nicx.agents.orchestrator import OrchestratorAgent
-    from nicx.agents.simple import SimpleAgent
+    from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
+    from nicx.cerebro.agentes.simple import SimpleAgent
 
     if not AgentRegistry.contains("simple"):
         AgentRegistry.register_value("simple", SimpleAgent)
@@ -33,8 +33,8 @@ def _register_agents():
 
 
 def _register_tools():
-    from nicx.tools.calculator import CalculatorTool
-    from nicx.tools.think import ThinkTool
+    from nicx.ferramentas.calculator import CalculatorTool
+    from nicx.ferramentas.think import ThinkTool
 
     if not ToolRegistry.contains("calculator"):
         ToolRegistry.register_value("calculator", CalculatorTool)
@@ -101,7 +101,7 @@ class TestOrchestratorWithCalculator:
         _register_agents()
         _register_tools()
 
-        from nicx.tools.calculator import CalculatorTool
+        from nicx.ferramentas.calculator import CalculatorTool
 
         engine = MagicMock()
         engine.engine_id = "mock"
@@ -164,7 +164,7 @@ class TestAPIServerRoundtrip:
         pytest.importorskip("fastapi")
         from fastapi.testclient import TestClient
 
-        from nicx.server.app import create_app
+        from nicx.servidor.app import create_app
 
         engine = _make_engine("API response!")
         app = create_app(engine, "test-model")
@@ -189,7 +189,7 @@ class TestAPIServerRoundtrip:
         pytest.importorskip("fastapi")
         from fastapi.testclient import TestClient
 
-        from nicx.server.app import create_app
+        from nicx.servidor.app import create_app
 
         engine = _make_engine()
         app = create_app(engine, "test-model")
@@ -241,7 +241,7 @@ class TestTelemetryThroughAgent:
     def test_telemetry_record_created(self):
         """Telemetry records are now produced by InstrumentedEngine,
         not by agents directly."""
-        from nicx.telemetry.instrumented_engine import InstrumentedEngine
+        from nicx.registros.telemetria.instrumented_engine import InstrumentedEngine
 
         _register_agents()
         bus = EventBus(record_history=True)
@@ -264,9 +264,9 @@ class TestToolExecutorIntegration:
 
     def test_calculator_and_think(self):
         _register_tools()
-        from nicx.tools._stubs import ToolExecutor
-        from nicx.tools.calculator import CalculatorTool
-        from nicx.tools.think import ThinkTool
+        from nicx.ferramentas._stubs import ToolExecutor
+        from nicx.ferramentas.calculator import CalculatorTool
+        from nicx.ferramentas.think import ThinkTool
 
         bus = EventBus(record_history=True)
         executor = ToolExecutor([CalculatorTool(), ThinkTool()], bus=bus)
@@ -301,8 +301,8 @@ class TestHeuristicRewardWithTelemetry:
     """HeuristicRewardFunction scores using TelemetryRecord data."""
 
     def test_reward_from_telemetry_record(self):
-        from nicx.learning._stubs import RoutingContext
-        from nicx.learning.routing.heuristic_reward import HeuristicRewardFunction
+        from nicx.cerebro.roteamento.base import RoutingContext
+        from nicx.cerebro.roteamento.heuristic_reward import HeuristicRewardFunction
 
         rec = TelemetryRecord(
             timestamp=0.0,
@@ -330,7 +330,7 @@ class TestRouterPolicyRegistryDiscovery:
     """RouterPolicyRegistry discovers both heuristic and learned."""
 
     def test_both_policies_registered(self):
-        from nicx.learning import ensure_registered
+        from nicx.cerebro.roteamento import ensure_registered
 
         ensure_registered()
         assert RouterPolicyRegistry.contains("heuristic")
@@ -343,8 +343,8 @@ class TestTelemetryPipeline:
     def test_store_then_aggregate(self, tmp_path):
         import time
 
-        from nicx.telemetry.aggregator import TelemetryAggregator
-        from nicx.telemetry.store import TelemetryStore
+        from nicx.registros.telemetria.aggregator import TelemetryAggregator
+        from nicx.registros.telemetria.store import TelemetryStore
 
         db = tmp_path / "telemetry.db"
         store = TelemetryStore(db)
@@ -387,8 +387,8 @@ class TestEventBusTelemetryAggregator:
     """EventBus → TelemetryStore → TelemetryAggregator end-to-end."""
 
     def test_event_driven_pipeline(self, tmp_path):
-        from nicx.telemetry.aggregator import TelemetryAggregator
-        from nicx.telemetry.store import TelemetryStore
+        from nicx.registros.telemetria.aggregator import TelemetryAggregator
+        from nicx.registros.telemetria.store import TelemetryStore
 
         db = tmp_path / "telemetry.db"
         store = TelemetryStore(db)
@@ -419,9 +419,9 @@ class TestAskFlowWithRouterPolicy:
     """Full ask flow with router policy (mocked)."""
 
     def test_mocked_ask_with_registry_router(self):
-        from nicx.learning._stubs import RoutingContext
-        from nicx.learning.routing.heuristic_policy import ensure_registered
-        from nicx.learning.routing.router import HeuristicRouter
+        from nicx.cerebro.roteamento.base import RoutingContext
+        from nicx.cerebro.roteamento.heuristic_policy import ensure_registered
+        from nicx.cerebro.roteamento.router import HeuristicRouter
 
         ensure_registered()
         router_cls = RouterPolicyRegistry.get("heuristic")
@@ -442,10 +442,10 @@ class TestRewardTelemetryIntegration:
     def test_score_from_aggregated_stats(self, tmp_path):
         import time
 
-        from nicx.learning._stubs import RoutingContext
-        from nicx.learning.routing.heuristic_reward import HeuristicRewardFunction
-        from nicx.telemetry.aggregator import TelemetryAggregator
-        from nicx.telemetry.store import TelemetryStore
+        from nicx.cerebro.roteamento.base import RoutingContext
+        from nicx.cerebro.roteamento.heuristic_reward import HeuristicRewardFunction
+        from nicx.registros.telemetria.aggregator import TelemetryAggregator
+        from nicx.registros.telemetria.store import TelemetryStore
 
         db = tmp_path / "telemetry.db"
         store = TelemetryStore(db)
@@ -501,7 +501,7 @@ class TestSDKAskFlow:
     def test_sdk_ask_e2e(self):
         from unittest.mock import patch
 
-        from nicx.core.config import NicxConfig
+        from nicx.nucleo.config import NicxConfig
         from nicx.sdk import Nicx
 
         engine = _make_engine("SDK response")
@@ -516,7 +516,7 @@ class TestSDKMemoryHandle:
     """SDK memory handle with SQLite backend."""
 
     def test_index_and_search(self, tmp_path):
-        from nicx.core.config import NicxConfig
+        from nicx.nucleo.config import NicxConfig
         from nicx.sdk import MemoryHandle
 
         cfg = NicxConfig()
@@ -552,9 +552,9 @@ class TestFullPipeline:
     def test_full_pipeline(self, tmp_path):
         from unittest.mock import patch
 
-        from nicx.agents._stubs import AgentResult
-        from nicx.core.config import NicxConfig
-        from nicx.core.registry import AgentRegistry
+        from nicx.cerebro.agentes._stubs import AgentResult
+        from nicx.nucleo.config import NicxConfig
+        from nicx.nucleo.registry import AgentRegistry
         from nicx.sdk import Nicx
 
         engine = _make_engine("Pipeline response")

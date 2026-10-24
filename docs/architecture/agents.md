@@ -152,7 +152,7 @@ How it works:
 4. Calls `_emit_turn_end()` and returns an `AgentResult` with `turns=1`
 
 ```python
-from nicx.agents.simple import SimpleAgent
+from nicx.cerebro.agentes.simple import SimpleAgent
 
 agent = SimpleAgent(engine, model="qwen3:8b", bus=bus)
 result = agent.run("What is the capital of France?")
@@ -194,9 +194,9 @@ How it works:
 4. If `max_turns` is exceeded, returns the last content or a warning message
 
 ```python
-from nicx.agents.orchestrator import OrchestratorAgent
-from nicx.tools.calculator import CalculatorTool
-from nicx.tools.think import ThinkTool
+from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
+from nicx.ferramentas.calculator import CalculatorTool
+from nicx.ferramentas.think import ThinkTool
 
 agent = OrchestratorAgent(
     engine,
@@ -240,10 +240,10 @@ How it works:
 5. Loops until a final answer is produced or `max_turns` is exceeded
 
 !!! note "Backward compatibility"
-    The old `from nicx.agents.react import ReActAgent` import path still works via a backward-compat shim. The registry alias `"react"` also maps to `NativeReActAgent`.
+    The old `from nicx.cerebro.agentes.react import ReActAgent` import path still works via a backward-compat shim. The registry alias `"react"` also maps to `NativeReActAgent`.
 
 ```python
-from nicx.agents.native_react import NativeReActAgent
+from nicx.cerebro.agentes.native_react import NativeReActAgent
 
 agent = NativeReActAgent(
     engine,
@@ -272,7 +272,7 @@ How it works:
 4. Handles context window overflow with automatic truncation
 
 ```python
-from nicx.agents.codeact import CodeActAgent
+from nicx.cerebro.agentes.codeact import CodeActAgent
 
 agent = CodeActAgent(
     engine,
@@ -324,7 +324,7 @@ The agent supports configurable sub-model parameters for recursive calls:
 | `system_prompt` | `RLM_SYSTEM_PROMPT` | Override the system prompt |
 
 ```python
-from nicx.agents.rlm import RLMAgent
+from nicx.cerebro.agentes.rlm import RLMAgent
 
 agent = RLMAgent(
     engine,
@@ -353,7 +353,7 @@ How it works:
 4. Extracts the final message content from the conversation
 
 ```python
-from nicx.agents.openhands import OpenHandsAgent
+from nicx.cerebro.agentes.openhands import OpenHandsAgent
 
 agent = OpenHandsAgent(
     engine,
@@ -394,7 +394,7 @@ How it works:
     `ClaudeCodeAgent` raises `RuntimeError` at `run()` time if `node` or npm is not found on `PATH`. An `ANTHROPIC_API_KEY` environment variable is required for the Claude Agent SDK to authenticate.
 
 ```python
-from nicx.agents.claude_code import ClaudeCodeAgent
+from nicx.cerebro.agentes.claude_code import ClaudeCodeAgent
 
 agent = ClaudeCodeAgent(
     engine=None,   # not used
@@ -436,7 +436,7 @@ graph LR
 2. **Allowed roots:** If `roots` are configured in the allowlist, the resolved path must be under one of them. An empty `roots` list allows any non-blocked path.
 
 ```python
-from nicx.sandbox import ContainerRunner, SandboxedAgent
+from nicx.ferramentas.sandbox import ContainerRunner, SandboxedAgent
 
 runner = ContainerRunner(
     image="nicx-sandbox:latest",
@@ -540,8 +540,8 @@ These events are consumed by the `TelemetryStore` (for metrics) and `TraceCollec
 Agents are registered via the `@AgentRegistry.register("name")` decorator:
 
 ```python
-from nicx.core.registry import AgentRegistry
-from nicx.agents._stubs import BaseAgent
+from nicx.nucleo.registry import AgentRegistry
+from nicx.cerebro.agentes._stubs import BaseAgent
 
 @AgentRegistry.register("my-agent")
 class MyAgent(BaseAgent):
@@ -554,7 +554,7 @@ class MyAgent(BaseAgent):
 To list all registered agents:
 
 ```python
-from nicx.core.registry import AgentRegistry
+from nicx.nucleo.registry import AgentRegistry
 
 print(AgentRegistry.keys())
 # ("simple", "orchestrator", "native_react", "react", "codeact", "rlm", "openhands")

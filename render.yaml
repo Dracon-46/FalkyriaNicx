@@ -1,5 +1,5 @@
 # Render Blueprint for the Nicx FastAPI server.
-# Deploys src/nicx/server/app.py via deploy/docker/Dockerfile.
+# Deploys src/nicx/servidor/app.py via deploy/docker/Dockerfile.
 # Apply at: https://dashboard.render.com/blueprint/new?repo=https://github.com/Dracon-46/FalkyriaNicx
 services:
   - type: web

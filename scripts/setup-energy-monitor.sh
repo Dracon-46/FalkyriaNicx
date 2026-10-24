@@ -59,7 +59,7 @@ uv sync --inexact --extra "$extra"
 echo
 echo "Verifying ..."
 uv run python - <<'PY'
-from nicx.telemetry.energy_monitor import create_energy_monitor
+from nicx.registros.telemetria.energy_monitor import create_energy_monitor
 
 monitor = create_energy_monitor()
 if monitor is None:

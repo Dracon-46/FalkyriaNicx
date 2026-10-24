@@ -13,7 +13,7 @@
 #   1. Visit https://<DOMAIN>/ and create the admin account.
 #   2. Create project "Nicx".
 #   3. Settings → Project → grab the Project API Key (phc_…).
-#   4. Update src/nicx/core/config.py AnalyticsConfig defaults:
+#   4. Update src/nicx/nucleo/config.py AnalyticsConfig defaults:
 #        host = "https://<DOMAIN>"
 #        key  = "phc_<new>"
 #   5. Ship a release. Frontend + backend + install.sh all read those
@@ -126,7 +126,7 @@ Next steps:
   2. Create the first admin account (any email, your password).
   3. Create project "Nicx".
   4. Settings → Project → Project API Key — copy the phc_… value.
-  5. Update src/nicx/core/config.py AnalyticsConfig defaults:
+  5. Update src/nicx/nucleo/config.py AnalyticsConfig defaults:
         host = "https://$DOMAIN"
         key  = "phc_<the-new-key>"
   6. Settings → Data Management → set retention to 365 days.

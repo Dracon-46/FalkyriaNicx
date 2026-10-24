@@ -40,7 +40,7 @@ bad_test = pathlib.Path("tests") / f"test_bad_collection_{os.getpid()}.py"
 try:
     if sys.argv[1] == "collect-only":
         result = pytest.main(
-            ["--collect-only", "-q", "tests/core/test_config_paths.py"]
+            ["--collect-only", "-q", "tests/nucleo/test_config_paths.py"]
         )
         assert result == pytest.ExitCode.OK, result
     else:

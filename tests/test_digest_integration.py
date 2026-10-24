@@ -8,13 +8,13 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-from nicx.agents.digest_store import DigestStore
-from nicx.core.types import ToolResult
+from nicx.cerebro.agentes.digest_store import DigestStore
+from nicx.nucleo.types import ToolResult
 
 
 def test_full_digest_pipeline(tmp_path):
     """Verify collect -> synthesize -> TTS -> store -> retrieve."""
-    from nicx.agents.morning_digest import MorningDigestAgent
+    from nicx.cerebro.agentes.morning_digest import MorningDigestAgent
 
     # Mock engine returns a narrative
     mock_engine = MagicMock()

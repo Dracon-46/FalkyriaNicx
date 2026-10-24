@@ -8,11 +8,11 @@ from unittest.mock import patch
 
 import pytest
 
-from nicx.agents._stubs import AgentResult
-from nicx.core.config import NicxConfig
-from nicx.core.events import EventBus
-from nicx.core.types import Message, Role
-from nicx.system import QueryOrchestrator
+from nicx.cerebro.agentes._stubs import AgentResult
+from nicx.nucleo.config import NicxConfig
+from nicx.nucleo.events import EventBus
+from nicx.nucleo.sistema import QueryOrchestrator
+from nicx.nucleo.types import Message, Role
 
 
 class _FakeEngine:
@@ -124,7 +124,7 @@ class TestDetectAgentIntent:
         ],
     )
     def test_morning_digest_triggers(self, query):
-        from nicx.core.registry import AgentRegistry
+        from nicx.nucleo.registry import AgentRegistry
 
         # Register a stub so the intent check returns the name.
         try:
@@ -163,7 +163,7 @@ class TestRunAgentPersonaWiring:
                 return AgentResult(content="hi", turns=1)
 
         orch = QueryOrchestrator(_FakeSystem())
-        with patch("nicx.core.registry.AgentRegistry.get", return_value=_Agent):
+        with patch("nicx.nucleo.registry.AgentRegistry.get", return_value=_Agent):
             orch._run_agent(
                 "hi",
                 [Message(role=Role.USER, content="hi")],

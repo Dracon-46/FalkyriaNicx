@@ -200,7 +200,7 @@ Skills can compose other skills. At discovery time, SkillManager validates:
 ## File Layout
 
 ```
-src/nicx/skills/
+src/nicx/cerebro/habilidades/
 ├── __init__.py           # Public exports
 ├── types.py              # SkillManifest, SkillStep
 ├── manager.py            # SkillManager

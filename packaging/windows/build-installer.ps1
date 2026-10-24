@@ -5,9 +5,9 @@
 
 .DESCRIPTION
     Etapas:
-      1. Interface: `npm run build` em frontend/ (grava src/nicx/server/static).
+      1. Interface: `npm run build` em frontend/ (grava src/nicx/servidor/static).
       2. Pacote Python `nicx` (wheel), conferindo que a interface e os textos
-         legais (src/nicx/legal/*.md) foram incluídos.
+         legais (src/nicx/privacidade/textos/*.md) foram incluídos.
       3. Extensão nativa `nicx-rust` (wheel cp312 win_amd64) com o maturin.
       4. Versões fixadas das dependências (constraints.txt), exportadas do uv.lock.
       5. Cópia do uv.exe, ícone, imagens do assistente e texto dos termos de uso.
@@ -22,7 +22,7 @@
     atual, se houver; senão 0.1.0.
 
 .PARAMETER SkipFrontend
-    Não recompila a interface; usa o que já estiver em src/nicx/server/static.
+    Não recompila a interface; usa o que já estiver em src/nicx/servidor/static.
 
 .PARAMETER SkipRust
     Não recompila a extensão; reaproveita o wheel nicx_rust mais recente de
@@ -162,7 +162,7 @@ New-Item -ItemType Directory -Force -Path $BuildDir, $DistDir, $WheelDir, $Brand
 
 $staticIndex = Join-Path $Repo 'src\nicx\server\static\index.html'
 if ($SkipFrontend) {
-    Write-Step 'Interface: reaproveitando src/nicx/server/static (-SkipFrontend)'
+    Write-Step 'Interface: reaproveitando src/nicx/servidor/static (-SkipFrontend)'
 } else {
     Write-Step 'Interface: npm run build'
     Invoke-Native 'npm.cmd' @('run', 'build') (Join-Path $Repo 'frontend')
@@ -191,15 +191,15 @@ try {
     $names = @($zip.Entries | ForEach-Object { $_.FullName })
 } finally { $zip.Dispose() }
 $required = @(
-    'nicx/server/static/index.html',
-    'nicx/legal/termos-de-uso.md',
-    'nicx/legal/politica-de-privacidade.md',
-    'nicx/legal/consentimento.md'
+    'nicx/servidor/static/index.html',
+    'nicx/privacidade/textos/termos-de-uso.md',
+    'nicx/privacidade/textos/politica-de-privacidade.md',
+    'nicx/privacidade/textos/consentimento.md'
 )
 foreach ($r in $required) {
     if ($names -notcontains $r) { Stop-Build "o wheel não contém $r" }
 }
-$staticCount = @($names | Where-Object { $_ -like 'nicx/server/static/*' }).Count
+$staticCount = @($names | Where-Object { $_ -like 'nicx/servidor/static/*' }).Count
 Write-Ok "$($nicxWheel.Name) ($([math]::Round($nicxWheel.Length / 1MB, 1)) MB; $staticCount arquivos da interface; textos legais incluídos)"
 
 # ---------------------------------------------------------------------------

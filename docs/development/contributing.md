@@ -66,23 +66,23 @@ uv run pytest tests/ -v
 ### Run a Specific Test File
 
 ```bash
-uv run pytest tests/core/test_registry.py -v
-uv run pytest tests/engine/test_ollama.py -v
-uv run pytest tests/memory/test_sqlite.py -v
+uv run pytest tests/nucleo/test_registry.py -v
+uv run pytest tests/motores/test_ollama.py -v
+uv run pytest tests/memoria/test_sqlite.py -v
 ```
 
 ### Run a Specific Test
 
 ```bash
-uv run pytest tests/core/test_registry.py::test_register_and_get -v
+uv run pytest tests/nucleo/test_registry.py::test_register_and_get -v
 ```
 
 ### Run Tests by Module
 
 ```bash
-uv run pytest tests/agents/ -v       # All agent tests
-uv run pytest tests/tools/ -v        # All tool tests
-uv run pytest tests/learning/ -v     # All learning tests
+uv run pytest tests/cerebro/agentes/ -v       # All agent tests
+uv run pytest tests/ferramentas/ -v        # All tool tests
+uv run pytest tests/cerebro/roteamento/ -v     # All learning tests
 ```
 
 ### Test Coverage
@@ -288,7 +288,7 @@ implementations are added by decorating a class -- no factory modifications
 needed:
 
 ```python
-from nicx.core.registry import EngineRegistry
+from nicx.nucleo.registry import EngineRegistry
 
 @EngineRegistry.register("my_engine")
 class MyEngine(InferenceEngine):
@@ -315,7 +315,7 @@ pattern to fail gracefully when deps are not installed:
 ```python
 # In __init__.py — import to trigger registration
 try:
-    import nicx.memory.faiss_backend  # noqa: F401
+    import nicx.memoria.faiss_backend  # noqa: F401
 except ImportError:
     pass
 ```
@@ -359,7 +359,7 @@ class BenchmarkResult:
 
 ### Import Style
 
-- Absolute imports only (`from nicx.core.registry import ...`)
+- Absolute imports only (`from nicx.nucleo.registry import ...`)
 - Sort imports with `ruff` (isort rules enabled)
 - Place `from __future__ import annotations` as the first import
 
@@ -380,7 +380,7 @@ class BenchmarkResult:
     ```
 
 3. **Add tests** for new functionality. Place them in the corresponding
-   `tests/` subdirectory (e.g., new engine tests go in `tests/engine/`).
+   `tests/` subdirectory (e.g., new engine tests go in `tests/motores/`).
 
 4. **Follow the registry pattern** for any new extensible component.
 

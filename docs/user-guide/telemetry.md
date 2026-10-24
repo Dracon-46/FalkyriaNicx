@@ -33,8 +33,8 @@ Each inference call produces a `TelemetryRecord` with the following fields:
 The `TelemetryStore` is an append-only SQLite database that persists telemetry records. It integrates with the event bus to capture records automatically.
 
 ```python
-from nicx.telemetry.store import TelemetryStore
-from nicx.core.events import EventBus
+from nicx.registros.telemetria.store import TelemetryStore
+from nicx.nucleo.events import EventBus
 
 bus = EventBus()
 store = TelemetryStore(db_path="~/.nicx/telemetry.db")
@@ -65,7 +65,7 @@ All CLI commands and SDK methods use this wrapper, so telemetry is recorded tran
 The `TelemetryAggregator` provides read-only query and aggregation methods over stored telemetry data.
 
 ```python
-from nicx.telemetry.aggregator import TelemetryAggregator
+from nicx.registros.telemetria.aggregator import TelemetryAggregator
 
 agg = TelemetryAggregator(db_path="~/.nicx/telemetry.db")
 
@@ -233,10 +233,10 @@ Each step in a trace records a single action the agent took.
 The `TraceCollector` wraps any `BaseAgent` to automatically record a `Trace` for every `run()` call. It subscribes to event bus events during execution and converts them into `TraceStep` objects.
 
 ```python
-from nicx.agents.orchestrator import OrchestratorAgent
-from nicx.traces.collector import TraceCollector
-from nicx.traces.store import TraceStore
-from nicx.core.events import EventBus
+from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
+from nicx.registros.rastros.collector import TraceCollector
+from nicx.registros.rastros.store import TraceStore
+from nicx.nucleo.events import EventBus
 
 bus = EventBus()
 store = TraceStore(db_path="./traces.db")
@@ -265,7 +265,7 @@ print(result.content)
 The `TraceStore` is an SQLite-backed database for persisting complete traces with their steps.
 
 ```python
-from nicx.traces.store import TraceStore
+from nicx.registros.rastros.store import TraceStore
 
 store = TraceStore(db_path="./traces.db")
 
@@ -309,7 +309,7 @@ store.close()
 The `TraceAnalyzer` provides read-only aggregated statistics over stored traces. These statistics are used by the learning system to update routing policies.
 
 ```python
-from nicx.traces.analyzer import TraceAnalyzer
+from nicx.registros.rastros.analyzer import TraceAnalyzer
 
 analyzer = TraceAnalyzer(store=trace_store)
 

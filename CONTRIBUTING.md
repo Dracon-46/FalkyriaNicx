@@ -27,7 +27,7 @@ No frontend (`frontend/`): `npx tsc --noEmit` e `npm run build`.
 
 - Um assunto por PR, com descrição do que muda e de como foi testado.
 - Componentes novos (motores, ferramentas, agentes, canais) se registram pelo
-  padrão de registro em `src/nicx/core/registry.py`.
+  padrão de registro em `src/nicx/nucleo/registry.py`.
 - Arquivos de texto sempre com `encoding="utf-8"`: o Nicx roda no Windows.
 - Nada de telemetria, atualizador automático ou envio de dados para serviços
   externos sem decisão explícita da Falkyria.

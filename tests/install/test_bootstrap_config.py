@@ -1,4 +1,4 @@
-"""Tests for nicx.cli._bootstrap.write_initial_config."""
+"""Tests for nicx.comandos._bootstrap.write_initial_config."""
 
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ if sys.version_info >= (3, 11):
 else:
     import tomli as tomllib
 
-from nicx.cli import _bootstrap
-from nicx.core.config import GpuInfo, HardwareInfo
+from nicx.comandos import _bootstrap
+from nicx.nucleo.config import GpuInfo, HardwareInfo
 
 
 def test_writes_minimal_local_config(tmp_nicx_home: Path) -> None:
@@ -95,7 +95,7 @@ def test_handles_special_chars_in_model_name(tmp_nicx_home: Path) -> None:
 
 def test_nicx_config_has_install_provenance_fields() -> None:
     """Top-level provenance fields should be addressable as attributes."""
-    from nicx.core.config import NicxConfig
+    from nicx.nucleo.config import NicxConfig
 
     cfg = NicxConfig()
     assert hasattr(cfg, "installed_at")
@@ -108,7 +108,7 @@ def test_load_config_parses_provenance_from_toml(
     tmp_nicx_home: Path,
 ) -> None:
     """If config.toml has installed_at/installer_version at top level, load them."""
-    from nicx.core.config import load_config
+    from nicx.nucleo.config import load_config
 
     cfg_path = tmp_nicx_home / "config.toml"
     cfg_path.write_text(

@@ -315,8 +315,8 @@ Returns a `(key, engine_instance)` tuple for the requested engine, or `None` if 
 Probes all registered engines for health and returns a sorted list of healthy `(key, engine)` pairs. The config default engine is sorted first.
 
 ```python
-from nicx.engine import discover_engines
-from nicx.core.config import load_config
+from nicx.motores import discover_engines
+from nicx.nucleo.config import load_config
 
 config = load_config()
 healthy = discover_engines(config)
@@ -328,7 +328,7 @@ healthy = discover_engines(config)
 Calls `list_models()` on each engine and returns a dictionary mapping engine keys to model ID lists:
 
 ```python
-from nicx.engine import discover_engines, discover_models
+from nicx.motores import discover_engines, discover_models
 
 engines = discover_engines(config)
 models = discover_models(engines)
@@ -410,8 +410,8 @@ The `EngineConfig` dataclass and its per-engine sub-dataclasses map these settin
 Converts a sequence of `Message` objects to OpenAI-format dictionaries, handling tool calls and tool call IDs:
 
 ```python
-from nicx.engine._base import messages_to_dicts
-from nicx.core.types import Message, Role
+from nicx.motores._base import messages_to_dicts
+from nicx.nucleo.types import Message, Role
 
 messages = [Message(role=Role.USER, content="Hello")]
 dicts = messages_to_dicts(messages)
@@ -423,7 +423,7 @@ dicts = messages_to_dicts(messages)
 A custom exception raised when an engine is unreachable. All engine backends catch `httpx.ConnectError` and `httpx.TimeoutException` and re-raise as `EngineConnectionError`:
 
 ```python
-from nicx.engine import EngineConnectionError
+from nicx.motores import EngineConnectionError
 
 try:
     result = engine.generate(messages, model="qwen3:8b")

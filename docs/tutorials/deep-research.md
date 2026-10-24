@@ -150,7 +150,7 @@ finally:
 The companion `research.toml` in `examples/deep_research/` expresses the same setup declaratively. You can load it programmatically with `load_recipe()` and pass the result to `SystemBuilder`:
 
 ```python title="Using the recipe"
-from nicx.recipes import load_recipe
+from nicx.cerebro.receitas import load_recipe
 from nicx import SystemBuilder
 
 recipe = load_recipe("examples/deep_research/research.toml")

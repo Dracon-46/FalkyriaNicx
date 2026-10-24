@@ -67,7 +67,7 @@ class LaunchError(Exception):
 
 
 def nicx_home() -> Path:
-    """Same precedence as nicx.core.paths: NICX_HOME > XDG_DATA_HOME/nicx > ~/.nicx."""
+    """Same precedence as nicx.nucleo.paths: NICX_HOME > XDG_DATA_HOME/nicx > ~/.nicx."""
     env_home = os.environ.get("NICX_HOME")
     if env_home:
         return Path(os.path.expandvars(env_home)).expanduser().resolve()

@@ -136,8 +136,8 @@ uv run python examples/scheduled_ops/gym_scheduler.py \
 The equivalent Python code:
 
 ```python title="Programmatic task registration"
-from nicx.scheduler import TaskScheduler
-from nicx.scheduler.store import SchedulerStore
+from nicx.agenda import TaskScheduler
+from nicx.agenda.store import SchedulerStore
 
 store = SchedulerStore()
 scheduler = TaskScheduler(store)
@@ -185,7 +185,7 @@ uv run python examples/scheduled_ops/daily_digest.py \
 Or add channel output inside the script:
 
 ```python title="In-script channel output"
-from nicx.channels import ChannelRegistry
+from nicx.canais import ChannelRegistry
 
 channel = ChannelRegistry.create("slack", webhook_url="https://hooks.slack.com/...")
 channel.send(response)

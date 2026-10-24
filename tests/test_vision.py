@@ -11,9 +11,9 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-import nicx.engine.ollama as ollama_mod
-from nicx.core.types import Message, Role
-from nicx.engine._base import messages_to_dicts
+import nicx.motores.ollama as ollama_mod
+from nicx.motores._base import messages_to_dicts
+from nicx.nucleo.types import Message, Role
 
 
 def test_message_defaults_to_no_images() -> None:
@@ -55,7 +55,7 @@ def test_default_num_ctx_default_and_override(monkeypatch) -> None:
 
 def test_guardrails_preserves_images_when_sanitizing() -> None:
     """A flagged message gets rewritten; its image must survive the rewrite."""
-    from nicx.security.guardrails import GuardrailsEngine
+    from nicx.seguranca.guardrails import GuardrailsEngine
 
     class _RecordingEngine:
         """Captures the messages the guardrail forwards to the real engine."""

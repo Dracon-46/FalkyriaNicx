@@ -116,9 +116,9 @@ $$\text{RRF}(d) = \sum_{i} \frac{w_i}{k + \text{rank}_i(d)}$$
 - **Configurable:** RRF constant `k` (default 60) and per-backend weights
 
 ```python
-from nicx.tools.storage.sqlite import SQLiteMemory
-from nicx.tools.storage.faiss_backend import FAISSMemory
-from nicx.tools.storage.hybrid import HybridMemory
+from nicx.ferramentas.storage.sqlite import SQLiteMemory
+from nicx.ferramentas.storage.faiss_backend import FAISSMemory
+from nicx.ferramentas.storage.hybrid import HybridMemory
 
 hybrid = HybridMemory(
     sparse=SQLiteMemory(db_path="memory.db"),
@@ -129,7 +129,7 @@ hybrid = HybridMemory(
 ```
 
 !!! note "Backward compatibility"
-    The old imports (e.g., `from nicx.memory.sqlite import SQLiteMemory`) still work via backward-compatibility shims in the `memory/` package, but the canonical location is now `nicx.tools.storage.*`.
+    The old imports (e.g., `from nicx.memoria.sqlite import SQLiteMemory`) still work via backward-compatibility shims in the `memory/` package, but the canonical location is now `nicx.ferramentas.storage.*`.
 
 ---
 
@@ -170,7 +170,7 @@ The `chunk_text()` function splits text using paragraph boundaries:
 5. Discard chunks smaller than `min_chunk_size`
 
 ```python
-from nicx.tools.storage.chunking import chunk_text, ChunkConfig
+from nicx.ferramentas.storage.chunking import chunk_text, ChunkConfig
 
 config = ChunkConfig(chunk_size=256, chunk_overlap=32)
 chunks = chunk_text(document_text, source="docs/guide.md", config=config)
@@ -204,7 +204,7 @@ Ingests a file or directory into chunks:
 
 ```python
 from pathlib import Path
-from nicx.tools.storage.ingest import ingest_path
+from nicx.ferramentas.storage.ingest import ingest_path
 
 # Ingest a single file
 chunks = ingest_path(Path("docs/guide.md"))
@@ -248,7 +248,7 @@ The default embedder wraps the `sentence-transformers` library:
 - **Output:** NumPy arrays of shape `(n, dim)`
 
 ```python
-from nicx.tools.storage.embeddings import SentenceTransformerEmbedder
+from nicx.ferramentas.storage.embeddings import SentenceTransformerEmbedder
 
 embedder = SentenceTransformerEmbedder(model_name="all-MiniLM-L6-v2")
 vectors = embedder.embed(["Hello world", "How are you?"])
@@ -296,7 +296,7 @@ How it works:
 6. Returns a **new** message list with the context message prepended
 
 ```python
-from nicx.tools.storage.context import inject_context, ContextConfig
+from nicx.ferramentas.storage.context import inject_context, ContextConfig
 
 config = ContextConfig(top_k=3, min_score=0.2)
 messages = inject_context("What is the API?", messages, backend, config=config)
@@ -322,8 +322,8 @@ inform your response, citing sources where applicable:
 Memory backends are registered via the `@MemoryRegistry.register("name")` decorator:
 
 ```python
-from nicx.core.registry import MemoryRegistry
-from nicx.tools.storage._stubs import MemoryBackend
+from nicx.nucleo.registry import MemoryRegistry
+from nicx.ferramentas.storage._stubs import MemoryBackend
 
 @MemoryRegistry.register("my-backend")
 class MyMemoryBackend(MemoryBackend):

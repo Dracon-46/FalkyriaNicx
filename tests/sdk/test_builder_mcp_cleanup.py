@@ -16,18 +16,18 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from nicx.core.config import NicxConfig
-from nicx.system.builder import SystemBuilder
+from nicx.nucleo.config import NicxConfig
+from nicx.nucleo.sistema.builder import SystemBuilder
 
 
 @pytest.fixture
 def _mock_mcp_stack():
     """Patch MCPClient / transports / MCPToolProvider so no real I/O happens."""
     with (
-        patch("nicx.mcp.client.MCPClient") as MockClient,
-        patch("nicx.mcp.transport.StreamableHTTPTransport") as MockHttp,
-        patch("nicx.mcp.transport.StdioTransport") as MockStdio,
-        patch("nicx.tools.mcp_adapter.MCPToolProvider") as MockProvider,
+        patch("nicx.ferramentas.mcp.client.MCPClient") as MockClient,
+        patch("nicx.ferramentas.mcp.transport.StreamableHTTPTransport") as MockHttp,
+        patch("nicx.ferramentas.mcp.transport.StdioTransport") as MockStdio,
+        patch("nicx.ferramentas.mcp_adapter.MCPToolProvider") as MockProvider,
     ):
         MockProvider.return_value.discover.return_value = []
         MockClient.return_value.initialize.return_value = None

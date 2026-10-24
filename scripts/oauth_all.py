@@ -18,7 +18,7 @@ from urllib.parse import parse_qs, urlencode, urlparse
 
 import httpx
 
-from nicx.core import open_browser
+from nicx.nucleo import open_browser
 
 CONFIG_DIR = Path.home() / ".nicx" / "connectors"
 CONFIG_DIR.mkdir(parents=True, exist_ok=True)

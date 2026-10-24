@@ -7,9 +7,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from nicx.core.config import NicxConfig
-from nicx.core.events import EventBus
-from nicx.system import NicxSystem, SystemBuilder
+from nicx.nucleo.config import NicxConfig
+from nicx.nucleo.events import EventBus
+from nicx.nucleo.sistema import NicxSystem, SystemBuilder
 
 
 class TestNicxSystem:
@@ -52,9 +52,9 @@ class TestNicxSystem:
         assert system.rate_limiter is None
 
     def test_system_orchestrator_wires_direct_agent_security(self):
-        from nicx.agents._stubs import AgentContext, AgentResult, BaseAgent
-        from nicx.core.registry import AgentRegistry
-        from nicx.security.capabilities import CapabilityPolicy
+        from nicx.cerebro.agentes._stubs import AgentContext, AgentResult, BaseAgent
+        from nicx.nucleo.registry import AgentRegistry
+        from nicx.seguranca.capabilities import CapabilityPolicy
 
         class _Limiter:
             def __init__(self):
@@ -166,8 +166,8 @@ class TestNicxSystem:
 
     def test_ask_with_agent_override(self):
         """Passing agent= param should use that agent even if system has a default."""
-        from nicx.agents._stubs import AgentResult
-        from nicx.core.registry import AgentRegistry
+        from nicx.cerebro.agentes._stubs import AgentResult
+        from nicx.nucleo.registry import AgentRegistry
 
         class TestAgent:
             agent_id = "test-system-agent"
@@ -361,7 +361,7 @@ class TestSystemBuilder:
         assert builder._traces is False
 
     def test_import_works(self):
-        from nicx.system import NicxSystem, SystemBuilder
+        from nicx.nucleo.sistema import NicxSystem, SystemBuilder
 
         assert NicxSystem is not None
         assert SystemBuilder is not None
@@ -449,7 +449,7 @@ class TestSystemBuilderEngineInstance:
         config = NicxConfig()
         engine = self._fake_engine(healthy=False)
         builder = SystemBuilder(config).engine_instance(engine)
-        with patch("nicx.engine._discovery.get_engine") as mock_get_engine:
+        with patch("nicx.motores._discovery.get_engine") as mock_get_engine:
             with pytest.raises(RuntimeError, match="Refusing to fall back"):
                 builder._resolve_engine(config)
         mock_get_engine.assert_not_called()
@@ -458,7 +458,7 @@ class TestSystemBuilderEngineInstance:
         config = NicxConfig()
         engine = self._fake_engine(healthy=True)
         builder = SystemBuilder(config).engine_instance(engine, key="endpoint")
-        with patch("nicx.engine._discovery.get_engine") as mock_get_engine:
+        with patch("nicx.motores._discovery.get_engine") as mock_get_engine:
             resolved_engine, _ = builder._resolve_engine(config)
         assert resolved_engine is engine
         mock_get_engine.assert_not_called()

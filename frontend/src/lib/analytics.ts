@@ -21,7 +21,7 @@ import { create } from 'zustand';
 import { apiFetch } from './api';
 
 /**
- * Mirror of the Python event catalog (src/nicx/analytics/events.py
+ * Mirror of the Python event catalog (src/nicx/privacidade/events.py
  * REGISTRY). Anything not in this set is dropped with a console.warn at
  * track() time, so typos surface in development. `analytics_consent` is
  * missing on purpose: the server records it when the user makes a choice.
@@ -247,7 +247,7 @@ export function track(event: string, properties: Record<string, unknown> = {}): 
       console.warn(
         `[analytics] Unknown event "${event}" dropped. ` +
           `Add it to KNOWN_EVENTS in lib/analytics.ts and to the Python ` +
-          `REGISTRY in src/nicx/analytics/events.py.`,
+          `REGISTRY in src/nicx/privacidade/events.py.`,
       );
     }
     return;
@@ -281,7 +281,7 @@ export function track(event: string, properties: Record<string, unknown> = {}): 
  *
  * Used for model / tool names that we want to cohort on without
  * actually shipping the raw value. Mirror of the backend's
- * :func:`nicx.analytics.redaction.hash_id`.
+ * :func:`nicx.privacidade.redaction.hash_id`.
  */
 export async function hashId(s: string): Promise<string> {
   if (!s) return '';
