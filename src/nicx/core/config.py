@@ -15,7 +15,6 @@ import subprocess
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
 from typing import (
-    TYPE_CHECKING,
     Any,
     Dict,
     List,
@@ -32,14 +31,6 @@ from nicx.core.paths import (
     get_config_path,
     get_data_dir,
 )
-
-if TYPE_CHECKING:
-    # Only used by type-checkers (mypy/pyright) for the ``NicxConfig.mining``
-    # field annotation. The runtime import is deferred inside
-    # ``_parse_mining_section()`` to break the import cycle:
-    # ``mining/_stubs.py`` imports ``HardwareInfo`` from this module at its
-    # top level.
-    from nicx.mining._stubs import MiningConfig
 
 try:
     import tomllib  # Python 3.11+
@@ -1846,7 +1837,6 @@ class NicxConfig:
     skills: SkillsConfig = field(default_factory=SkillsConfig)
     digest: DigestConfig = field(default_factory=DigestConfig)
     proactive: ProactiveConfig = field(default_factory=ProactiveConfig)
-    mining: Optional["MiningConfig"] = None
 
     @property
     def _config_dir(self) -> Path:
@@ -1890,7 +1880,6 @@ class NicxConfig:
 # ``hardware`` is auto-detected and not user-settable.
 _SETTABLE_SECTIONS = frozenset(NicxConfig.__dataclass_fields__.keys()) - {
     "hardware",
-    "mining",
 }
 
 
@@ -2075,47 +2064,6 @@ def _migrate_toml_data(data: Dict[str, Any], cfg: "NicxConfig") -> None:
                 )
 
 
-def _parse_mining_section(data: dict) -> Optional["MiningConfig"]:
-    """Parse the ``[mining]`` TOML section into a ``MiningConfig``.
-
-    Returns None if the section is absent. Resolves the ``submit_target``
-    string into a ``SoloTarget`` or ``PoolTarget`` tagged union.
-    """
-    if "mining" not in data:
-        return None
-
-    # Lazy runtime import to break the import cycle: ``mining/_stubs.py``
-    # imports ``HardwareInfo`` from this module at its top level. By the
-    # time ``_parse_mining_section`` is called, ``core.config`` is already
-    # fully initialized in ``sys.modules``, so the cycle is harmless.
-    from nicx.mining._stubs import MiningConfig, PoolTarget, SoloTarget
-
-    section = data["mining"]
-    extra = section.get("extra", {}) or {}
-
-    target_str = section.get("submit_target", "solo")
-    submit_target: Any
-    if target_str == "solo":
-        submit_target = SoloTarget(
-            pearld_rpc_url=extra.get("pearld_rpc_url", "http://localhost:44107")
-        )
-    elif isinstance(target_str, str) and target_str.startswith("pool:"):
-        submit_target = PoolTarget(url=target_str[len("pool:") :])
-    else:
-        raise ValueError(
-            f"[mining].submit_target must be 'solo' or 'pool:<url>', got {target_str!r}"
-        )
-
-    return MiningConfig(
-        provider=section["provider"],
-        wallet_address=section["wallet_address"],
-        submit_target=submit_target,
-        fee_bps=int(section.get("fee_bps", 0)),
-        fee_payout_address=section.get("fee_payout_address") or None,
-        extra={k: v for k, v in extra.items()},
-    )
-
-
 @functools.lru_cache(maxsize=1)
 def load_config(path: Optional[Path] = None) -> NicxConfig:
     """Detect hardware, build defaults, overlay TOML overrides.
@@ -2202,9 +2150,6 @@ def load_config(path: Optional[Path] = None) -> NicxConfig:
                 f"capabilities.{key}" for key in _security_data["capabilities"]
             )
         apply_security_profile(cfg.security, cfg.server, overrides=_user_security_keys)
-
-        # Mining: dedicated parser for tagged-union submit_target
-        cfg.mining = _parse_mining_section(data)
 
     # Apply profile even without a config file (in case defaults set one)
     if not config_path.exists() and cfg.security.profile:

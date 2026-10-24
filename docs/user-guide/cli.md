@@ -244,35 +244,6 @@ nicx model pull qwen3:8b
 
 ---
 
-## `nicx pearl`
-
-Access Pearl's native node, wallet, and RPC tools from the Nicx CLI.
-
-```bash
-nicx pearl doctor
-nicx pearl node -- <pearld args>
-nicx pearl wallet -- <oyster args>
-nicx pearl ctl -- <prlctl args>
-nicx pearl address
-```
-
-All Pearl wrapper commands use the `nicx pearl <command>` shape. The
-pass-through commands map to Pearl's native binaries:
-
-| Nicx command | Pearl binary | Use |
-|--------------------|--------------|-----|
-| `nicx pearl doctor` | n/a | Check whether `pearld`, `oyster`, and `prlctl` are discoverable |
-| `nicx pearl node` | `pearld` | Run the Pearl full node |
-| `nicx pearl wallet` | `oyster` | Run the Oyster wallet daemon |
-| `nicx pearl ctl` | `prlctl` | Query Pearl node or wallet RPC |
-| `nicx pearl address` | `prlctl --wallet getnewaddress` | Generate a wallet address from Oyster |
-
-Use `PEARL_HOME=/path/to/pearl` or `--pearl-home /path/to/pearl` if Pearl's
-`bin/` directory is not on `PATH`. See the [Pearl CLI guide](pearl.md) for
-examples.
-
----
-
 ## `nicx memory`
 
 Manage the document memory store for retrieval-augmented generation.
