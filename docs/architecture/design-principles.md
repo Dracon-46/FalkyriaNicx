@@ -50,8 +50,8 @@ Adding a new implementation requires two things: implement the ABC and register 
 All extensible components use the **`@XRegistry.register("name")` decorator** pattern. Registration happens at import time, and no factory function or configuration file needs modification.
 
 ```python
-from nicx.core.registry import EngineRegistry
-from nicx.engine._stubs import InferenceEngine
+from nicx.nucleo.registry import EngineRegistry
+from nicx.motores._stubs import InferenceEngine
 
 @EngineRegistry.register("my-engine")
 class MyEngine(InferenceEngine):

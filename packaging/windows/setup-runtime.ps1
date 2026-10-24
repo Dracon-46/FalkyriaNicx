@@ -841,7 +841,7 @@ voice_speed = 1.0
         Write-StatusOk "configuração criada: $ConfigPath"
     }
     if (-not $DryRun) {
-        $seed = Invoke-Tool $VenvPython @('-X', 'utf8', '-c', 'from nicx.cli._bootstrap import _seed_memory_files; _seed_memory_files()') @{ PYTHONUTF8 = '1' } -Quiet
+        $seed = Invoke-Tool $VenvPython @('-X', 'utf8', '-c', 'from nicx.comandos._bootstrap import _seed_memory_files; _seed_memory_files()') @{ PYTHONUTF8 = '1' } -Quiet
         if ($seed.ExitCode -eq 0) { Write-StatusOk 'personalidade e memória do Nicx prontas (SOUL.md, MEMORY.md, USER.md)' }
         else { Write-StatusWarn 'não foi possível criar SOUL.md/MEMORY.md/USER.md; o Nicx usa a persona padrão.' }
     }

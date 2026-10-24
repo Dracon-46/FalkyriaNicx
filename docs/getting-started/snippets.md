@@ -88,9 +88,9 @@ docker run -p 8000:8000 nicx serve --host 0.0.0.0
 ## Custom Tool (10 lines)
 
 ```python
-from nicx.core.registry import ToolRegistry
-from nicx.core.types import ToolResult
-from nicx.tools._stubs import BaseTool, ToolSpec
+from nicx.nucleo.registry import ToolRegistry
+from nicx.nucleo.types import ToolResult
+from nicx.ferramentas._stubs import BaseTool, ToolSpec
 
 @ToolRegistry.register("my_tool")
 class MyTool(BaseTool):

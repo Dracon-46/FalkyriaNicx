@@ -484,9 +484,9 @@ When an agent is configured (e.g., `--agent orchestrator`), non-streaming reques
 LLM-guided spec search (the frontier-driven harness-learning subsystem)
 is exposed as a Python library only — there is currently no top-level
 `nicx` subcommand for it. Construct a `SpecSearchOrchestrator`
-directly from `nicx.learning.spec_search.orchestrator` and call
+directly from `nicx.cerebro.roteamento.spec_search.orchestrator` and call
 `.run(trigger)` with a trigger from
-`nicx.learning.spec_search.triggers`. See
+`nicx.cerebro.roteamento.spec_search.triggers`. See
 [`docs/user-guide/llm-guided-spec-search.md`](llm-guided-spec-search.md)
 for the architecture and the building blocks
 (`splits.py`, external corpora, `external_adapter`).

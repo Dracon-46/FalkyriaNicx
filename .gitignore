@@ -53,7 +53,7 @@ results/
 logs/
 # Anchored to repo root — DO NOT use the unanchored form `traces/`.
 # hatchling honors .gitignore when building the wheel; an unanchored
-# `traces/` pattern matches src/nicx/traces/ and silently drops
+# `traces/` pattern matches src/nicx/registros/rastros/ and silently drops
 # the runtime module from the wheel.
 /traces/
 coding_task_*
@@ -70,7 +70,7 @@ frontend/dist/
 
 # Desktop
 desktop/
-src/nicx/server/static/
+src/nicx/servidor/static/
 
 # Desktop (Tauri)
 frontend/src-tauri/target/
@@ -100,8 +100,8 @@ CLAUDE.md
 # Research output
 research_mining_*
 .python-version
-src/nicx/channels/whatsapp_baileys_bridge/node_modules/
-src/nicx/agents/claude_code_runner/node_modules/
+src/nicx/canais/whatsapp_baileys_bridge/node_modules/
+src/nicx/cerebro/agentes/claude_code_runner/node_modules/
 
 # SQLite in-memory artifacts
 :memory:

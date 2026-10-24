@@ -41,7 +41,7 @@ export default defineConfig({
     }),
   ],
   build: {
-    outDir: '../src/nicx/server/static',
+    outDir: '../src/nicx/servidor/static',
     emptyOutDir: true,
     // Preserve the Vite 6 browser baseline for existing desktop webviews.
     target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],

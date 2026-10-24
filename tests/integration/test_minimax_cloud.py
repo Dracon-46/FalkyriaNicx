@@ -10,9 +10,9 @@ import os
 
 import pytest
 
-from nicx.core.registry import EngineRegistry
-from nicx.core.types import Message, Role
-from nicx.engine.cloud import CloudEngine
+from nicx.motores.cloud import CloudEngine
+from nicx.nucleo.registry import EngineRegistry
+from nicx.nucleo.types import Message, Role
 
 _MINIMAX_KEY = os.environ.get("MINIMAX_API_KEY", "")
 _skip_no_key = pytest.mark.skipif(

@@ -12,7 +12,7 @@ else:
 
 from click.testing import CliRunner
 
-from nicx.cli import cli
+from nicx.comandos import cli
 
 
 def test_bootstrap_command_writes_config(tmp_nicx_home: Path, monkeypatch) -> None:

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from nicx.core import config as config_mod
+from nicx.nucleo import config as config_mod
 
 
 def test_fixture_redirects_default_config_dir(tmp_nicx_home: Path) -> None:

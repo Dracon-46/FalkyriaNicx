@@ -100,7 +100,7 @@ enabled = ["code_interpreter", "file_read", "file_write", "shell_exec", "web_sea
 nicx ask "Write a Python script that converts YAML to JSON"
 
 # Explain existing code
-nicx ask "Read src/nicx/core/events.py and explain the EventBus pattern"
+nicx ask "Read src/nicx/nucleo/events.py and explain the EventBus pattern"
 
 # Debug a failing test
 nicx ask "Run pytest tests/test_memory.py -v and fix any failures"
@@ -109,7 +109,7 @@ nicx ask "Run pytest tests/test_memory.py -v and fix any failures"
 nicx ask "Read utils.py and refactor the parse_config function to use dataclasses"
 
 # Generate tests
-nicx ask "Read src/nicx/tools/calculator.py and write unit tests for it"
+nicx ask "Read src/nicx/ferramentas/calculator.py and write unit tests for it"
 
 # Shell tasks
 nicx ask "Find all Python files larger than 100KB in this repo"

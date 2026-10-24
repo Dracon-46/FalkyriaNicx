@@ -158,15 +158,15 @@ Channel implementations use Python's `threading` module rather than asyncio. Thi
 
 To add a new channel backend:
 
-1. Create a new file in `src/nicx/channels/`.
+1. Create a new file in `src/nicx/canais/`.
 2. Subclass `BaseChannel` and implement all six abstract methods.
 3. Set `channel_id` as a class attribute.
 4. Decorate with `@ChannelRegistry.register("name")`.
 5. Add the module name to `_CHANNEL_MODULES` in `channels/__init__.py`.
 
 ```python
-from nicx.channels._stubs import BaseChannel, ChannelMessage, ChannelStatus
-from nicx.core.registry import ChannelRegistry
+from nicx.canais._stubs import BaseChannel, ChannelMessage, ChannelStatus
+from nicx.nucleo.registry import ChannelRegistry
 
 @ChannelRegistry.register("my_platform")
 class MyPlatformChannel(BaseChannel):

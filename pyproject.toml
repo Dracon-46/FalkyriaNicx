@@ -199,7 +199,7 @@ Repository = "https://github.com/Dracon-46/FalkyriaNicx"
 Issues = "https://github.com/Dracon-46/FalkyriaNicx/issues"
 
 [project.scripts]
-nicx = "nicx.cli:main"
+nicx = "nicx.comandos:main"
 
 # Version is derived from git tags by hatch-vcs. For source/editable
 # checkouts this yields the true `git describe` version (e.g. 1.0.3.dev109+g<sha>)
@@ -237,14 +237,14 @@ exclude = [
 ]
 # The publishing workflow builds this UI before packaging. Keep its generated
 # files even though the directory is intentionally ignored by Git.
-artifacts = ["/src/nicx/server/static/**"]
+artifacts = ["/src/nicx/servidor/static/**"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/nicx"]
-artifacts = ["/src/nicx/server/static/**"]
+artifacts = ["/src/nicx/servidor/static/**"]
 
 [tool.hatch.build.targets.wheel.force-include]
-"src/nicx/channels/whatsapp_baileys_bridge" = "_node_modules/whatsapp_baileys_bridge"
+"src/nicx/canais/whatsapp_baileys_bridge" = "_node_modules/whatsapp_baileys_bridge"
 "scripts/install" = "_install_scripts"
 "deploy/windows" = "_deploy/windows"
 
@@ -275,7 +275,7 @@ select = ["E", "F", "I", "W"]
 [tool.ruff.lint.per-file-ignores]
 # research_loop.py carries long prompt strings too (documented in CLAUDE.md);
 # the ignore was missing here.
-"src/nicx/agents/research_loop.py" = ["E501"]
+"src/nicx/cerebro/agentes/research_loop.py" = ["E501"]
 
 [dependency-groups]
 dev = [

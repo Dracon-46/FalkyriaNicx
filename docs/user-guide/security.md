@@ -138,10 +138,10 @@ completion, capability denials, and rate-limit denials with that identity.
 === "Warn mode (default)"
 
     ```python title="warn_mode.py"
-    from nicx.engine.ollama import OllamaEngine
-    from nicx.security.guardrails import GuardrailsEngine
-    from nicx.security.types import RedactionMode
-    from nicx.core.types import Message, Role
+    from nicx.motores.ollama import OllamaEngine
+    from nicx.seguranca.guardrails import GuardrailsEngine
+    from nicx.seguranca.types import RedactionMode
+    from nicx.nucleo.types import Message, Role
 
     engine = OllamaEngine()
     guarded = GuardrailsEngine(engine)  # (1)!
@@ -157,10 +157,10 @@ completion, capability denials, and rate-limit denials with that identity.
 === "Redact mode"
 
     ```python title="redact_mode.py"
-    from nicx.engine.ollama import OllamaEngine
-    from nicx.security.guardrails import GuardrailsEngine
-    from nicx.security.types import RedactionMode
-    from nicx.core.types import Message, Role
+    from nicx.motores.ollama import OllamaEngine
+    from nicx.seguranca.guardrails import GuardrailsEngine
+    from nicx.seguranca.types import RedactionMode
+    from nicx.nucleo.types import Message, Role
 
     engine = OllamaEngine()
     guarded = GuardrailsEngine(engine, mode=RedactionMode.REDACT)  # (1)!
@@ -175,10 +175,10 @@ completion, capability denials, and rate-limit denials with that identity.
 === "Block mode"
 
     ```python title="block_mode.py"
-    from nicx.engine.ollama import OllamaEngine
-    from nicx.security.guardrails import GuardrailsEngine, SecurityBlockError
-    from nicx.security.types import RedactionMode
-    from nicx.core.types import Message, Role
+    from nicx.motores.ollama import OllamaEngine
+    from nicx.seguranca.guardrails import GuardrailsEngine, SecurityBlockError
+    from nicx.seguranca.types import RedactionMode
+    from nicx.nucleo.types import Message, Role
 
     engine = OllamaEngine()
     guarded = GuardrailsEngine(engine, mode=RedactionMode.BLOCK)
@@ -218,9 +218,9 @@ You can subscribe to these events with an `AuditLogger` to build a persistent se
 You can pass any set of `BaseScanner` subclasses to restrict or extend scanning:
 
 ```python title="custom_scanners.py"
-from nicx.security.guardrails import GuardrailsEngine
-from nicx.security.scanner import SecretScanner
-from nicx.security.types import RedactionMode
+from nicx.seguranca.guardrails import GuardrailsEngine
+from nicx.seguranca.scanner import SecretScanner
+from nicx.seguranca.types import RedactionMode
 
 # Only scan for secrets, skip PII
 guarded = GuardrailsEngine(
@@ -263,7 +263,7 @@ Both methods yield output in real time and, when `scan_output=True`, scan the ac
 ### Direct Usage
 
 ```python title="secret_scanner.py"
-from nicx.security.scanner import SecretScanner
+from nicx.seguranca.scanner import SecretScanner
 
 scanner = SecretScanner()
 
@@ -303,7 +303,7 @@ print(clean)  # Token: [REDACTED:openai_key]
 ### Direct Usage
 
 ```python title="pii_scanner.py"
-from nicx.security.scanner import PIIScanner
+from nicx.seguranca.scanner import PIIScanner
 
 scanner = PIIScanner()
 
@@ -346,7 +346,7 @@ The `DEFAULT_SENSITIVE_PATTERNS` frozenset contains the following glob patterns:
 
 ```python title="file_policy.py"
 from pathlib import Path
-from nicx.security.file_policy import is_sensitive_file, filter_sensitive_paths
+from nicx.seguranca.file_policy import is_sensitive_file, filter_sensitive_paths
 
 # Check a single file
 print(is_sensitive_file(".env"))           # True
@@ -377,11 +377,11 @@ The `AuditLogger` persists security events to an append-only SQLite database. It
 ### Event Bus Integration (Automatic)
 
 ```python title="audit_bus.py"
-from nicx.core.events import EventBus
-from nicx.security.audit import AuditLogger
-from nicx.security.guardrails import GuardrailsEngine
-from nicx.security.types import RedactionMode
-from nicx.engine.ollama import OllamaEngine
+from nicx.nucleo.events import EventBus
+from nicx.seguranca.audit import AuditLogger
+from nicx.seguranca.guardrails import GuardrailsEngine
+from nicx.seguranca.types import RedactionMode
+from nicx.motores.ollama import OllamaEngine
 
 bus = EventBus()
 
@@ -402,8 +402,8 @@ guarded = GuardrailsEngine(
 
 ```python title="audit_manual.py"
 import time
-from nicx.security.audit import AuditLogger
-from nicx.security.types import SecurityEvent, SecurityEventType
+from nicx.seguranca.audit import AuditLogger
+from nicx.seguranca.types import SecurityEvent, SecurityEventType
 
 audit = AuditLogger(db_path="./audit.db")
 
@@ -420,7 +420,7 @@ audit.log(event)
 ### Querying the Audit Log
 
 ```python title="audit_query.py"
-from nicx.security.audit import AuditLogger
+from nicx.seguranca.audit import AuditLogger
 
 audit = AuditLogger(db_path="~/.nicx/audit.db")
 
@@ -482,8 +482,8 @@ Implement `BaseScanner` and pass an instance to `GuardrailsEngine`:
 
 ```python title="custom_scanner.py"
 import re
-from nicx.security._stubs import BaseScanner
-from nicx.security.types import ScanFinding, ScanResult, ThreatLevel
+from nicx.seguranca._stubs import BaseScanner
+from nicx.seguranca.types import ScanFinding, ScanResult, ThreatLevel
 
 
 class InternalUrlScanner(BaseScanner):
@@ -511,8 +511,8 @@ class InternalUrlScanner(BaseScanner):
 
 
 # Use with GuardrailsEngine
-from nicx.security.guardrails import GuardrailsEngine
-from nicx.security.types import RedactionMode
+from nicx.seguranca.guardrails import GuardrailsEngine
+from nicx.seguranca.types import RedactionMode
 
 guarded = GuardrailsEngine(
     engine,

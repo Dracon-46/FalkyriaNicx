@@ -8,13 +8,13 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import nicx
-from nicx.core.config import NicxConfig, load_config
-from nicx.core.events import EventBus
-from nicx.core.types import Message, Role
-from nicx.engine._discovery import get_engine
-from nicx.system import NicxSystem, SystemBuilder
-from nicx.telemetry.instrumented_engine import InstrumentedEngine
-from nicx.telemetry.store import TelemetryStore
+from nicx.motores._discovery import get_engine
+from nicx.nucleo.config import NicxConfig, load_config
+from nicx.nucleo.events import EventBus
+from nicx.nucleo.sistema import NicxSystem, SystemBuilder
+from nicx.nucleo.types import Message, Role
+from nicx.registros.telemetria.instrumented_engine import InstrumentedEngine
+from nicx.registros.telemetria.store import TelemetryStore
 
 logger = logging.getLogger(__name__)
 
@@ -30,14 +30,14 @@ class MemoryHandle:
         if self._backend is not None:
             return self._backend
 
-        import nicx.tools.storage  # noqa: F401
-        from nicx.core.registry import MemoryRegistry
+        import nicx.ferramentas.storage  # noqa: F401
+        from nicx.nucleo.registry import MemoryRegistry
 
         key = self._config.memory.default_backend
         if not MemoryRegistry.contains(key):
             # Register built-in backends
             try:
-                from nicx.tools.storage.sqlite import SQLiteMemory  # noqa: F401
+                from nicx.ferramentas.storage.sqlite import SQLiteMemory  # noqa: F401
             except ImportError:
                 pass
 
@@ -61,8 +61,8 @@ class MemoryHandle:
         chunk_overlap: int = 64,
     ) -> Dict[str, Any]:
         """Index a file or directory into memory."""
-        from nicx.tools.storage.chunking import ChunkConfig
-        from nicx.tools.storage.ingest import ingest_path
+        from nicx.ferramentas.storage.chunking import ChunkConfig
+        from nicx.ferramentas.storage.ingest import ingest_path
 
         backend = self._get_backend()
         cfg = ChunkConfig(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
@@ -201,7 +201,7 @@ class Nicx:
 
         # Import engines to trigger registration
         try:
-            import nicx.engine  # noqa: F401
+            import nicx.motores  # noqa: F401
         except ImportError:
             pass
 
@@ -216,7 +216,7 @@ class Nicx:
         self._resolved_engine_key, engine = resolved
 
         # Apply security guardrails
-        from nicx.security import setup_security
+        from nicx.seguranca import setup_security
 
         sec = setup_security(self._config, engine, self._bus)
         engine = sec.engine
@@ -228,7 +228,9 @@ class Nicx:
         energy_monitor = None
         if self._config.telemetry.gpu_metrics:
             try:
-                from nicx.telemetry.energy_monitor import create_energy_monitor
+                from nicx.registros.telemetria.energy_monitor import (
+                    create_energy_monitor,
+                )
 
                 energy_monitor = create_energy_monitor(
                     prefer_vendor=self._config.telemetry.energy_vendor or None,
@@ -453,9 +455,9 @@ class Nicx:
         channel: Optional[Any] = None,
     ) -> Dict[str, Any]:
         """Run an agent and return the result dict."""
-        import nicx.agents  # noqa: F401
-        from nicx.agents._stubs import AgentContext
-        from nicx.core.registry import AgentRegistry
+        import nicx.cerebro.agentes  # noqa: F401
+        from nicx.cerebro.agentes._stubs import AgentContext
+        from nicx.nucleo.registry import AgentRegistry
 
         if not AgentRegistry.contains(agent_name):
             raise ValueError(
@@ -468,8 +470,8 @@ class Nicx:
         # Build tools
         tool_objects: List[Any] = []
         if tools:
-            import nicx.tools  # noqa: F401
-            from nicx.cli.ask import _build_tools
+            import nicx.ferramentas  # noqa: F401
+            from nicx.comandos.ask import _build_tools
 
             tool_objects = _build_tools(
                 tools,
@@ -487,7 +489,7 @@ class Nicx:
         if getattr(agent_cls, "accepts_tools", False):
             agent_kwargs["tools"] = tool_objects
             agent_kwargs["max_turns"] = self._config.agent.max_turns
-        from nicx.security.runtime import agent_security_kwargs
+        from nicx.seguranca.runtime import agent_security_kwargs
 
         agent_kwargs.update(
             agent_security_kwargs(
@@ -519,8 +521,8 @@ class Nicx:
                 }
             )
             # Ensure digest agent always has its required tools
-            from nicx.tools.digest_collect import DigestCollectTool
-            from nicx.tools.text_to_speech import TextToSpeechTool
+            from nicx.ferramentas.digest_collect import DigestCollectTool
+            from nicx.ferramentas.text_to_speech import TextToSpeechTool
 
             digest_tools = [DigestCollectTool(), TextToSpeechTool()]
             existing = agent_kwargs.get("tools", [])
@@ -532,7 +534,7 @@ class Nicx:
         import inspect as _inspect
 
         if "prompt_builder" in _inspect.signature(agent_cls.__init__).parameters:
-            from nicx.prompt.builder import SystemPromptBuilder
+            from nicx.cerebro.prompt.builder import SystemPromptBuilder
 
             agent_kwargs["prompt_builder"] = SystemPromptBuilder(
                 agent_template=self._config.agent.default_system_prompt or "",
@@ -541,7 +543,7 @@ class Nicx:
             )
 
         agent_obj = agent_cls(self._engine, model_name, **agent_kwargs)
-        from nicx.security.runtime import wire_agent_security
+        from nicx.seguranca.runtime import wire_agent_security
 
         wire_agent_security(
             agent_obj,
@@ -555,8 +557,8 @@ class Nicx:
         # Context injection
         if context and self._config.agent.context_from_memory:
             try:
-                from nicx.cli.ask import _get_memory_backend, _get_memory_facts
-                from nicx.tools.storage.context import (
+                from nicx.comandos.ask import _get_memory_backend, _get_memory_facts
+                from nicx.ferramentas.storage.context import (
                     ContextConfig,
                     inject_context,
                 )
@@ -605,8 +607,8 @@ class Nicx:
     ) -> List[Message]:
         """Inject memory context into messages."""
         try:
-            from nicx.cli.ask import _get_memory_backend, _get_memory_facts
-            from nicx.tools.storage.context import ContextConfig, inject_context
+            from nicx.comandos.ask import _get_memory_backend, _get_memory_facts
+            from nicx.ferramentas.storage.context import ContextConfig, inject_context
 
             backend = _get_memory_backend(self._config)
             facts = _get_memory_facts(self._config)
@@ -634,7 +636,7 @@ class Nicx:
 
     def list_engines(self) -> List[str]:
         """Return a list of registered engine keys."""
-        from nicx.core.registry import EngineRegistry
+        from nicx.nucleo.registry import EngineRegistry
 
         return list(EngineRegistry.keys())
 

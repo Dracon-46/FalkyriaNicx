@@ -171,7 +171,7 @@ tools = ["think", "memory_store", "memory_search"]
 You can load this recipe programmatically:
 
 ```python title="Loading the messaging recipe"
-from nicx.recipes import load_recipe
+from nicx.cerebro.receitas import load_recipe
 from nicx import SystemBuilder
 
 recipe = load_recipe("examples/messaging_hub/messaging.toml")
@@ -206,7 +206,7 @@ nicx scheduler create "Daily inbox summary" \
     --type cron --value "0 17 * * *"
 ```
 
-Or use the operator recipe pattern to run a persistent triage agent on a schedule. See the operator recipes in `src/nicx/recipes/data/operators/` for ready-made examples.
+Or use the operator recipe pattern to run a persistent triage agent on a schedule. See the operator recipes in `src/nicx/cerebro/receitas/data/operators/` for ready-made examples.
 
 ## See Also
 

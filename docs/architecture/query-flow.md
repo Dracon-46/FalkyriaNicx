@@ -161,8 +161,8 @@ for ek, model_ids in all_models.items():
 If no model was explicitly specified, the router policy selects one:
 
 ```python
-from nicx.learning import ensure_registered
-from nicx.learning.router import build_routing_context
+from nicx.cerebro.roteamento import ensure_registered
+from nicx.cerebro.roteamento.router import build_routing_context
 ensure_registered()  # Ensure learning policies are registered
 
 policy_key = router_policy or config.learning.routing.policy

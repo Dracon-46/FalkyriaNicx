@@ -87,7 +87,7 @@ entirely regardless of consent.
 
 The canonical, authoritative list with every property name and its
 type validator lives in
-[`src/nicx/analytics/events.py`](../src/nicx/analytics/events.py).
+[`src/nicx/privacidade/events.py`](../src/nicx/privacidade/events.py).
 That file is the only place new events can be added — PR review is
 the gate.
 
@@ -112,11 +112,11 @@ Backend events use a property allowlist and value-level redaction:
 
 Two independent filters run before backend event properties are sent:
 
-1. [`src/nicx/analytics/redaction.py`](../src/nicx/analytics/redaction.py) — value-level pattern matching (20+ regexes for PII).
-2. [`src/nicx/analytics/events.py`](../src/nicx/analytics/events.py) — structural allowlist (event name + property name + type validator).
+1. [`src/nicx/privacidade/redaction.py`](../src/nicx/privacidade/redaction.py) — value-level pattern matching (20+ regexes for PII).
+2. [`src/nicx/privacidade/events.py`](../src/nicx/privacidade/events.py) — structural allowlist (event name + property name + type validator).
 
 Any failure at either layer → the event or property is silently
-dropped. Tests covering the patterns: [`tests/analytics/test_redaction.py`](../tests/analytics/test_redaction.py).
+dropped. Tests covering the patterns: [`tests/privacidade/test_redaction.py`](../tests/analytics/test_redaction.py).
 
 The frontend never talks to the analytics destination directly: it posts
 each event to the local backend (`POST /v1/analytics/capture`), which runs
@@ -158,10 +158,10 @@ erase what was already sent, use "Apagar meus dados" first.
 
 ## For researchers and contributors
 
-- **Adding an event**: edit `src/nicx/analytics/events.py`,
+- **Adding an event**: edit `src/nicx/privacidade/events.py`,
   declare the spec, then update this page. PR review enforces both.
-- **Adding a PII pattern**: edit `src/nicx/analytics/redaction.py`
-  and add a test case in `tests/analytics/test_redaction.py`.
+- **Adding a PII pattern**: edit `src/nicx/privacidade/redaction.py`
+  and add a test case in `tests/privacidade/test_redaction.py`.
 - **Inspecting what your install sends**: run with
   `NICX_LOG_LEVEL=DEBUG` and grep for `Analytics`. You'll see
   every event name and (redacted) property dict before it ships.
@@ -170,6 +170,6 @@ erase what was already sent, use "Apagar meus dados" first.
 
 - Local telemetry (FLOPs, energy, latency stored in
   `~/.nicx/telemetry.db`) is a **separate** subsystem documented
-  in [`src/nicx/telemetry/`](../src/nicx/telemetry/). It
+  in [`src/nicx/registros/telemetria/`](../src/nicx/registros/telemetria/). It
   never leaves the machine and is controlled by `[telemetry]` (not
   `[analytics]`) in `config.toml`.

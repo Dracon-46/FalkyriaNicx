@@ -11,9 +11,9 @@ from typing import Any
 
 from nicx.acoes.intencoes import APPS, STEP_NORMAL, Action, normalize
 from nicx.acoes.sistema import run
-from nicx.core.registry import ToolRegistry
-from nicx.core.types import ToolResult
-from nicx.tools._stubs import BaseTool, ToolSpec
+from nicx.ferramentas._stubs import BaseTool, ToolSpec
+from nicx.nucleo.registry import ToolRegistry
+from nicx.nucleo.types import ToolResult
 
 _ACTIONS = {
     "volume_mais": ("volume", "up"),

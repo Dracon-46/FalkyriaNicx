@@ -1137,7 +1137,7 @@ You can configure Nicx entirely from Python without a TOML file:
 
 ```python
 from nicx import Nicx
-from nicx.core.config import (
+from nicx.nucleo.config import (
     AgentConfig,
     EngineConfig,
     IntelligenceConfig,

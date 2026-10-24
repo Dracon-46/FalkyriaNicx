@@ -47,7 +47,7 @@ There's a fuller version at
 Then confirm the list actually resolved:
 
 ```bash
-python -c "from nicx.core.config import load_config; print(load_config().tools.enabled)"
+python -c "from nicx.nucleo.config import load_config; print(load_config().tools.enabled)"
 ```
 
 ---

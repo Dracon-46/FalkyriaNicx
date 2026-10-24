@@ -9,9 +9,9 @@ import pytest
 import tomllib
 from click.testing import CliRunner
 
-from nicx.cli import _analytics_consent
-from nicx.cli.init_cmd import init
-from nicx.core.config import load_config
+from nicx.comandos import _analytics_consent
+from nicx.comandos.init_cmd import init
+from nicx.nucleo.config import load_config
 
 
 class TerminalInput(io.StringIO):

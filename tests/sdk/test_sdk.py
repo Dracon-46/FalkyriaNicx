@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 import nicx
-from nicx.core.config import NicxConfig
+from nicx.nucleo.config import NicxConfig
 from nicx.sdk import MemoryHandle, Nicx
 
 
@@ -73,8 +73,8 @@ class TestNicxAsk:
             j.close()
 
     def test_ask_with_agent(self):
-        from nicx.agents._stubs import AgentResult
-        from nicx.core.registry import AgentRegistry
+        from nicx.cerebro.agentes._stubs import AgentResult
+        from nicx.nucleo.registry import AgentRegistry
 
         engine = _make_engine()
 
@@ -96,16 +96,16 @@ class TestNicxAsk:
             j.close()
 
     def test_simple_agent_ignores_tool_security_kwargs(self):
-        from nicx.agents.simple import SimpleAgent
-        from nicx.core.registry import AgentRegistry
-        from nicx.security import SecurityContext
+        from nicx.cerebro.agentes.simple import SimpleAgent
+        from nicx.nucleo.registry import AgentRegistry
+        from nicx.seguranca import SecurityContext
 
         engine = _make_engine("simple secured response")
         AgentRegistry.register_value("simple", SimpleAgent)
         with (
             patch("nicx.sdk.get_engine", return_value=("mock", engine)),
             patch(
-                "nicx.security.setup_security",
+                "nicx.seguranca.setup_security",
                 return_value=SecurityContext(
                     engine=engine,
                     capability_policy=object(),
@@ -120,10 +120,10 @@ class TestNicxAsk:
         assert result == "simple secured response"
 
     def test_direct_operation_agent_receives_policy_rate_and_identity(self):
-        from nicx.agents._stubs import AgentContext, AgentResult, BaseAgent
-        from nicx.core.registry import AgentRegistry
-        from nicx.security import SecurityContext
-        from nicx.security.capabilities import CapabilityPolicy
+        from nicx.cerebro.agentes._stubs import AgentContext, AgentResult, BaseAgent
+        from nicx.nucleo.registry import AgentRegistry
+        from nicx.seguranca import SecurityContext
+        from nicx.seguranca.capabilities import CapabilityPolicy
 
         class _RecordingLimiter:
             def __init__(self):
@@ -150,7 +150,7 @@ class TestNicxAsk:
         with (
             patch("nicx.sdk.get_engine", return_value=("mock", engine)),
             patch(
-                "nicx.security.setup_security",
+                "nicx.seguranca.setup_security",
                 return_value=SecurityContext(
                     engine=engine,
                     capability_policy=policy,
@@ -166,8 +166,8 @@ class TestNicxAsk:
         assert limiter.keys == ["direct-sdk:agent_run"]
 
     def test_ask_with_agent_wires_persona(self, tmp_path):
-        from nicx.agents.simple import SimpleAgent
-        from nicx.core.registry import AgentRegistry
+        from nicx.cerebro.agentes.simple import SimpleAgent
+        from nicx.nucleo.registry import AgentRegistry
 
         soul = tmp_path / "SOUL.md"
         soul.write_text("SDK_PERSONA_SENTINEL", encoding="utf-8")
@@ -218,7 +218,7 @@ class TestNicxModels:
             j.close()
 
     def test_list_engines(self):
-        from nicx.core.registry import EngineRegistry
+        from nicx.nucleo.registry import EngineRegistry
 
         EngineRegistry.register_value("test-eng", object)
         j = Nicx(config=NicxConfig())
@@ -382,7 +382,7 @@ class TestNicxStreaming:
 class TestNicxLifecycle:
     @pytest.mark.parametrize("security_enabled", [False, True])
     def test_close_initialized_engine(self, security_enabled: bool) -> None:
-        from nicx.security.guardrails import GuardrailsEngine
+        from nicx.seguranca.guardrails import GuardrailsEngine
 
         cfg = NicxConfig()
         cfg.security.enabled = security_enabled

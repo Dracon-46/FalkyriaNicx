@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 
-from nicx.cli.serve import serve
+from nicx.comandos.serve import serve
 
 RENDER_BLUEPRINT = Path(__file__).resolve().parents[2] / "render.yaml"
 RENDER_DOC = Path(__file__).resolve().parents[2] / "docs/deployment/render.md"

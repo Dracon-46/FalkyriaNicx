@@ -58,7 +58,7 @@ The default backend using SQLite's built-in FTS5 full-text search extension. Zer
 - **Dependencies:** None (built into Python)
 
 ```python
-from nicx.core.registry import MemoryRegistry
+from nicx.nucleo.registry import MemoryRegistry
 
 backend = MemoryRegistry.create("sqlite", db_path="./memory.db")
 doc_id = backend.store("Hello world", source="test.txt")
@@ -156,8 +156,8 @@ Combines a sparse retriever and a dense retriever using Reciprocal Rank Fusion (
 - **Dependencies:** Depends on sub-backends
 
 ```python
-from nicx.tools.storage.bm25 import BM25Memory
-from nicx.tools.storage.faiss_backend import FAISSMemory
+from nicx.ferramentas.storage.bm25 import BM25Memory
+from nicx.ferramentas.storage.faiss_backend import FAISSMemory
 
 sparse = BM25Memory()
 dense = FAISSMemory()
@@ -173,7 +173,7 @@ backend = MemoryRegistry.create(
 ```
 
 !!! note "Backward compatibility"
-    The old `from nicx.memory.bm25 import BM25Memory` still works via backward-compatibility shims, but new code should use the canonical `nicx.tools.storage.*` imports.
+    The old `from nicx.memoria.bm25 import BM25Memory` still works via backward-compatibility shims, but new code should use the canonical `nicx.ferramentas.storage.*` imports.
 
 | Parameter       | Default | Description                              |
 |-----------------|---------|------------------------------------------|
@@ -262,8 +262,8 @@ The ingestion pipeline automatically skips:
 
 ```python
 from pathlib import Path
-from nicx.tools.storage.chunking import ChunkConfig
-from nicx.tools.storage.ingest import ingest_path
+from nicx.ferramentas.storage.chunking import ChunkConfig
+from nicx.ferramentas.storage.ingest import ingest_path
 
 # Default chunking
 chunks = ingest_path(Path("./docs/"))

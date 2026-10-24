@@ -5,7 +5,7 @@
 # This config has two parts:
 #   1. The agent system being optimized (intelligence / engine / agent / tools).
 #      Same schema as the other examples in this directory; parsed by
-#      ``nicx.core.config.load_config``.
+#      ``nicx.nucleo.config.load_config``.
 #   2. ``[learning.spec_search]`` and its sub-tables — the search hyperparameters
 #      consumed by ``SpecSearchOrchestrator.from_config`` and ``SpecSearchLoop``.
 #

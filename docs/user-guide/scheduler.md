@@ -3,7 +3,7 @@
 The task scheduler lets you run agent queries automatically on a schedule -- once at a future time, on a recurring interval, or via a cron expression. Scheduled tasks are persisted in SQLite so they survive process restarts, and execution is handled by a background daemon thread that polls for due tasks every 60 seconds.
 
 !!! note "Optional component"
-    The scheduler is a standalone module (`nicx.scheduler`). It is not wired into the default `Nicx` / `NicxSystem` startup. You enable it explicitly via `SystemBuilder` or by starting the CLI daemon with `nicx scheduler start`.
+    The scheduler is a standalone module (`nicx.agenda`). It is not wired into the default `Nicx` / `NicxSystem` startup. You enable it explicitly via `SystemBuilder` or by starting the CLI daemon with `nicx scheduler start`.
 
 ---
 
@@ -115,8 +115,8 @@ Run 2: started=2026-02-24T08:00:00Z finished=2026-02-24T08:00:05Z success=True
 ## Python API
 
 ```python title="scheduler_example.py"
-from nicx.scheduler.store import SchedulerStore
-from nicx.scheduler.scheduler import TaskScheduler
+from nicx.agenda.store import SchedulerStore
+from nicx.agenda.scheduler import TaskScheduler
 
 # Set up storage
 store = SchedulerStore(db_path="~/.nicx/scheduler.db")  # (1)!

@@ -60,7 +60,7 @@ graph LR
 ### Connecting
 
 ```python title="connect.py"
-from nicx.channels.telegram import TelegramChannel
+from nicx.canais.telegram import TelegramChannel
 
 channel = TelegramChannel(
     bot_token="YOUR_BOT_TOKEN",  # (1)!
@@ -75,7 +75,7 @@ print(channel.status())  # ChannelStatus.CONNECTED
 ### Sending Messages
 
 ```python title="send_message.py"
-from nicx.channels.telegram import TelegramChannel
+from nicx.canais.telegram import TelegramChannel
 
 channel = TelegramChannel()
 channel.connect()
@@ -100,8 +100,8 @@ channel.disconnect()
 Register handler callbacks before calling `connect()`. Each handler receives a `ChannelMessage` and can optionally return a reply string.
 
 ```python title="receive_messages.py"
-from nicx.channels._stubs import ChannelMessage
-from nicx.channels.discord_channel import DiscordChannel
+from nicx.canais._stubs import ChannelMessage
+from nicx.canais.discord_channel import DiscordChannel
 
 channel = DiscordChannel()
 
@@ -125,7 +125,7 @@ channel.connect()                    # (2)!
 ### Listing Available Channels
 
 ```python title="list_channels.py"
-from nicx.channels.slack import SlackChannel
+from nicx.canais.slack import SlackChannel
 
 channel = SlackChannel()
 channel.connect()
@@ -164,8 +164,8 @@ Every incoming message is delivered to handlers as a `ChannelMessage` dataclass.
 Pass an `EventBus` to publish channel events to the rest of the system:
 
 ```python title="channel_events.py"
-from nicx.core.events import EventBus, EventType
-from nicx.channels.telegram import TelegramChannel
+from nicx.nucleo.events import EventBus, EventType
+from nicx.canais.telegram import TelegramChannel
 
 bus = EventBus()
 
@@ -312,9 +312,9 @@ This example connects a Telegram channel, registers a handler that echoes messag
 
 ```python title="full_example.py"
 import time
-from nicx.channels._stubs import ChannelMessage
-from nicx.channels.telegram import TelegramChannel
-from nicx.core.events import EventBus
+from nicx.canais._stubs import ChannelMessage
+from nicx.canais.telegram import TelegramChannel
+from nicx.nucleo.events import EventBus
 
 bus = EventBus()
 channel = TelegramChannel(
@@ -416,7 +416,7 @@ To get a dedicated number, upgrade to a paid SendBlue plan.
 ### Programmatic Setup
 
 ```python title="sendblue_setup.py"
-from nicx.channels.sendblue import SendBlueChannel
+from nicx.canais.sendblue import SendBlueChannel
 
 channel = SendBlueChannel(
     api_key_id="YOUR_API_KEY_ID",         # or SENDBLUE_API_KEY_ID env var
@@ -538,7 +538,7 @@ If `ready` is `false`, the Messaging tab shows a "Disconnected" badge with a "Re
 ### Connecting
 
 ```python title="whatsapp_connect.py"
-from nicx.channels.whatsapp_baileys import WhatsAppBaileysChannel
+from nicx.canais.whatsapp_baileys import WhatsAppBaileysChannel
 
 channel = WhatsAppBaileysChannel(
     assistant_name="Nicx",           # (1)!
@@ -555,8 +555,8 @@ On first connection, the bridge will print a QR code to the terminal. Scan it wi
 ### Receiving Messages
 
 ```python title="whatsapp_receive.py"
-from nicx.channels._stubs import ChannelMessage
-from nicx.channels.whatsapp_baileys import WhatsAppBaileysChannel
+from nicx.canais._stubs import ChannelMessage
+from nicx.canais.whatsapp_baileys import WhatsAppBaileysChannel
 
 channel = WhatsAppBaileysChannel()
 
