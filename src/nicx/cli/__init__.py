@@ -118,11 +118,9 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     from nicx.cli.init_cmd import init
     from nicx.cli.legal_cmd import legal
     from nicx.cli.memory_cmd import memory
-    from nicx.cli.mine_cmd import mine
     from nicx.cli.model import model
     from nicx.cli.operators_cmd import operators
     from nicx.cli.optimize_cmd import optimize_group
-    from nicx.cli.pearl_cmd import pearl
     from nicx.cli.quickstart_cmd import quickstart
     from nicx.cli.registry_cmd import registry
     from nicx.cli.scheduler_cmd import scheduler
@@ -142,8 +140,6 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     cli.add_command(serve, "serve")
     cli.add_command(model, "model")
     cli.add_command(memory, "memory")
-    cli.add_command(mine, "mine")
-    cli.add_command(pearl, "pearl")
     cli.add_command(telemetry, "telemetry")
     cli.add_command(bench, "bench")
     cli.add_command(channel, "channel")
