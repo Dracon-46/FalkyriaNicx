@@ -108,6 +108,26 @@ def _default_num_ctx() -> int:
     return _configured_num_ctx() or _FALLBACK_NUM_CTX
 
 
+_FALLBACK_KEEP_ALIVE = "20m"
+
+
+def _keep_alive() -> str:
+    """How long Ollama keeps the model loaded after a request.
+
+    Priority: ``NICX_KEEP_ALIVE`` > ``[engine.ollama] keep_alive`` > 20m.
+    """
+    raw = os.environ.get("NICX_KEEP_ALIVE", "").strip()
+    if raw:
+        return raw
+    try:
+        from nicx.core.config import load_config
+
+        value = str(load_config().engine.ollama.keep_alive).strip()
+    except Exception:  # noqa: BLE001 - a broken config must not block inference
+        value = ""
+    return value or _FALLBACK_KEEP_ALIVE
+
+
 _OOM_MARKERS = (
     "out of memory",
     "out-of-memory",
@@ -224,6 +244,7 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
             "model": model,
             "messages": msg_dicts,
             "stream": False,
+            "keep_alive": _keep_alive(),
             "options": _ollama_request_options(
                 temperature=temperature,
                 max_tokens=max_tokens,
@@ -349,6 +370,7 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
             "model": model,
             "messages": messages_to_dicts(messages),
             "stream": True,
+            "keep_alive": _keep_alive(),
             "options": _ollama_request_options(
                 temperature=temperature,
                 max_tokens=max_tokens,
@@ -448,6 +470,7 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
             "model": model,
             "messages": msg_dicts,
             "stream": True,
+            "keep_alive": _keep_alive(),
             "options": _ollama_request_options(
                 temperature=temperature,
                 max_tokens=max_tokens,
@@ -611,9 +634,59 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
             logger.debug("Ollama health check failed at %s: %s", self._host, exc)
             return False
 
+    def load(self, model: str) -> None:
+        """Load the model's weights into RAM without reading any prompt.
+
+        An empty request makes Ollama load the model and return. On CPU this
+        moves the 5-30 s disk load out of the first question; prompt reading
+        cannot be done ahead of time (qwen3.5 reuses no prompt cache here).
+        """
+        try:
+            self._client.post(
+                "/api/generate",
+                json={"model": model, "keep_alive": _keep_alive()},
+                timeout=300.0,
+            )
+        except Exception as exc:  # noqa: BLE001 - optional optimisation
+            logger.debug("Could not preload %s: %s", model, exc)
+
+    def unload(self, model: str) -> None:
+        """Free the model's RAM now instead of after ``keep_alive``."""
+        try:
+            self._client.post(
+                "/api/generate",
+                json={"model": model, "keep_alive": 0},
+                timeout=10.0,
+            )
+        except Exception as exc:  # noqa: BLE001 - best effort, usually on exit
+            logger.debug("Could not unload %s from Ollama: %s", model, exc)
+
     def close(self) -> None:
         self._client.close()
         self._close_async_client()
 
 
-__all__ = ["OllamaEngine"]
+def unload_configured_model() -> None:
+    """Unload the configured default model, e.g. after stopping the server.
+
+    The server may be force-killed (``taskkill /F`` on Windows), which skips
+    its own cleanup; whoever stopped it calls this instead.
+    """
+    try:
+        from nicx.core.config import load_config
+
+        cfg = load_config()
+        model = cfg.intelligence.default_model
+        if not model:
+            return
+        host = (
+            cfg.engine.ollama.host
+            or os.environ.get("OLLAMA_HOST")
+            or OllamaEngine._DEFAULT_HOST
+        )
+        OllamaEngine(host=host).unload(model)
+    except Exception as exc:  # noqa: BLE001 - best effort on exit
+        logger.debug("Could not unload the configured model: %s", exc)
+
+
+__all__ = ["OllamaEngine", "unload_configured_model"]

@@ -90,6 +90,7 @@ export async function sendSpokenMessage(
         stream: true,
         temperature: app.settings.temperature,
         max_tokens: app.settings.maxTokens,
+        voice: true,
       },
       options.signal,
     )) {

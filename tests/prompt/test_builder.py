@@ -221,3 +221,21 @@ def test_missing_files_handled(tmp_path: Path):
     )
     prompt = builder.build()
     assert "Nicx" in prompt
+
+
+def test_title_only_persona_files_are_left_out(tmp_path: Path):
+    """Fresh MEMORY.md / USER.md hold only a title: nothing to send."""
+    from nicx.prompt.builder import SystemPromptBuilder
+
+    (tmp_path / "SOUL.md").write_text("# Agent Persona\n\nVocê é o Nicx.\n", "utf-8")
+    (tmp_path / "MEMORY.md").write_text("# Agent Memory\r\n\r\n", "utf-8")
+    (tmp_path / "USER.md").write_text("# User Profile\n\n", "utf-8")
+    prompt = SystemPromptBuilder(
+        agent_template="",
+        memory_files_config=MemoryFilesConfig(
+            soul_path=str(tmp_path / "SOUL.md"),
+            memory_path=str(tmp_path / "MEMORY.md"),
+            user_path=str(tmp_path / "USER.md"),
+        ),
+    ).build()
+    assert prompt == "## Agent Persona\n\nVocê é o Nicx."

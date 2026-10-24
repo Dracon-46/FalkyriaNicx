@@ -58,10 +58,8 @@ class ShellExecTool(BaseTool):
     def spec(self) -> ToolSpec:
         return ToolSpec(
             name="shell_exec",
-            description=(
-                "Execute a shell command and return its stdout/stderr."
-                " Runs with a minimal environment for security."
-            ),
+            # Short: tool schemas go out with every prompt.
+            description="Run a shell command (cmd on Windows); returns stdout/stderr.",
             parameters={
                 "type": "object",
                 "properties": {
@@ -71,22 +69,16 @@ class ShellExecTool(BaseTool):
                     },
                     "timeout": {
                         "type": "integer",
-                        "description": ("Timeout in seconds (default 30, max 300)."),
+                        "description": "Seconds (default 30, max 300).",
                     },
                     "working_dir": {
                         "type": "string",
-                        "description": (
-                            "Working directory for the command."
-                            " Must exist and be a directory."
-                        ),
+                        "description": "Existing folder to run in.",
                     },
                     "env_passthrough": {
                         "type": "array",
                         "items": {"type": "string"},
-                        "description": (
-                            "Additional environment variable names"
-                            " to pass through from the host."
-                        ),
+                        "description": "Extra env var names to pass.",
                     },
                 },
                 "required": ["command"],

@@ -365,6 +365,12 @@ class OllamaEngineConfig:
     # ~3.4 GB at 8192, ~3.7 GB at 16384 and ~4.2 GB at 32768. 8192 fits a
     # 16 GB machine with other apps open. ``NICX_NUM_CTX`` overrides it.
     num_ctx: int = 8192
+    # How long Ollama keeps the model loaded after the last request. Its own
+    # default (5 min) meant reloading ~3 GB and re-reading the whole prompt
+    # (~40 s on CPU) after a short pause. `nicx serve` unloads the model when
+    # it stops, so this only holds RAM while Nicx is open. ``NICX_KEEP_ALIVE``
+    # overrides it; "0" unloads after every answer.
+    keep_alive: str = "20m"
 
 
 @dataclass(slots=True)
@@ -1140,14 +1146,22 @@ class AgentConfig:
     system_prompt: str = ""  # inline system prompt (takes precedence if set)
     system_prompt_path: str = ""  # path to system prompt file (.txt, .md)
     context_from_memory: bool = True  # inject relevant memory context into prompts
+    # Comandos diretos ("aumenta o volume", "que horas são") executados na
+    # hora, sem chamar o modelo: menos de 1 s e nenhum token (nicx.acoes).
+    quick_actions: bool = True
+    # Send the tool list (~600 tokens) only when the message looks like it
+    # needs one (search, current data, files, the PC, math); small talk goes
+    # straight to the model. With nothing cached between questions on CPU,
+    # this cuts a plain answer to about a third (nicx.acoes.roteamento).
+    tools_on_demand: bool = True
+    # Curto de propósito: vai em toda pergunta, e na CPU cada token de
+    # entrada custa tempo. A persona completa fica no SOUL.md.
     default_system_prompt: str = (
-        "Você é o Nicx, a inteligência artificial da Falkyria. Se perguntarem "
-        "quem ou o que você é, apresente-se como Nicx, a IA da Falkyria. O Nicx "
-        "pode rodar sobre modelos de linguagem diferentes (locais ou na nuvem); "
-        "se perguntarem qual modelo está por trás, diga isso com franqueza. "
-        "Responda em português do Brasil, a menos que falem com você em outro "
-        "idioma. Seja útil, conciso e preciso; nunca invente fatos, números ou "
-        "fontes, e diga quando não souber."
+        "Você é o Nicx, a IA da Falkyria. Responda em português do Brasil (ou no "
+        "idioma de quem falar), curto e direto. Não invente fatos; diga quando não "
+        "souber. Se perguntarem qual modelo roda por trás, diga com franqueza. "
+        "Quando pedirem uma ação no computador, use as ferramentas em vez de "
+        "explicar como fazer."
     )
 
     # Backward-compat property for old field name
@@ -2196,7 +2210,7 @@ default_model = "{model}"
 default_agent = "simple"
 
 [tools]
-enabled = ["code_interpreter", "web_search", "file_read", "shell_exec"]
+enabled = ["controle_pc", "code_interpreter", "web_search", "file_read", "shell_exec"]
 """
 
 

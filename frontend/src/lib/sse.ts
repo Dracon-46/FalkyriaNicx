@@ -7,6 +7,8 @@ export interface ChatRequest {
   stream: true;
   temperature?: number;
   max_tokens?: number;
+  /** Nicx: the reply will be spoken, so ask for a short answer. */
+  voice?: boolean;
 }
 
 export async function* streamChat(

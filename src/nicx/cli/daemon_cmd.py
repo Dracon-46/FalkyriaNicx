@@ -502,6 +502,10 @@ def stop() -> None:
     terminate_process(pid, grace_seconds=10.0)
 
     clear_server_state(pid)
+    # A forced kill skips the server's own cleanup: free the model's RAM here.
+    from nicx.engine.ollama import unload_configured_model
+
+    unload_configured_model()
     console.print(f"[green]Server stopped[/green] (PID {pid}).")
 
 

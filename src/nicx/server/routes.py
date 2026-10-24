@@ -154,20 +154,105 @@ def _ensure_identity_prompt(messages: list[Message], app_config) -> list[Message
     return [combined_system, *non_system_messages]
 
 
+# Spoken replies: a few short sentences. On CPU every generated token costs
+# ~0.3 s, and a list read aloud is hard to follow anyway.
+_VOICE_HINT = (
+    "\n\n(Resposta falada: no máximo 2 frases curtas, sem listas nem markdown.)"
+)
+_VOICE_MAX_TOKENS = 200
+
+
+def _turn_needs_agent_tools(
+    req: ChatCompletionRequest, agent: Any, config: Any
+) -> bool:
+    """Whether this turn should go through the tool-using agent.
+
+    Small talk skips the agent and its ~600-token tool list (``tools_on_demand``);
+    agents without tools keep their own path.
+    """
+    agent_cfg = getattr(config, "agent", None)
+    if not getattr(agent_cfg, "tools_on_demand", True):
+        return True
+    if not getattr(agent, "_tools", None):
+        return True
+    from nicx.acoes.roteamento import conversation_needs_tools
+
+    user_texts = [
+        m.content
+        for m in req.messages
+        if m.role == "user" and isinstance(m.content, str)
+    ]
+    return conversation_needs_tools(user_texts)
+
+
+async def _quick_action_reply(req: ChatCompletionRequest, config: Any) -> str | None:
+    """Run a direct command from the latest user message, if it is one.
+
+    Only plain chat turns qualify: callers that pass their own ``tools`` want
+    the model's raw tool calls, and the command must be the newest message.
+    """
+    agent_cfg = getattr(config, "agent", None)
+    if req.tools or not getattr(agent_cfg, "quick_actions", True):
+        return None
+    last = req.messages[-1] if req.messages else None
+    if last is None or last.role != "user" or not isinstance(last.content, str):
+        return None
+    from nicx.acoes import handle
+
+    outcome = await asyncio.to_thread(handle, last.content)
+    return outcome.message if outcome is not None else None
+
+
+def _immediate_response(text: str, model: str, *, stream: bool):
+    """Answer with ready text, in the same shape as a model reply."""
+    if not stream:
+        return ChatCompletionResponse(
+            model=model,
+            choices=[Choice(message=ChoiceMessage(content=text))],
+        )
+    chunk_id = f"chatcmpl-{uuid.uuid4().hex[:12]}"
+
+    async def generate():
+        for delta, finish in (
+            (DeltaMessage(role="assistant"), None),
+            (DeltaMessage(content=text), None),
+            (DeltaMessage(), "stop"),
+        ):
+            chunk = ChatCompletionChunk(
+                id=chunk_id,
+                model=model,
+                choices=[StreamChoice(delta=delta, finish_reason=finish)],
+            )
+            yield f"data: {chunk.model_dump_json()}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
+    )
+
+
 @router.post("/v1/chat/completions")
 async def chat_completions(request_body: ChatCompletionRequest, request: Request):
     """Handle chat completion requests (streaming and non-streaming)."""
     engine = request.app.state.engine
     agent = getattr(request.app.state, "agent", None)
     model = request_body.model
+    config = getattr(request.app.state, "config", None)
     use_server_agent = (
         agent is not None
         and not request_body.tools
         and (not request_body.stream or bool(getattr(agent, "_tools", None)))
+        and _turn_needs_agent_tools(request_body, agent, config)
     )
 
+    # "Aumenta o volume", "que horas são": executa na hora, sem o modelo.
+    quick_reply = await _quick_action_reply(request_body, config)
+    if quick_reply is not None:
+        return _immediate_response(quick_reply, model, stream=request_body.stream)
+
     # Inject memory context into messages before dispatching
-    config = getattr(request.app.state, "config", None)
     memory_backend = getattr(request.app.state, "memory_backend", None)
     if (
         config is not None
@@ -273,6 +358,13 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
                 "Complexity analysis failed",
                 exc_info=True,
             )
+
+    # Spoken reply on the direct path (the agent path does this itself).
+    if request_body.voice and not use_server_agent and not request_body.tools:
+        last = request_body.messages[-1] if request_body.messages else None
+        if last is not None and last.role == "user" and isinstance(last.content, str):
+            last.content = f"{last.content}{_VOICE_HINT}"
+            request_body.max_tokens = min(request_body.max_tokens, _VOICE_MAX_TOKENS)
 
     if request_body.stream:
         # When the client passes `tools`, stream the model's raw
@@ -616,6 +708,11 @@ def _handle_agent(
 
     # Last message is the input
     input_text = req.messages[-1].content if req.messages else ""
+    voice = bool(getattr(req, "voice", False)) and isinstance(input_text, str)
+    if voice:
+        # At the end of the user turn, not in the system prompt: the fixed
+        # prefix stays identical, so Ollama's prompt cache still applies.
+        input_text = f"{input_text}{_VOICE_HINT}"
 
     # Override agent model for this request if the caller specified one.
     # Locked for the full override-run-restore cycle: only the
@@ -623,8 +720,11 @@ def _handle_agent(
     # itself reads self._model throughout the call.
     with _get_agent_model_lock(agent):
         original_model = agent._model
+        original_max_tokens = getattr(agent, "_max_tokens", None)
         if model:
             agent._model = model
+        if voice and original_max_tokens:
+            agent._max_tokens = min(original_max_tokens, _VOICE_MAX_TOKENS)
         try:
             if trace_store is not None:
                 from nicx.traces.collector import TraceCollector
@@ -635,6 +735,8 @@ def _handle_agent(
                 result = agent.run(input_text, context=ctx)
         finally:
             agent._model = original_model
+            if voice and original_max_tokens:
+                agent._max_tokens = original_max_tokens
 
     usage = UsageInfo(
         prompt_tokens=result.metadata.get("prompt_tokens", 0),

@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import os
 import sys
+import threading
 
 import click
 from rich.console import Console
@@ -26,7 +27,7 @@ from nicx.intelligence import (
 
 logger = logging.getLogger(__name__)
 
-_DEFAULT_TOOLS = frozenset({"think", "calculator", "web_search"})
+_DEFAULT_TOOLS = frozenset({"think", "calculator", "web_search", "controle_pc"})
 
 
 def _resolve_server_cors_origins(configured: object) -> list[str]:
@@ -807,4 +808,31 @@ def serve(
 
     from nicx.server.daemon import run_server
 
-    run_server(app, host=bind_host, port=bind_port, log_level="info")
+    ollama_host = _local_ollama_host(engine)
+    if ollama_host:
+        # Load the weights now so the first question skips the disk load.
+        from nicx.engine.ollama import OllamaEngine
+
+        threading.Thread(
+            target=OllamaEngine(host=ollama_host).load,
+            args=(model_name,),
+            name="model-preload",
+            daemon=True,
+        ).start()
+    try:
+        run_server(app, host=bind_host, port=bind_port, log_level="info")
+    finally:
+        if ollama_host:
+            # Nicx closed: give the RAM back now, not after keep_alive.
+            from nicx.engine.ollama import OllamaEngine
+
+            OllamaEngine(host=ollama_host).unload(model_name)
+
+
+def _local_ollama_host(engine: object) -> str | None:
+    from nicx.server.routes import _ollama_host
+
+    try:
+        return _ollama_host(engine)
+    except Exception:  # noqa: BLE001 - optional optimisation
+        return None

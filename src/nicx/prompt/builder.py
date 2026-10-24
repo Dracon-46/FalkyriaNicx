@@ -20,6 +20,18 @@ class PromptSection:
     cache_segment: PromptCacheSegment
 
 
+def _drop_title(text: str) -> str:
+    """Drop a leading ``# Title`` line; the builder adds its own heading.
+
+    A persona file that is only its title (the fresh MEMORY.md / USER.md)
+    becomes empty, so no empty section is sent to the model on every turn.
+    """
+    stripped = text.lstrip()
+    if stripped.startswith("# "):
+        stripped = stripped.split("\n", 1)[1] if "\n" in stripped else ""
+    return stripped.strip()
+
+
 class SystemPromptBuilder:
     """Assembles system prompts with frozen prefix for cache stability."""
 
@@ -241,7 +253,7 @@ class SystemPromptBuilder:
         # Always read as UTF-8. On Windows, ``read_text()`` falls back to the
         # system code page (e.g. cp950 for zh-TW, cp932 for ja) and raises
         # ``UnicodeDecodeError`` on any non-ASCII persona content.
-        content = path.read_text(encoding="utf-8")
+        content = _drop_title(path.read_text(encoding="utf-8"))
         if len(content) <= max_chars:
             return content
         return self._truncate(content, max_chars)

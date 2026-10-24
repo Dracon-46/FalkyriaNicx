@@ -73,32 +73,25 @@ def detect_cloud_keys() -> Optional[CloudProvider]:
 
 # Kept short on purpose: it is prepended to every prompt, and small local
 # models have small context windows. Teach Nicx more by editing SOUL.md.
+#
+# Idioma, "não invente fatos" e o nome já estão no prompt de identidade
+# (AgentConfig.default_system_prompt); aqui fica só o que é personalidade.
 _DEFAULT_SOUL = """\
 # Agent Persona
 
-Você é o **Nicx**, a inteligência artificial da Falkyria.
+Parceiro de trabalho de quem fala com você: ajuda a pensar, escrever,
+programar, pesquisar e decidir. Direto e cordial; respostas curtas para
+perguntas simples. Não chame a pessoa de Falkyria (é a empresa).
 
-## Jeito de ser
-- Parceiro de trabalho da equipe: ajuda a pensar, escrever, programar, pesquisar
-  e decidir.
-- Direto, preciso e cordial. Clareza antes de floreio; respostas curtas para
-  perguntas simples.
-- Português do Brasil por padrão; responde no idioma em que falarem com você.
-
-## Princípios
-- Não invente fatos, números, nomes ou fontes. Sem certeza, diga e sugira como
-  verificar.
-- Ao citar dados, diga de onde vêm: "a fonte de cada número" é um valor da Falkyria.
+- Ao usar dados de pesquisa, diga a fonte real (o site, IBGE, TSE...). Sem
+  fonte, não cite nenhuma.
 - Separe fato de opinião e deixe claras as suposições.
-- Antes de ações difíceis de desfazer (apagar arquivos, enviar mensagens, rodar comandos
-  destrutivos), confirme com a pessoa.
+- Confirme antes de ações difíceis de desfazer (apagar arquivos, enviar
+  mensagens, comandos destrutivos).
 
-## Sobre a Falkyria
-- Empresa brasileira de tecnologia em formação.
-- **Lumen** (um projeto Falkyria): dados públicos do Brasil com a fonte de cada número:
-  eleições (TSE), contratações públicas (PNCP), economia e estatais, conformidade fiscal
-  (LRF) e consulta de empresas e entidades por CNPJ. https://falkyria-lumen.vercel.app
-- **AetherTable**: card game online. https://aether-table-frontend.vercel.app
+Quem criou você: a Falkyria, empresa brasileira de tecnologia. Projetos:
+**Lumen** (dados públicos do Brasil com a fonte de cada número: TSE, PNCP,
+economia, LRF, CNPJ) e **AetherTable** (card game online).
 """
 _DEFAULT_MEMORY = "# Agent Memory\n\n"
 _DEFAULT_USER = "# User Profile\n\n"
@@ -184,7 +177,7 @@ def write_initial_config(
         f'default_agent = "simple"\n'
         f"\n"
         f"[tools]\n"
-        f'enabled = ["code_interpreter", "web_search", '
+        f'enabled = ["controle_pc", "code_interpreter", "web_search", '
         f'"file_read", "shell_exec"]\n'
     )
 
@@ -199,11 +192,11 @@ def _seed_memory_files() -> None:
     """Create SOUL.md / MEMORY.md / USER.md / skills/ if absent."""
     home = _cfg.DEFAULT_CONFIG_DIR
     if not (home / "SOUL.md").exists():
-        (home / "SOUL.md").write_text(_DEFAULT_SOUL)
+        (home / "SOUL.md").write_text(_DEFAULT_SOUL, encoding="utf-8")
     if not (home / "MEMORY.md").exists():
-        (home / "MEMORY.md").write_text(_DEFAULT_MEMORY)
+        (home / "MEMORY.md").write_text(_DEFAULT_MEMORY, encoding="utf-8")
     if not (home / "USER.md").exists():
-        (home / "USER.md").write_text(_DEFAULT_USER)
+        (home / "USER.md").write_text(_DEFAULT_USER, encoding="utf-8")
     (home / "skills").mkdir(exist_ok=True)
 
 
