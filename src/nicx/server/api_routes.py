@@ -65,13 +65,6 @@ class FeedbackScoreRequest(BaseModel):
     source: str = "api"
 
 
-class OptimizeRunRequest(BaseModel):
-    benchmark: str
-    max_trials: int = 20
-    optimizer_model: str = "claude-sonnet-4-6"
-    max_samples: int = 50
-
-
 # ---- Agent routes ----
 
 agents_router = APIRouter(prefix="/v1/agents", tags=["agents"])
@@ -1232,67 +1225,6 @@ async def feedback_stats(request: Request):
     return {"total": 0, "mean_score": 0.0}
 
 
-# ---- Optimize routes ----
-
-optimize_router = APIRouter(prefix="/v1/optimize", tags=["optimize"])
-
-
-@optimize_router.get("/runs")
-async def list_optimize_runs(request: Request):
-    """List optimization runs."""
-    try:
-        from nicx.core.config import DEFAULT_CONFIG_DIR
-        from nicx.learning.optimize.store import OptimizationStore
-
-        db_path = DEFAULT_CONFIG_DIR / "optimize.db"
-        if not db_path.exists():
-            return {"runs": []}
-
-        store = OptimizationStore(db_path)
-        runs = store.list_runs()
-        store.close()
-        return {"runs": runs}
-    except Exception as exc:
-        logger.warning("Failed to list optimization runs: %s", exc)
-        return {"runs": []}
-
-
-@optimize_router.get("/runs/{run_id}")
-async def get_optimize_run(run_id: str, request: Request):
-    """Get optimization run details."""
-    try:
-        from nicx.core.config import DEFAULT_CONFIG_DIR
-        from nicx.learning.optimize.store import OptimizationStore
-
-        db_path = DEFAULT_CONFIG_DIR / "optimize.db"
-        if not db_path.exists():
-            return {"run_id": run_id, "status": "not_found"}
-
-        store = OptimizationStore(db_path)
-        run = store.get_run(run_id)
-        store.close()
-
-        if run is None:
-            return {"run_id": run_id, "status": "not_found"}
-
-        return {
-            "run_id": run.run_id,
-            "status": run.status,
-            "benchmark": run.benchmark,
-            "trials": len(run.trials),
-            "best_trial_id": (run.best_trial.trial_id if run.best_trial else None),
-        }
-    except Exception as exc:
-        logger.warning("Failed to get optimization run %s: %s", run_id, exc)
-        return {"run_id": run_id, "status": "not_found"}
-
-
-@optimize_router.post("/runs")
-async def start_optimize_run(req: OptimizeRunRequest, request: Request):
-    """Start a new optimization run."""
-    return {"status": "started", "run_id": "placeholder"}
-
-
 def include_all_routes(app) -> None:
     """Include all extended API routers in a FastAPI app."""
     from nicx.server.approval_routes import (
@@ -1312,7 +1244,6 @@ def include_all_routes(app) -> None:
     app.include_router(learning_router)
     app.include_router(speech_router)
     app.include_router(feedback_router)
-    app.include_router(optimize_router)
 
     # Agent Manager routes (if available)
     try:
@@ -1365,5 +1296,4 @@ __all__ = [
     "learning_router",
     "speech_router",
     "feedback_router",
-    "optimize_router",
 ]

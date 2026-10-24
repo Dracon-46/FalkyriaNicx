@@ -100,17 +100,14 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     from nicx.cli.add_cmd import add
     from nicx.cli.agent_cmd import agent
     from nicx.cli.ask import ask
-    from nicx.cli.bench_cmd import bench
     from nicx.cli.channel_cmd import channel
     from nicx.cli.channels_cmd import channels
     from nicx.cli.chat_cmd import chat
-    from nicx.cli.compose_cmd import compose
     from nicx.cli.config_cmd import config
     from nicx.cli.connect_cmd import connect
     from nicx.cli.daemon_cmd import restart, start, status, stop
     from nicx.cli.digest_cmd import digest
     from nicx.cli.doctor_cmd import doctor
-    from nicx.cli.eval_cmd import eval_group
     from nicx.cli.feedback_cmd import feedback_group
     from nicx.cli.gateway_cmd import gateway
     from nicx.cli.gui_cmd import gui
@@ -120,7 +117,6 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     from nicx.cli.memory_cmd import memory
     from nicx.cli.model import model
     from nicx.cli.operators_cmd import operators
-    from nicx.cli.optimize_cmd import optimize_group
     from nicx.cli.quickstart_cmd import quickstart
     from nicx.cli.registry_cmd import registry
     from nicx.cli.scheduler_cmd import scheduler
@@ -141,7 +137,6 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     cli.add_command(model, "model")
     cli.add_command(memory, "memory")
     cli.add_command(telemetry, "telemetry")
-    cli.add_command(bench, "bench")
     cli.add_command(channel, "channel")
     cli.add_command(channels, "channels")
     cli.add_command(scheduler, "scheduler")
@@ -156,12 +151,9 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     cli.add_command(vault, "vault")
     cli.add_command(add, "add")
     cli.add_command(operators, "operators")
-    cli.add_command(eval_group, "eval")
     cli.add_command(host, "host")
     cli.add_command(quickstart, "quickstart")
-    cli.add_command(optimize_group, "optimize")
     cli.add_command(feedback_group, "feedback")
-    cli.add_command(compose, "compose")
     cli.add_command(gateway, "gateway")
     cli.add_command(gui, "gui")
     cli.add_command(escuta, "escuta")

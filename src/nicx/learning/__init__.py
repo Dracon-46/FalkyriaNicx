@@ -8,11 +8,6 @@ from nicx.learning._stubs import (
     RouterPolicy,
     RoutingContext,
 )
-from nicx.learning.agents.agent_evolver import AgentConfigEvolver
-from nicx.learning.learning_orchestrator import LearningOrchestrator
-from nicx.learning.optimize.llm_optimizer import LLMOptimizer
-from nicx.learning.optimize.optimizer import OptimizationEngine
-from nicx.learning.optimize.store import OptimizationStore
 from nicx.learning.routing.complexity import (
     ComplexityQueryAnalyzer,
     score_complexity,
@@ -22,26 +17,6 @@ from nicx.learning.routing.router import (
     HeuristicRouter,
     build_routing_context,
 )
-
-# Training imports torch (seconds to load), so it is resolved on first use;
-# importing ``nicx.learning.routing`` (e.g. from ``nicx ask``) stays fast.
-_LAZY_TRAINING = {
-    "TrainingDataMiner": "nicx.learning.training.data",
-    "HAS_TORCH": "nicx.learning.training.lora",
-    "LoRATrainer": "nicx.learning.training.lora",
-    "LoRATrainingConfig": "nicx.learning.training.lora",
-}
-
-
-def __getattr__(name: str):
-    module = _LAZY_TRAINING.get(name)
-    if module is None:
-        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-    import importlib
-
-    value = getattr(importlib.import_module(module), name)
-    globals()[name] = value
-    return value
 
 
 def ensure_registered() -> None:
@@ -58,50 +33,15 @@ def ensure_registered() -> None:
 
     _reg_learned()
 
-    # Intelligence training (optional deps)
-    try:
-        import nicx.learning.intelligence  # noqa: F401
-    except ImportError:
-        pass
-
-    # Orchestrator-specific training (optional deps)
-    try:
-        import nicx.learning.intelligence.orchestrator  # noqa: F401
-    except ImportError:
-        pass
-
-    # Agent optimizers (optional deps)
-    try:
-        import nicx.learning.agents.dspy_optimizer  # noqa: F401
-    except ImportError:
-        pass
-    try:
-        import nicx.learning.agents.gepa_optimizer  # noqa: F401
-    except ImportError:
-        pass
-    try:
-        import nicx.learning.agents.ace_optimizer  # noqa: F401
-    except ImportError:
-        pass
-
 
 __all__ = [
-    "AgentConfigEvolver",
     "ComplexityQueryAnalyzer",
-    "HAS_TORCH",
     "HeuristicRewardFunction",
     "HeuristicRouter",
-    "LLMOptimizer",
-    "LearningOrchestrator",
-    "LoRATrainer",
-    "LoRATrainingConfig",
-    "OptimizationEngine",
-    "OptimizationStore",
     "QueryAnalyzer",
     "RewardFunction",
     "RouterPolicy",
     "RoutingContext",
-    "TrainingDataMiner",
     "build_routing_context",
     "ensure_registered",
     "score_complexity",
