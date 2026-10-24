@@ -28,6 +28,9 @@ class ChatCompletionRequest(BaseModel):
     max_tokens: int = 1024
     stream: bool = False
     tools: Optional[List[Dict[str, Any]]] = None
+    # Nicx extension: the reply will be read aloud (voice conversation), so
+    # the agent is asked for a short answer without markdown.
+    voice: bool = False
 
 
 # ---------------------------------------------------------------------------

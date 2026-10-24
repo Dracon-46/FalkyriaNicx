@@ -183,4 +183,7 @@ try:
 except ImportError:
     pass
 
+# Controle do PC (volume, mídia, abrir apps): vive em nicx.acoes.
+import nicx.acoes.ferramenta  # noqa: E402, F401
+
 __all__ = ["BaseTool", "ToolExecutor", "ToolSpec"]

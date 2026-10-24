@@ -138,11 +138,9 @@ class CodeInterpreterTool(BaseTool):
         return ToolSpec(
             name="code_interpreter",
             description=(
-                "Execute Python code and return what it prints"
-                " (use print() to see results)."
-                " Code is AST-validated and runs in a hardened, isolated"
-                " subprocess (no imports of os/sys/subprocess/network, no"
-                " file IO, no eval/exec)."
+                "Run Python and return what it prints (use print())."
+                " Sandboxed: no os/sys/subprocess/network imports, no files,"
+                " no eval/exec."
             ),
             parameters={
                 "type": "object",

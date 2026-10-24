@@ -65,6 +65,9 @@ def _test_config():
     # Route tests exercise the injected engine directly. Factory-level
     # config-derived security is covered separately.
     cfg.security.enabled = False
+    # These tests exercise the agent path with small-talk messages; routing
+    # those away from the agent is covered in test_tool_routing.py.
+    cfg.agent.tools_on_demand = False
     return cfg
 
 
@@ -908,6 +911,7 @@ def _identity_config():
     cfg = NicxConfig()
     cfg.agent.default_system_prompt = "You are Nicx."
     cfg.analytics.enabled = False
+    cfg.agent.tools_on_demand = False
     return cfg
 
 
@@ -1673,6 +1677,7 @@ def _traces_enabled_config(tmp_path):
     cfg.traces.enabled = True
     cfg.traces.db_path = str(tmp_path / "traces.db")
     cfg.analytics.enabled = False
+    cfg.agent.tools_on_demand = False
     return cfg
 
 
