@@ -37,7 +37,7 @@ This pattern applies across all five primitives:
 |--------|-----|----------------|
 | Engine | `InferenceEngine` | Ollama, vLLM, SGLang, llama.cpp, Cloud |
 | Memory | `MemoryBackend` | SQLite, FAISS, ColBERT, BM25, Hybrid |
-| Agents | `BaseAgent` | Simple, Orchestrator, NativeReAct, NativeOpenHands, RLM, OpenHands, ClaudeCode, Operative, MonitorOperative |
+| Agents | `BaseAgent` | Simple, Orchestrator, NativeReAct, CodeAct, RLM, OpenHands, ClaudeCode, Operative, MonitorOperative |
 | Learning | `RouterPolicy` | Heuristic, TraceDriven, GRPO |
 | Tools | `BaseTool` | Calculator, Think, Retrieval, LLM, FileRead |
 

@@ -201,7 +201,7 @@ src/nicx/
         simple.py               # SimpleAgent — single-turn, no tools
         orchestrator.py         # OrchestratorAgent — multi-turn tool calling (function_calling + structured)
         native_react.py         # NativeReActAgent — Thought-Action-Observation loop
-        native_openhands.py     # NativeOpenHandsAgent — CodeAct-style code execution
+        codeact.py     # CodeActAgent — CodeAct-style code execution
         rlm.py                  # RLMAgent — recursive LM with persistent REPL
         openhands.py            # OpenHandsAgent — wraps real openhands-sdk
         react.py                # Backward-compat shim (re-exports NativeReActAgent)

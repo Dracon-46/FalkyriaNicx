@@ -375,8 +375,7 @@ def _check_nodejs() -> CheckResult:
             "warn",
             "Not found",
             details=(
-                "Node.js 22+ is required for ClaudeCodeAgent and the "
-                "WhatsApp Baileys channel bridge."
+                "Node.js 22+ is required for the WhatsApp Baileys channel bridge."
             ),
         )
     try:
@@ -396,9 +395,7 @@ def _check_nodejs() -> CheckResult:
             "Node.js",
             "warn",
             f"{version_str} (requires >= v22)",
-            details=(
-                "Upgrade Node.js for ClaudeCodeAgent and WhatsApp Baileys support."
-            ),
+            details=("Upgrade Node.js for WhatsApp Baileys support."),
         )
     except Exception as exc:
         return CheckResult("Node.js", "warn", f"Error checking version: {exc}")

@@ -30,7 +30,7 @@ except ImportError:
     pass
 
 try:
-    import nicx.agents.native_openhands  # noqa: F401
+    import nicx.agents.codeact  # noqa: F401
 except ImportError:
     pass
 
@@ -40,22 +40,7 @@ except ImportError:
     pass
 
 try:
-    import nicx.agents.openhands  # noqa: F401
-except ImportError:
-    pass
-
-try:
     import nicx.agents.rlm  # noqa: F401
-except ImportError:
-    pass
-
-try:
-    import nicx.agents.claude_code  # noqa: F401
-except ImportError:
-    pass
-
-try:
-    import nicx.agents.opencode  # noqa: F401
 except ImportError:
     pass
 

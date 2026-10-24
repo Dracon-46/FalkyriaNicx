@@ -343,12 +343,6 @@ class TestBuiltinRecipes:
         assert r.agent_type == "orchestrator"
         assert "gaia" in r.eval_benchmarks
 
-    def test_swebench_openhands_loads(self) -> None:
-        r = resolve_recipe("swebench-openhands")
-        assert r is not None
-        assert r.kind == "discrete"
-        assert r.agent_type == "native_openhands"
-
     def test_coding_benchmark_loads(self) -> None:
         r = resolve_recipe("coding-benchmark")
         assert r is not None

@@ -1,9 +1,4 @@
-"""NativeOpenHandsAgent -- code-execution-centric agent.
-
-Renamed from ``OpenHandsAgent`` to clarify this is Nicx's native
-CodeAct-style implementation.  The ``OpenHandsAgent`` name is now used
-for the real openhands-sdk integration in ``openhands.py``.
-"""
+"""CodeActAgent -- code-execution-centric agent (CodeAct style)."""
 
 from __future__ import annotations
 
@@ -23,7 +18,7 @@ from nicx.engine._base import estimate_prompt_tokens
 from nicx.engine._stubs import InferenceEngine
 from nicx.tools._stubs import BaseTool, build_tool_descriptions
 
-OPENHANDS_SYSTEM_PROMPT = (  # noqa: E501
+CODEACT_SYSTEM_PROMPT = (  # noqa: E501
     "You are an AI assistant with access to tools. "
     "You MUST use tools when they would help answer "
     "the user's question.\n\n"
@@ -54,11 +49,11 @@ OPENHANDS_SYSTEM_PROMPT = (  # noqa: E501
 )
 
 
-@AgentRegistry.register("native_openhands")
-class NativeOpenHandsAgent(ToolUsingAgent):
+@AgentRegistry.register("codeact")
+class CodeActAgent(ToolUsingAgent):
     """Native CodeAct agent -- generates and executes Python code."""
 
-    agent_id = "native_openhands"
+    agent_id = "codeact"
     _default_temperature = 0.7
     _default_max_tokens = 2048
     _default_max_turns = 3
@@ -242,7 +237,7 @@ class NativeOpenHandsAgent(ToolUsingAgent):
 
         tool_descriptions = build_tool_descriptions(self._tools)
         prompt_template = (
-            load_system_prompt_override("native_openhands") or OPENHANDS_SYSTEM_PROMPT
+            load_system_prompt_override("codeact") or CODEACT_SYSTEM_PROMPT
         )
         system_prompt = prompt_template.format(
             tool_descriptions=tool_descriptions,
@@ -292,7 +287,7 @@ class NativeOpenHandsAgent(ToolUsingAgent):
         messages = self._build_messages(input, context, system_prompt=system_prompt)
 
         # Inject few-shot exemplars before the user input
-        for ex in load_few_shot_exemplars("native_openhands"):
+        for ex in load_few_shot_exemplars("codeact"):
             if ex.get("input") and ex.get("output"):
                 messages.insert(-1, Message(role=Role.USER, content=ex["input"]))
                 messages.insert(-1, Message(role=Role.ASSISTANT, content=ex["output"]))
@@ -436,4 +431,4 @@ class NativeOpenHandsAgent(ToolUsingAgent):
         return result
 
 
-__all__ = ["NativeOpenHandsAgent"]
+__all__ = ["CodeActAgent"]

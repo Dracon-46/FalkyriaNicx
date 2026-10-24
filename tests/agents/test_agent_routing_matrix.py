@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from nicx.agents._stubs import AgentResult
-from nicx.agents.native_openhands import NativeOpenHandsAgent
+from nicx.agents.codeact import CodeActAgent
 from nicx.agents.native_react import NativeReActAgent
 from nicx.agents.orchestrator import OrchestratorAgent
 from nicx.agents.simple import SimpleAgent
@@ -32,7 +32,7 @@ def _make_mock_engine(response="Hello!"):
 
 # ReAct needs a structured response to produce a result on first turn
 _REACT_RESPONSE = "Thought: Simple query.\nFinal Answer: Hello!"
-_OPENHANDS_RESPONSE = "Hello!"
+_CODEACT_RESPONSE = "Hello!"
 _SIMPLE_RESPONSE = "Hello!"
 _ORCHESTRATOR_RESPONSE = "Hello!"
 
@@ -41,14 +41,14 @@ AGENT_FACTORIES = {
     "simple": lambda e, m, bus: SimpleAgent(e, m, bus=bus),
     "orchestrator": lambda e, m, bus: OrchestratorAgent(e, m, bus=bus),
     "native_react": lambda e, m, bus: NativeReActAgent(e, m, bus=bus),
-    "native_openhands": lambda e, m, bus: NativeOpenHandsAgent(e, m, bus=bus),
+    "codeact": lambda e, m, bus: CodeActAgent(e, m, bus=bus),
 }
 
 AGENT_RESPONSES = {
     "simple": _SIMPLE_RESPONSE,
     "orchestrator": _ORCHESTRATOR_RESPONSE,
     "native_react": _REACT_RESPONSE,
-    "native_openhands": _OPENHANDS_RESPONSE,
+    "codeact": _CODEACT_RESPONSE,
 }
 
 _ALL_AGENTS = list(AGENT_RESPONSES)
@@ -117,7 +117,7 @@ class TestAgentCommon:
         ("simple", "simple"),
         ("orchestrator", "orchestrator"),
         ("native_react", "native_react"),
-        ("native_openhands", "native_openhands"),
+        ("codeact", "codeact"),
     ],
 )
 def test_agent_id(agent_key, expected_id):

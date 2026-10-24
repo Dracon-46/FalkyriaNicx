@@ -9,7 +9,7 @@ Agents are the agentic logic layer of Nicx. They determine how a query is proces
 | `SimpleAgent`       | `simple`          | No              | No         | Single-turn query-to-response                |
 | `OrchestratorAgent` | `orchestrator`    | Yes             | Yes        | Multi-turn tool-calling loop (function_calling + structured) |
 | `NativeReActAgent`  | `native_react`    | Yes             | Yes        | Thought-Action-Observation loop              |
-| `NativeOpenHandsAgent` | `native_openhands` | Yes          | Yes        | CodeAct-style code execution + tool calls    |
+| `CodeActAgent` | `codeact` | Yes          | Yes        | CodeAct-style code execution + tool calls    |
 | `RLMAgent`          | `rlm`             | Yes             | Yes        | Recursive LM with persistent REPL            |
 | `OpenHandsAgent`    | `openhands`       | No              | Yes        | Wraps real openhands-sdk                     |
 | `ClaudeCodeAgent`   | `claude_code`     | No              | Yes        | Claude Agent SDK via Node.js subprocess       |
@@ -237,9 +237,9 @@ Models may also return one complete JSON object, optionally inside a JSON code f
 
 ---
 
-## NativeOpenHandsAgent
+## CodeActAgent
 
-The `NativeOpenHandsAgent` is a CodeAct-style agent that generates and executes Python code alongside structured tool calls. It can also pre-fetch URL content from user input to provide direct context to the LLM. Extends `ToolUsingAgent`.
+The `CodeActAgent` is a CodeAct-style agent that generates and executes Python code alongside structured tool calls. It can also pre-fetch URL content from user input to provide direct context to the LLM. Extends `ToolUsingAgent`.
 
 **How it works:**
 
@@ -345,8 +345,8 @@ nicx ask --agent native_react --tools calculator "What is 2+2?"
 # ReAct alias (same as native_react)
 nicx ask --agent react --tools calculator,think "Solve step by step: 15% of 340"
 
-# NativeOpenHandsAgent
-nicx ask --agent native_openhands --tools calculator,web_search "Summarize example.com"
+# CodeActAgent
+nicx ask --agent codeact --tools calculator,web_search "Summarize example.com"
 
 # RLMAgent
 nicx ask --agent rlm "Summarize this long document"
@@ -726,7 +726,7 @@ agent_cls = AgentRegistry.get("orchestrator")
 
 # List all registered agent keys
 AgentRegistry.keys()
-# ["simple", "orchestrator", "native_react", "react", "native_openhands",
+# ["simple", "orchestrator", "native_react", "react", "codeact",
 #  "rlm", "openhands", "claude_code", "operative", "monitor_operative"]
 ```
 
