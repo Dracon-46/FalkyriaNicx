@@ -1,3 +1,1 @@
-"""Agent learning — config optimization via DSPy, GEPA, and evolution."""
-
-from __future__ import annotations
+"""Descoberta de skills a partir de sequências de ferramentas repetidas."""

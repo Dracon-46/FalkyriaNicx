@@ -125,27 +125,6 @@ class Recipe:
             kwargs["eval_suites"] = self.eval_suites
         return kwargs
 
-    def to_eval_suite(
-        self,
-        benchmarks: Optional[List[str]] = None,
-        max_samples: Optional[int] = None,
-        judge_model: Optional[str] = None,
-    ) -> Any:
-        """Convert this recipe into an ``EvalSuiteConfig``.
-
-        Uses the recipe's model/engine as the single ``[[models]]`` entry
-        and the recipe's benchmarks (or *benchmarks* override) as
-        ``[[benchmarks]]``, inheriting agent type and tools.
-        """
-        from nicx.recipes.composer import recipe_to_eval_suite
-
-        return recipe_to_eval_suite(
-            self,
-            benchmarks=benchmarks,
-            max_samples=max_samples,
-            judge_model=judge_model,
-        )
-
     def to_operator_manifest(self) -> Any:
         """Convert this recipe into an ``OperatorManifest``."""
         from nicx.recipes.composer import recipe_to_operator

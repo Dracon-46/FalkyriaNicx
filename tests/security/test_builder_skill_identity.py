@@ -94,7 +94,6 @@ def test_builder_nested_skill_cannot_fall_back_to_default_identity(
     monkeypatch.setattr(builder, "_setup_scheduler", lambda config, bus: (None, None))
     monkeypatch.setattr(builder, "_setup_workflow", lambda config, bus: None)
     monkeypatch.setattr(builder, "_setup_sessions", lambda config: None)
-    monkeypatch.setattr(builder, "_setup_learning_orchestrator", lambda config: None)
 
     system = builder.build()
     inner = _PipelineSkillManager.inner_executor

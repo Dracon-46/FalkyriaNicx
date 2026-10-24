@@ -1,4 +1,4 @@
-"""Tests for energy telemetry wiring — verify CLI, SDK, bench, and
+"""Tests for energy telemetry wiring — verify CLI, SDK, and
 telemetry stats all flow through InstrumentedEngine + EnergyMonitor."""
 
 from __future__ import annotations
@@ -24,7 +24,6 @@ from nicx.telemetry.instrumented_engine import InstrumentedEngine
 from nicx.telemetry.store import TelemetryStore
 
 _ask_mod = importlib.import_module("nicx.cli.ask")
-_bench_mod = importlib.import_module("nicx.cli.bench_cmd")
 
 
 # ---------------------------------------------------------------------------
@@ -571,124 +570,6 @@ class TestInstrumentedEngineEnergy:
         # the engine call path is resilient.
         with pytest.raises(RuntimeError, match="GPU fell off"):
             ie.generate(messages, model="test")
-
-
-# ---------------------------------------------------------------------------
-# Bench CLI wiring
-# ---------------------------------------------------------------------------
-
-
-class TestBenchWiring:
-    """Verify bench CLI creates and passes energy_monitor."""
-
-    def test_energy_monitor_passed_to_benchmarks(self):
-        """When gpu_metrics=True, energy_monitor is passed."""
-        engine = MagicMock()
-        engine.engine_id = "mock"
-        engine.list_models.return_value = ["test-model"]
-        engine.generate.return_value = {
-            "content": "Hello",
-            "usage": {
-                "prompt_tokens": 5,
-                "completion_tokens": 3,
-                "total_tokens": 8,
-            },
-        }
-
-        cfg = NicxConfig()
-        cfg.telemetry.gpu_metrics = True
-        mock_monitor = _mock_energy_monitor()
-
-        with (
-            patch(
-                "nicx.cli.bench_cmd.get_engine",
-                return_value=("mock", engine),
-            ),
-            patch(
-                "nicx.cli.bench_cmd.load_config",
-                return_value=cfg,
-            ),
-            patch(
-                "nicx.telemetry.energy_monitor.create_energy_monitor",
-                return_value=mock_monitor,
-            ) as mock_create,
-        ):
-            result = CliRunner().invoke(
-                cli,
-                ["bench", "run", "-n", "2"],
-            )
-
-        assert result.exit_code == 0
-        mock_create.assert_called_once()
-        mock_monitor.close.assert_called_once()
-
-    def test_no_energy_monitor_when_gpu_metrics_off(self):
-        """No energy_monitor when gpu_metrics=False."""
-        engine = MagicMock()
-        engine.engine_id = "mock"
-        engine.list_models.return_value = ["test-model"]
-        engine.generate.return_value = {
-            "content": "Hello",
-            "usage": {
-                "prompt_tokens": 5,
-                "completion_tokens": 3,
-                "total_tokens": 8,
-            },
-        }
-
-        cfg = NicxConfig()
-        cfg.telemetry.gpu_metrics = False
-
-        with (
-            patch(
-                "nicx.cli.bench_cmd.get_engine",
-                return_value=("mock", engine),
-            ),
-            patch(
-                "nicx.cli.bench_cmd.load_config",
-                return_value=cfg,
-            ),
-        ):
-            result = CliRunner().invoke(
-                cli,
-                ["bench", "run", "-n", "2"],
-            )
-
-        assert result.exit_code == 0
-
-    def test_warmup_flag_passed(self):
-        """--warmup flag is forwarded to benchmarks."""
-        engine = MagicMock()
-        engine.engine_id = "mock"
-        engine.list_models.return_value = ["test-model"]
-        engine.generate.return_value = {
-            "content": "Hello",
-            "usage": {
-                "prompt_tokens": 5,
-                "completion_tokens": 3,
-                "total_tokens": 8,
-            },
-        }
-
-        cfg = NicxConfig()
-        cfg.telemetry.gpu_metrics = False
-
-        with (
-            patch(
-                "nicx.cli.bench_cmd.get_engine",
-                return_value=("mock", engine),
-            ),
-            patch(
-                "nicx.cli.bench_cmd.load_config",
-                return_value=cfg,
-            ),
-        ):
-            result = CliRunner().invoke(
-                cli,
-                ["bench", "run", "-n", "2", "-w", "3"],
-            )
-
-        assert result.exit_code == 0
 
 
 # ---------------------------------------------------------------------------

@@ -25,7 +25,6 @@ if TYPE_CHECKING:
     from nicx.agents.scheduler import AgentScheduler
     from nicx.channels._stubs import BaseChannel
     from nicx.learning._stubs import RouterPolicy
-    from nicx.learning.learning_orchestrator import LearningOrchestrator
     from nicx.mcp.client import MCPClient
     from nicx.mcp.server import MCPServer
     from nicx.operators.manager import OperatorManager
@@ -84,7 +83,6 @@ class NicxSystem:
     agent_executor: Optional[AgentExecutor] = None
     speech_backend: Optional[SpeechBackend] = None
     skill_manager: Optional[SkillManager] = None
-    _learning_orchestrator: Optional[LearningOrchestrator] = None
     _mcp_clients: List[MCPClient] = field(default_factory=list)
     # Keep newly added fields after every pre-existing positional field so
     # older positional NicxSystem(...) calls retain their original meaning.

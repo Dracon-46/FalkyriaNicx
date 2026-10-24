@@ -95,11 +95,6 @@ class TestCLI:
         assert "export" in result.output
         assert "clear" in result.output
 
-    def test_bench_subcommands_exist(self) -> None:
-        result = CliRunner().invoke(cli, ["bench", "--help"])
-        assert result.exit_code == 0
-        assert "run" in result.output
-
     def test_scheduler_subcommands_exist(self) -> None:
         result = CliRunner().invoke(cli, ["scheduler", "--help"])
         assert result.exit_code == 0
