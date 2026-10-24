@@ -22,14 +22,14 @@ from nicx.core.types import (
 
 def _register_all():
     """Ensure agents and tools are registered."""
-    from nicx.agents.native_openhands import NativeOpenHandsAgent
+    from nicx.agents.codeact import CodeActAgent
     from nicx.agents.native_react import NativeReActAgent
     from nicx.tools.calculator import CalculatorTool
     from nicx.tools.think import ThinkTool
 
     for key, cls in [
         ("native_react", NativeReActAgent),
-        ("native_openhands", NativeOpenHandsAgent),
+        ("codeact", CodeActAgent),
     ]:
         if not AgentRegistry.contains(key):
             AgentRegistry.register_value(key, cls)
@@ -167,16 +167,16 @@ class TestReActPipeline:
 
 
 # ---------------------------------------------------------------------------
-# OpenHands pipeline integration
+# CodeAct pipeline integration
 # ---------------------------------------------------------------------------
 
 
-class TestOpenHandsPipeline:
-    """End-to-end: OpenHands agent with code execution."""
+class TestCodeActPipeline:
+    """End-to-end: CodeAct agent with code execution."""
 
-    def test_openhands_code_execution_e2e(self):
+    def test_codeact_code_execution_e2e(self):
         _register_all()
-        from nicx.agents.native_openhands import NativeOpenHandsAgent
+        from nicx.agents.codeact import CodeActAgent
         from nicx.tools.code_interpreter import (
             CodeInterpreterTool,
         )
@@ -192,7 +192,7 @@ class TestOpenHandsPipeline:
             _simple_response("The result is 4."),
         ]
         engine = _make_engine(responses)
-        agent = NativeOpenHandsAgent(
+        agent = CodeActAgent(
             engine,
             "test-model",
             tools=[CodeInterpreterTool()],
@@ -205,25 +205,25 @@ class TestOpenHandsPipeline:
         # The code_interpreter actually runs print(2+2)
         assert "4" in result.tool_results[0].content
 
-    def test_openhands_direct_answer(self):
-        """OpenHands returns directly when no code is needed."""
+    def test_codeact_direct_answer(self):
+        """CodeAct returns directly when no code is needed."""
         _register_all()
-        from nicx.agents.native_openhands import NativeOpenHandsAgent
+        from nicx.agents.codeact import CodeActAgent
 
         engine = _make_engine(_simple_response("Hello! How can I help?"))
-        agent = NativeOpenHandsAgent(engine, "test-model")
+        agent = CodeActAgent(engine, "test-model")
         result = agent.run("Say hello")
         assert result.content == "Hello! How can I help?"
         assert result.turns == 1
 
-    def test_openhands_event_chain(self):
-        """Verify event chain through OpenHands run."""
+    def test_codeact_event_chain(self):
+        """Verify event chain through a CodeAct run."""
         _register_all()
-        from nicx.agents.native_openhands import NativeOpenHandsAgent
+        from nicx.agents.codeact import CodeActAgent
 
         engine = _make_engine(_simple_response("Direct answer."))
         bus = EventBus(record_history=True)
-        agent = NativeOpenHandsAgent(
+        agent = CodeActAgent(
             engine,
             "test-model",
             bus=bus,
@@ -482,7 +482,7 @@ class TestAgentRoutingMatrix:
 
     @pytest.mark.parametrize(
         "agent_key",
-        ["native_react", "native_openhands"],
+        ["native_react", "codeact"],
     )
     def test_agent_returns_valid_result(self, agent_key):
         _register_all()
@@ -504,7 +504,7 @@ class TestAgentRoutingMatrix:
 
     @pytest.mark.parametrize(
         "agent_key",
-        ["native_react", "native_openhands"],
+        ["native_react", "codeact"],
     )
     def test_agent_emits_events(self, agent_key):
         _register_all()

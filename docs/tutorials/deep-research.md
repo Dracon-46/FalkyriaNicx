@@ -165,7 +165,7 @@ This is useful when you want to version-control the research configuration, shar
 
 ### Swap the agent
 
-Replace `"orchestrator"` with `"native_react"` for a Thought-Action-Observation loop, or `"native_openhands"` for a CodeAct-style agent that can write and execute code:
+Replace `"orchestrator"` with `"native_react"` for a Thought-Action-Observation loop, or `"codeact"` for a CodeAct-style agent that can write and execute code:
 
 ```python
 response = j.ask(prompt, agent="native_react", tools=tools)

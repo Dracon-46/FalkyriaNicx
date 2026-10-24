@@ -29,7 +29,7 @@ Each engine is configured via its own sub-section in `config.toml` (e.g., `[engi
 
 ### Agentic Logic
 
-The Agentic Logic primitive implements **pluggable agents** that handle queries with varying levels of sophistication. The agent hierarchy is organized around `BaseAgent` (ABC with concrete helpers) and `ToolUsingAgent` (intermediate base for agents that accept tools, with `accepts_tools = True`). Nine agent types are available: `SimpleAgent` (single-turn, no tools), `OrchestratorAgent` (multi-turn tool-calling loop with function_calling and structured modes), `NativeReActAgent` (Thought-Action-Observation loop), `NativeOpenHandsAgent` (CodeAct-style code execution), `RLMAgent` (recursive LM with persistent REPL), `OpenHandsAgent` (wraps real `openhands-sdk`), `ClaudeCodeAgent` (Claude Agent SDK via Node.js subprocess), `OperativeAgent` (persistent scheduled agent with state management), and `MonitorOperativeAgent` (long-horizon agent with configurable strategy axes).
+The Agentic Logic primitive implements **pluggable agents** that handle queries with varying levels of sophistication. The agent hierarchy is organized around `BaseAgent` (ABC with concrete helpers) and `ToolUsingAgent` (intermediate base for agents that accept tools, with `accepts_tools = True`). Nine agent types are available: `SimpleAgent` (single-turn, no tools), `OrchestratorAgent` (multi-turn tool-calling loop with function_calling and structured modes), `NativeReActAgent` (Thought-Action-Observation loop), `CodeActAgent` (CodeAct-style code execution), `RLMAgent` (recursive LM with persistent REPL), `OpenHandsAgent` (wraps real `openhands-sdk`), `ClaudeCodeAgent` (Claude Agent SDK via Node.js subprocess), `OperativeAgent` (persistent scheduled agent with state management), and `MonitorOperativeAgent` (long-horizon agent with configurable strategy axes).
 
 The sandbox module (`nicx.sandbox`) adds a `SandboxedAgent` wrapper that runs any `BaseAgent` inside a Docker or Podman container with mount-security enforcement, and a `ContainerRunner` that manages the container lifecycle.
 
@@ -123,7 +123,7 @@ src/nicx/
         simple.py           SimpleAgent (single-turn, no tools)
         orchestrator.py     OrchestratorAgent (multi-turn tool loop, function_calling + structured)
         native_react.py     NativeReActAgent (Thought-Action-Observation loop)
-        native_openhands.py NativeOpenHandsAgent (CodeAct-style code execution)
+        codeact.py CodeActAgent (CodeAct-style code execution)
         rlm.py              RLMAgent (recursive LM with persistent REPL)
         openhands.py        OpenHandsAgent (wraps real openhands-sdk)
         react.py            Backward-compat shim (re-exports NativeReActAgent as ReActAgent)

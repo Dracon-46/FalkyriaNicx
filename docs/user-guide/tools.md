@@ -137,7 +137,7 @@ If the tool name is unknown, a `ToolResult` with `success=False` is returned. If
 
 ## build_tool_descriptions()
 
-The `build_tool_descriptions()` function is the **single source of truth** for generating enriched tool descriptions used in agent system prompts. All text-based agents (`NativeReActAgent`, `NativeOpenHandsAgent`, `RLMAgent`, `OrchestratorAgent` in structured mode) use this function to produce Markdown-formatted tool sections.
+The `build_tool_descriptions()` function is the **single source of truth** for generating enriched tool descriptions used in agent system prompts. All text-based agents (`NativeReActAgent`, `CodeActAgent`, `RLMAgent`, `OrchestratorAgent` in structured mode) use this function to produce Markdown-formatted tool sections.
 
 ### Parameters
 
@@ -170,7 +170,7 @@ print(desc)
 ### Agents using this builder
 
 - **NativeReActAgent** -- Injects descriptions into the ReAct system prompt
-- **NativeOpenHandsAgent** -- Injects descriptions into the CodeAct system prompt
+- **CodeActAgent** -- Injects descriptions into the CodeAct system prompt
 - **RLMAgent** -- Adds an `## Available Tools` section to the REPL system prompt
 - **OrchestratorAgent** (structured mode) -- Passes `tools=` to `build_system_prompt()` which delegates to this builder
 
@@ -459,7 +459,7 @@ is null; `announcement_date` preserves the publisher's local release date.
 
 **Registry key:** `code_interpreter` | **Category:** `code`
 
-Executes Python code snippets in a sandboxed environment and returns the output. Used by `NativeOpenHandsAgent` for CodeAct-style execution.
+Executes Python code snippets in a sandboxed environment and returns the output. Used by `CodeActAgent` for CodeAct-style execution.
 
 **Parameters:**
 

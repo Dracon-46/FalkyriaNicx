@@ -21,7 +21,7 @@ from nicx.engine._stubs import InferenceEngine
 
 logger = logging.getLogger(__name__)
 
-# Sentinel markers (same as ClaudeCodeAgent)
+# Sentinel markers around the JSON result in stdout
 _OUTPUT_START = "---NICX_OUTPUT_START---"
 _OUTPUT_END = "---NICX_OUTPUT_END---"
 

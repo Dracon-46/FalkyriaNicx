@@ -105,7 +105,7 @@ class ToolUsingAgent(BaseAgent):
     ) -> None: ...
 ```
 
-All tool-using agents (`OrchestratorAgent`, `NativeReActAgent`, `NativeOpenHandsAgent`, `RLMAgent`) extend this class.
+All tool-using agents (`OrchestratorAgent`, `NativeReActAgent`, `CodeActAgent`, `RLMAgent`) extend this class.
 
 !!! info "Agents that bypass ToolUsingAgent"
     Some agents extend `BaseAgent` directly and set `accepts_tools = False`: `SimpleAgent` (single-turn, no tools), `OpenHandsAgent` (tool management is handled by the openhands-sdk), and `ClaudeCodeAgent` (tools are managed by the Claude Agent SDK). `SandboxedAgent` also extends `BaseAgent` directly because it wraps another agent rather than calling tools itself.
@@ -121,11 +121,11 @@ Start here. Pick the simplest agent that handles your task — simpler agents ar
 | Simple Q&A, single-turn | `simple` | No overhead, one inference call |
 | Multi-step with tools (calculator, search, files) | `orchestrator` | Function-calling loop, most compatible with OpenAI-format models |
 | Explicit reasoning chains | `native_react` | Thought-Action-Observation loop based on [ReAct (Yao et al., 2023)](https://arxiv.org/abs/2210.03629); reasoning traces are visible and debuggable |
-| Code generation + execution | `native_openhands` | CodeAct pattern inspired by [OpenHands (Wang et al., 2024)](https://arxiv.org/abs/2407.16741); generates and executes Python inline |
+| Code generation + execution | `codeact` | CodeAct pattern inspired by [OpenHands (Wang et al., 2024)](https://arxiv.org/abs/2407.16741); generates and executes Python inline |
 | Long documents, recursive decomposition | `rlm` | Stores context in a persistent REPL, decomposes via recursive sub-LM calls |
 | Untrusted inputs | `sandboxed` wrapping any agent | Container isolation with network disabled and mount allowlists |
 
-**General guidance:** `orchestrator` is the default for most tool-using tasks. Use `native_react` when you want visible reasoning traces (e.g., for debugging or auditing agent behavior). Use `native_openhands` when the task involves writing and running code. Use `rlm` when context is too long to fit in a single prompt window.
+**General guidance:** `orchestrator` is the default for most tool-using tasks. Use `native_react` when you want visible reasoning traces (e.g., for debugging or auditing agent behavior). Use `codeact` when the task involves writing and running code. Use `rlm` when context is too long to fit in a single prompt window.
 
 ---
 
@@ -254,9 +254,9 @@ agent = NativeReActAgent(
 result = agent.run("What is the square root of 256?")
 ```
 
-### NativeOpenHandsAgent
+### CodeActAgent
 
-**Registry key:** `native_openhands`
+**Registry key:** `codeact`
 
 A CodeAct-style agent that generates and executes Python code. Extends `ToolUsingAgent`. It can also invoke tools via structured `Action:` / `Action Input:` output. URLs in the input are automatically pre-fetched and inlined for the LLM.
 
@@ -272,9 +272,9 @@ How it works:
 4. Handles context window overflow with automatic truncation
 
 ```python
-from nicx.agents.native_openhands import NativeOpenHandsAgent
+from nicx.agents.codeact import CodeActAgent
 
-agent = NativeOpenHandsAgent(
+agent = CodeActAgent(
     engine,
     model="qwen3:8b",
     tools=[CalculatorTool(), WebSearchTool()],
@@ -557,7 +557,7 @@ To list all registered agents:
 from nicx.core.registry import AgentRegistry
 
 print(AgentRegistry.keys())
-# ("simple", "orchestrator", "native_react", "react", "native_openhands", "rlm", "openhands")
+# ("simple", "orchestrator", "native_react", "react", "codeact", "rlm", "openhands")
 ```
 
 To instantiate an agent by key:
