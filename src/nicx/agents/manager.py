@@ -424,7 +424,7 @@ class AgentManager:
     def get_latest_checkpoint(self, agent_id: str) -> Optional[Dict[str, Any]]:
         row = self._conn.execute(
             "SELECT * FROM agent_checkpoints"
-            " WHERE agent_id = ? ORDER BY created_at DESC LIMIT 1",
+            " WHERE agent_id = ? ORDER BY created_at DESC, rowid DESC LIMIT 1",
             (agent_id,),
         ).fetchone()
         return self._row_to_checkpoint(row) if row else None
