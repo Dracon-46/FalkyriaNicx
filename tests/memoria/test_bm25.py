@@ -6,7 +6,7 @@ import pytest
 
 rank_bm25 = pytest.importorskip("rank_bm25")
 
-from nicx.ferramentas.storage.bm25 import BM25Memory  # noqa: E402
+from nicx.memoria.armazenamento.bm25 import BM25Memory  # noqa: E402
 from nicx.nucleo.events import EventBus, EventType  # noqa: E402
 from nicx.nucleo.registry import MemoryRegistry  # noqa: E402
 
@@ -124,7 +124,7 @@ def test_clear():
 def test_event_bus_store():
     bus = EventBus(record_history=True)
     backend = _make_backend()
-    import nicx.ferramentas.storage.bm25 as mod
+    import nicx.memoria.armazenamento.bm25 as mod
 
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus
@@ -142,7 +142,7 @@ def test_event_bus_retrieve():
     bus = EventBus(record_history=True)
     backend = _make_backend()
     backend.store("searchable content for events")
-    import nicx.ferramentas.storage.bm25 as mod
+    import nicx.memoria.armazenamento.bm25 as mod
 
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus

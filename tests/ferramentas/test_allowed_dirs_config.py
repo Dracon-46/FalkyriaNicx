@@ -9,8 +9,8 @@ from unittest.mock import Mock
 import pytest
 
 from nicx.ferramentas._paths import resolve_allowed_dirs
-from nicx.ferramentas.file_read import FileReadTool
-from nicx.ferramentas.file_write import FileWriteTool
+from nicx.ferramentas.arquivos.file_read import FileReadTool
+from nicx.ferramentas.arquivos.file_write import FileWriteTool
 from nicx.nucleo.config import NicxConfig, load_config
 
 

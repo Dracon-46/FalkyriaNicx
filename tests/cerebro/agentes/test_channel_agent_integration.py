@@ -26,7 +26,7 @@ from nicx.conectores._stubs import Document
 from nicx.conectores.pipeline import IngestionPipeline
 from nicx.conectores.retriever import TwoStageRetriever
 from nicx.conectores.store import KnowledgeStore
-from nicx.ferramentas.knowledge_search import KnowledgeSearchTool
+from nicx.ferramentas.conhecimento.knowledge_search import KnowledgeSearchTool
 
 # ---------------------------------------------------------------------------
 # FakeChannel helper

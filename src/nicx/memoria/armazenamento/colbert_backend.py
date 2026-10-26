@@ -43,7 +43,7 @@ except ImportError as exc:
         "    pip install colbert-ai\n"
     ) from exc
 
-from nicx.ferramentas.storage._stubs import MemoryBackend, RetrievalResult
+from nicx.memoria.armazenamento._stubs import MemoryBackend, RetrievalResult
 from nicx.nucleo.events import EventType, get_event_bus
 from nicx.nucleo.registry import MemoryRegistry
 

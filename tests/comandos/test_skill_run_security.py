@@ -28,8 +28,8 @@ def write_skill(root: Path, name: str, steps: list[dict]) -> None:
 
 @pytest.fixture
 def skill_cli(tmp_path):
-    from nicx.ferramentas.calculator import CalculatorTool
-    from nicx.ferramentas.shell_exec import ShellExecTool
+    from nicx.ferramentas.agentes.calculator import CalculatorTool
+    from nicx.ferramentas.codigo.shell_exec import ShellExecTool
     from nicx.nucleo.registry import ToolRegistry
 
     ToolRegistry.register_value("calculator", CalculatorTool)
@@ -122,7 +122,7 @@ def test_default_deny_blocks_real_shell_before_dispatch(skill_cli):
             }
         ],
     )
-    with patch("nicx.ferramentas.shell_exec.ShellExecTool.execute") as execute:
+    with patch("nicx.ferramentas.codigo.shell_exec.ShellExecTool.execute") as execute:
         result = CliRunner().invoke(cli, ["skill", "run", "shell"], input="y\n")
     assert result.exit_code != 0
     assert "code:execute" in result.output and "denied" in result.output
@@ -168,7 +168,7 @@ def test_granted_shell_still_requires_user_confirmation(
         ],
     )
     with patch(
-        "nicx.ferramentas.shell_exec.ShellExecTool.execute",
+        "nicx.ferramentas.codigo.shell_exec.ShellExecTool.execute",
         return_value=ToolResult(
             tool_name="shell_exec",
             content="STEP_RAN",
@@ -215,7 +215,7 @@ def test_policy_startup_failure_never_dispatches(skill_cli):
             }
         ],
     )
-    with patch("nicx.ferramentas.shell_exec.ShellExecTool.execute") as execute:
+    with patch("nicx.ferramentas.codigo.shell_exec.ShellExecTool.execute") as execute:
         result = CliRunner().invoke(cli, ["skill", "run", "shell"])
     assert result.exit_code != 0
     execute.assert_not_called()

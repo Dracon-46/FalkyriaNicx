@@ -7,14 +7,14 @@ import tempfile
 
 import pytest
 
-from nicx.ferramentas.mcp.server import MCPServer
-from nicx.ferramentas.storage._stubs import MemoryBackend, RetrievalResult
-from nicx.ferramentas.storage_tools import (
+from nicx.ferramentas.conhecimento.storage_tools import (
     MemoryIndexTool,
     MemoryRetrieveTool,
     MemorySearchTool,
     MemoryStoreTool,
 )
+from nicx.ferramentas.mcp.server import MCPServer
+from nicx.memoria.armazenamento._stubs import MemoryBackend, RetrievalResult
 
 
 class _InMemoryBackend(MemoryBackend):
@@ -225,7 +225,7 @@ class TestMemoryIndexTool:
 class TestStorageToolsRegistration:
     def test_storage_tools_importable(self):
         """All storage tools are importable and instantiable."""
-        from nicx.ferramentas.storage_tools import (
+        from nicx.ferramentas.conhecimento.storage_tools import (
             MemoryIndexTool,
             MemoryRetrieveTool,
             MemorySearchTool,

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from nicx.ferramentas.apply_patch import ApplyPatchTool
+from nicx.ferramentas.arquivos.apply_patch import ApplyPatchTool
 
 
 class TestApplyPatchTool:

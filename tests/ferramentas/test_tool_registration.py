@@ -6,6 +6,7 @@ import importlib
 import subprocess
 import sys
 
+from nicx.ferramentas import NOT_TOOL_MODULES
 from nicx.nucleo.registry import ToolRegistry
 
 # Every tool name that should be registered after importing the package.
@@ -115,6 +116,9 @@ def _reload_tool_modules() -> None:
     for mod_name in list(sys.modules):
         if (
             mod_name.startswith("nicx.ferramentas.")
+            # MCP e sandbox são infraestrutura: recarregar criaria
+            # cópias novas das classes (isinstance passaria a falhar).
+            and not mod_name.startswith(NOT_TOOL_MODULES)
             and not mod_name.endswith("_stubs")
             and not mod_name.endswith("agent_tools")
         ):

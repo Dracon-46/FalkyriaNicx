@@ -5,8 +5,8 @@ from __future__ import annotations
 import uuid
 from typing import Any, Dict, List, Optional
 
-from nicx.ferramentas.storage._stubs import MemoryBackend, RetrievalResult
-from nicx.ferramentas.storage.context import (
+from nicx.memoria.armazenamento._stubs import MemoryBackend, RetrievalResult
+from nicx.memoria.armazenamento.context import (
     ContextConfig,
     build_context_message,
     format_context,
@@ -359,7 +359,7 @@ def test_inject_context_publishes_event():
     backend = _FakeMemory(results)
     messages = [Message(role=Role.USER, content="hello")]
 
-    import nicx.ferramentas.storage.context as mod
+    import nicx.memoria.armazenamento.context as mod
 
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus

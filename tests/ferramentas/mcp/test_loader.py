@@ -35,7 +35,9 @@ def _mock_mcp_stack():
         patch("nicx.ferramentas.mcp.client.MCPClient") as MockClient,
         patch("nicx.ferramentas.mcp.transport.StreamableHTTPTransport") as MockHttp,
         patch("nicx.ferramentas.mcp.transport.StdioTransport") as MockStdio,
-        patch("nicx.ferramentas.mcp_adapter.MCPToolProvider") as MockProvider,
+        patch(
+            "nicx.ferramentas.integracoes.mcp_adapter.MCPToolProvider"
+        ) as MockProvider,
     ):
         # Default: any provider discovers no tools (per-test overrides as needed)
         MockProvider.return_value.discover.return_value = []

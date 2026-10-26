@@ -260,7 +260,7 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
         and request_body.messages
     ):
         try:
-            from nicx.ferramentas.storage.context import ContextConfig, inject_context
+            from nicx.memoria.armazenamento.context import ContextConfig, inject_context
 
             memory_service = getattr(request.app.state, "memory_service", None)
             facts = memory_service.list_facts() if memory_service is not None else []

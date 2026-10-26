@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sqlite3
 
-from nicx.ferramentas.db_query import DatabaseQueryTool
+from nicx.ferramentas.codigo.db_query import DatabaseQueryTool
 
 
 class TestDatabaseQueryTool:

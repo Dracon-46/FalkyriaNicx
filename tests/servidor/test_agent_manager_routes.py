@@ -13,6 +13,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from nicx.cerebro.agentes.manager import AgentManager
+from nicx.ferramentas import NOT_TOOL_MODULES
 
 
 @pytest.fixture
@@ -651,6 +652,9 @@ class TestResolveToolSpecs:
         for mod_name in list(sys.modules):
             if (
                 mod_name.startswith("nicx.ferramentas.")
+                # MCP e sandbox são infraestrutura: recarregar criaria
+                # cópias novas das classes (isinstance passaria a falhar).
+                and not mod_name.startswith(NOT_TOOL_MODULES)
                 and not mod_name.endswith("_stubs")
                 and not mod_name.endswith("agent_tools")
             ):

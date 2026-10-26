@@ -432,7 +432,7 @@ class SystemBuilder:
 
     def _resolve_memory(self, config):
         try:
-            import nicx.ferramentas.storage  # noqa: F401 -- trigger registration
+            import nicx.memoria.armazenamento  # noqa: F401 -- trigger registration
             from nicx.nucleo.registry import MemoryRegistry
 
             key = config.memory.default_backend
@@ -653,12 +653,12 @@ class SystemBuilder:
         """
         import json
 
+        from nicx.ferramentas.integracoes.mcp_adapter import MCPToolProvider
         from nicx.ferramentas.mcp.client import MCPClient
         from nicx.ferramentas.mcp.transport import (
             StdioTransport,
             StreamableHTTPTransport,
         )
-        from nicx.ferramentas.mcp_adapter import MCPToolProvider
 
         cfg = json.loads(server_cfg) if isinstance(server_cfg, str) else server_cfg
         name = cfg.get("name", "<unnamed>")

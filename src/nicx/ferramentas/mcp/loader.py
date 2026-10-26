@@ -72,9 +72,9 @@ def load_mcp_tools_from_config(
     # Imported lazily so that `nicx.ferramentas.mcp.loader` can be imported
     # cheaply from CLI startup paths without dragging in the heavy MCP
     # client stack until something actually wants to discover tools.
+    from nicx.ferramentas.integracoes.mcp_adapter import MCPToolProvider
     from nicx.ferramentas.mcp.client import MCPClient
     from nicx.ferramentas.mcp.transport import StdioTransport, StreamableHTTPTransport
-    from nicx.ferramentas.mcp_adapter import MCPToolProvider
 
     tools: list["BaseTool"] = []
     clients: list["MCPClient"] = []

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from nicx.ferramentas.code_interpreter import CodeInterpreterTool
+from nicx.ferramentas.codigo.code_interpreter import CodeInterpreterTool
 from nicx.nucleo.registry import ToolRegistry
 
 

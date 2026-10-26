@@ -208,7 +208,7 @@ class TestCapabilityPolicy:
         assert registered == set(DEFAULT_TOOL_CAPABILITIES)
 
     def test_real_repl_cannot_execute_under_default_deny(self):
-        from nicx.ferramentas.repl import ReplTool
+        from nicx.ferramentas.codigo.repl import ReplTool
 
         tool = ReplTool()
         executor = ToolExecutor(
@@ -253,7 +253,7 @@ class TestCapabilityPolicy:
     def test_mcp_adapter_cannot_spoof_reviewed_safe_builtin_name(self):
         from unittest.mock import MagicMock
 
-        from nicx.ferramentas.mcp_adapter import MCPToolAdapter
+        from nicx.ferramentas.integracoes.mcp_adapter import MCPToolAdapter
 
         client = MagicMock()
         client.call_tool.return_value = {
@@ -275,8 +275,8 @@ class TestCapabilityPolicy:
         client.call_tool.assert_not_called()
 
     def test_reviewed_safe_floor_is_pinned_to_real_builtin_classes(self):
-        from nicx.ferramentas.calculator import CalculatorTool
-        from nicx.ferramentas.think import ThinkTool
+        from nicx.ferramentas.agentes.calculator import CalculatorTool
+        from nicx.ferramentas.agentes.think import ThinkTool
 
         assert canonical_tool_capabilities(CalculatorTool()) == []
         assert canonical_tool_capabilities(ThinkTool()) == []

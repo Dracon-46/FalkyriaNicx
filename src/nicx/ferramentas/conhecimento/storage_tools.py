@@ -10,7 +10,7 @@ import os
 from typing import Any
 
 from nicx.ferramentas._stubs import BaseTool, ToolSpec
-from nicx.ferramentas.storage._stubs import MemoryBackend
+from nicx.memoria.armazenamento._stubs import MemoryBackend
 from nicx.nucleo.registry import ToolRegistry
 from nicx.nucleo.types import ToolResult
 
@@ -280,8 +280,8 @@ class MemoryIndexTool(BaseTool):
         try:
             from pathlib import Path
 
-            from nicx.ferramentas.storage.chunking import ChunkConfig
-            from nicx.ferramentas.storage.ingest import ingest_path
+            from nicx.memoria.armazenamento.chunking import ChunkConfig
+            from nicx.memoria.armazenamento.ingest import ingest_path
 
             chunk_size = params.get("chunk_size", 512)
             chunk_overlap = params.get("chunk_overlap", 64)

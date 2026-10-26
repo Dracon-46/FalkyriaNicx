@@ -6,7 +6,7 @@ import builtins
 import sys
 from unittest.mock import MagicMock
 
-from nicx.ferramentas.pdf_tool import PDFExtractTool, _parse_pages
+from nicx.ferramentas.arquivos.pdf_tool import PDFExtractTool, _parse_pages
 
 
 class TestPDFExtractTool:

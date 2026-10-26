@@ -440,7 +440,7 @@ class AgentExecutor:
 
             if not mcp_tools:
                 try:
-                    from nicx.ferramentas.mcp_adapter import MCPToolAdapter
+                    from nicx.ferramentas.integracoes.mcp_adapter import MCPToolAdapter
 
                     pool = (
                         getattr(
@@ -701,7 +701,7 @@ class AgentExecutor:
             and self._system.config.agent.context_from_memory
         ):
             try:
-                from nicx.ferramentas.storage.context import (
+                from nicx.memoria.armazenamento.context import (
                     ContextConfig,
                     format_context,
                 )

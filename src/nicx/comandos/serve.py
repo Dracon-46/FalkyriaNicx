@@ -541,7 +541,7 @@ def serve(
     # null backend. Built before the scheduler so AgentExecutor can reuse it.
     memory_backend = None
     try:
-        import nicx.ferramentas.storage  # noqa: F401
+        import nicx.memoria.armazenamento  # noqa: F401
         from nicx.nucleo.registry import MemoryRegistry
 
         mem_key = config.memory.default_backend

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from nicx.ferramentas.storage.ingest import (
+from nicx.memoria.armazenamento.ingest import (
     detect_file_type,
     ingest_path,
     read_document,

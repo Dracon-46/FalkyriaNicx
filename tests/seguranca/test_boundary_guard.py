@@ -181,27 +181,27 @@ class TestToolTagging:
         assert BaseTool.is_local is True
 
     def test_web_search_is_external(self) -> None:
-        from nicx.ferramentas.web_search import WebSearchTool
+        from nicx.ferramentas.web.web_search import WebSearchTool
 
         assert WebSearchTool.is_local is False
 
     def test_http_request_is_external(self) -> None:
-        from nicx.ferramentas.http_request import HttpRequestTool
+        from nicx.ferramentas.web.http_request import HttpRequestTool
 
         assert HttpRequestTool.is_local is False
 
     def test_channel_send_is_external(self) -> None:
-        from nicx.ferramentas.channel_tools import ChannelSendTool
+        from nicx.ferramentas.integracoes.channel_tools import ChannelSendTool
 
         assert ChannelSendTool.is_local is False
 
     def test_think_tool_is_local(self) -> None:
-        from nicx.ferramentas.think import ThinkTool
+        from nicx.ferramentas.agentes.think import ThinkTool
 
         assert ThinkTool.is_local is True
 
     def test_calculator_is_local(self) -> None:
-        from nicx.ferramentas.calculator import CalculatorTool
+        from nicx.ferramentas.agentes.calculator import CalculatorTool
 
         assert CalculatorTool.is_local is True
 

@@ -176,7 +176,7 @@ def test_executor_handles_missing_tools(tmp_path):
 def test_executor_file_tools_keep_application_directory_policy(
     tmp_path, monkeypatch, mode, invalid_policy
 ):
-    from nicx.ferramentas.file_read import FileReadTool
+    from nicx.ferramentas.arquivos.file_read import FileReadTool
     from nicx.nucleo.config import NicxConfig
 
     cfg = NicxConfig()
@@ -618,7 +618,7 @@ def test_executor_mcp_opt_out_does_not_call_lazy_provider(tmp_path):
 def test_executor_preserves_custom_dict_tool_schema(tmp_path):
     """Executor-based agents see the same custom schema advertised by SSE."""
 
-    from nicx.ferramentas.think import ThinkTool
+    from nicx.ferramentas.agentes.think import ThinkTool
 
     AgentRegistry.register_value("capturing", _CapturingToolAgent)
     ToolRegistry.register_value("think", ThinkTool)

@@ -28,8 +28,8 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
-from nicx.ferramentas.storage._stubs import MemoryBackend, RetrievalResult
-from nicx.ferramentas.storage.embeddings import Embedder, OllamaEmbedder
+from nicx.memoria.armazenamento._stubs import MemoryBackend, RetrievalResult
+from nicx.memoria.armazenamento.embeddings import Embedder, OllamaEmbedder
 from nicx.nucleo.registry import MemoryRegistry
 
 logger = logging.getLogger(__name__)

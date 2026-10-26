@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from nicx.ferramentas.storage.chunking import Chunk, ChunkConfig, chunk_text
+from nicx.memoria.armazenamento.chunking import Chunk, ChunkConfig, chunk_text
 
 # Directories to skip when walking a tree
 _SKIP_DIRS = frozenset(

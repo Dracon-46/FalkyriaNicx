@@ -99,7 +99,7 @@ def _raise_agent_tool_failure(result: Any, *, not_found: bool = False) -> None:
 async def list_agents(request: Request):
     """List available agent types and running agents."""
     try:
-        from nicx.ferramentas.agent_tools import AgentListTool
+        from nicx.ferramentas.agentes.agent_tools import AgentListTool
 
         # Registry names and live agent metadata are administrative state,
         # just like spawn/send/kill.  Authorize before reading either source
@@ -128,7 +128,7 @@ async def list_agents(request: Request):
 
     running = []
     try:
-        from nicx.ferramentas.agent_tools import _SPAWNED_AGENTS
+        from nicx.ferramentas.agentes.agent_tools import _SPAWNED_AGENTS
 
         running = [{"id": k, **v} for k, v in _SPAWNED_AGENTS.items()]
     except ImportError:
@@ -141,7 +141,7 @@ async def list_agents(request: Request):
 async def create_agent(req: AgentCreateRequest, request: Request):
     """Spawn a new agent."""
     try:
-        from nicx.ferramentas.agent_tools import AgentSpawnTool
+        from nicx.ferramentas.agentes.agent_tools import AgentSpawnTool
 
         tool = AgentSpawnTool()
         params = {"agent_type": req.agent_type}
@@ -164,7 +164,7 @@ async def create_agent(req: AgentCreateRequest, request: Request):
 async def kill_agent(agent_id: str, request: Request):
     """Kill a running agent."""
     try:
-        from nicx.ferramentas.agent_tools import AgentKillTool
+        from nicx.ferramentas.agentes.agent_tools import AgentKillTool
 
         tool = AgentKillTool()
         result = _execute_agent_admin_tool(request, tool, {"agent_id": agent_id})
@@ -178,7 +178,7 @@ async def kill_agent(agent_id: str, request: Request):
 async def message_agent(agent_id: str, req: AgentMessageRequest, request: Request):
     """Send a message to a running agent."""
     try:
-        from nicx.ferramentas.agent_tools import AgentSendTool
+        from nicx.ferramentas.agentes.agent_tools import AgentSendTool
 
         tool = AgentSendTool()
         result = _execute_agent_admin_tool(
@@ -208,10 +208,10 @@ def _get_memory_backend(request: Request):
     """
     backend = getattr(request.app.state, "memory_backend", None)
     if backend is None:
-        from nicx.ferramentas.storage._stubs import MemoryBackendUnavailable
+        from nicx.memoria.armazenamento._stubs import MemoryBackendUnavailable
 
         try:
-            from nicx.ferramentas.storage.sqlite import SQLiteMemory
+            from nicx.memoria.armazenamento.sqlite import SQLiteMemory
 
             backend = SQLiteMemory()
         except MemoryBackendUnavailable as exc:
@@ -296,10 +296,10 @@ async def memory_config(request: Request):
         available = True
         detail: Optional[str] = None
         if backend is None:
-            from nicx.ferramentas.storage._stubs import MemoryBackendUnavailable
+            from nicx.memoria.armazenamento._stubs import MemoryBackendUnavailable
 
             try:
-                from nicx.ferramentas.storage.sqlite import SQLiteMemory
+                from nicx.memoria.armazenamento.sqlite import SQLiteMemory
 
                 backend = SQLiteMemory()
             except MemoryBackendUnavailable as exc:
@@ -333,7 +333,7 @@ def memory_index(req: MemoryIndexRequest, request: Request):
         import os
         from pathlib import Path
 
-        from nicx.ferramentas.storage.ingest import ingest_path
+        from nicx.memoria.armazenamento.ingest import ingest_path
         from nicx.seguranca.file_policy import is_sensitive_file
 
         target = Path(req.path).expanduser().resolve()

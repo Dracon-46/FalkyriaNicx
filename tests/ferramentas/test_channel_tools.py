@@ -9,7 +9,7 @@ from nicx.canais._stubs import (
     ChannelHandler,
     ChannelStatus,
 )
-from nicx.ferramentas.channel_tools import (
+from nicx.ferramentas.integracoes.channel_tools import (
     ChannelListTool,
     ChannelSendTool,
     ChannelStatusTool,

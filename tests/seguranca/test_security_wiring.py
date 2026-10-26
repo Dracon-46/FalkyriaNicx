@@ -5,7 +5,7 @@ from __future__ import annotations
 from unittest.mock import MagicMock
 
 from nicx.cerebro.agentes._stubs import AgentResult, ToolUsingAgent
-from nicx.ferramentas.repl import ReplTool
+from nicx.ferramentas.codigo.repl import ReplTool
 from nicx.nucleo.config import (
     CapabilitiesConfig,
     NicxConfig,

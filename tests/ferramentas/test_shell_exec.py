@@ -16,7 +16,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from nicx.ferramentas.shell_exec import ShellExecTool
+from nicx.ferramentas.codigo.shell_exec import ShellExecTool
 from nicx.nucleo import get_python_executable
 
 
@@ -44,7 +44,7 @@ class TestShellExecTool:
         import nicx.ferramentas as tools_pkg
         from nicx.nucleo.registry import ToolRegistry
 
-        sys.modules.pop("nicx.ferramentas.shell_exec", None)
+        sys.modules.pop("nicx.ferramentas.codigo.shell_exec", None)
         importlib.reload(tools_pkg)
 
         assert ToolRegistry.contains("shell_exec")
@@ -292,7 +292,7 @@ class TestSanitizedEnvWindowsKeys:
     """
 
     def test_base_env_keys_include_windows_essentials(self):
-        from nicx.ferramentas.shell_exec import _WINDOWS_ENV_KEYS
+        from nicx.ferramentas.codigo.shell_exec import _WINDOWS_ENV_KEYS
 
         for key in (
             "SystemRoot",
@@ -308,7 +308,7 @@ class TestSanitizedEnvWindowsKeys:
             assert key in _WINDOWS_ENV_KEYS, f"{key} missing from Windows keys"
 
     def test_windows_keys_are_only_enabled_on_windows(self):
-        from nicx.ferramentas.shell_exec import _BASE_ENV_KEYS, _WINDOWS_ENV_KEYS
+        from nicx.ferramentas.codigo.shell_exec import _BASE_ENV_KEYS, _WINDOWS_ENV_KEYS
 
         if os.name == "nt":
             assert set(_WINDOWS_ENV_KEYS) <= set(_BASE_ENV_KEYS)

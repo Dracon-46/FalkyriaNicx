@@ -30,14 +30,14 @@ class MemoryHandle:
         if self._backend is not None:
             return self._backend
 
-        import nicx.ferramentas.storage  # noqa: F401
+        import nicx.memoria.armazenamento  # noqa: F401
         from nicx.nucleo.registry import MemoryRegistry
 
         key = self._config.memory.default_backend
         if not MemoryRegistry.contains(key):
             # Register built-in backends
             try:
-                from nicx.ferramentas.storage.sqlite import SQLiteMemory  # noqa: F401
+                from nicx.memoria.armazenamento.sqlite import SQLiteMemory  # noqa: F401
             except ImportError:
                 pass
 
@@ -61,8 +61,8 @@ class MemoryHandle:
         chunk_overlap: int = 64,
     ) -> Dict[str, Any]:
         """Index a file or directory into memory."""
-        from nicx.ferramentas.storage.chunking import ChunkConfig
-        from nicx.ferramentas.storage.ingest import ingest_path
+        from nicx.memoria.armazenamento.chunking import ChunkConfig
+        from nicx.memoria.armazenamento.ingest import ingest_path
 
         backend = self._get_backend()
         cfg = ChunkConfig(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
@@ -521,8 +521,8 @@ class Nicx:
                 }
             )
             # Ensure digest agent always has its required tools
-            from nicx.ferramentas.digest_collect import DigestCollectTool
-            from nicx.ferramentas.text_to_speech import TextToSpeechTool
+            from nicx.ferramentas.agentes.digest_collect import DigestCollectTool
+            from nicx.ferramentas.integracoes.text_to_speech import TextToSpeechTool
 
             digest_tools = [DigestCollectTool(), TextToSpeechTool()]
             existing = agent_kwargs.get("tools", [])
@@ -558,7 +558,7 @@ class Nicx:
         if context and self._config.agent.context_from_memory:
             try:
                 from nicx.comandos.ask import _get_memory_backend, _get_memory_facts
-                from nicx.ferramentas.storage.context import (
+                from nicx.memoria.armazenamento.context import (
                     ContextConfig,
                     inject_context,
                 )
@@ -608,7 +608,7 @@ class Nicx:
         """Inject memory context into messages."""
         try:
             from nicx.comandos.ask import _get_memory_backend, _get_memory_facts
-            from nicx.ferramentas.storage.context import ContextConfig, inject_context
+            from nicx.memoria.armazenamento.context import ContextConfig, inject_context
 
             backend = _get_memory_backend(self._config)
             facts = _get_memory_facts(self._config)

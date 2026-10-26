@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from nicx.ferramentas.storage.sqlite import SQLiteMemory
+from nicx.memoria.armazenamento.sqlite import SQLiteMemory
 from nicx.nucleo.registry import MemoryRegistry
 
 # ---------------------------------------------------------------------------
@@ -20,7 +20,7 @@ def _make_sqlite(tmp_path):
 
 def _make_bm25():
     bm25_mod = pytest.importorskip(
-        "nicx.ferramentas.storage.bm25",
+        "nicx.memoria.armazenamento.bm25",
         exc_type=ImportError,
     )
     BM25Memory = bm25_mod.BM25Memory
@@ -37,19 +37,19 @@ def _make_backend(key, tmp_path):
         return _make_bm25()
     elif key == "faiss":
         mod = pytest.importorskip(
-            "nicx.ferramentas.storage.faiss_backend",
+            "nicx.memoria.armazenamento.faiss_backend",
             exc_type=ImportError,
         )
         return mod.FAISSMemory(db_path=str(tmp_path / "faiss"))
     elif key == "colbert":
         mod = pytest.importorskip(
-            "nicx.ferramentas.storage.colbert_backend",
+            "nicx.memoria.armazenamento.colbert_backend",
             exc_type=ImportError,
         )
         return mod.ColBERTMemory(db_path=str(tmp_path / "colbert"))
     elif key == "hybrid":
         mod = pytest.importorskip(
-            "nicx.ferramentas.storage.hybrid",
+            "nicx.memoria.armazenamento.hybrid",
             exc_type=ImportError,
         )
         sqlite = _make_sqlite(tmp_path)

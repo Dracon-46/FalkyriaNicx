@@ -102,14 +102,14 @@ def imessage_start(
             TwoStageRetriever,
         )
         from nicx.conectores.store import KnowledgeStore
-        from nicx.ferramentas.knowledge_search import (
+        from nicx.ferramentas.agentes.think import ThinkTool
+        from nicx.ferramentas.conhecimento.knowledge_search import (
             KnowledgeSearchTool,
         )
-        from nicx.ferramentas.knowledge_sql import (
+        from nicx.ferramentas.conhecimento.knowledge_sql import (
             KnowledgeSQLTool,
         )
-        from nicx.ferramentas.scan_chunks import ScanChunksTool
-        from nicx.ferramentas.think import ThinkTool
+        from nicx.ferramentas.conhecimento.scan_chunks import ScanChunksTool
         from nicx.motores.ollama import OllamaEngine
         from nicx.nucleo.config import load_config
         from nicx.nucleo.events import EventBus

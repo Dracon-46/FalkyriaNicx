@@ -5,14 +5,14 @@ from __future__ import annotations
 import pytest
 
 from nicx.ferramentas._stubs import BaseTool, ToolSpec
-from nicx.ferramentas.calculator import CalculatorTool
+from nicx.ferramentas.agentes.calculator import CalculatorTool
+from nicx.ferramentas.agentes.think import ThinkTool
 from nicx.ferramentas.mcp.protocol import (
     INVALID_PARAMS,
     METHOD_NOT_FOUND,
     MCPRequest,
 )
 from nicx.ferramentas.mcp.server import MCPServer
-from nicx.ferramentas.think import ThinkTool
 from nicx.nucleo.events import EventBus, EventType
 from nicx.nucleo.types import ToolResult
 

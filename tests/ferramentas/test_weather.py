@@ -13,7 +13,7 @@ import pytest
 
 from nicx.conectores import weather as weather_connector
 from nicx.ferramentas._stubs import ToolExecutor
-from nicx.ferramentas.weather import WeatherTool
+from nicx.ferramentas.web.weather import WeatherTool
 from nicx.nucleo.registry import ConnectorRegistry, ToolRegistry
 from nicx.nucleo.types import ToolCall
 from nicx.seguranca.capabilities import DEFAULT_TOOL_CAPABILITIES
@@ -65,7 +65,7 @@ def _forecast_response():
 
 
 def test_registered_and_declared_external():
-    import nicx.ferramentas.weather as weather_module
+    import nicx.ferramentas.web.weather as weather_module
 
     weather_module = importlib.reload(weather_module)
     assert ToolRegistry.contains("get_weather")
@@ -107,7 +107,7 @@ def test_tool_executor_applies_external_boundary_guard():
         arguments='{"location":"Vienna,AT"}',
     )
     with patch(
-        "nicx.ferramentas.weather.weather_connector.fetch_weather",
+        "nicx.ferramentas.web.weather.weather_connector.fetch_weather",
         return_value=(_current_response(), None),
     ):
         result = executor.execute(call)
@@ -119,7 +119,7 @@ def test_tool_executor_applies_external_boundary_guard():
 def test_dynamic_location_units_language_and_structured_current():
     tool = WeatherTool(api_key="secret-key", config=_config())
     with patch(
-        "nicx.ferramentas.weather.weather_connector.fetch_weather",
+        "nicx.ferramentas.web.weather.weather_connector.fetch_weather",
         return_value=(_current_response(), None),
     ) as fetch:
         result = tool.execute(location=" Vienna,AT ", units="metric", language="de")
@@ -152,7 +152,7 @@ def test_dynamic_location_units_language_and_structured_current():
 def test_forecast_is_bounded_and_structured():
     tool = WeatherTool(api_key="test-key", config=_config())
     with patch(
-        "nicx.ferramentas.weather.weather_connector.fetch_weather",
+        "nicx.ferramentas.web.weather.weather_connector.fetch_weather",
         return_value=(_current_response(), _forecast_response()),
     ) as fetch:
         result = tool.execute(
@@ -193,7 +193,9 @@ def test_corrupt_connector_key_is_unconfigured_and_never_sent(
     path = tmp_path / "weather.json"
     path.write_text(json.dumps({"api_key": stored_key}), encoding="utf-8")
     connector = weather_connector.WeatherConnector(token_path=str(path))
-    monkeypatch.setattr("nicx.ferramentas.weather.get_tool_credential", lambda *_: None)
+    monkeypatch.setattr(
+        "nicx.ferramentas.web.weather.get_tool_credential", lambda *_: None
+    )
     tool = WeatherTool(connector=connector, config=_config())
 
     assert tool.is_configured() is False
@@ -291,7 +293,7 @@ def test_config_defaults_are_used_when_arguments_are_omitted():
         ),
     )
     with patch(
-        "nicx.ferramentas.weather.weather_connector.fetch_weather",
+        "nicx.ferramentas.web.weather.weather_connector.fetch_weather",
         return_value=(_current_response(), None),
     ) as fetch:
         result = tool.execute()
@@ -307,11 +309,11 @@ def test_secure_tool_credential_precedes_connector(monkeypatch):
     connector.stored_api_key.return_value = "connector-key"
     tool = WeatherTool(connector=connector, config=_config())
     monkeypatch.setattr(
-        "nicx.ferramentas.weather.get_tool_credential",
+        "nicx.ferramentas.web.weather.get_tool_credential",
         lambda *_args, **_kwargs: "credential-key",
     )
     with patch(
-        "nicx.ferramentas.weather.weather_connector.fetch_weather",
+        "nicx.ferramentas.web.weather.weather_connector.fetch_weather",
         return_value=(_current_response(), None),
     ) as fetch:
         result = tool.execute(location="Paris,FR")
@@ -326,11 +328,11 @@ def test_existing_connector_credential_is_reused(monkeypatch):
     connector.stored_api_key.return_value = "connector-key"
     tool = WeatherTool(connector=connector, config=_config())
     monkeypatch.setattr(
-        "nicx.ferramentas.weather.get_tool_credential",
+        "nicx.ferramentas.web.weather.get_tool_credential",
         lambda *_args, **_kwargs: None,
     )
     with patch(
-        "nicx.ferramentas.weather.weather_connector.fetch_weather",
+        "nicx.ferramentas.web.weather.weather_connector.fetch_weather",
         return_value=(_current_response(), None),
     ) as fetch:
         result = tool.execute(location="Boston,US")
@@ -349,14 +351,14 @@ def test_default_connector_path_honors_runtime_nicx_home(tmp_path, monkeypatch):
     )
     monkeypatch.setenv("NICX_HOME", str(root))
     monkeypatch.setattr(
-        "nicx.ferramentas.weather.get_tool_credential",
+        "nicx.ferramentas.web.weather.get_tool_credential",
         lambda *_args, **_kwargs: None,
     )
     tool = WeatherTool(connector=weather_connector.WeatherConnector(), config=_config())
 
     assert tool.is_configured() is True
     with patch(
-        "nicx.ferramentas.weather.weather_connector.fetch_weather",
+        "nicx.ferramentas.web.weather.weather_connector.fetch_weather",
         return_value=(_current_response(), None),
     ) as fetch:
         result = tool.execute(location="Vienna")
@@ -370,10 +372,10 @@ def test_missing_credentials_fails_without_calling_provider(monkeypatch):
     connector.stored_api_key.return_value = None
     tool = WeatherTool(connector=connector, config=_config())
     monkeypatch.setattr(
-        "nicx.ferramentas.weather.get_tool_credential",
+        "nicx.ferramentas.web.weather.get_tool_credential",
         lambda *_args, **_kwargs: None,
     )
-    with patch("nicx.ferramentas.weather.weather_connector.fetch_weather") as fetch:
+    with patch("nicx.ferramentas.web.weather.weather_connector.fetch_weather") as fetch:
         result = tool.execute(location="Vienna")
 
     assert result.success is False
@@ -397,7 +399,7 @@ def test_missing_credentials_fails_without_calling_provider(monkeypatch):
 )
 def test_invalid_arguments_fail_before_network(params, expected):
     tool = WeatherTool(api_key="test-key", config=_config())
-    with patch("nicx.ferramentas.weather.weather_connector.fetch_weather") as fetch:
+    with patch("nicx.ferramentas.web.weather.weather_connector.fetch_weather") as fetch:
         result = tool.execute(**params)
 
     assert result.success is False
@@ -409,7 +411,7 @@ def test_provider_error_never_exposes_api_key():
     secret = "super-secret-weather-key"
     tool = WeatherTool(api_key=secret, config=_config())
     with patch(
-        "nicx.ferramentas.weather.weather_connector.fetch_weather",
+        "nicx.ferramentas.web.weather.weather_connector.fetch_weather",
         side_effect=httpx.RequestError(
             f"request failed: https://example.test/?appid={secret}"
         ),

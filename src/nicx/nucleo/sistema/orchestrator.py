@@ -42,11 +42,11 @@ class QueryOrchestrator:
 
         if context and s.config.agent.context_from_memory:
             try:
-                from nicx.ferramentas.storage.context import (
+                from nicx.memoria import load_configured_facts
+                from nicx.memoria.armazenamento.context import (
                     ContextConfig,
                     inject_context,
                 )
-                from nicx.memoria import load_configured_facts
 
                 ctx_cfg = ContextConfig(
                     top_k=s.config.memory.context_top_k,
@@ -202,8 +202,8 @@ class QueryOrchestrator:
                     "honorific": dc.honorific,
                 }
             )
-            from nicx.ferramentas.digest_collect import DigestCollectTool
-            from nicx.ferramentas.text_to_speech import TextToSpeechTool
+            from nicx.ferramentas.agentes.digest_collect import DigestCollectTool
+            from nicx.ferramentas.integracoes.text_to_speech import TextToSpeechTool
 
             digest_tools = [DigestCollectTool(), TextToSpeechTool()]
             existing = agent_kwargs.get("tools", [])
@@ -344,11 +344,11 @@ class QueryOrchestrator:
         for name in tool_names:
             try:
                 if name == "retrieval" and s.memory_backend:
-                    from nicx.ferramentas.retrieval import RetrievalTool
+                    from nicx.ferramentas.conhecimento.retrieval import RetrievalTool
 
                     tools.append(RetrievalTool(s.memory_backend))
                 elif name == "llm":
-                    from nicx.ferramentas.llm_tool import LLMTool
+                    from nicx.ferramentas.agentes.llm_tool import LLMTool
 
                     tools.append(LLMTool(s.engine, model=s.model))
                 elif name in {"file_read", "file_write"} and ToolRegistry.contains(

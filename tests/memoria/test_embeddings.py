@@ -6,7 +6,7 @@ import pytest
 
 st = pytest.importorskip("sentence_transformers")
 
-from nicx.ferramentas.storage.embeddings import (  # noqa: E402
+from nicx.memoria.armazenamento.embeddings import (  # noqa: E402
     Embedder,
     SentenceTransformerEmbedder,
 )

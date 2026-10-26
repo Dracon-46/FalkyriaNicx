@@ -118,7 +118,7 @@ def injection_result_from_json(json_str: str) -> object:
 
 def retrieval_results_from_json(json_str: str) -> list:
     """Convert Rust memory ``retrieve()`` JSON to a list of results."""
-    from nicx.ferramentas.storage._stubs import RetrievalResult
+    from nicx.memoria.armazenamento._stubs import RetrievalResult
 
     items = json.loads(json_str)
     results: List[RetrievalResult] = []

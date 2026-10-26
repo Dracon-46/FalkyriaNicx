@@ -8,7 +8,7 @@ colbert = pytest.importorskip("colbert")
 
 import torch  # noqa: E402
 
-from nicx.ferramentas.storage.colbert_backend import ColBERTMemory  # noqa: E402
+from nicx.memoria.armazenamento.colbert_backend import ColBERTMemory  # noqa: E402
 from nicx.nucleo.events import EventBus, EventType  # noqa: E402
 from nicx.nucleo.registry import MemoryRegistry  # noqa: E402
 
@@ -132,7 +132,7 @@ def test_clear():
 def test_event_bus_store():
     bus = EventBus(record_history=True)
     backend = _make_backend()
-    import nicx.ferramentas.storage.colbert_backend as mod
+    import nicx.memoria.armazenamento.colbert_backend as mod
 
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus
@@ -150,7 +150,7 @@ def test_event_bus_retrieve():
     bus = EventBus(record_history=True)
     backend = _make_backend()
     backend.store("searchable content for events")
-    import nicx.ferramentas.storage.colbert_backend as mod
+    import nicx.memoria.armazenamento.colbert_backend as mod
 
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus

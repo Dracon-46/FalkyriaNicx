@@ -47,7 +47,7 @@ class TestAgentRoutes:
         assert resp.status_code in (404, 501)
 
     def test_admin_lifecycle_is_capability_gated_before_mutation(self):
-        from nicx.ferramentas.agent_tools import _SPAWNED_AGENTS
+        from nicx.ferramentas.agentes.agent_tools import _SPAWNED_AGENTS
 
         app = _make_app()
         app.state.bus = EventBus(record_history=True)
@@ -77,7 +77,7 @@ class TestAgentRoutes:
         }
 
     def test_agent_listing_is_capability_gated_before_disclosure(self):
-        from nicx.ferramentas.agent_tools import _SPAWNED_AGENTS
+        from nicx.ferramentas.agentes.agent_tools import _SPAWNED_AGENTS
 
         app = _make_app()
         app.state.bus = EventBus(record_history=True)
@@ -108,7 +108,7 @@ class TestAgentRoutes:
         )
 
     def test_admin_lifecycle_is_rate_limited_before_mutation(self):
-        from nicx.ferramentas.agent_tools import _SPAWNED_AGENTS
+        from nicx.ferramentas.agentes.agent_tools import _SPAWNED_AGENTS
 
         class _DenyLimiter:
             def __init__(self) -> None:

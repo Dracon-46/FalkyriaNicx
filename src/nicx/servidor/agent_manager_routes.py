@@ -131,7 +131,7 @@ def _resolve_memory_backend(config: Any) -> Any:
     if config is None:
         return None
     try:
-        import nicx.ferramentas.storage  # noqa: F401
+        import nicx.memoria.armazenamento  # noqa: F401
         from nicx.nucleo.registry import MemoryRegistry
 
         key = config.memory.default_backend
@@ -705,9 +705,9 @@ def _get_mcp_tools_locked(
     if not app_config.tools.mcp.enabled or not app_config.tools.mcp.servers:
         return openai_tools, adapters_by_name
 
+    from nicx.ferramentas.integracoes.mcp_adapter import MCPToolProvider
     from nicx.ferramentas.mcp.client import MCPClient
     from nicx.ferramentas.mcp.transport import StdioTransport, StreamableHTTPTransport
-    from nicx.ferramentas.mcp_adapter import MCPToolProvider
 
     try:
         server_list = resolve_mcp_servers(

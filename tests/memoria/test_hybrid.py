@@ -5,8 +5,8 @@ from __future__ import annotations
 import uuid
 from typing import Any, Dict, List, Optional
 
-from nicx.ferramentas.storage._stubs import MemoryBackend, RetrievalResult
-from nicx.ferramentas.storage.hybrid import (
+from nicx.memoria.armazenamento._stubs import MemoryBackend, RetrievalResult
+from nicx.memoria.armazenamento.hybrid import (
     HybridMemory,
     reciprocal_rank_fusion,
 )
@@ -194,7 +194,7 @@ def test_clear_both():
 def test_event_bus_store():
     bus = EventBus(record_history=True)
     hybrid = _make_hybrid()
-    import nicx.ferramentas.storage.hybrid as mod
+    import nicx.memoria.armazenamento.hybrid as mod
 
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus
@@ -211,7 +211,7 @@ def test_event_bus_retrieve():
     bus = EventBus(record_history=True)
     hybrid = _make_hybrid()
     hybrid.store("retrievable content here")
-    import nicx.ferramentas.storage.hybrid as mod
+    import nicx.memoria.armazenamento.hybrid as mod
 
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus

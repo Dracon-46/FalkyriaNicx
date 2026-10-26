@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import pytest
 
-from nicx.ferramentas.calculator import CalculatorTool
+from nicx.ferramentas.agentes.calculator import CalculatorTool
+from nicx.ferramentas.agentes.think import ThinkTool
 from nicx.ferramentas.mcp.client import MCPClient
 from nicx.ferramentas.mcp.server import MCPServer
 from nicx.ferramentas.mcp.transport import InProcessTransport
-from nicx.ferramentas.think import ThinkTool
 
 # Tool configs: (tool_class, call_arguments, expected_substring)
 _TOOL_CONFIGS = {

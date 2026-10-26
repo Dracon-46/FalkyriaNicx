@@ -62,7 +62,7 @@ class KGAddEntityTool(BaseTool):
                 content="No knowledge graph backend available.",
                 success=False,
             )
-        from nicx.ferramentas.storage.knowledge_graph import Entity
+        from nicx.memoria.armazenamento.knowledge_graph import Entity
 
         entity = Entity(
             entity_id=params["entity_id"],
@@ -129,7 +129,7 @@ class KGAddRelationTool(BaseTool):
                 content="No knowledge graph backend available.",
                 success=False,
             )
-        from nicx.ferramentas.storage.knowledge_graph import Relation
+        from nicx.memoria.armazenamento.knowledge_graph import Relation
 
         relation = Relation(
             source_id=params["source_id"],

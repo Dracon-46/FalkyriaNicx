@@ -10,7 +10,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from nicx.ferramentas.calculator import CalculatorTool
+from nicx.ferramentas.agentes.calculator import CalculatorTool
+from nicx.ferramentas.agentes.think import ThinkTool
 from nicx.ferramentas.mcp.protocol import MCPRequest
 from nicx.ferramentas.mcp.server import MCPServer
 from nicx.ferramentas.mcp.transport import (
@@ -19,7 +20,6 @@ from nicx.ferramentas.mcp.transport import (
     StdioTransport,
     StreamableHTTPTransport,
 )
-from nicx.ferramentas.think import ThinkTool
 
 
 @pytest.fixture

@@ -10,14 +10,14 @@ from nicx.nucleo.registry import ConnectorRegistry, ToolRegistry
 
 
 def test_digest_collect_registered():
-    from nicx.ferramentas.digest_collect import DigestCollectTool
+    from nicx.ferramentas.agentes.digest_collect import DigestCollectTool
 
     ToolRegistry.register_value("digest_collect", DigestCollectTool)
     assert ToolRegistry.contains("digest_collect")
 
 
 def test_digest_collect_executes():
-    from nicx.ferramentas.digest_collect import DigestCollectTool
+    from nicx.ferramentas.agentes.digest_collect import DigestCollectTool
 
     tool = DigestCollectTool()
 
@@ -49,7 +49,7 @@ def test_digest_collect_executes():
 
 
 def test_digest_collect_missing_connector():
-    from nicx.ferramentas.digest_collect import DigestCollectTool
+    from nicx.ferramentas.agentes.digest_collect import DigestCollectTool
 
     tool = DigestCollectTool()
 

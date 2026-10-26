@@ -35,7 +35,7 @@ def test_get_memory_backend_returns_backend_even_when_empty(
     which is the kind of ambiguity that leads to silent grounding
     failures downstream.
     """
-    from nicx.ferramentas.storage.sqlite import SQLiteMemory
+    from nicx.memoria.armazenamento.sqlite import SQLiteMemory
     from nicx.nucleo.config import MemoryConfig, NicxConfig
     from nicx.nucleo.registry import MemoryRegistry
 
@@ -61,7 +61,7 @@ def test_get_memory_backend_returns_backend_with_docs(
     monkeypatch,
 ):
     """_get_memory_backend returns a backend when docs exist."""
-    from nicx.ferramentas.storage.sqlite import SQLiteMemory
+    from nicx.memoria.armazenamento.sqlite import SQLiteMemory
     from nicx.nucleo.config import MemoryConfig, NicxConfig
     from nicx.nucleo.registry import MemoryRegistry
 

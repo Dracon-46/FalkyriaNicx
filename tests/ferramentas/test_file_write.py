@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from nicx.ferramentas.file_write import FileWriteTool
+from nicx.ferramentas.arquivos.file_write import FileWriteTool
 
 
 class TestFileWriteTool:

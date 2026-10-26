@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 
-from nicx.ferramentas.agent_tools import (
+from nicx.ferramentas.agentes.agent_tools import (
     _SPAWNED_AGENTS,
     AgentKillTool,
     AgentListTool,
