@@ -54,7 +54,7 @@ def test_nicx_rust_lives_in_uv_dependency_group() -> None:
 
 def test_nicx_rust_has_local_uv_path_source() -> None:
     src = _pyproject()["tool"]["uv"]["sources"]["nicx-rust"]
-    assert src["path"] == "rust/crates/nicx-python"
+    assert src["path"] == "rust/crates/nicx-ponte"
 
 
 def test_desktop_app_syncs_the_native_group() -> None:

@@ -66,10 +66,6 @@ EXPECTED_TOOLS = {
     "db_query",
     # pdf_tool.py
     "pdf_extract",
-    # image_tool.py
-    "image_generate",
-    # audio_tool.py
-    "audio_transcribe",
     # text_to_speech.py
     "text_to_speech",
     # digest_collect.py

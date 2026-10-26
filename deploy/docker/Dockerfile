@@ -54,7 +54,7 @@ COPY --from=frontend /src/nicx/servidor/static src/nicx/servidor/static/
 # Install the project itself without re-resolving dependencies.
 RUN uv pip install --system --no-deps . && \
     maturin build --release \
-        --manifest-path rust/crates/nicx-python/Cargo.toml \
+        --manifest-path rust/crates/nicx-ponte/Cargo.toml \
         --interpreter python3 \
         --out /tmp/nicx-rust-wheel && \
     uv pip install --system --no-deps /tmp/nicx-rust-wheel/*.whl && \

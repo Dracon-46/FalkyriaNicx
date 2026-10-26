@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional
 RUST_MISSING_HINT = (
     "Memory backend unavailable: the native `nicx_rust` extension is not "
     "installed in this environment. Build it into the venv that runs the server "
-    "with `uv run maturin develop -m rust/crates/nicx-python/Cargo.toml` "
+    "with `uv run maturin develop -m rust/crates/nicx-ponte/Cargo.toml` "
     "(needs rustc >= 1.88), then restart. Verify with "
     '`python -c "from nicx.nucleo.rust import RUST_AVAILABLE; '
     'print(RUST_AVAILABLE)"`.'

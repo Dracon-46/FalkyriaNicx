@@ -1,0 +1,21 @@
+[package]
+name = "nicx-ponte"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "nicx_rust"
+crate-type = ["cdylib"]
+
+[dependencies]
+nicx-nucleo = { path = "../nicx-nucleo" }
+nicx-motores = { path = "../nicx-motores" }
+nicx-seguranca = { path = "../nicx-seguranca" }
+nicx-ferramentas = { path = "../nicx-ferramentas" }
+nicx-agentes = { path = "../nicx-agentes" }
+pyo3 = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+once_cell = { workspace = true }
+parking_lot = { workspace = true }

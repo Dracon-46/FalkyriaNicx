@@ -202,7 +202,7 @@ class TestOptionalCredentials:
     def test_required_keys_unchanged_for_other_tools(self):
         from nicx.nucleo.credentials import get_required_credentials
 
-        assert get_required_credentials("image_generate") == ["OPENAI_API_KEY"]
+        assert get_required_credentials("get_weather") == ["OPENWEATHERMAP_API_KEY"]
 
     def test_youdotcom_key_can_be_persisted(self, tmp_path, monkeypatch):
         """Unknown keys are rejected by save_credential, so the Settings UI

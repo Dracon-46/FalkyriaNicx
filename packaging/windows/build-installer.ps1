@@ -223,7 +223,7 @@ if ($SkipRust) {
     if (-not (Test-Path -LiteralPath $venvPython)) { Stop-Build "Python do projeto não encontrado: $venvPython" }
     Get-ChildItem -LiteralPath $WheelDir -Filter 'nicx_rust-*.whl' -ErrorAction SilentlyContinue | Remove-Item -Force
     Invoke-Native $uv @('run', '--no-sync', 'maturin', 'build', '--release',
-        '--manifest-path', (Join-Path $Repo 'rust\crates\nicx-python\Cargo.toml'),
+        '--manifest-path', (Join-Path $Repo 'rust\crates\nicx-ponte\Cargo.toml'),
         '--interpreter', $venvPython, '--out', $WheelDir)
     $rustWheel = Get-ChildItem -LiteralPath $WheelDir -Filter 'nicx_rust-*-cp312-*win_amd64.whl' | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     if (-not $rustWheel) { Stop-Build 'o wheel cp312 win_amd64 do nicx-rust não foi gerado' }

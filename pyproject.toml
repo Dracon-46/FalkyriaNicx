@@ -226,7 +226,7 @@ git_describe_command = [
 fallback_version = "0.0.0+unknown"
 
 [tool.uv.sources]
-nicx-rust = { path = "rust/crates/nicx-python" }
+nicx-rust = { path = "rust/crates/nicx-ponte" }
 
 [tool.hatch.build.targets.sdist]
 # Tauri release bundles carry these executables; Python source distributions

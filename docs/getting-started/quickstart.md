@@ -37,7 +37,7 @@ Nicx is a modular AI assistant framework. Here's what developers build with it:
 
     !!! warning "Requires the Rust extension"
         `nicx memory index` and `nicx memory search` import `nicx_rust`. If you
-        skipped the `uv run maturin develop -m rust/crates/nicx-python/Cargo.toml`
+        skipped the `uv run maturin develop -m rust/crates/nicx-ponte/Cargo.toml`
         step in [Installation](installation.md), these commands fail with
         `ModuleNotFoundError: No module named 'nicx_rust'`. Build the extension
         once and any preset (including `deep-research`) will work.

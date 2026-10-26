@@ -17,7 +17,7 @@ STATE_DIR="$NICX_HOME/.state"
 LOG="$STATE_DIR/extension-build.log"
 BUILT="$STATE_DIR/extension-built"
 FAILED="$STATE_DIR/extension-failed"
-MANIFEST="$SRC_DIR/rust/crates/nicx-python/Cargo.toml"
+MANIFEST="$SRC_DIR/rust/crates/nicx-ponte/Cargo.toml"
 
 mkdir -p "$STATE_DIR"
 

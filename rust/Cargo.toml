@@ -1,23 +1,12 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/nicx-core",
-    "crates/nicx-engine",
-    "crates/nicx-agents",
-    "crates/nicx-tools",
-    "crates/nicx-learning",
-    "crates/nicx-telemetry",
-    "crates/nicx-traces",
-    "crates/nicx-security",
-    "crates/nicx-mcp",
-    "crates/nicx-python",
-    "crates/nicx-sessions",
-    "crates/nicx-workflow",
-    "crates/nicx-skills",
-    "crates/nicx-recipes",
-    "crates/nicx-templates",
-    "crates/nicx-a2a",
-    "crates/nicx-scheduler",
+    "crates/nicx-nucleo",
+    "crates/nicx-motores",
+    "crates/nicx-agentes",
+    "crates/nicx-ferramentas",
+    "crates/nicx-seguranca",
+    "crates/nicx-ponte",
 ]
 
 # uuid 1.27 requires Rust 1.89; keep this aligned with rust-toolchain.toml.
