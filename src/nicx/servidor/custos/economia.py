@@ -14,7 +14,7 @@ from typing import Any, Dict, List
 # `nicx.nucleo.types` so the telemetry layer can read it without
 # crossing the server → telemetry layering. Re-exported here for
 # backward compatibility with existing imports of `from
-# nicx.servidor.savings import TOKEN_COUNTING_VERSION`.
+# nicx.servidor.custos.economia import TOKEN_COUNTING_VERSION`.
 from nicx.nucleo.types import TOKEN_COUNTING_VERSION  # noqa: E402,F401
 
 # ---------------------------------------------------------------------------

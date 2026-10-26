@@ -12,8 +12,8 @@ import pytest
 pytest.importorskip("fastapi", reason="nicx[server] not installed")
 
 from nicx.comandos.scan_cmd import PrivacyScanner  # noqa: E402
-from nicx.servidor.api_routes import _iterate_sync_stream  # noqa: E402
-from nicx.servidor.routes import security_scan  # noqa: E402
+from nicx.servidor.rotas.api import _iterate_sync_stream  # noqa: E402
+from nicx.servidor.rotas.chat import security_scan  # noqa: E402
 
 
 def test_security_scan_runs_on_worker_thread() -> None:

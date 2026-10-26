@@ -7,8 +7,8 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from nicx.nucleo.config import NicxConfig
-from nicx.servidor import wake_routes
-from nicx.servidor.wake_routes import WakeBusy
+from nicx.servidor.rotas import escuta as wake_routes
+from nicx.servidor.rotas.escuta import WakeBusy
 
 
 class FakeClock:

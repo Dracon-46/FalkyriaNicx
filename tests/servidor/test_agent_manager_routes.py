@@ -38,7 +38,7 @@ class TestAgentManagerRoutes:
     def client(self, manager):
         from fastapi import FastAPI
 
-        from nicx.servidor.agent_manager_routes import create_agent_manager_router
+        from nicx.servidor.rotas.agentes import create_agent_manager_router
 
         app = FastAPI()
         routers = create_agent_manager_router(manager)
@@ -316,7 +316,7 @@ class TestAgentManagerRoutes:
         client.app.state.config = None
         monkeypatch.setattr(executor_module, "AgentExecutor", _CapturingExecutor)
         monkeypatch.setattr(
-            "nicx.servidor.agent_manager_routes._start_managed_worker",
+            "nicx.servidor.rotas.agentes._start_managed_worker",
             lambda state, target, **kwargs: target(),
         )
         agent = manager.create_agent(name=f"remote-{route_kind}", agent_type="simple")
@@ -391,7 +391,7 @@ class TestAgentManagerStreaming:
     def stream_client(self, manager, _mock_engine):
         from fastapi import FastAPI
 
-        from nicx.servidor.agent_manager_routes import create_agent_manager_router
+        from nicx.servidor.rotas.agentes import create_agent_manager_router
 
         app = FastAPI()
         app.state.engine = _mock_engine
@@ -515,7 +515,7 @@ class TestAgentManagerStreaming:
         from fastapi import FastAPI
         from fastapi.testclient import TestClient as TC
 
-        from nicx.servidor.agent_manager_routes import create_agent_manager_router
+        from nicx.servidor.rotas.agentes import create_agent_manager_router
 
         app = FastAPI()
         app.state.engine = error_engine
@@ -543,7 +543,7 @@ class TestAgentManagerStreaming:
         from fastapi.testclient import TestClient
 
         from nicx.motores._stubs import StreamChunk
-        from nicx.servidor.agent_manager_routes import (
+        from nicx.servidor.rotas.agentes import (
             create_agent_manager_router,
         )
 
@@ -609,7 +609,7 @@ class TestAgentManagerStreaming:
         from fastapi import FastAPI
         from fastapi.testclient import TestClient as TC
 
-        from nicx.servidor.agent_manager_routes import (
+        from nicx.servidor.rotas.agentes import (
             create_agent_manager_router,
         )
 
@@ -622,7 +622,7 @@ class TestAgentManagerStreaming:
 
         agent = manager.create_agent(name="stream-init-error", agent_type="simple")
         with patch(
-            "nicx.servidor.agent_manager_routes._stream_managed_agent",
+            "nicx.servidor.rotas.agentes._stream_managed_agent",
             new=AsyncMock(side_effect=RuntimeError("stream setup failed")),
         ):
             resp = client.post(
@@ -665,7 +665,7 @@ class TestResolveToolSpecs:
         yield ToolRegistry
 
     def test_string_names_resolve_to_openai_specs(self, _registered_tools):
-        from nicx.servidor.agent_manager_routes import _resolve_tool_specs
+        from nicx.servidor.rotas.agentes import _resolve_tool_specs
 
         specs = _resolve_tool_specs(["file_read", "think"])
         assert len(specs) == 2
@@ -678,14 +678,14 @@ class TestResolveToolSpecs:
             assert "parameters" in s["function"]
 
     def test_unknown_names_dropped(self, _registered_tools):
-        from nicx.servidor.agent_manager_routes import _resolve_tool_specs
+        from nicx.servidor.rotas.agentes import _resolve_tool_specs
 
         specs = _resolve_tool_specs(["file_read", "nonexistent_tool_xyz"])
         assert len(specs) == 1
         assert specs[0]["function"]["name"] == "file_read"
 
     def test_dict_entries_passed_through(self, _registered_tools):
-        from nicx.servidor.agent_manager_routes import _resolve_tool_specs
+        from nicx.servidor.rotas.agentes import _resolve_tool_specs
 
         full_spec = {
             "type": "function",
@@ -700,7 +700,7 @@ class TestResolveToolSpecs:
         assert specs[0] is full_spec
 
     def test_empty_and_none_return_empty_list(self):
-        from nicx.servidor.agent_manager_routes import _resolve_tool_specs
+        from nicx.servidor.rotas.agentes import _resolve_tool_specs
 
         assert _resolve_tool_specs(None) == []
         assert _resolve_tool_specs([]) == []
@@ -735,7 +735,7 @@ class TestLightweightSystemEngineResolution:
 
     def test_resolves_preferred_engine_over_default(self, monkeypatch):
         pytest.importorskip("fastapi")
-        from nicx.servidor import agent_manager_routes as amr
+        from nicx.servidor.rotas import agentes as amr
 
         captured = self._capture_get_engine(monkeypatch)
         amr._make_lightweight_system(
@@ -745,7 +745,7 @@ class TestLightweightSystemEngineResolution:
 
     def test_falls_back_to_engine_default_without_preference(self, monkeypatch):
         pytest.importorskip("fastapi")
-        from nicx.servidor import agent_manager_routes as amr
+        from nicx.servidor.rotas import agentes as amr
 
         captured = self._capture_get_engine(monkeypatch)
         amr._make_lightweight_system(
@@ -757,7 +757,7 @@ class TestLightweightSystemEngineResolution:
         pytest.importorskip("fastapi")
         from nicx.nucleo.events import EventBus
         from nicx.registros.telemetria import instrumented_engine
-        from nicx.servidor import agent_manager_routes as amr
+        from nicx.servidor.rotas import agentes as amr
 
         resolved_engine = MagicMock()
         wrapped_engine = MagicMock()
@@ -791,7 +791,7 @@ class TestLightweightSystemEngineResolution:
         monkeypatch,
     ):
         pytest.importorskip("fastapi")
-        from nicx.servidor import agent_manager_routes as amr
+        from nicx.servidor.rotas import agentes as amr
 
         backend = object()
         resolver = MagicMock(return_value=backend)
@@ -821,7 +821,7 @@ class TestLightweightSystemEngineResolution:
         assert runtime._owns_memory_backend is True
 
     def test_lightweight_system_carries_runtime_policy_and_limiter(self):
-        from nicx.servidor import agent_manager_routes as amr
+        from nicx.servidor.rotas import agentes as amr
 
         policy = object()
         limiter = object()
@@ -846,7 +846,7 @@ class TestLightweightSystemEngineResolution:
 
     def test_memory_backend_lazy_init_is_synchronized(self, monkeypatch):
         pytest.importorskip("fastapi")
-        from nicx.servidor import agent_manager_routes as amr
+        from nicx.servidor.rotas import agentes as amr
 
         backend = object()
         resolver_calls = 0

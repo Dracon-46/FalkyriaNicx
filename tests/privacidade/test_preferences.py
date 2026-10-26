@@ -15,8 +15,8 @@ from fastapi.testclient import TestClient
 from nicx.nucleo.config import NicxConfig, load_config
 from nicx.nucleo.events import EventBus, EventType
 from nicx.privacidade.client import AnalyticsClient
-from nicx.servidor import analytics_routes
 from nicx.servidor.auth_middleware import AuthMiddleware
+from nicx.servidor.rotas import privacidade as analytics_routes
 
 
 @pytest.fixture

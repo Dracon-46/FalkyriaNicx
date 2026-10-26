@@ -51,7 +51,7 @@ def sendblue_channel():
 
 @pytest.fixture
 def webhook_app(mock_bridge, sendblue_channel):
-    from nicx.servidor.webhook_routes import create_webhook_router
+    from nicx.servidor.rotas.webhooks import create_webhook_router
 
     app = FastAPI()
     router = create_webhook_router(
@@ -128,7 +128,7 @@ class TestSendBlueWebhook:
     def test_webhook_secret_validation(self, mock_bridge):
         """When a webhook secret is set, reject requests without it."""
         from nicx.canais.sendblue import SendBlueChannel
-        from nicx.servidor.webhook_routes import create_webhook_router
+        from nicx.servidor.rotas.webhooks import create_webhook_router
 
         ch = SendBlueChannel(
             api_key_id="k",
@@ -169,7 +169,7 @@ class TestSendBlueWebhook:
 
     def test_no_bridge_returns_200(self, sendblue_channel):
         """When no bridge exists, webhook should not crash."""
-        from nicx.servidor.webhook_routes import create_webhook_router
+        from nicx.servidor.rotas.webhooks import create_webhook_router
 
         app = FastAPI()
         router = create_webhook_router(bridge=None, sendblue_channel=sendblue_channel)
@@ -189,7 +189,7 @@ class TestSendBlueWebhook:
     def test_no_secret_configured_is_rejected(self, mock_bridge):
         """Fail closed: a channel without a webhook_secret rejects all posts."""
         from nicx.canais.sendblue import SendBlueChannel
-        from nicx.servidor.webhook_routes import create_webhook_router
+        from nicx.servidor.rotas.webhooks import create_webhook_router
 
         ch = SendBlueChannel(api_key_id="k", api_secret_key="s", from_number="+1555")
         ch.connect()
@@ -219,7 +219,7 @@ class TestSendBlueHealth:
         app.state.channel_bridge = MagicMock()
         app.state.channel_bridge._channels = {"sendblue": sendblue_channel}
 
-        from nicx.servidor.agent_manager_routes import (
+        from nicx.servidor.rotas.agentes import (
             create_agent_manager_router,
         )
 
@@ -243,7 +243,7 @@ class TestSendBlueHealth:
         app = FastAPI()
         # No sendblue_channel or bridge on state
 
-        from nicx.servidor.agent_manager_routes import (
+        from nicx.servidor.rotas.agentes import (
             create_agent_manager_router,
         )
 

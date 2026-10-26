@@ -34,7 +34,7 @@ def mock_speech_backend():
 def app_with_speech(mock_speech_backend):
     from fastapi import FastAPI
 
-    from nicx.servidor.api_routes import speech_router
+    from nicx.servidor.rotas.api import speech_router
 
     app = FastAPI()
     app.state.speech_backend = mock_speech_backend
@@ -70,7 +70,7 @@ def test_transcribe_endpoint_offloads_backend_work(client, mock_speech_backend):
     )
 
     with patch(
-        "nicx.servidor.api_routes.asyncio.to_thread",
+        "nicx.servidor.rotas.api.asyncio.to_thread",
         new_callable=AsyncMock,
     ) as mock_to_thread:
         mock_to_thread.return_value = expected
@@ -165,7 +165,7 @@ def test_health_no_backend():
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
 
-    from nicx.servidor.api_routes import speech_router
+    from nicx.servidor.rotas.api import speech_router
 
     app = FastAPI()
     app.state.speech_backend = None
@@ -203,7 +203,7 @@ def mock_tts_backend():
 def _tts_app(backend, *, config=None):
     from fastapi import FastAPI
 
-    from nicx.servidor.api_routes import speech_router
+    from nicx.servidor.rotas.api import speech_router
 
     app = FastAPI()
     app.include_router(speech_router)
@@ -217,7 +217,7 @@ def _tts_app(backend, *, config=None):
 def _unresolved_tts_app():
     from fastapi import FastAPI
 
-    from nicx.servidor.api_routes import speech_router
+    from nicx.servidor.rotas.api import speech_router
 
     app = FastAPI()
     app.include_router(speech_router)
@@ -265,7 +265,7 @@ def test_synthesize_rejects_empty_text(mock_tts_backend):
 
 
 def test_synthesize_rejects_oversized_text(mock_tts_backend):
-    from nicx.servidor.api_routes import _MAX_TTS_CHARS
+    from nicx.servidor.rotas.api import _MAX_TTS_CHARS
 
     client = _tts_app(mock_tts_backend)
 
@@ -302,7 +302,7 @@ def test_synthesize_offloads_backend_work(mock_tts_backend):
     expected = TTSResult(audio=b"RIFFoffloaded", format="wav", sample_rate=22050)
 
     with patch(
-        "nicx.servidor.api_routes.asyncio.to_thread",
+        "nicx.servidor.rotas.api.asyncio.to_thread",
         new_callable=AsyncMock,
         return_value=expected,
     ) as to_thread:

@@ -506,7 +506,7 @@ def test_server_rejects_private_custom_host_without_saving_credentials(
 ) -> None:
     fastapi = pytest.importorskip("fastapi")
     testclient = pytest.importorskip("fastapi.testclient")
-    from nicx.servidor import connectors_router
+    from nicx.servidor.rotas import conectores as connectors_router
 
     class HermeticIMAPConnector(IMAPConnector):
         def __init__(self) -> None:

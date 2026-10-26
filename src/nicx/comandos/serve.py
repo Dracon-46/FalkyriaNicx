@@ -729,10 +729,10 @@ def serve(
     # Wrap existing channel in ChannelBridge orchestrator
     if channel_bridge is not None:
         try:
-            from nicx.servidor.channel_bridge import (
+            from nicx.servidor.pontes.canais import (
                 ChannelBridge,
             )
-            from nicx.servidor.session_store import (
+            from nicx.servidor.pontes.sessoes_canais import (
                 SessionStore,
             )
 
@@ -830,7 +830,7 @@ def serve(
 
 
 def _local_ollama_host(engine: object) -> str | None:
-    from nicx.servidor.routes import _ollama_host
+    from nicx.servidor.rotas.chat import _ollama_host
 
     try:
         return _ollama_host(engine)

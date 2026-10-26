@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from nicx.servidor.session_store import SessionStore
+from nicx.servidor.pontes.sessoes_canais import SessionStore
 
 
 @pytest.fixture

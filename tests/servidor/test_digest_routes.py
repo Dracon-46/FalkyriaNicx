@@ -41,7 +41,7 @@ def _make_app(db_path: str):
     from fastapi import FastAPI
 
     from nicx.cerebro.agentes.autonomos.digest_store import DigestStore
-    from nicx.servidor.digest_routes import create_digest_router
+    from nicx.servidor.rotas.briefing import create_digest_router
 
     # Patch get_today to fall back to get_latest — avoids timezone issues in CI
     original_get_today = DigestStore.get_today
@@ -84,7 +84,7 @@ def test_get_digest_404(tmp_path):
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
 
-    from nicx.servidor.digest_routes import create_digest_router
+    from nicx.servidor.rotas.briefing import create_digest_router
 
     app = FastAPI()
     app.include_router(create_digest_router(db_path=str(tmp_path / "empty.db")))
@@ -108,7 +108,7 @@ def test_get_history(store, tmp_path):
 
 def test_generate_runs_entire_nicx_lifecycle_on_one_worker(tmp_path, monkeypatch):
     """Construction, ask, and cleanup all stay off the event-loop thread."""
-    from nicx.servidor import digest_routes
+    from nicx.servidor.rotas import briefing as digest_routes
 
     calls: list[tuple[str, int]] = []
 

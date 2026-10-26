@@ -60,7 +60,7 @@ def _isolate_connector_dbs(tmp_path_factory):
 @pytest.fixture(autouse=True)
 def _finish_connector_syncs(monkeypatch):
     """Drain each test's sync workers before its mocks and DB isolation expire."""
-    from nicx.servidor import connectors_router
+    from nicx.servidor.rotas import conectores as connectors_router
 
     workers: list[threading.Thread] = []
 

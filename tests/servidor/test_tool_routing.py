@@ -93,7 +93,7 @@ def test_routing_can_be_turned_off():
 
 
 def test_spoken_small_talk_gets_the_voice_hint_on_the_direct_path():
-    from nicx.servidor.routes import _VOICE_HINT, _VOICE_MAX_TOKENS
+    from nicx.servidor.rotas.chat import _VOICE_HINT, _VOICE_MAX_TOKENS
 
     client = _client()
     engine = client.app.state.engine

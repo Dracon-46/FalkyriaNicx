@@ -31,7 +31,7 @@ from nicx.motores.cloud import (
 )
 from nicx.nucleo.registry import EngineRegistry
 from nicx.nucleo.types import Message, Role
-from nicx.servidor import cloud_router
+from nicx.servidor.rotas import nuvem as cloud_router
 from tests.motores.conftest import CLOUD_KEY_ENV_VARS
 
 _ALL_CLOUD_KEYS = CLOUD_KEY_ENV_VARS

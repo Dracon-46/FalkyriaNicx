@@ -14,7 +14,7 @@ import pytest
 pytest.importorskip("fastapi")  # agent_manager_routes imports FastAPI at module load
 
 from nicx.nucleo.types import Role  # noqa: E402
-from nicx.servidor.agent_manager_routes import (  # noqa: E402
+from nicx.servidor.rotas.agentes import (  # noqa: E402
     _build_managed_system_prompt,
     _instantiate_managed_tool,
     _replay_history_messages,

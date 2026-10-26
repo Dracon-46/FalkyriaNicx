@@ -10,7 +10,7 @@ starlette = pytest.importorskip("starlette")
 from fastapi import FastAPI  # noqa: E402
 from starlette.testclient import TestClient  # noqa: E402
 
-from nicx.servidor.api_routes import learning_router  # noqa: E402
+from nicx.servidor.rotas.api import learning_router  # noqa: E402
 
 
 def _make_app() -> FastAPI:

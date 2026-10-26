@@ -12,22 +12,22 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from nicx.servidor.analytics_routes import (
+from nicx.servidor.rotas.api import include_all_routes
+from nicx.servidor.rotas.briefing import create_digest_router
+from nicx.servidor.rotas.chat import router
+from nicx.servidor.rotas.comparacao import comparison_router
+from nicx.servidor.rotas.conectores import create_connectors_router
+from nicx.servidor.rotas.escuta import router as wake_router
+from nicx.servidor.rotas.painel_economia import dashboard_router
+from nicx.servidor.rotas.pesquisa import router as research_router
+from nicx.servidor.rotas.privacidade import (
     configure_analytics,
     stop_analytics,
 )
-from nicx.servidor.analytics_routes import (
+from nicx.servidor.rotas.privacidade import (
     router as analytics_router,
 )
-from nicx.servidor.api_routes import include_all_routes
-from nicx.servidor.comparison import comparison_router
-from nicx.servidor.connectors_router import create_connectors_router
-from nicx.servidor.dashboard import dashboard_router
-from nicx.servidor.digest_routes import create_digest_router
-from nicx.servidor.research_router import router as research_router
-from nicx.servidor.routes import router
-from nicx.servidor.upload_router import router as upload_router
-from nicx.servidor.wake_routes import router as wake_router
+from nicx.servidor.rotas.upload import router as upload_router
 
 logger = logging.getLogger(__name__)
 _MANAGED_SHUTDOWN_GRACE_SECONDS = 0.25
@@ -75,14 +75,14 @@ def _restore_sendblue_bindings(app: FastAPI) -> None:
                 if bridge and hasattr(bridge, "_channels"):
                     bridge._channels["sendblue"] = sb
                 else:
-                    from nicx.servidor.channel_bridge import ChannelBridge
-                    from nicx.servidor.session_store import SessionStore
+                    from nicx.servidor.pontes.canais import ChannelBridge
+                    from nicx.servidor.pontes.sessoes_canais import SessionStore
 
                     session_store = SessionStore()
                     engine = getattr(app.state, "engine", None)
                     dr_agent = None
                     if engine:
-                        from nicx.servidor.agent_manager_routes import (
+                        from nicx.servidor.rotas.agentes import (
                             _build_deep_research_tools,
                         )
 
@@ -523,7 +523,7 @@ def create_app(
     # Mount webhook routes (always — SendBlue may be configured dynamically)
     if webhook_config:
         try:
-            from nicx.servidor.webhook_routes import (
+            from nicx.servidor.rotas.webhooks import (
                 create_webhook_router,
             )
 

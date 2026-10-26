@@ -159,7 +159,7 @@ def test_slack_daemon_wires_security(monkeypatch, tmp_path):
         "nicx.cerebro.agentes.pesquisa.deep_research.DeepResearchAgent", _Agent
     )
     monkeypatch.setattr(
-        "nicx.servidor.agent_manager_routes._build_deep_research_tools",
+        "nicx.servidor.rotas.agentes._build_deep_research_tools",
         lambda **kwargs: [],
     )
 

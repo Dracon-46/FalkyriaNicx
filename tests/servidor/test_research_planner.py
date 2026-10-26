@@ -9,7 +9,7 @@ import pytest
 
 from nicx.cerebro.agentes.pesquisa.research_loop import DEFAULT_PLANNER_MODEL
 from nicx.nucleo.config import NicxConfig
-from nicx.servidor import research_router
+from nicx.servidor.rotas import pesquisa as research_router
 
 
 class _DummyEngine:

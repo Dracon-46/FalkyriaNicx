@@ -21,7 +21,7 @@ def test_delayed_sync_finishes_before_database_paths_are_restored(
     from nicx.conectores.pipeline import IngestionPipeline
     from nicx.conectores.store import KnowledgeStore
     from nicx.nucleo import config
-    from nicx.servidor import connectors_router
+    from nicx.servidor.rotas import conectores as connectors_router
     from tests.servidor.conftest import _finish_connector_syncs, _isolate_connector_dbs
 
     baseline = tmp_path / "restored-home"

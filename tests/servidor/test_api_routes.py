@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 from nicx.nucleo.events import EventBus, EventType  # noqa: E402
 from nicx.seguranca.capabilities import CapabilityPolicy  # noqa: E402
-from nicx.servidor.api_routes import (  # noqa: E402
+from nicx.servidor.rotas.api import (  # noqa: E402
     include_all_routes,
     memory_index,
     memory_search,

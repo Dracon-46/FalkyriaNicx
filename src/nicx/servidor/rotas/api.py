@@ -1227,7 +1227,7 @@ async def feedback_stats(request: Request):
 
 def include_all_routes(app) -> None:
     """Include all extended API routers in a FastAPI app."""
-    from nicx.servidor.approval_routes import (
+    from nicx.servidor.rotas.aprovacoes import (
         router as approval_router,  # noqa: PLC0415
     )
 
@@ -1248,7 +1248,7 @@ def include_all_routes(app) -> None:
     # Agent Manager routes (if available)
     try:
         if hasattr(app.state, "agent_manager") and app.state.agent_manager:
-            from nicx.servidor.agent_manager_routes import (  # noqa: PLC0415
+            from nicx.servidor.rotas.agentes import (  # noqa: PLC0415
                 create_agent_manager_router,
             )
 
@@ -1274,7 +1274,7 @@ def include_all_routes(app) -> None:
     # publishes to, so events silently never reached this endpoint.
     try:
         from nicx.nucleo.events import get_event_bus
-        from nicx.servidor.ws_bridge import create_ws_router
+        from nicx.servidor.pontes.websocket import create_ws_router
 
         ws_router = create_ws_router(getattr(app.state, "bus", None) or get_event_bus())
         app.include_router(ws_router)
