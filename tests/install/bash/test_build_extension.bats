@@ -4,8 +4,8 @@ setup() {
     TEST_TMPDIR=$(mktemp -d)
     export NICX_HOME="$TEST_TMPDIR/.nicx"
     mkdir -p "$NICX_HOME/.state"
-    mkdir -p "$NICX_HOME/src/rust/crates/nicx-python"
-    touch "$NICX_HOME/src/rust/crates/nicx-python/Cargo.toml"
+    mkdir -p "$NICX_HOME/src/rust/crates/nicx-ponte"
+    touch "$NICX_HOME/src/rust/crates/nicx-ponte/Cargo.toml"
     export UV_STUB_LOG="$TEST_TMPDIR/uv.log"
     : > "$UV_STUB_LOG"
     export PATH="$BATS_TEST_DIRNAME/stubs:$PATH"
@@ -39,7 +39,7 @@ teardown() {
 @test "calls uv run maturin develop with the right manifest" {
     UV_STUB_EXIT=0 run bash "$SCRIPT"
     grep -q "run maturin develop -m" "$UV_STUB_LOG"
-    grep -q "rust/crates/nicx-python/Cargo.toml" "$UV_STUB_LOG"
+    grep -q "rust/crates/nicx-ponte/Cargo.toml" "$UV_STUB_LOG"
 }
 
 @test "atomic rename — no .tmp file left behind" {

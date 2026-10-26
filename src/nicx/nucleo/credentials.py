@@ -41,7 +41,6 @@ TOOL_CREDENTIALS: dict[str, list[str]] = {
     ],
     "get_weather": ["OPENWEATHERMAP_API_KEY"],
     "fx_macro_data": ["FXMACRODATA_API_KEY"],
-    "image_generate": ["OPENAI_API_KEY"],
     "slack": ["SLACK_BOT_TOKEN", "SLACK_APP_TOKEN"],
     "telegram": ["TELEGRAM_BOT_TOKEN"],
     "discord": ["DISCORD_BOT_TOKEN"],

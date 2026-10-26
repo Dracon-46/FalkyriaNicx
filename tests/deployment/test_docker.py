@@ -133,7 +133,7 @@ class TestDockerFiles:
         required_markers = [
             "rustup toolchain install 1.88",
             "maturin build --release",
-            "rust/crates/nicx-python/Cargo.toml",
+            "rust/crates/nicx-ponte/Cargo.toml",
             "/tmp/nicx-rust-wheel/*.whl",
             "import nicx_rust",
         ]

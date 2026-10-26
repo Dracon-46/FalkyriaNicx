@@ -42,7 +42,7 @@ If you prefer to run each step yourself:
     git clone https://github.com/Dracon-46/FalkyriaNicx.git
     cd FalkyriaNicx
     uv sync --extra desktop
-    uv run maturin develop -m rust/crates/nicx-python/Cargo.toml
+    uv run maturin develop -m rust/crates/nicx-ponte/Cargo.toml
     cd frontend && npm install && cd ..
     ```
 
@@ -136,7 +136,7 @@ programmatically. Every feature is accessible from the terminal.
 git clone https://github.com/Dracon-46/FalkyriaNicx.git
 cd FalkyriaNicx
 uv sync
-uv run maturin develop -m rust/crates/nicx-python/Cargo.toml
+uv run maturin develop -m rust/crates/nicx-ponte/Cargo.toml
 ```
 
 Requires [Rust](https://rustup.rs/). On Python 3.14+, set `PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1` before the `maturin` command.
@@ -180,7 +180,7 @@ For programmatic access, the `Nicx` class provides a high-level sync API.
 git clone https://github.com/Dracon-46/FalkyriaNicx.git
 cd FalkyriaNicx
 uv sync
-uv run maturin develop -m rust/crates/nicx-python/Cargo.toml
+uv run maturin develop -m rust/crates/nicx-ponte/Cargo.toml
 ```
 
 Requires [Rust](https://rustup.rs/). On Python 3.14+, set `PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1` before the `maturin` command.

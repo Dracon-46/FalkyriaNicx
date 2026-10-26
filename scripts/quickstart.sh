@@ -271,8 +271,8 @@ ok "Python dependencies installed"
 
 # ── 7b. Build Rust extension ──────────────────────────────────────
 info "Building Rust extension..."
-(cd rust && uv run maturin develop -m crates/nicx-python/Cargo.toml --quiet 2>/dev/null \
-  || uv run maturin develop -m crates/nicx-python/Cargo.toml)
+(cd rust && uv run maturin develop -m crates/nicx-ponte/Cargo.toml --quiet 2>/dev/null \
+  || uv run maturin develop -m crates/nicx-ponte/Cargo.toml)
 ok "Rust extension built"
 
 # ── 8. Install frontend dependencies ────────────────────────────────

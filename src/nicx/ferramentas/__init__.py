@@ -128,16 +128,6 @@ except ImportError:
     pass
 
 try:
-    import nicx.ferramentas.image_tool  # noqa: F401
-except ImportError:
-    pass
-
-try:
-    import nicx.ferramentas.audio_tool  # noqa: F401
-except ImportError:
-    pass
-
-try:
     import nicx.ferramentas.knowledge_tools  # noqa: F401
 except ImportError:
     pass
