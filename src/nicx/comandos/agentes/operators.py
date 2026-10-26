@@ -12,7 +12,7 @@ from rich.table import Table
 
 def _builtin_operators_dir() -> Path:
     """Return the path to built-in operator manifests shipped with the package."""
-    return Path(__file__).resolve().parents[1] / "cerebro" / "operadores" / "data"
+    return Path(__file__).resolve().parents[2] / "cerebro" / "operadores" / "data"
 
 
 @click.group()

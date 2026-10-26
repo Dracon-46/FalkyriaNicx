@@ -22,9 +22,8 @@ import logging
 from typing import TYPE_CHECKING, Any, Optional
 
 if TYPE_CHECKING:
-    from nicx.ferramentas._stubs import BaseTool
+    from nicx.ferramentas._stubs import BaseTool, ToolSpec  # noqa: F401
     from nicx.ferramentas.mcp.client import MCPClient
-    from nicx.nucleo.types import ToolSpec  # noqa: F401
 
 logger = logging.getLogger(__name__)
 

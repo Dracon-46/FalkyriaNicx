@@ -604,7 +604,7 @@ class TestAfmIsTreatedAsLocal:
     def test_image_privacy_guard_does_not_warn_for_afm(self):
         """`nicx ask -i photo.png --engine afm` must not claim the image
         leaves the machine."""
-        from nicx.comandos.ask import LOCAL_ENGINES
+        from nicx.comandos.conversa.ask import LOCAL_ENGINES
 
         assert "afm" in LOCAL_ENGINES
         assert "openai" not in LOCAL_ENGINES

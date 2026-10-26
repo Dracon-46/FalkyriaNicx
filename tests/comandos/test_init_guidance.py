@@ -8,7 +8,7 @@ from unittest import mock
 from click.testing import CliRunner
 
 from nicx.comandos import cli
-from nicx.comandos.init_cmd import _next_steps_text
+from nicx.comandos.instalacao.init import _next_steps_text
 
 _NO_DL = "--no-download"
 
@@ -19,9 +19,11 @@ class TestInitShowsNextSteps:
         config_dir = tmp_path / ".nicx"
         config_path = config_dir / "config.toml"
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
-            mock.patch("nicx.comandos.init_cmd.PrivacyScanner"),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
+            mock.patch("nicx.comandos.instalacao.init.PrivacyScanner"),
         ):
             result = CliRunner().invoke(cli, ["init", "--engine", "llamacpp", _NO_DL])
         assert result.exit_code == 0
@@ -34,9 +36,11 @@ class TestInitShowsNextSteps:
         config_dir = tmp_path / ".nicx"
         config_path = config_dir / "config.toml"
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
-            mock.patch("nicx.comandos.init_cmd.PrivacyScanner"),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
+            mock.patch("nicx.comandos.instalacao.init.PrivacyScanner"),
         ):
             result = CliRunner().invoke(cli, ["init", "--engine", "llamacpp", _NO_DL])
         assert result.exit_code == 0
@@ -94,9 +98,11 @@ class TestMinimalConfig:
         config_dir = tmp_path / ".nicx"
         config_path = config_dir / "config.toml"
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
-            mock.patch("nicx.comandos.init_cmd.PrivacyScanner"),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
+            mock.patch("nicx.comandos.instalacao.init.PrivacyScanner"),
         ):
             result = CliRunner().invoke(cli, ["init", "--engine", "ollama", _NO_DL])
         assert result.exit_code == 0
@@ -112,9 +118,11 @@ class TestMinimalConfig:
         config_dir = tmp_path / ".nicx"
         config_path = config_dir / "config.toml"
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
-            mock.patch("nicx.comandos.init_cmd.PrivacyScanner"),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
+            mock.patch("nicx.comandos.instalacao.init.PrivacyScanner"),
         ):
             result = CliRunner().invoke(
                 cli,
@@ -133,9 +141,11 @@ class TestInitDownloadPrompt:
         config_dir = tmp_path / ".nicx"
         config_path = config_dir / "config.toml"
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
-            mock.patch("nicx.comandos.init_cmd.PrivacyScanner"),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
+            mock.patch("nicx.comandos.instalacao.init.PrivacyScanner"),
         ):
             result = CliRunner().invoke(
                 cli, ["init", "--engine", "ollama"], input="n\n"
@@ -148,9 +158,11 @@ class TestInitDownloadPrompt:
         config_dir = tmp_path / ".nicx"
         config_path = config_dir / "config.toml"
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
-            mock.patch("nicx.comandos.init_cmd.PrivacyScanner"),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
+            mock.patch("nicx.comandos.instalacao.init.PrivacyScanner"),
         ):
             result = CliRunner().invoke(cli, ["init", "--engine", "ollama", _NO_DL])
         assert result.exit_code == 0
@@ -162,10 +174,14 @@ class TestInitEmptyModelFallback:
         config_dir = tmp_path / ".nicx"
         config_path = config_dir / "config.toml"
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
-            mock.patch("nicx.comandos.init_cmd.recommend_model", return_value=""),
-            mock.patch("nicx.comandos.init_cmd.PrivacyScanner"),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
+            mock.patch(
+                "nicx.comandos.instalacao.init.recommend_model", return_value=""
+            ),
+            mock.patch("nicx.comandos.instalacao.init.PrivacyScanner"),
         ):
             result = CliRunner().invoke(cli, ["init", "--engine", "llamacpp"])
         assert result.exit_code == 0
@@ -193,13 +209,15 @@ class TestInitDownloadDispatch:
         config_dir = tmp_path / ".nicx"
         config_path = config_dir / "config.toml"
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
             mock.patch(
-                "nicx.comandos.init_cmd.ollama_pull",
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
+            mock.patch(
+                "nicx.comandos.instalacao.init.ollama_pull",
                 return_value=True,
             ) as mock_pull,
-            mock.patch("nicx.comandos.init_cmd.PrivacyScanner"),
+            mock.patch("nicx.comandos.instalacao.init.PrivacyScanner"),
         ):
             result = CliRunner().invoke(
                 cli, ["init", "--engine", "ollama"], input="y\n"
@@ -211,9 +229,11 @@ class TestInitDownloadDispatch:
         config_dir = tmp_path / ".nicx"
         config_path = config_dir / "config.toml"
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
-            mock.patch("nicx.comandos.init_cmd.PrivacyScanner"),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
+            mock.patch("nicx.comandos.instalacao.init.PrivacyScanner"),
         ):
             result = CliRunner().invoke(cli, ["init", "--engine", "vllm"], input="y\n")
         assert result.exit_code == 0
@@ -225,11 +245,13 @@ class TestInitPrivacyHook:
         config_dir = tmp_path / ".nicx"
         config_path = config_dir / "config.toml"
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
-            mock.patch("nicx.comandos.init_cmd.PrivacyScanner") as MockScanner,
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
+            mock.patch("nicx.comandos.instalacao.init.PrivacyScanner") as MockScanner,
         ):
-            from nicx.comandos.scan_cmd import ScanResult
+            from nicx.comandos.instalacao.scan import ScanResult
 
             instance = MockScanner.return_value
             instance.run_quick.return_value = [

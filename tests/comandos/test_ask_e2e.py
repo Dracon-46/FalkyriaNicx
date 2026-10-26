@@ -13,7 +13,7 @@ from nicx.comandos import cli
 from nicx.nucleo.config import NicxConfig
 
 # Import the actual module (not the Click command attribute)
-_ask_mod = importlib.import_module("nicx.comandos.ask")
+_ask_mod = importlib.import_module("nicx.comandos.conversa.ask")
 
 
 def _mock_engine_response():

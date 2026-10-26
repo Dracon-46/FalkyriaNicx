@@ -6,18 +6,18 @@ from unittest.mock import MagicMock, patch
 
 from click.testing import CliRunner
 
-from nicx.comandos._model_switch import (
+from nicx.comandos.conversa._model_switch import (
     interactive_pick_model,
     resolve_chat_cli_model,
     variant_preset_model,
 )
-from nicx.comandos._runtime_panel import (
+from nicx.comandos.conversa._runtime_panel import (
     ChatRuntimeOptions,
     interactive_pick_runtime_options,
     runtime_cli_options,
     tty_wants_runtime_panel,
 )
-from nicx.comandos.chat_cmd import chat
+from nicx.comandos.conversa.chat import chat
 from nicx.nucleo.config import NicxConfig
 
 
@@ -25,7 +25,7 @@ def _chat_patches(engine: MagicMock, config: NicxConfig | None = None):
     cfg = config or NicxConfig()
     cfg.intelligence.default_model = "default-m"
     return (
-        patch("nicx.comandos.chat_cmd.load_config", return_value=cfg),
+        patch("nicx.comandos.conversa.chat.load_config", return_value=cfg),
         patch("nicx.motores.get_engine", return_value=("ollama", engine)),
         patch("nicx.cerebro.inteligencia.register_builtin_models"),
     )
@@ -165,15 +165,15 @@ class TestChatPickerIntegration:
         cfg = NicxConfig()
         cfg.intelligence.default_model = "gpt-4o-mini"
         with (
-            patch("nicx.comandos.chat_cmd.load_config", return_value=cfg),
+            patch("nicx.comandos.conversa.chat.load_config", return_value=cfg),
             patch("nicx.motores.get_engine", return_value=("cloud", engine)),
             patch("nicx.cerebro.inteligencia.register_builtin_models"),
             patch(
-                "nicx.comandos._model_switch.tty_wants_model_picker",
+                "nicx.comandos.conversa._model_switch.tty_wants_model_picker",
                 return_value=False,
             ),
             patch(
-                "nicx.comandos._runtime_panel.tty_wants_runtime_panel",
+                "nicx.comandos.conversa._runtime_panel.tty_wants_runtime_panel",
                 return_value=True,
             ) as wants_panel,
         ):
@@ -198,11 +198,11 @@ class TestChatPickerIntegration:
         cfg = NicxConfig()
         cfg.intelligence.default_model = "gpt-4o-mini"
         with (
-            patch("nicx.comandos.chat_cmd.load_config", return_value=cfg),
+            patch("nicx.comandos.conversa.chat.load_config", return_value=cfg),
             patch("nicx.motores.get_engine", return_value=("cloud", engine)),
             patch("nicx.cerebro.inteligencia.register_builtin_models"),
             patch(
-                "nicx.comandos._model_switch.tty_wants_model_picker",
+                "nicx.comandos.conversa._model_switch.tty_wants_model_picker",
                 return_value=False,
             ),
         ):
@@ -221,14 +221,14 @@ class TestChatPickerIntegration:
         cfg = NicxConfig()
         cfg.intelligence.default_model = "default-m"
         with (
-            patch("nicx.comandos.chat_cmd.load_config", return_value=cfg),
+            patch("nicx.comandos.conversa.chat.load_config", return_value=cfg),
             patch(
                 "nicx.motores.get_engine",
                 return_value=("[bold]engine[/bold]", engine),
             ),
             patch("nicx.cerebro.inteligencia.register_builtin_models"),
             patch(
-                "nicx.comandos._runtime_panel.tty_wants_runtime_panel",
+                "nicx.comandos.conversa._runtime_panel.tty_wants_runtime_panel",
                 return_value=False,
             ),
         ):
@@ -262,11 +262,11 @@ class TestChatPickerIntegration:
             p[1],
             p[2],
             patch(
-                "nicx.comandos._model_switch.tty_wants_model_picker",
+                "nicx.comandos.conversa._model_switch.tty_wants_model_picker",
                 return_value=False,
             ),
             patch(
-                "nicx.comandos._runtime_panel.tty_wants_runtime_panel",
+                "nicx.comandos.conversa._runtime_panel.tty_wants_runtime_panel",
                 return_value=False,
             ),
         ):
@@ -288,15 +288,15 @@ class TestChatPickerIntegration:
             p[1],
             p[2],
             patch(
-                "nicx.comandos._model_switch.tty_wants_model_picker",
+                "nicx.comandos.conversa._model_switch.tty_wants_model_picker",
                 return_value=True,
             ),
             patch(
-                "nicx.comandos._runtime_panel.tty_wants_runtime_panel",
+                "nicx.comandos.conversa._runtime_panel.tty_wants_runtime_panel",
                 return_value=False,
             ),
             patch(
-                "nicx.comandos._model_switch.interactive_pick_model",
+                "nicx.comandos.conversa._model_switch.interactive_pick_model",
                 return_value="picked-model",
             ),
         ):
@@ -318,11 +318,11 @@ class TestChatPickerIntegration:
             p[1],
             p[2],
             patch(
-                "nicx.comandos._model_switch.tty_wants_model_picker",
+                "nicx.comandos.conversa._model_switch.tty_wants_model_picker",
                 return_value=False,
             ),
             patch(
-                "nicx.comandos._runtime_panel.tty_wants_runtime_panel",
+                "nicx.comandos.conversa._runtime_panel.tty_wants_runtime_panel",
                 return_value=True,
             ),
         ):
@@ -358,15 +358,15 @@ class TestChatPickerIntegration:
             p[1],
             p[2],
             patch(
-                "nicx.comandos._model_switch.tty_wants_model_picker",
+                "nicx.comandos.conversa._model_switch.tty_wants_model_picker",
                 return_value=False,
             ),
             patch(
-                "nicx.comandos._runtime_panel.tty_wants_runtime_panel",
+                "nicx.comandos.conversa._runtime_panel.tty_wants_runtime_panel",
                 return_value=False,
             ),
             patch(
-                "nicx.comandos._model_switch.resolve_chat_cli_model",
+                "nicx.comandos.conversa._model_switch.resolve_chat_cli_model",
                 return_value="",
             ),
         ):
@@ -385,11 +385,11 @@ class TestChatPickerIntegration:
             p[1],
             p[2],
             patch(
-                "nicx.comandos._model_switch.tty_wants_model_picker",
+                "nicx.comandos.conversa._model_switch.tty_wants_model_picker",
                 return_value=False,
             ),
             patch(
-                "nicx.comandos._runtime_panel.tty_wants_runtime_panel",
+                "nicx.comandos.conversa._runtime_panel.tty_wants_runtime_panel",
                 return_value=False,
             ),
         ):

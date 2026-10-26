@@ -22,7 +22,7 @@ from pathlib import Path
 import click
 
 import nicx
-from nicx.comandos._install_detect import detect_install
+from nicx.comandos.instalacao._install_detect import detect_install
 
 
 def _fetch_url(repo_root: Path) -> str:

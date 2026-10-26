@@ -26,7 +26,7 @@ class TestAgentCmd:
         # A message with bracketed text is what triggers the MarkupError
         # when fed to console.print() unescaped.
         boom = RuntimeError("DB locked at [/var/run/x] not a [valid] tag")
-        with patch("nicx.comandos.agent_cmd._get_manager", side_effect=boom):
+        with patch("nicx.comandos.agentes.agent._get_manager", side_effect=boom):
             result = CliRunner().invoke(cli, ["agents", "list"])
         # No traceback / unhandled exception leaked through.
         assert result.exception is None, result.output

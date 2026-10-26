@@ -22,10 +22,14 @@ def tmp_nicx_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setattr("nicx.nucleo.config.DEFAULT_CONFIG_DIR", home)
     monkeypatch.setattr("nicx.nucleo.config.DEFAULT_CONFIG_PATH", config_path)
     # Also patch init_cmd's module-level bindings (imported with ``from ... import``).
-    monkeypatch.setattr("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", home)
-    monkeypatch.setattr("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path)
+    monkeypatch.setattr("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", home)
+    monkeypatch.setattr(
+        "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+    )
     # Patch doctor_cmd's module-level bindings.
-    monkeypatch.setattr("nicx.comandos.doctor_cmd.DEFAULT_CONFIG_PATH", config_path)
+    monkeypatch.setattr(
+        "nicx.comandos.instalacao.doctor.DEFAULT_CONFIG_PATH", config_path
+    )
     monkeypatch.setenv("HOME", str(tmp_path))
     # These tests drive state purely via marker files; pin the runtime Rust
     # import check off so a built extension in the dev venv can't flip

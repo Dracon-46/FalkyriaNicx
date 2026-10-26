@@ -14,8 +14,8 @@ from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
 
-from nicx.comandos._install_detect import InstallInfo
-from nicx.comandos.self_update_cmd import _fetch_url, self_update
+from nicx.comandos.instalacao._install_detect import InstallInfo
+from nicx.comandos.instalacao.self_update import _fetch_url, self_update
 
 
 def _mock_info(kind: str = "pypi") -> InstallInfo:
@@ -35,14 +35,14 @@ def _mock_info(kind: str = "pypi") -> InstallInfo:
 def _falkyria_remote(monkeypatch):
     """Resolve the checkout's remote without shelling out to git."""
     monkeypatch.setattr(
-        "nicx.comandos.self_update_cmd._fetch_url",
+        "nicx.comandos.instalacao.self_update._fetch_url",
         lambda repo_root: "https://git.example/falkyria/nicx.git",
     )
 
 
 def test_check_flag_prints_plan_and_exits_clean():
     with patch(
-        "nicx.comandos.self_update_cmd.detect_install",
+        "nicx.comandos.instalacao.self_update.detect_install",
         return_value=_mock_info("editable-git"),
     ):
         runner = CliRunner()
@@ -57,10 +57,10 @@ def test_check_flag_prints_plan_and_exits_clean():
 def test_check_does_not_invoke_subprocess(kind):
     with (
         patch(
-            "nicx.comandos.self_update_cmd.detect_install",
+            "nicx.comandos.instalacao.self_update.detect_install",
             return_value=_mock_info(kind),
         ),
-        patch("nicx.comandos.self_update_cmd.subprocess.run") as mock_run,
+        patch("nicx.comandos.instalacao.self_update.subprocess.run") as mock_run,
     ):
         CliRunner().invoke(self_update, ["--check"])
     mock_run.assert_not_called()
@@ -71,10 +71,10 @@ def test_package_index_installs_are_refused(kind):
     """The ``nicx`` name on PyPI is not Falkyria's: never install from it."""
     with (
         patch(
-            "nicx.comandos.self_update_cmd.detect_install",
+            "nicx.comandos.instalacao.self_update.detect_install",
             return_value=_mock_info(kind),
         ),
-        patch("nicx.comandos.self_update_cmd.subprocess.run") as mock_run,
+        patch("nicx.comandos.instalacao.self_update.subprocess.run") as mock_run,
     ):
         result = CliRunner().invoke(self_update, ["-y"])
     assert result.exit_code == 1
@@ -94,7 +94,7 @@ def test_package_index_installs_are_refused(kind):
 )
 def test_fetch_url_asks_git_for_the_default_remote(proc, expected):
     with patch(
-        "nicx.comandos.self_update_cmd.subprocess.run", return_value=proc
+        "nicx.comandos.instalacao.self_update.subprocess.run", return_value=proc
     ) as run:
         assert _fetch_url(Path("/repo")) == expected
     assert run.call_args.args[0] == ["git", "ls-remote", "--get-url"]
@@ -105,17 +105,20 @@ def test_fetch_url_asks_git_for_the_default_remote(proc, expected):
 def test_editable_git_repairs_history_and_rebuilds_active_venv(monkeypatch, shallow):
     """Recover tags before rebuilding even when Git has no new commits."""
     mock_proc = CompletedProcess([], 0, stdout=shallow + "\n", stderr="")
-    monkeypatch.setattr("nicx.comandos.self_update_cmd.sys.prefix", "/managed venv")
     monkeypatch.setattr(
-        "nicx.comandos.self_update_cmd.sys.executable", "/managed venv/bin/python"
+        "nicx.comandos.instalacao.self_update.sys.prefix", "/managed venv"
+    )
+    monkeypatch.setattr(
+        "nicx.comandos.instalacao.self_update.sys.executable",
+        "/managed venv/bin/python",
     )
     with (
         patch(
-            "nicx.comandos.self_update_cmd.detect_install",
+            "nicx.comandos.instalacao.self_update.detect_install",
             return_value=_mock_info("editable-git"),
         ),
         patch(
-            "nicx.comandos.self_update_cmd.subprocess.run",
+            "nicx.comandos.instalacao.self_update.subprocess.run",
             return_value=mock_proc,
         ) as mock_run,
     ):
@@ -144,20 +147,22 @@ def test_editable_git_repairs_history_and_rebuilds_active_venv(monkeypatch, shal
 
 def test_editable_global_install_rebuilds_running_interpreter(monkeypatch):
     mock_proc = CompletedProcess([], 0, stdout="false\n", stderr="")
-    monkeypatch.setattr("nicx.comandos.self_update_cmd.sys.prefix", "/global python")
     monkeypatch.setattr(
-        "nicx.comandos.self_update_cmd.sys.base_prefix", "/global python"
+        "nicx.comandos.instalacao.self_update.sys.prefix", "/global python"
     )
     monkeypatch.setattr(
-        "nicx.comandos.self_update_cmd.sys.executable", "/global python/python"
+        "nicx.comandos.instalacao.self_update.sys.base_prefix", "/global python"
+    )
+    monkeypatch.setattr(
+        "nicx.comandos.instalacao.self_update.sys.executable", "/global python/python"
     )
     with (
         patch(
-            "nicx.comandos.self_update_cmd.detect_install",
+            "nicx.comandos.instalacao.self_update.detect_install",
             return_value=_mock_info("editable-git"),
         ),
         patch(
-            "nicx.comandos.self_update_cmd.subprocess.run",
+            "nicx.comandos.instalacao.self_update.subprocess.run",
             return_value=mock_proc,
         ) as mock_run,
     ):
@@ -179,16 +184,18 @@ def test_editable_global_install_rebuilds_running_interpreter(monkeypatch):
 
 @pytest.mark.parametrize("failed_step", [0, 1, 2, 3])
 def test_editable_upgrade_stops_on_failure(monkeypatch, failed_step):
-    monkeypatch.setattr("nicx.comandos.self_update_cmd.sys.prefix", "/managed venv")
+    monkeypatch.setattr(
+        "nicx.comandos.instalacao.self_update.sys.prefix", "/managed venv"
+    )
     responses = [CompletedProcess([], 0, stdout="true\n", stderr="")] * failed_step
     responses.append(CompletedProcess([], 7, stdout="", stderr="failed"))
     with (
         patch(
-            "nicx.comandos.self_update_cmd.detect_install",
+            "nicx.comandos.instalacao.self_update.detect_install",
             return_value=_mock_info("editable-git"),
         ),
         patch(
-            "nicx.comandos.self_update_cmd.subprocess.run", side_effect=responses
+            "nicx.comandos.instalacao.self_update.subprocess.run", side_effect=responses
         ) as run,
     ):
         result = CliRunner().invoke(self_update, ["-y"])
@@ -200,10 +207,10 @@ def test_editable_upgrade_stops_on_failure(monkeypatch, failed_step):
 def test_decline_confirmation_exits_nonzero():
     with (
         patch(
-            "nicx.comandos.self_update_cmd.detect_install",
+            "nicx.comandos.instalacao.self_update.detect_install",
             return_value=_mock_info("editable-git"),
         ),
-        patch("nicx.comandos.self_update_cmd.subprocess.run") as mock_run,
+        patch("nicx.comandos.instalacao.self_update.subprocess.run") as mock_run,
     ):
         result = CliRunner().invoke(self_update, input="n\n")
     assert result.exit_code == 1

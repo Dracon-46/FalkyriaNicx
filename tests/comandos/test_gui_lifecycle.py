@@ -15,7 +15,8 @@ import psutil
 import pytest
 from click.testing import CliRunner
 
-from nicx.comandos import daemon_cmd, gui_cmd
+from nicx.comandos.sistema import daemon as daemon_cmd
+from nicx.comandos.sistema import gui as gui_cmd
 
 
 @pytest.fixture(autouse=True)

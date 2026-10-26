@@ -380,6 +380,33 @@ class TestSessionRoutes:
         resp = client.get("/v1/sessions")
         assert resp.status_code == 200
 
+    def test_sessions_come_from_the_configured_store(self, tmp_path):
+        """The routes used to import a module that never existed and always
+        answered with an error; now they read the real session store."""
+        from types import SimpleNamespace
+
+        from nicx.memoria.sessoes.session import SessionStore
+
+        db = tmp_path / "sessions.db"
+        store = SessionStore(db)
+        session = store.get_or_create(
+            "ana", channel="telegram", channel_user_id="ana-1"
+        )
+        store.save_message(session.session_id, "user", "oi", channel="telegram")
+        store.close()
+
+        app = _make_app()
+        app.state.config = SimpleNamespace(sessions=SimpleNamespace(db_path=str(db)))
+        client = TestClient(app)
+
+        listed = client.get("/v1/sessions").json()
+        assert "error" not in listed
+        assert [s["session_id"] for s in listed["sessions"]] == [session.session_id]
+
+        one = client.get(f"/v1/sessions/{session.session_id}").json()
+        assert one["messages"][0]["content"] == "oi"
+        assert client.get("/v1/sessions/nao-existe").status_code == 404
+
 
 class TestTraceRoutes:
     def test_list_traces(self):

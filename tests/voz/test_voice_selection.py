@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 import pytest
 
-from nicx.comandos._voice_chat import _BACKEND_DEFAULT_VOICE, VoiceSession
+from nicx.comandos.conversa._voice_chat import _BACKEND_DEFAULT_VOICE, VoiceSession
 
 
 @dataclass
@@ -107,7 +107,7 @@ def test_configured_backend_is_tried_before_healthy_fallbacks(monkeypatch, prefe
 
 def test_synthesis_failure_falls_back_without_retrying_or_leaking_voice(monkeypatch):
     import nicx.voz  # noqa: F401
-    from nicx.comandos._voice_chat import speak
+    from nicx.comandos.conversa._voice_chat import speak
     from nicx.nucleo.registry import TTSRegistry
     from nicx.voz.tts import TTSResult
 

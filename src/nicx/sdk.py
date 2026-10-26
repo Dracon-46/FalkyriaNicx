@@ -471,7 +471,7 @@ class Nicx:
         tool_objects: List[Any] = []
         if tools:
             import nicx.ferramentas  # noqa: F401
-            from nicx.comandos.ask import _build_tools
+            from nicx.comandos.conversa.ask import _build_tools
 
             tool_objects = _build_tools(
                 tools,
@@ -557,7 +557,10 @@ class Nicx:
         # Context injection
         if context and self._config.agent.context_from_memory:
             try:
-                from nicx.comandos.ask import _get_memory_backend, _get_memory_facts
+                from nicx.comandos.conversa.ask import (
+                    _get_memory_backend,
+                    _get_memory_facts,
+                )
                 from nicx.memoria.armazenamento.context import (
                     ContextConfig,
                     inject_context,
@@ -607,7 +610,10 @@ class Nicx:
     ) -> List[Message]:
         """Inject memory context into messages."""
         try:
-            from nicx.comandos.ask import _get_memory_backend, _get_memory_facts
+            from nicx.comandos.conversa.ask import (
+                _get_memory_backend,
+                _get_memory_facts,
+            )
             from nicx.memoria.armazenamento.context import ContextConfig, inject_context
 
             backend = _get_memory_backend(self._config)

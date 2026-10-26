@@ -7,7 +7,7 @@ import sys
 import click
 
 import nicx
-from nicx.comandos.scan_cmd import scan
+from nicx.comandos.instalacao.scan import scan
 
 
 def _invoked_command(argv: list[str]) -> str:
@@ -73,7 +73,7 @@ def cli(ctx: click.Context, verbose: bool, quiet: bool, pick_model_bare: bool) -
     if not quiet and ctx.invoked_subcommand and not skip_update_check:
         import threading
 
-        from nicx.comandos._version_check import check_for_updates
+        from nicx.comandos.instalacao._version_check import check_for_updates
 
         # Run the PyPI version poll off the hot path: on a cache miss it does
         # a blocking urlopen (up to 3s) that otherwise delays every command,
@@ -89,45 +89,45 @@ def cli(ctx: click.Context, verbose: bool, quiet: bool, pick_model_bare: bool) -
 
     # First-run guard — routes bare `nicx` to chat or init.
     if ctx.invoked_subcommand is None:
-        from nicx.comandos._first_run import check_and_route
+        from nicx.comandos.instalacao._first_run import check_and_route
 
         check_and_route(ctx)
 
 
 cli.add_command(scan, "scan")
 if not _DATA_BOUNDARY_BOOTSTRAP:
-    from nicx.comandos._bootstrap import bootstrap_cmd
-    from nicx.comandos.add_cmd import add
-    from nicx.comandos.agent_cmd import agent
-    from nicx.comandos.ask import ask
-    from nicx.comandos.channel_cmd import channel
-    from nicx.comandos.channels_cmd import channels
-    from nicx.comandos.chat_cmd import chat
-    from nicx.comandos.config_cmd import config
-    from nicx.comandos.connect_cmd import connect
-    from nicx.comandos.daemon_cmd import restart, start, status, stop
-    from nicx.comandos.digest_cmd import digest
-    from nicx.comandos.doctor_cmd import doctor
-    from nicx.comandos.feedback_cmd import feedback_group
-    from nicx.comandos.gateway_cmd import gateway
-    from nicx.comandos.gui_cmd import gui
-    from nicx.comandos.host_cmd import host
-    from nicx.comandos.init_cmd import init
-    from nicx.comandos.legal_cmd import legal
-    from nicx.comandos.memory_cmd import memory
-    from nicx.comandos.model import model
-    from nicx.comandos.operators_cmd import operators
-    from nicx.comandos.quickstart_cmd import quickstart
-    from nicx.comandos.registry_cmd import registry
-    from nicx.comandos.scheduler_cmd import scheduler
-    from nicx.comandos.self_update_cmd import self_update
-    from nicx.comandos.serve import serve
-    from nicx.comandos.skill_cmd import skill
-    from nicx.comandos.telemetry_cmd import telemetry
-    from nicx.comandos.tool_cmd import tool
-    from nicx.comandos.vault_cmd import vault
-    from nicx.comandos.wake_cmd import escuta, mascote
-    from nicx.comandos.workflow_cmd import workflow
+    from nicx.comandos.agentes.agent import agent
+    from nicx.comandos.agentes.digest import digest
+    from nicx.comandos.agentes.operators import operators
+    from nicx.comandos.agentes.scheduler import scheduler
+    from nicx.comandos.agentes.skill import skill
+    from nicx.comandos.agentes.workflow import workflow
+    from nicx.comandos.conversa.ask import ask
+    from nicx.comandos.conversa.chat import chat
+    from nicx.comandos.instalacao._bootstrap import bootstrap_cmd
+    from nicx.comandos.instalacao.config import config
+    from nicx.comandos.instalacao.doctor import doctor
+    from nicx.comandos.instalacao.init import init
+    from nicx.comandos.instalacao.legal import legal
+    from nicx.comandos.instalacao.quickstart import quickstart
+    from nicx.comandos.instalacao.self_update import self_update
+    from nicx.comandos.recursos.add import add
+    from nicx.comandos.recursos.channel import channel
+    from nicx.comandos.recursos.channels import channels
+    from nicx.comandos.recursos.connect import connect
+    from nicx.comandos.recursos.feedback import feedback_group
+    from nicx.comandos.recursos.memory import memory
+    from nicx.comandos.recursos.model import model
+    from nicx.comandos.recursos.registry import registry
+    from nicx.comandos.recursos.telemetry import telemetry
+    from nicx.comandos.recursos.tool import tool
+    from nicx.comandos.recursos.vault import vault
+    from nicx.comandos.sistema.daemon import restart, start, status, stop
+    from nicx.comandos.sistema.gateway import gateway
+    from nicx.comandos.sistema.gui import gui
+    from nicx.comandos.sistema.host import host
+    from nicx.comandos.sistema.serve import serve
+    from nicx.comandos.voz.escuta import escuta, mascote
 
     cli.add_command(init, "init")
     cli.add_command(legal, "legal")
@@ -168,7 +168,7 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     # Deep Research setup pulls the ingestion pipeline (embeddings/numpy). Guard
     # it so an import-time dependency failure cannot take down the whole CLI.
     try:
-        from nicx.comandos.deep_research_setup_cmd import deep_research_setup
+        from nicx.comandos.agentes.deep_research_setup import deep_research_setup
 
         cli.add_command(deep_research_setup, "deep-research-setup")
         cli.add_command(deep_research_setup, "research")
@@ -183,14 +183,14 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
 
     # Gateway CLI commands (lazy import to avoid pulling starlette)
     try:
-        from nicx.comandos.auth_cmd import auth
+        from nicx.comandos.sistema.auth import auth
 
         cli.add_command(auth, "auth")
     except ImportError:
         pass
 
     try:
-        from nicx.comandos.tunnel_cmd import tunnel
+        from nicx.comandos.sistema.tunnel import tunnel
 
         cli.add_command(tunnel, "tunnel")
     except ImportError:

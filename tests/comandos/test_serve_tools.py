@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from nicx.comandos.serve import _resolve_allowed_tools, _resolve_server_cors_origins
+from nicx.comandos.sistema.serve import (
+    _resolve_allowed_tools,
+    _resolve_server_cors_origins,
+)
 from nicx.nucleo.config import NicxConfig
 
 

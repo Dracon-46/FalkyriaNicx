@@ -6,9 +6,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from nicx.comandos._first_run import check_and_route
-from nicx.comandos.chat_cmd import chat as chat_cmd
-from nicx.comandos.init_cmd import init as init_cmd
+from nicx.comandos.conversa.chat import chat as chat_cmd
+from nicx.comandos.instalacao._first_run import check_and_route
+from nicx.comandos.instalacao.init import init as init_cmd
 from nicx.nucleo import config as _cfg
 
 

@@ -8,7 +8,7 @@ from typing import Any
 
 import uvicorn
 
-from nicx.comandos.daemon_cmd import clear_server_state, record_server_state
+from nicx.comandos.sistema.daemon import clear_server_state, record_server_state
 
 
 class DaemonServer(uvicorn.Server):

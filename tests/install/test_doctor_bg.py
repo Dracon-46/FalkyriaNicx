@@ -6,7 +6,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-from nicx.comandos.doctor_cmd import doctor
+from nicx.comandos.instalacao.doctor import doctor
 
 
 def test_doctor_shows_bg_section_when_state_present(tmp_nicx_home: Path) -> None:

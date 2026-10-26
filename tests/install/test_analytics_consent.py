@@ -9,8 +9,8 @@ import pytest
 import tomllib
 from click.testing import CliRunner
 
-from nicx.comandos import _analytics_consent
-from nicx.comandos.init_cmd import init
+from nicx.comandos.instalacao import _analytics_consent
+from nicx.comandos.instalacao.init import init
 from nicx.nucleo.config import load_config
 
 

@@ -6,6 +6,7 @@ import asyncio
 import inspect
 import json
 import logging
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -581,16 +582,26 @@ async def remove_skill(skill_name: str, request: Request):
 sessions_router = APIRouter(prefix="/v1/sessions", tags=["sessions"])
 
 
+def _session_store(request: Request):
+    """The session store at the configured path (``[sessions] db_path``)."""
+    from nicx.memoria.sessoes.session import SessionStore
+
+    config = getattr(request.app.state, "config", None)
+    sessions_cfg = getattr(config, "sessions", None)
+    db_path = getattr(sessions_cfg, "db_path", None)
+    return SessionStore(db_path) if db_path else SessionStore()
+
+
 @sessions_router.get("")
 async def list_sessions(request: Request, limit: int = 20):
     """List active sessions."""
     try:
-        from nicx.memoria.sessoes.store import SessionStore
-
-        store = SessionStore()
-        sessions = store.recent(limit=limit)
-        items = [s.to_dict() if hasattr(s, "to_dict") else str(s) for s in sessions]
-        return {"sessions": items}
+        store = _session_store(request)
+        try:
+            sessions = store.list_sessions(limit=limit)
+        finally:
+            store.close()
+        return {"sessions": [asdict(s) for s in sessions]}
     except Exception as exc:
         return {"sessions": [], "error": str(exc)}
 
@@ -599,13 +610,14 @@ async def list_sessions(request: Request, limit: int = 20):
 async def get_session(session_id: str, request: Request):
     """Get a specific session."""
     try:
-        from nicx.memoria.sessoes.store import SessionStore
-
-        store = SessionStore()
-        session = store.get(session_id)
+        store = _session_store(request)
+        try:
+            session = store.get(session_id)
+        finally:
+            store.close()
         if session is None:
             raise HTTPException(status_code=404, detail="Session not found")
-        return session.to_dict() if hasattr(session, "to_dict") else {"id": session_id}
+        return asdict(session)
     except HTTPException:
         raise
     except Exception as exc:

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-from nicx.comandos._model_switch import (
+from nicx.comandos.conversa._model_switch import (
     interactive_pick_model,
     resolve_chat_cli_model,
     tty_wants_model_picker,

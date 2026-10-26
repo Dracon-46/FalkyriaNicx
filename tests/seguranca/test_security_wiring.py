@@ -142,7 +142,7 @@ class TestCapabilityPolicyReachesExecutor:
     def test_cli_ask_propagates_runtime_identity_and_limiter(self, monkeypatch) -> None:
         import importlib
 
-        ask_module = importlib.import_module("nicx.comandos.ask")
+        ask_module = importlib.import_module("nicx.comandos.conversa.ask")
 
         key = "restricted-cli-ask-agent"
         AgentRegistry.register_value(key, _CallingAgent)

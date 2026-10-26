@@ -339,6 +339,28 @@ class SessionStore:
             )
         return sessions
 
+    def get(self, session_id: str) -> Optional[Session]:
+        """Return one session with its messages, or None if it does not exist."""
+        row = self._conn.execute(
+            "SELECT session_id, user_id, display_name, channel_ids, created_at,"
+            " last_activity, metadata FROM sessions WHERE session_id = ?",
+            (session_id,),
+        ).fetchone()
+        if row is None:
+            return None
+        return Session(
+            session_id=row[0],
+            identity=SessionIdentity(
+                user_id=row[1],
+                display_name=row[2] or "",
+                channel_ids=json.loads(row[3]) if row[3] else {},
+            ),
+            messages=self._load_messages(session_id),
+            created_at=row[4] or 0.0,
+            last_activity=row[5] or 0.0,
+            metadata=json.loads(row[6]) if row[6] else {},
+        )
+
     def _load_messages(self, session_id: str) -> List[SessionMessage]:
         rows = self._conn.execute(
             "SELECT role, content, channel, timestamp, metadata "

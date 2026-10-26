@@ -15,7 +15,7 @@ import pytest
 from click.testing import CliRunner
 
 from nicx.comandos import cli
-from nicx.comandos.daemon_cmd import (
+from nicx.comandos.sistema.daemon import (
     _pid_alive,
     _read_pid,
     _write_pid,
@@ -35,14 +35,14 @@ class TestDaemonCommands:
 
     def test_stop_no_server(self) -> None:
         """``nicx stop`` when no PID file shows 'not running'."""
-        with patch("nicx.comandos.daemon_cmd._read_pid", return_value=None):
+        with patch("nicx.comandos.sistema.daemon._read_pid", return_value=None):
             result = CliRunner().invoke(cli, ["stop"])
         assert result.exit_code != 0
         assert "No running server" in result.output
 
     def test_status_no_server(self) -> None:
         """``nicx status`` when no PID file shows 'not running'."""
-        with patch("nicx.comandos.daemon_cmd._read_pid", return_value=None):
+        with patch("nicx.comandos.sistema.daemon._read_pid", return_value=None):
             result = CliRunner().invoke(cli, ["status"])
         assert result.exit_code == 0
         assert "not running" in result.output
@@ -50,7 +50,7 @@ class TestDaemonCommands:
     def test_read_pid_no_file(self, tmp_path: Path) -> None:
         """``_read_pid()`` returns None when no PID file exists."""
         with patch(
-            "nicx.comandos.daemon_cmd._PID_FILE",
+            "nicx.comandos.sistema.daemon._PID_FILE",
             tmp_path / "nonexistent.pid",
         ):
             assert _read_pid() is None
@@ -59,9 +59,9 @@ class TestDaemonCommands:
         """Write a PID, then read it back with a successful liveness probe."""
         pid_file = tmp_path / "server.pid"
         with (
-            patch("nicx.comandos.daemon_cmd._PID_FILE", pid_file),
-            patch("nicx.comandos.daemon_cmd.DEFAULT_CONFIG_DIR", tmp_path),
-            patch("nicx.comandos.daemon_cmd._pid_alive", return_value=True),
+            patch("nicx.comandos.sistema.daemon._PID_FILE", pid_file),
+            patch("nicx.comandos.sistema.daemon.DEFAULT_CONFIG_DIR", tmp_path),
+            patch("nicx.comandos.sistema.daemon._pid_alive", return_value=True),
         ):
             _write_pid(12345)
             assert pid_file.exists()
@@ -74,9 +74,9 @@ class TestDaemonCommands:
         mock_config.server.port = 8000
 
         with (
-            patch("nicx.comandos.daemon_cmd._read_pid", return_value=9999),
+            patch("nicx.comandos.sistema.daemon._read_pid", return_value=9999),
             patch(
-                "nicx.comandos.daemon_cmd.load_config",
+                "nicx.comandos.sistema.daemon.load_config",
                 return_value=mock_config,
             ),
         ):
@@ -87,7 +87,7 @@ class TestDaemonCommands:
 
     def test_start_already_running(self) -> None:
         """``nicx start`` exits with error when a server is already running."""
-        with patch("nicx.comandos.daemon_cmd._read_pid", return_value=42):
+        with patch("nicx.comandos.sistema.daemon._read_pid", return_value=42):
             result = CliRunner().invoke(cli, ["start"])
         assert result.exit_code != 0
         assert "already running" in result.output
@@ -120,7 +120,7 @@ class TestPidLiveness:
         pid_file = tmp_path / "server.pid"
         pid_file.write_text(str(proc.pid))
 
-        with patch("nicx.comandos.daemon_cmd._PID_FILE", pid_file):
+        with patch("nicx.comandos.sistema.daemon._PID_FILE", pid_file):
             assert _read_pid() is None
 
         assert not pid_file.exists()
@@ -130,8 +130,10 @@ class TestPidLiveness:
         try:
             pid_file = tmp_path / "server.pid"
             with (
-                patch("nicx.comandos.daemon_cmd._PID_FILE", pid_file),
-                patch("nicx.comandos.daemon_cmd._STATE_FILE", tmp_path / "server.json"),
+                patch("nicx.comandos.sistema.daemon._PID_FILE", pid_file),
+                patch(
+                    "nicx.comandos.sistema.daemon._STATE_FILE", tmp_path / "server.json"
+                ),
             ):
                 _write_pid(proc.pid)
                 assert _read_pid() == proc.pid
@@ -145,7 +147,7 @@ class TestPidLiveness:
     def test_pid_reused_after_registration_does_not_block_or_get_signaled(
         self, tmp_path
     ):
-        from nicx.comandos import daemon_cmd
+        from nicx.comandos.sistema import daemon as daemon_cmd
 
         proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
         pid_file = tmp_path / "server.pid"
@@ -188,14 +190,16 @@ class TestDaemonDetachment:
         the spawn is reached.
         """
         with (
-            patch("nicx.comandos.daemon_cmd._read_pid", return_value=None),
-            patch("nicx.comandos.daemon_cmd._read_pid_unlocked", return_value=None),
-            patch("nicx.comandos.daemon_cmd._state_lock", return_value=nullcontext()),
-            patch("nicx.comandos.daemon_cmd._write_pid_unlocked"),
-            patch("nicx.comandos.daemon_cmd.load_config"),
-            patch("nicx.comandos.daemon_cmd.sys.platform", platform),
-            patch("nicx.comandos.daemon_cmd.DEFAULT_CONFIG_DIR"),
-            patch("nicx.comandos.daemon_cmd.subprocess.Popen") as popen,
+            patch("nicx.comandos.sistema.daemon._read_pid", return_value=None),
+            patch("nicx.comandos.sistema.daemon._read_pid_unlocked", return_value=None),
+            patch(
+                "nicx.comandos.sistema.daemon._state_lock", return_value=nullcontext()
+            ),
+            patch("nicx.comandos.sistema.daemon._write_pid_unlocked"),
+            patch("nicx.comandos.sistema.daemon.load_config"),
+            patch("nicx.comandos.sistema.daemon.sys.platform", platform),
+            patch("nicx.comandos.sistema.daemon.DEFAULT_CONFIG_DIR"),
+            patch("nicx.comandos.sistema.daemon.subprocess.Popen") as popen,
             patch("builtins.open", MagicMock()),
         ):
             popen.return_value = MagicMock(pid=4321)
@@ -212,15 +216,17 @@ class TestDaemonDetachment:
     ) -> None:
         """Both direct Python and launchers can protect the startup interval."""
         with (
-            patch("nicx.comandos.daemon_cmd._read_pid", return_value=None),
-            patch("nicx.comandos.daemon_cmd._read_pid_unlocked", return_value=None),
-            patch("nicx.comandos.daemon_cmd._state_lock", return_value=nullcontext()),
-            patch("nicx.comandos.daemon_cmd.load_config"),
-            patch("nicx.comandos.daemon_cmd.subprocess.Popen") as popen,
-            patch("nicx.comandos.daemon_cmd.DEFAULT_CONFIG_DIR", tmp_path),
-            patch("nicx.comandos.daemon_cmd._LOG_FILE", tmp_path / "server.log"),
-            patch("nicx.comandos.daemon_cmd.sys.platform", "win32"),
-            patch("nicx.comandos.daemon_cmd._write_pid_unlocked") as write_pid,
+            patch("nicx.comandos.sistema.daemon._read_pid", return_value=None),
+            patch("nicx.comandos.sistema.daemon._read_pid_unlocked", return_value=None),
+            patch(
+                "nicx.comandos.sistema.daemon._state_lock", return_value=nullcontext()
+            ),
+            patch("nicx.comandos.sistema.daemon.load_config"),
+            patch("nicx.comandos.sistema.daemon.subprocess.Popen") as popen,
+            patch("nicx.comandos.sistema.daemon.DEFAULT_CONFIG_DIR", tmp_path),
+            patch("nicx.comandos.sistema.daemon._LOG_FILE", tmp_path / "server.log"),
+            patch("nicx.comandos.sistema.daemon.sys.platform", "win32"),
+            patch("nicx.comandos.sistema.daemon._write_pid_unlocked") as write_pid,
             patch.object(subprocess, "CREATE_NO_WINDOW", 0x08000000, create=True),
             patch.object(
                 subprocess, "CREATE_NEW_PROCESS_GROUP", 0x00000200, create=True
@@ -242,12 +248,14 @@ class TestDaemonDetachment:
     def test_second_start_rechecks_under_lock(self, tmp_path: Path) -> None:
         """A second start must not spawn after another caller registered."""
         with (
-            patch("nicx.comandos.daemon_cmd._read_pid", return_value=None),
-            patch("nicx.comandos.daemon_cmd._read_pid_unlocked", return_value=4321),
-            patch("nicx.comandos.daemon_cmd._state_lock", return_value=nullcontext()),
-            patch("nicx.comandos.daemon_cmd.load_config"),
-            patch("nicx.comandos.daemon_cmd.DEFAULT_CONFIG_DIR", tmp_path),
-            patch("nicx.comandos.daemon_cmd.subprocess.Popen") as popen,
+            patch("nicx.comandos.sistema.daemon._read_pid", return_value=None),
+            patch("nicx.comandos.sistema.daemon._read_pid_unlocked", return_value=4321),
+            patch(
+                "nicx.comandos.sistema.daemon._state_lock", return_value=nullcontext()
+            ),
+            patch("nicx.comandos.sistema.daemon.load_config"),
+            patch("nicx.comandos.sistema.daemon.DEFAULT_CONFIG_DIR", tmp_path),
+            patch("nicx.comandos.sistema.daemon.subprocess.Popen") as popen,
         ):
             result = CliRunner().invoke(cli, ["start"])
             assert result.exit_code != 0
@@ -257,22 +265,24 @@ class TestDaemonDetachment:
     def test_failed_registration_terminates_spawned_tree(self, tmp_path: Path) -> None:
         """A failed launch must clean up its launcher and any descendants."""
         with (
-            patch("nicx.comandos.daemon_cmd._read_pid", return_value=None),
-            patch("nicx.comandos.daemon_cmd._read_pid_unlocked", return_value=None),
-            patch("nicx.comandos.daemon_cmd._state_lock", return_value=nullcontext()),
-            patch("nicx.comandos.daemon_cmd.load_config"),
-            patch("nicx.comandos.daemon_cmd.DEFAULT_CONFIG_DIR", tmp_path),
-            patch("nicx.comandos.daemon_cmd._LOG_FILE", tmp_path / "server.log"),
+            patch("nicx.comandos.sistema.daemon._read_pid", return_value=None),
+            patch("nicx.comandos.sistema.daemon._read_pid_unlocked", return_value=None),
             patch(
-                "nicx.comandos.daemon_cmd._write_pid_unlocked",
+                "nicx.comandos.sistema.daemon._state_lock", return_value=nullcontext()
+            ),
+            patch("nicx.comandos.sistema.daemon.load_config"),
+            patch("nicx.comandos.sistema.daemon.DEFAULT_CONFIG_DIR", tmp_path),
+            patch("nicx.comandos.sistema.daemon._LOG_FILE", tmp_path / "server.log"),
+            patch(
+                "nicx.comandos.sistema.daemon._write_pid_unlocked",
                 side_effect=RuntimeError("conflict"),
             ),
             patch(
-                "nicx.comandos.daemon_cmd.subprocess.Popen",
+                "nicx.comandos.sistema.daemon.subprocess.Popen",
                 return_value=MagicMock(pid=4321),
             ),
-            patch("nicx.comandos.daemon_cmd.terminate_process") as terminate,
-            patch("nicx.comandos.daemon_cmd.clear_server_state") as clear,
+            patch("nicx.comandos.sistema.daemon.terminate_process") as terminate,
+            patch("nicx.comandos.sistema.daemon.clear_server_state") as clear,
         ):
             result = CliRunner().invoke(cli, ["start"])
             assert result.exit_code != 0
@@ -330,7 +340,7 @@ class TestDaemonDetachment:
 
 def test_subprocess_registers_actual_python_pid(tmp_path: Path, monkeypatch) -> None:
     """A real child registers its PID whether Python is direct or uses a launcher."""
-    from nicx.comandos import daemon_cmd
+    from nicx.comandos.sistema import daemon as daemon_cmd
 
     pid_file = tmp_path / "server.pid"
     state_file = tmp_path / "server.json"
@@ -345,7 +355,7 @@ def test_subprocess_registers_actual_python_pid(tmp_path: Path, monkeypatch) -> 
 import os
 import time
 from pathlib import Path
-from nicx.comandos import daemon_cmd
+from nicx.comandos.sistema import daemon as daemon_cmd
 
 daemon_cmd._PID_FILE = Path(os.environ["NICX_TEST_PID_FILE"])
 daemon_cmd._STATE_FILE = Path(os.environ["NICX_TEST_STATE_FILE"])

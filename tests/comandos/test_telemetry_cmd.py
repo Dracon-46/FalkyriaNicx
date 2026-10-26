@@ -39,7 +39,7 @@ def _patch_config(tmp_path: Path):
     cfg = mock.MagicMock()
     cfg.telemetry.db_path = str(db_path)
     return mock.patch(
-        "nicx.comandos.telemetry_cmd.load_config",
+        "nicx.comandos.recursos.telemetry.load_config",
         return_value=cfg,
     ), db_path
 

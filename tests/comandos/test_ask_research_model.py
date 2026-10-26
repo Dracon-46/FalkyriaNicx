@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from nicx.cerebro.agentes.pesquisa.research_loop import DEFAULT_PLANNER_MODEL
-from nicx.comandos.ask import _resolve_research_model
+from nicx.comandos.conversa.ask import _resolve_research_model
 from nicx.nucleo.config import NicxConfig
 
 

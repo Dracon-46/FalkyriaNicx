@@ -84,7 +84,7 @@ def test_install_uses_cached_skill_and_displays_warning(
     monkeypatch.setenv("NICX_HOME", str(tmp_path / "installed"))
     with (
         patch("subprocess.run", side_effect=failed_pull),
-        patch("nicx.comandos.skill_cmd._get_resolver", return_value=resolver),
+        patch("nicx.comandos.agentes.skill._get_resolver", return_value=resolver),
     ):
         result = CliRunner().invoke(
             cli, ["skill", "install", f"{resolver.name}:cached"]
@@ -102,7 +102,7 @@ def test_cache_cannot_satisfy_missing_skill(resolver, tmp_path, monkeypatch):
     monkeypatch.setenv("NICX_HOME", str(tmp_path / "installed"))
     with (
         patch("subprocess.run", side_effect=failed_pull),
-        patch("nicx.comandos.skill_cmd._get_resolver", return_value=resolver),
+        patch("nicx.comandos.agentes.skill._get_resolver", return_value=resolver),
     ):
         result = CliRunner().invoke(
             cli, ["skill", "install", f"{resolver.name}:missing"]
@@ -117,8 +117,8 @@ def test_update_does_not_claim_refresh_succeeded(resolver):
     cfg.skills.sources = [SkillSourceConfig(source=resolver.name)]
     with (
         patch("subprocess.run", side_effect=failed_pull),
-        patch("nicx.comandos.skill_cmd._get_resolver", return_value=resolver),
-        patch("nicx.comandos.skill_cmd.load_config", return_value=cfg),
+        patch("nicx.comandos.agentes.skill._get_resolver", return_value=resolver),
+        patch("nicx.comandos.agentes.skill.load_config", return_value=cfg),
     ):
         result = CliRunner().invoke(cli, ["skill", "update"])
     assert "may be stale" in result.output

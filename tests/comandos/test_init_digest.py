@@ -49,9 +49,11 @@ class TestInitDigestEncoding:
         config_dir = tmp_path / ".nicx"
         config_path = config_dir / "config.toml"
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
-            mock.patch("nicx.comandos.init_cmd.PrivacyScanner"),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
+            mock.patch("nicx.comandos.instalacao.init.PrivacyScanner"),
             # Emulate Windows' non-UTF default locale on every platform. Any
             # init-path read/write that omits encoding now uses cp1252 and the
             # box-drawing rule raises exactly the original Unicode error.

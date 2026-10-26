@@ -14,8 +14,8 @@ def test_chat_simple_preset_can_serve_without_an_api_key(tmp_path: Path) -> None
     config_dir = tmp_path / ".nicx"
     config_path = config_dir / "config.toml"
     with (
-        mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-        mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
+        mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+        mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path),
     ):
         result = CliRunner().invoke(
             cli,

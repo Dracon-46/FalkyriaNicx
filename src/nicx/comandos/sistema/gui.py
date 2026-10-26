@@ -47,7 +47,7 @@ def _frontend_dir() -> Path | None:
     """Find the source checkout's frontend directory."""
     configured = os.environ.get("NICX_FRONTEND_DIR")
     candidates = [Path(configured)] if configured else []
-    candidates.append(Path(__file__).resolve().parents[3] / "frontend")
+    candidates.append(Path(__file__).resolve().parents[4] / "frontend")
     for candidate in candidates:
         if candidate.is_dir() and (candidate / "package.json").is_file():
             return candidate
@@ -73,7 +73,7 @@ def _read_frontend_state() -> dict:
 
 
 def _frontend_state_lock():
-    from nicx.comandos.daemon_cmd import _state_lock
+    from nicx.comandos.sistema.daemon import _state_lock
 
     return _state_lock(_FRONTEND_STATE_FILE)
 
@@ -89,7 +89,7 @@ def clear_frontend_state(pid: int, launch_token: str | None) -> None:
 def _process_identity(process: psutil.Process) -> dict | None:
     """Return an identity that cannot be confused with a recycled PID."""
     if sys.platform == "linux":
-        from nicx.comandos.daemon_cmd import _linux_process_identity
+        from nicx.comandos.sistema.daemon import _linux_process_identity
 
         # psutil's Linux epoch start time depends on the current boot epoch.
         # Keep the same clock-stable identity used by daemon bookkeeping.
@@ -401,7 +401,11 @@ def _daemon_pid_alive(port: int, *, require_ready: bool = False) -> bool:
     knows which process is supposed to be serving this port.
     """
     # Imported lazily; daemon_cmd imports this module for its own `stop`.
-    from nicx.comandos.daemon_cmd import _read_pid_unlocked, _read_state, _state_lock
+    from nicx.comandos.sistema.daemon import (
+        _read_pid_unlocked,
+        _read_state,
+        _state_lock,
+    )
 
     with _state_lock():
         state = _read_state()

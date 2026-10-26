@@ -1,10 +1,10 @@
-"""Tests for nicx.comandos._bootstrap.detect_cloud_keys."""
+"""Tests for nicx.comandos.instalacao._bootstrap.detect_cloud_keys."""
 
 from __future__ import annotations
 
 import pytest
 
-from nicx.comandos import _bootstrap
+from nicx.comandos.instalacao import _bootstrap
 
 ALL_KEYS = (
     "OPENROUTER_API_KEY",

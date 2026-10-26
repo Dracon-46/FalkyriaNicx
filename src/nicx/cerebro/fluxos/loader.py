@@ -66,6 +66,29 @@ def load_workflow(path: str | Path) -> WorkflowGraph:
     return graph
 
 
+def discover_workflows(directory: str | Path | None = None) -> Dict[str, WorkflowGraph]:
+    """Load every ``*.toml`` workflow in *directory* (default ``~/.nicx/workflows``).
+
+    Files that fail to parse are skipped, so one broken definition does not
+    hide the others. Keys are the workflow names (or the file stem).
+    """
+    if directory is None:
+        from nicx.nucleo.paths import get_config_dir
+
+        directory = get_config_dir() / "workflows"
+    folder = Path(directory)
+    if not folder.is_dir():
+        return {}
+    workflows: Dict[str, WorkflowGraph] = {}
+    for path in sorted(folder.glob("*.toml")):
+        try:
+            graph = load_workflow(path)
+        except Exception:  # noqa: BLE001 - skip broken files, keep the rest
+            continue
+        workflows[graph.name or path.stem] = graph
+    return workflows
+
+
 def _parse_node(data: Dict[str, Any]) -> WorkflowNode:
     """Parse a single node from TOML data."""
     node_type = NodeType(data.get("type", "agent"))
@@ -81,4 +104,4 @@ def _parse_node(data: Dict[str, Any]) -> WorkflowNode:
     )
 
 
-__all__ = ["load_workflow"]
+__all__ = ["discover_workflows", "load_workflow"]

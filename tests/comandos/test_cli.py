@@ -114,9 +114,11 @@ class TestCLI:
         config_dir = tmp_path / ".nicx"
         config_path = config_dir / "config.toml"
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
-            mock.patch("nicx.comandos.init_cmd.PrivacyScanner"),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
+            mock.patch("nicx.comandos.instalacao.init.PrivacyScanner"),
         ):
             result = CliRunner().invoke(
                 cli, ["init", "--engine", "ollama", "--no-download"]
@@ -144,8 +146,10 @@ class TestCLI:
             return original_write_text(path, data, *args, **kwargs)
 
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
             mock.patch.object(Path, "read_text", autospec=True, side_effect=read_text),
             mock.patch.object(
                 Path, "write_text", autospec=True, side_effect=write_text
@@ -166,8 +170,10 @@ class TestCLI:
         config_path.write_text(original, encoding="utf-8")
 
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
         ):
             rejected = CliRunner().invoke(
                 cli,

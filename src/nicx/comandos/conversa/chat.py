@@ -11,9 +11,14 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.markup import escape
 
-from nicx.comandos._runtime_panel import runtime_cli_options
 from nicx.comandos._tool_names import resolve_tool_names
-from nicx.comandos._voice_chat import VOICE_EXIT, VoiceSession, read_voice_input, speak
+from nicx.comandos.conversa._runtime_panel import runtime_cli_options
+from nicx.comandos.conversa._voice_chat import (
+    VOICE_EXIT,
+    VoiceSession,
+    read_voice_input,
+    speak,
+)
 from nicx.memoria import publish_completed_exchange
 from nicx.nucleo.config import load_config
 from nicx.nucleo.events import EventBus
@@ -24,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 def _safe_rich_label(value: object) -> str:
     """Strip terminal controls and escape Rich markup in dynamic labels."""
-    from nicx.comandos._model_switch import sanitize_model_id
+    from nicx.comandos.conversa._model_switch import sanitize_model_id
 
     return escape(sanitize_model_id(str(value)))
 
@@ -135,7 +140,7 @@ def chat(
         sys.exit(1)
 
     engine_name, engine = resolved
-    from nicx.comandos._model_switch import (
+    from nicx.comandos.conversa._model_switch import (
         interactive_pick_model,
         resolve_chat_cli_model,
         tty_wants_model_picker,
@@ -163,7 +168,7 @@ def chat(
         console.print("[red]No model available.[/red]")
         sys.exit(1)
 
-    from nicx.comandos._runtime_panel import (
+    from nicx.comandos.conversa._runtime_panel import (
         ChatRuntimeOptions,
         interactive_pick_runtime_options,
         tty_wants_runtime_panel,
@@ -315,15 +320,15 @@ def chat(
     )
 
     # Background-work status banner (disappears after first user message)
-    from nicx.comandos._bg_state import get_status
-    from nicx.comandos._chat_banner import render_startup_banner
+    from nicx.comandos.conversa._chat_banner import render_startup_banner
+    from nicx.comandos.instalacao._bg_state import get_status
 
     _banner = render_startup_banner(get_status())
     if _banner:
         console.print(f"[dim cyan]{_banner}[/dim cyan]")
 
     # Completion-notification dispatcher (fires once per task per session)
-    from nicx.comandos._chat_notifications import NotificationDispatcher
+    from nicx.comandos.conversa._chat_notifications import NotificationDispatcher
 
     _notifications = NotificationDispatcher(get_status())
 
@@ -345,7 +350,7 @@ def chat(
     # previous sessions are immediately available without a manual index step.
     memory_backend = None
     if config.agent.context_from_memory:
-        from nicx.comandos.ask import _get_memory_backend
+        from nicx.comandos.conversa.ask import _get_memory_backend
 
         memory_backend = _get_memory_backend(config)
 

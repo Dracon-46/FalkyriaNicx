@@ -9,7 +9,7 @@ import httpx
 import pytest
 from fastapi import FastAPI
 
-from nicx.comandos import daemon_cmd
+from nicx.comandos.sistema import daemon as daemon_cmd
 from nicx.servidor.daemon import DaemonServer, run_server
 
 

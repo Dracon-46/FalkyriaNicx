@@ -29,7 +29,7 @@ def _patch_channel(
         return_value=cfg,
     )
     get_channel_patch = mock.patch(
-        "nicx.comandos.channel_cmd._get_channel",
+        "nicx.comandos.recursos.channel._get_channel",
         return_value=bridge_instance,
     )
     return config_patch, get_channel_patch, bridge_instance

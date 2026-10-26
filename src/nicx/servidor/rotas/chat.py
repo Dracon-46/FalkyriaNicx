@@ -1573,7 +1573,7 @@ async def channel_status(request: Request):
 @router.get("/v1/security/scan")
 async def security_scan():
     """Run a read-only security environment audit and return findings."""
-    from nicx.comandos.scan_cmd import PrivacyScanner
+    from nicx.comandos.instalacao.scan import PrivacyScanner
 
     scanner = PrivacyScanner()
     results = await asyncio.to_thread(scanner.run_all)

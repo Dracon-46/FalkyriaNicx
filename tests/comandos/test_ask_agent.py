@@ -14,7 +14,7 @@ from nicx.comandos import cli
 from nicx.ferramentas._stubs import BaseTool, ToolSpec
 from nicx.nucleo.types import Role, StepType, ToolCall, ToolResult
 
-_ask_mod = importlib.import_module("nicx.comandos.ask")
+_ask_mod = importlib.import_module("nicx.comandos.conversa.ask")
 
 
 def _mock_engine(content="Hello from engine"):
@@ -399,7 +399,7 @@ class TestAskSkillsAndTraces:
 
 class TestBuildTools:
     def test_build_calculator(self, mock_setup):
-        from nicx.comandos.ask import _build_tools
+        from nicx.comandos.conversa.ask import _build_tools
         from nicx.nucleo.config import NicxConfig
 
         _register_tools()
@@ -409,7 +409,7 @@ class TestBuildTools:
         assert tools[0].tool_id == "calculator"
 
     def test_build_think(self, mock_setup):
-        from nicx.comandos.ask import _build_tools
+        from nicx.comandos.conversa.ask import _build_tools
         from nicx.nucleo.config import NicxConfig
 
         _register_tools()
@@ -419,7 +419,7 @@ class TestBuildTools:
         assert tools[0].tool_id == "think"
 
     def test_build_unknown_tool_skipped(self, mock_setup):
-        from nicx.comandos.ask import _build_tools
+        from nicx.comandos.conversa.ask import _build_tools
         from nicx.nucleo.config import NicxConfig
 
         config = NicxConfig()
@@ -427,7 +427,7 @@ class TestBuildTools:
         assert len(tools) == 0
 
     def test_build_empty_names(self, mock_setup):
-        from nicx.comandos.ask import _build_tools
+        from nicx.comandos.conversa.ask import _build_tools
         from nicx.nucleo.config import NicxConfig
 
         config = NicxConfig()
@@ -435,7 +435,7 @@ class TestBuildTools:
         assert len(tools) == 0
 
     def test_build_multiple_tools(self, mock_setup):
-        from nicx.comandos.ask import _build_tools
+        from nicx.comandos.conversa.ask import _build_tools
         from nicx.nucleo.config import NicxConfig
 
         _register_tools()

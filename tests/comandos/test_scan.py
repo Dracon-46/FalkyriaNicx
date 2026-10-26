@@ -7,7 +7,7 @@ import sys
 from subprocess import CompletedProcess
 from unittest.mock import MagicMock, patch
 
-from nicx.comandos.scan_cmd import PrivacyScanner, ScanResult
+from nicx.comandos.instalacao.scan import PrivacyScanner, ScanResult
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -446,11 +446,11 @@ class TestJsonOutput:
     def test_json_output_structure(self) -> None:
         from click.testing import CliRunner
 
-        from nicx.comandos.scan_cmd import scan
+        from nicx.comandos.instalacao.scan import scan
 
         runner = CliRunner()
         with patch(
-            "nicx.comandos.scan_cmd.PrivacyScanner.run_all",
+            "nicx.comandos.instalacao.scan.PrivacyScanner.run_all",
             return_value=[
                 ScanResult("Test", "ok", "all good", "all"),
             ],

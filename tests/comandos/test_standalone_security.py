@@ -24,7 +24,7 @@ def _security(raw_engine, wrapped_engine, policy, limiter):
 
 
 def test_deep_research_setup_chat_wires_security(monkeypatch):
-    from nicx.comandos.deep_research_setup_cmd import _launch_chat
+    from nicx.comandos.agentes.deep_research_setup import _launch_chat
 
     raw_engine = MagicMock(name="raw-engine")
     wrapped_engine = MagicMock(name="wrapped-engine")
@@ -61,7 +61,7 @@ def test_deep_research_setup_chat_wires_security(monkeypatch):
 
 
 def test_imessage_foreground_wires_security(monkeypatch):
-    from nicx.comandos.channels_cmd import imessage_start
+    from nicx.comandos.recursos.channels import imessage_start
 
     raw_engine = MagicMock(name="raw-engine")
     wrapped_engine = MagicMock(name="wrapped-engine")

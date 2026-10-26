@@ -76,7 +76,7 @@ def _missing_deps() -> list[str]:
 def _tray_image() -> Any:
     from PIL import Image, ImageDraw
 
-    static = Path(__file__).resolve().parents[1] / "servidor" / "static"
+    static = Path(__file__).resolve().parents[2] / "servidor" / "static"
     for name in ("pwa-192x192.png", "apple-touch-icon.png"):
         path = static / name
         if path.is_file():

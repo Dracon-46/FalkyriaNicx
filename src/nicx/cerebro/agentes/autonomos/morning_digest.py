@@ -158,33 +158,8 @@ class MorningDigestAgent(ToolUsingAgent):
         result = self._generate(messages)
         narrative = self._strip_think_tags(result.get("content", ""))
 
-        # Step 2b: Self-evaluate and optionally regenerate
         quality_score = 0.0
         evaluator_feedback = ""
-        try:
-            from nicx.cerebro.agentes.digest_evaluator import DigestEvaluator
-
-            evaluator = DigestEvaluator(self._engine, self._model)
-            quality_score, evaluator_feedback = evaluator.evaluate(
-                collected_data, narrative
-            )
-
-            if quality_score < 7.0 and evaluator_feedback:
-                # Regenerate with feedback
-                messages.append(
-                    Message(
-                        role=Role.USER,
-                        content=(
-                            f"Your briefing scored {quality_score:.1f}/10. "
-                            f"Feedback: {evaluator_feedback}\n"
-                            f"Please revise the briefing addressing this feedback."
-                        ),
-                    )
-                )
-                result = self._generate(messages)
-                narrative = self._strip_think_tags(result.get("content", ""))
-        except Exception:  # noqa: BLE001
-            pass  # Evaluator failure shouldn't block digest delivery
 
         # Step 3: Generate audio via TTS
         # Strip any markdown that slipped through (##, *, -, etc.)

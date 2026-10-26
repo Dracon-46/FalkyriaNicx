@@ -13,7 +13,7 @@ from nicx.cerebro.roteamento.complexity import score_complexity
 from nicx.comandos import cli
 from nicx.nucleo.config import NicxConfig
 
-_ask_mod = importlib.import_module("nicx.comandos.ask")
+_ask_mod = importlib.import_module("nicx.comandos.conversa.ask")
 
 CLOUD_MODEL = "claude-sonnet-5-5"
 LOCAL_MODEL = "qwen3.5:4b"

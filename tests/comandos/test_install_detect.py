@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
-from nicx.comandos._install_detect import InstallInfo, detect_install
+from nicx.comandos.instalacao._install_detect import InstallInfo, detect_install
 
 
 def _patch_pkg_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
@@ -70,7 +70,7 @@ def test_unknown_install_falls_back_to_pypi(tmp_path, monkeypatch):
 
 def test_missing_nicx_file_falls_back_to_pypi(monkeypatch):
     """nicx unimportable / no __file__ — still get a sane default."""
-    with patch("nicx.comandos._install_detect.Path") as mock_path:
+    with patch("nicx.comandos.instalacao._install_detect.Path") as mock_path:
         mock_path.side_effect = Exception("boom")
         info = detect_install()
     assert info.kind == "unknown"

@@ -33,9 +33,11 @@ class TestInitConfig:
         config_dir = tmp_path / ".nicx"
         config_path = config_dir / "config.toml"  # absent -> passes the exists() guard
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
-            mock.patch("nicx.comandos.init_cmd.PrivacyScanner"),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
+            mock.patch("nicx.comandos.instalacao.init.PrivacyScanner"),
         ):
             result = CliRunner().invoke(
                 cli, ["init", "--config", str(provided), _NO_DL]
@@ -56,9 +58,11 @@ class TestInitConfig:
         config_path = config_dir / "config.toml"
 
         with (
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_DIR", config_dir),
-            mock.patch("nicx.comandos.init_cmd.DEFAULT_CONFIG_PATH", config_path),
-            mock.patch("nicx.comandos.init_cmd.PrivacyScanner"),
+            mock.patch("nicx.comandos.instalacao.init.DEFAULT_CONFIG_DIR", config_dir),
+            mock.patch(
+                "nicx.comandos.instalacao.init.DEFAULT_CONFIG_PATH", config_path
+            ),
+            mock.patch("nicx.comandos.instalacao.init.PrivacyScanner"),
         ):
             result = CliRunner().invoke(
                 cli,

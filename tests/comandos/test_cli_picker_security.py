@@ -6,14 +6,14 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from nicx.comandos._model_switch import (
+from nicx.comandos.conversa._model_switch import (
     MAX_MODEL_ID_LEN,
     interactive_pick_model,
     resolve_chat_cli_model,
     sanitize_model_id,
     tty_wants_model_picker,
 )
-from nicx.comandos._runtime_panel import (
+from nicx.comandos.conversa._runtime_panel import (
     MAX_NUM_CTX,
     ChatRuntimeOptions,
     _parse_int,
@@ -62,7 +62,7 @@ class TestRuntimePanelSecurity:
         assert opts.to_engine_kwargs(engine_name="ollama")["num_gpu"] == 999
 
     def test_extreme_num_gpu_capped(self) -> None:
-        from nicx.comandos._runtime_panel import MAX_NUM_GPU_LAYERS
+        from nicx.comandos.conversa._runtime_panel import MAX_NUM_GPU_LAYERS
 
         opts = ChatRuntimeOptions(num_gpu=10**9)
         assert (
