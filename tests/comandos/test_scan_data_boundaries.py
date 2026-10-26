@@ -8,7 +8,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-from nicx.comandos.scan_cmd import PrivacyScanner, ScanResult, scan
+from nicx.comandos.instalacao.scan import PrivacyScanner, ScanResult, scan
 from nicx.nucleo.config import NicxConfig
 
 
@@ -58,10 +58,12 @@ def _low_noise_config():
 
 def _patch_config(monkeypatch, tmp_path, config, config_loaded=True, error=""):
     monkeypatch.setattr(
-        "nicx.comandos.scan_cmd._load_data_boundary_config",
+        "nicx.comandos.instalacao.scan._load_data_boundary_config",
         lambda: (config, tmp_path, config_loaded, error, ""),
     )
-    monkeypatch.setattr("nicx.comandos.scan_cmd.get_config_dir", lambda: tmp_path)
+    monkeypatch.setattr(
+        "nicx.comandos.instalacao.scan.get_config_dir", lambda: tmp_path
+    )
 
 
 def test_scan_data_boundaries_json_redacts_paths(monkeypatch, tmp_path):
@@ -291,11 +293,11 @@ def test_top_level_scan_data_boundaries_does_not_check_for_updates(
         called["value"] = True
 
     monkeypatch.setattr(
-        "nicx.comandos._version_check.check_for_updates",
+        "nicx.comandos.instalacao._version_check.check_for_updates",
         fake_check_for_updates,
     )
     monkeypatch.setattr(
-        "nicx.comandos.scan_cmd._load_data_boundary_config",
+        "nicx.comandos.instalacao.scan._load_data_boundary_config",
         lambda: (NicxConfig(), tmp_path, False, "", ""),
     )
     monkeypatch.setattr(
@@ -347,7 +349,7 @@ def test_data_boundary_loader_honors_nicx_config(
     monkeypatch,
     tmp_path,
 ):
-    from nicx.comandos import scan_cmd
+    from nicx.comandos.instalacao import scan as scan_cmd
     from nicx.nucleo.config import load_config
 
     config_path = tmp_path / "custom.toml"
@@ -367,10 +369,10 @@ def test_data_boundary_loader_honors_nicx_config(
 
 
 def test_data_boundary_loader_reports_root_error(monkeypatch):
-    from nicx.comandos import scan_cmd
+    from nicx.comandos.instalacao import scan as scan_cmd
 
     monkeypatch.setattr(
-        "nicx.comandos.scan_cmd.get_config_dir",
+        "nicx.comandos.instalacao.scan.get_config_dir",
         lambda: (_ for _ in ()).throw(RuntimeError("bad home")),
     )
 

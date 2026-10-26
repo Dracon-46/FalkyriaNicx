@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from nicx.comandos._bg_state import BgStatus
+from nicx.comandos.instalacao._bg_state import BgStatus
 
 
 class NotificationDispatcher:

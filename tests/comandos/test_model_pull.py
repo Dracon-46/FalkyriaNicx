@@ -10,7 +10,7 @@ import httpx
 from click.testing import CliRunner
 from rich.console import Console
 
-from nicx.comandos.model import ollama_pull
+from nicx.comandos.recursos.model import ollama_pull
 from nicx.nucleo.config import NicxConfig
 
 
@@ -79,7 +79,9 @@ class TestPullCliMultiEngine:
             content=b'{"status":"pulling manifest"}\n{"error":"disk full"}\n',
         )
         with (
-            mock.patch("nicx.comandos.model.load_config", return_value=NicxConfig()),
+            mock.patch(
+                "nicx.comandos.recursos.model.load_config", return_value=NicxConfig()
+            ),
             mock.patch("httpx.stream", return_value=closing(response)),
         ):
             result = CliRunner().invoke(
@@ -95,7 +97,7 @@ class TestPullCliMultiEngine:
 
         runner = CliRunner()
         with (
-            mock.patch("nicx.comandos.model.load_config") as mock_cfg,
+            mock.patch("nicx.comandos.recursos.model.load_config") as mock_cfg,
             mock.patch("subprocess.run") as mock_run,
         ):
             mock_cfg.return_value.engine.default = "llamacpp"
@@ -117,7 +119,7 @@ class TestPullCliMultiEngine:
 
         runner = CliRunner()
         with (
-            mock.patch("nicx.comandos.model.load_config") as mock_cfg,
+            mock.patch("nicx.comandos.recursos.model.load_config") as mock_cfg,
             mock.patch("subprocess.run") as mock_run,
         ):
             mock_cfg.return_value.engine.default = "mlx"
@@ -139,7 +141,7 @@ class TestPullCliMultiEngine:
 
         runner = CliRunner()
         with (
-            mock.patch("nicx.comandos.model.load_config") as mock_cfg,
+            mock.patch("nicx.comandos.recursos.model.load_config") as mock_cfg,
             mock.patch("subprocess.run", side_effect=FileNotFoundError),
         ):
             mock_cfg.return_value.engine.default = "llamacpp"

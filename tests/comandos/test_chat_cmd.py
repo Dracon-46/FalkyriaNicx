@@ -18,8 +18,13 @@ from nicx.cerebro.agentes._stubs import (
     BaseAgent,
     ToolUsingAgent,
 )
-from nicx.comandos._voice_chat import VOICE_EXIT, VoiceSession, record_voice, speak
-from nicx.comandos.chat_cmd import _read_input, chat
+from nicx.comandos.conversa._voice_chat import (
+    VOICE_EXIT,
+    VoiceSession,
+    record_voice,
+    speak,
+)
+from nicx.comandos.conversa.chat import _read_input, chat
 from nicx.ferramentas._stubs import BaseTool, ToolSpec
 from nicx.memoria.store import LocalFactStore
 from nicx.nucleo.config import NicxConfig
@@ -97,10 +102,10 @@ class TestChatCommand:
         config.intelligence.default_model = "test-model"
 
         with (
-            patch("nicx.comandos.chat_cmd.load_config", return_value=config),
+            patch("nicx.comandos.conversa.chat.load_config", return_value=config),
             patch("nicx.motores.get_engine", return_value=("mock", engine)),
             patch("nicx.cerebro.inteligencia.register_builtin_models"),
-            patch("nicx.comandos._voice_chat.record_voice") as record_voice,
+            patch("nicx.comandos.conversa._voice_chat.record_voice") as record_voice,
         ):
             result = CliRunner().invoke(
                 chat,
@@ -120,7 +125,7 @@ class TestChatCommand:
         config.intelligence.default_model = "test-model"
 
         with (
-            patch("nicx.comandos.chat_cmd.load_config", return_value=config),
+            patch("nicx.comandos.conversa.chat.load_config", return_value=config),
             patch("nicx.motores.get_engine", return_value=("mock", engine)),
             patch("nicx.cerebro.inteligencia.register_builtin_models"),
             patch(
@@ -361,11 +366,11 @@ class TestChatAgents:
         config.agent.context_from_memory = True
 
         with (
-            patch("nicx.comandos.chat_cmd.load_config", return_value=config),
+            patch("nicx.comandos.conversa.chat.load_config", return_value=config),
             patch("nicx.motores.get_engine", return_value=("mock", engine)),
             patch("nicx.cerebro.inteligencia.register_builtin_models"),
             patch("nicx.memoria.build_memory_service", return_value=None),
-            patch("nicx.comandos.ask._get_memory_backend", return_value=None),
+            patch("nicx.comandos.conversa.ask._get_memory_backend", return_value=None),
         ):
             result = CliRunner().invoke(
                 chat,
@@ -395,11 +400,11 @@ class TestChatAgents:
         config.agent.context_from_memory = True
 
         with (
-            patch("nicx.comandos.chat_cmd.load_config", return_value=config),
+            patch("nicx.comandos.conversa.chat.load_config", return_value=config),
             patch("nicx.motores.get_engine", return_value=("mock", engine)),
             patch("nicx.cerebro.inteligencia.register_builtin_models"),
             patch("nicx.memoria.build_memory_service", return_value=None),
-            patch("nicx.comandos.ask._get_memory_backend", return_value=None),
+            patch("nicx.comandos.conversa.ask._get_memory_backend", return_value=None),
         ):
             result = CliRunner().invoke(
                 chat,
@@ -434,14 +439,14 @@ class TestChatAgents:
         config.agent.context_from_memory = True
 
         with (
-            patch("nicx.comandos.chat_cmd.load_config", return_value=config),
+            patch("nicx.comandos.conversa.chat.load_config", return_value=config),
             patch("nicx.motores.get_engine", return_value=("mock", engine)),
             patch("nicx.cerebro.inteligencia.register_builtin_models"),
             patch(
                 "nicx.memoria.build_memory_service",
                 return_value=_FailingMemoryService(),
             ),
-            patch("nicx.comandos.ask._get_memory_backend", return_value=None),
+            patch("nicx.comandos.conversa.ask._get_memory_backend", return_value=None),
         ):
             result = CliRunner().invoke(
                 chat,
@@ -463,15 +468,15 @@ class TestChatAgents:
         AgentRegistry.register_value("simple_chat_agent", _SimpleChatAgent)
 
         with (
-            patch("nicx.comandos.chat_cmd.load_config", return_value=config),
+            patch("nicx.comandos.conversa.chat.load_config", return_value=config),
             patch("nicx.motores.get_engine", return_value=("mock", engine)),
             patch("nicx.cerebro.inteligencia.register_builtin_models"),
             patch(
-                "nicx.comandos._model_switch.tty_wants_model_picker",
+                "nicx.comandos.conversa._model_switch.tty_wants_model_picker",
                 return_value=False,
             ),
             patch(
-                "nicx.comandos._runtime_panel.tty_wants_runtime_panel",
+                "nicx.comandos.conversa._runtime_panel.tty_wants_runtime_panel",
                 return_value=False,
             ),
         ):
@@ -505,7 +510,7 @@ class TestChatAgents:
         AgentRegistry.register_value("capturing_chat_agent", _CapturingAgent)
 
         with (
-            patch("nicx.comandos.chat_cmd.load_config", return_value=config),
+            patch("nicx.comandos.conversa.chat.load_config", return_value=config),
             patch("nicx.motores.get_engine", return_value=("mock", engine)),
             patch("nicx.cerebro.inteligencia.register_builtin_models"),
         ):
@@ -558,11 +563,11 @@ class TestChatAgents:
         )
 
         with (
-            patch("nicx.comandos.chat_cmd.load_config", return_value=config),
+            patch("nicx.comandos.conversa.chat.load_config", return_value=config),
             patch("nicx.motores.get_engine", return_value=("mock", engine)),
             patch("nicx.cerebro.inteligencia.register_builtin_models"),
             patch("nicx.memoria.build_memory_service", return_value=None),
-            patch("nicx.comandos.ask._get_memory_backend", return_value=None),
+            patch("nicx.comandos.conversa.ask._get_memory_backend", return_value=None),
         ):
             result = CliRunner().invoke(
                 chat,
@@ -636,7 +641,7 @@ class TestChatAgents:
         AgentRegistry.register_value("simple_chat_agent", _SimpleChatAgent)
 
         with (
-            patch("nicx.comandos.chat_cmd.load_config", return_value=config),
+            patch("nicx.comandos.conversa.chat.load_config", return_value=config),
             patch("nicx.motores.get_engine", return_value=("mock", engine)),
             patch("nicx.cerebro.inteligencia.register_builtin_models"),
             patch(
@@ -668,15 +673,15 @@ class TestChatAgents:
         ToolRegistry.register_value("dangerous_chat", _DangerousChatTool)
 
         with (
-            patch("nicx.comandos.chat_cmd.load_config", return_value=config),
+            patch("nicx.comandos.conversa.chat.load_config", return_value=config),
             patch("nicx.motores.get_engine", return_value=("mock", engine)),
             patch("nicx.cerebro.inteligencia.register_builtin_models"),
             patch(
-                "nicx.comandos._model_switch.tty_wants_model_picker",
+                "nicx.comandos.conversa._model_switch.tty_wants_model_picker",
                 return_value=False,
             ),
             patch(
-                "nicx.comandos._runtime_panel.tty_wants_runtime_panel",
+                "nicx.comandos.conversa._runtime_panel.tty_wants_runtime_panel",
                 return_value=False,
             ),
         ):
@@ -716,7 +721,7 @@ class TestChatAgents:
         ToolRegistry.register_value("dangerous_chat", _DangerousChatTool)
 
         with (
-            patch("nicx.comandos.chat_cmd.load_config", return_value=config),
+            patch("nicx.comandos.conversa.chat.load_config", return_value=config),
             patch("nicx.motores.get_engine", return_value=("mock", engine)),
             patch("nicx.cerebro.inteligencia.register_builtin_models"),
             patch(
@@ -728,11 +733,11 @@ class TestChatAgents:
                 ),
             ),
             patch(
-                "nicx.comandos._model_switch.tty_wants_model_picker",
+                "nicx.comandos.conversa._model_switch.tty_wants_model_picker",
                 return_value=False,
             ),
             patch(
-                "nicx.comandos._runtime_panel.tty_wants_runtime_panel",
+                "nicx.comandos.conversa._runtime_panel.tty_wants_runtime_panel",
                 return_value=False,
             ),
         ):

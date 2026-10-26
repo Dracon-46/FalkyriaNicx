@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 import pytest
 from click.testing import CliRunner
 
-from nicx.comandos.digest_cmd import digest
+from nicx.comandos.agentes.digest import digest
 
 # ---------------------------------------------------------------------------
 # CLI tests
@@ -27,7 +27,7 @@ class TestDigestScheduleCLI:
         mock_cfg.digest.timezone = "America/Los_Angeles"
 
         runner = CliRunner()
-        with patch("nicx.comandos.digest_cmd.load_config", return_value=mock_cfg):
+        with patch("nicx.comandos.agentes.digest.load_config", return_value=mock_cfg):
             result = runner.invoke(digest, ["--schedule", ""])
 
         assert result.exit_code == 0
@@ -47,15 +47,15 @@ class TestDigestScheduleCLI:
         runner = CliRunner()
         with (
             patch(
-                "nicx.comandos.digest_cmd.load_config",
+                "nicx.comandos.agentes.digest.load_config",
                 return_value=mock_cfg,
             ),
             patch(
-                "nicx.comandos.digest_cmd.DEFAULT_CONFIG_PATH",
+                "nicx.comandos.agentes.digest.DEFAULT_CONFIG_PATH",
                 config_path,
             ),
             patch(
-                "nicx.comandos.digest_cmd._create_scheduler_task",
+                "nicx.comandos.agentes.digest._create_scheduler_task",
                 return_value="abc123",
             ) as mock_create,
         ):
@@ -81,12 +81,12 @@ class TestDigestScheduleCLI:
         runner = CliRunner()
         with (
             patch(
-                "nicx.comandos.digest_cmd.load_config",
+                "nicx.comandos.agentes.digest.load_config",
                 return_value=mock_cfg,
             ),
-            patch("nicx.comandos.digest_cmd._save_digest_schedule") as mock_save,
+            patch("nicx.comandos.agentes.digest._save_digest_schedule") as mock_save,
             patch(
-                "nicx.comandos.digest_cmd._cancel_scheduler_tasks",
+                "nicx.comandos.agentes.digest._cancel_scheduler_tasks",
                 return_value=1,
             ),
         ):
@@ -98,10 +98,10 @@ class TestDigestScheduleCLI:
 
     def test_scheduler_task_persists_digest_timezone(self, tmp_path):
         from nicx.agenda.store import SchedulerStore
-        from nicx.comandos import digest_cmd
+        from nicx.comandos.agentes import digest as digest_cmd
 
         config_path = tmp_path / "config.toml"
-        with patch("nicx.comandos.digest_cmd.DEFAULT_CONFIG_PATH", config_path):
+        with patch("nicx.comandos.agentes.digest.DEFAULT_CONFIG_PATH", config_path):
             task_id = digest_cmd._create_scheduler_task(
                 "0 6 * * *",
                 "America/Los_Angeles",

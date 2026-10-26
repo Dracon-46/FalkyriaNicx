@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from nicx.comandos.dashboard import DashboardApp
+from nicx.comandos.recursos.dashboard import DashboardApp
 
 
 class TestDashboard:

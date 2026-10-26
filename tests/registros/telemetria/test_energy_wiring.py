@@ -23,7 +23,7 @@ from nicx.registros.telemetria.energy_monitor import BASIS_GPU, EnergySample
 from nicx.registros.telemetria.instrumented_engine import InstrumentedEngine
 from nicx.registros.telemetria.store import TelemetryStore
 
-_ask_mod = importlib.import_module("nicx.comandos.ask")
+_ask_mod = importlib.import_module("nicx.comandos.conversa.ask")
 
 
 # ---------------------------------------------------------------------------
@@ -600,7 +600,7 @@ def _patch_telemetry_config(tmp_path: Path):
     cfg = mock.MagicMock()
     cfg.telemetry.db_path = str(db_path)
     return mock.patch(
-        "nicx.comandos.telemetry_cmd.load_config",
+        "nicx.comandos.recursos.telemetry.load_config",
         return_value=cfg,
     ), db_path
 
@@ -858,7 +858,7 @@ class TestEndToEndPipeline:
         telem_cfg = mock.MagicMock()
         telem_cfg.telemetry.db_path = cfg.telemetry.db_path
         with mock.patch(
-            "nicx.comandos.telemetry_cmd.load_config",
+            "nicx.comandos.recursos.telemetry.load_config",
             return_value=telem_cfg,
         ):
             result = CliRunner().invoke(
@@ -907,7 +907,7 @@ class TestEndToEndPipeline:
         telem_cfg = mock.MagicMock()
         telem_cfg.telemetry.db_path = cfg.telemetry.db_path
         with mock.patch(
-            "nicx.comandos.telemetry_cmd.load_config",
+            "nicx.comandos.recursos.telemetry.load_config",
             return_value=telem_cfg,
         ):
             result = CliRunner().invoke(

@@ -11,7 +11,7 @@ from nicx.comandos import cli
 from nicx.nucleo.config import NicxConfig
 
 # Import the actual module (not the Click group attribute)
-_model_mod = importlib.import_module("nicx.comandos.model")
+_model_mod = importlib.import_module("nicx.comandos.recursos.model")
 
 
 def _mock_engine():

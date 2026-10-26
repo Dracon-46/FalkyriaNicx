@@ -1,4 +1,4 @@
-"""Tests for nicx.comandos._bootstrap.write_initial_config."""
+"""Tests for nicx.comandos.instalacao._bootstrap.write_initial_config."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ if sys.version_info >= (3, 11):
 else:
     import tomli as tomllib
 
-from nicx.comandos import _bootstrap
+from nicx.comandos.instalacao import _bootstrap
 from nicx.nucleo.config import GpuInfo, HardwareInfo
 
 

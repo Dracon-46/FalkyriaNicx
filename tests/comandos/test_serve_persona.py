@@ -27,9 +27,9 @@ from nicx.comandos import cli
 pytest.importorskip("fastapi")
 pytest.importorskip("uvicorn")
 
-# ``nicx.comandos.serve`` as a package attribute resolves to the click
+# ``nicx.comandos.sistema.serve`` as a package attribute resolves to the click
 # *command* (re-exported); grab the real module to monkeypatch its globals.
-serve_mod = importlib.import_module("nicx.comandos.serve")
+serve_mod = importlib.import_module("nicx.comandos.sistema.serve")
 
 
 def _fake_engine() -> MagicMock:

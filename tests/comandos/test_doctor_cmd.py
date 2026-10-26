@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 from click.testing import CliRunner
 
 from nicx.comandos import cli
-from nicx.comandos.doctor_cmd import (
+from nicx.comandos.instalacao.doctor import (
     CheckResult,
     _check_config_exists,
     _check_default_model,
@@ -36,15 +36,17 @@ class TestDoctorRuns:
         mock_config.intelligence.default_model = ""
 
         with (
-            patch("nicx.comandos.doctor_cmd.load_config", return_value=mock_config),
             patch(
-                "nicx.comandos.doctor_cmd.DEFAULT_CONFIG_PATH",
+                "nicx.comandos.instalacao.doctor.load_config", return_value=mock_config
+            ),
+            patch(
+                "nicx.comandos.instalacao.doctor.DEFAULT_CONFIG_PATH",
                 Path("/tmp/nonexistent/config.toml"),
             ),
-            patch("nicx.comandos.doctor_cmd._check_engines", return_value=[]),
-            patch("nicx.comandos.doctor_cmd._check_models", return_value=[]),
+            patch("nicx.comandos.instalacao.doctor._check_engines", return_value=[]),
+            patch("nicx.comandos.instalacao.doctor._check_models", return_value=[]),
             patch(
-                "nicx.comandos.doctor_cmd._check_speech_backend",
+                "nicx.comandos.instalacao.doctor._check_speech_backend",
                 return_value=CheckResult("Speech backend", "ok", "mock ready"),
             ),
         ):
@@ -60,15 +62,17 @@ class TestDoctorJsonOutput:
         mock_config.intelligence.default_model = ""
 
         with (
-            patch("nicx.comandos.doctor_cmd.load_config", return_value=mock_config),
             patch(
-                "nicx.comandos.doctor_cmd.DEFAULT_CONFIG_PATH",
+                "nicx.comandos.instalacao.doctor.load_config", return_value=mock_config
+            ),
+            patch(
+                "nicx.comandos.instalacao.doctor.DEFAULT_CONFIG_PATH",
                 Path("/tmp/nonexistent/config.toml"),
             ),
-            patch("nicx.comandos.doctor_cmd._check_engines", return_value=[]),
-            patch("nicx.comandos.doctor_cmd._check_models", return_value=[]),
+            patch("nicx.comandos.instalacao.doctor._check_engines", return_value=[]),
+            patch("nicx.comandos.instalacao.doctor._check_models", return_value=[]),
             patch(
-                "nicx.comandos.doctor_cmd._check_speech_backend",
+                "nicx.comandos.instalacao.doctor._check_speech_backend",
                 return_value=CheckResult("Speech backend", "ok", "mock ready"),
             ),
         ):
@@ -96,7 +100,7 @@ class TestCheckConfigMissing:
     def test_check_config_missing(self) -> None:
         """Warning when config file does not exist."""
         with patch(
-            "nicx.comandos.doctor_cmd.DEFAULT_CONFIG_PATH",
+            "nicx.comandos.instalacao.doctor.DEFAULT_CONFIG_PATH",
             Path("/tmp/nonexistent/config.toml"),
         ):
             result = _check_config_exists()
@@ -107,7 +111,7 @@ class TestCheckConfigMissing:
 class TestCheckEngineProbing:
     def test_check_engine_probing(self) -> None:
         """Engine health check reports reachable/unreachable engines."""
-        from nicx.comandos.doctor_cmd import CheckResult
+        from nicx.comandos.instalacao.doctor import CheckResult
 
         mock_engine_healthy = MagicMock()
         mock_engine_healthy.health.return_value = True
@@ -160,9 +164,9 @@ class TestCheckEngineProbing:
 
         ok = CheckResult("other", "ok", "ok")
         with (
-            patch("nicx.comandos.doctor_cmd._ensure_engines_imported"),
-            patch("nicx.comandos.doctor_cmd._get_config", return_value=config),
-            patch("nicx.comandos.doctor_cmd.load_config", return_value=config),
+            patch("nicx.comandos.instalacao.doctor._ensure_engines_imported"),
+            patch("nicx.comandos.instalacao.doctor._get_config", return_value=config),
+            patch("nicx.comandos.instalacao.doctor.load_config", return_value=config),
             patch(
                 "nicx.nucleo.registry.EngineRegistry.keys",
                 return_value=["beta", "alpha"],
@@ -171,13 +175,26 @@ class TestCheckEngineProbing:
                 "nicx.motores._discovery._make_engine",
                 side_effect=make_engine,
             ) as make,
-            patch("nicx.comandos.doctor_cmd._check_python_version", return_value=ok),
-            patch("nicx.comandos.doctor_cmd._check_config_exists", return_value=ok),
-            patch("nicx.comandos.doctor_cmd._check_config_parses", return_value=ok),
-            patch("nicx.comandos.doctor_cmd._check_optional_deps", return_value=[]),
-            patch("nicx.comandos.doctor_cmd._check_speech_backend", return_value=ok),
-            patch("nicx.comandos.doctor_cmd._check_nodejs", return_value=ok),
-            patch("nicx.comandos.doctor_cmd._check_security_profile", return_value=ok),
+            patch(
+                "nicx.comandos.instalacao.doctor._check_python_version", return_value=ok
+            ),
+            patch(
+                "nicx.comandos.instalacao.doctor._check_config_exists", return_value=ok
+            ),
+            patch(
+                "nicx.comandos.instalacao.doctor._check_config_parses", return_value=ok
+            ),
+            patch(
+                "nicx.comandos.instalacao.doctor._check_optional_deps", return_value=[]
+            ),
+            patch(
+                "nicx.comandos.instalacao.doctor._check_speech_backend", return_value=ok
+            ),
+            patch("nicx.comandos.instalacao.doctor._check_nodejs", return_value=ok),
+            patch(
+                "nicx.comandos.instalacao.doctor._check_security_profile",
+                return_value=ok,
+            ),
         ):
             results = _run_all_checks()
 
@@ -195,7 +212,9 @@ class TestCheckDefaultModel:
         """Leaving default model empty should be treated as valid auto-routing."""
         mock_config = MagicMock()
         mock_config.intelligence.default_model = ""
-        with patch("nicx.comandos.doctor_cmd.load_config", return_value=mock_config):
+        with patch(
+            "nicx.comandos.instalacao.doctor.load_config", return_value=mock_config
+        ):
             result = _check_default_model()
         assert result.status == "ok"
         assert "auto" in result.message.lower()
@@ -210,8 +229,10 @@ class TestCheckDefaultModel:
         mock_engine.list_models.return_value = ["mlx-community/Qwen3.5-4B-OptiQ-4bit"]
 
         with (
-            patch("nicx.comandos.doctor_cmd.load_config", return_value=mock_config),
-            patch("nicx.comandos.doctor_cmd._ensure_engines_imported"),
+            patch(
+                "nicx.comandos.instalacao.doctor.load_config", return_value=mock_config
+            ),
+            patch("nicx.comandos.instalacao.doctor._ensure_engines_imported"),
             patch.object(EngineRegistry, "keys", return_value=["mlx"]),
             patch(
                 "nicx.motores._discovery._make_engine",
@@ -294,12 +315,12 @@ class TestCheckNodejs:
 
 class TestCheckTtsBackend:
     def test_reports_configured_portuguese_voice(self) -> None:
-        from nicx.comandos.doctor_cmd import _check_tts_backend
+        from nicx.comandos.instalacao.doctor import _check_tts_backend
         from nicx.nucleo.config import NicxConfig
 
         config = NicxConfig()
         with (
-            patch("nicx.comandos.doctor_cmd._get_config", return_value=config),
+            patch("nicx.comandos.instalacao.doctor._get_config", return_value=config),
             patch("importlib.util.find_spec", return_value=object()),
         ):
             result = _check_tts_backend()
@@ -309,11 +330,13 @@ class TestCheckTtsBackend:
         assert "Brazilian Portuguese" in result.message
 
     def test_warns_when_kokoro_missing(self) -> None:
-        from nicx.comandos.doctor_cmd import _check_tts_backend
+        from nicx.comandos.instalacao.doctor import _check_tts_backend
         from nicx.nucleo.config import NicxConfig
 
         with (
-            patch("nicx.comandos.doctor_cmd._get_config", return_value=NicxConfig()),
+            patch(
+                "nicx.comandos.instalacao.doctor._get_config", return_value=NicxConfig()
+            ),
             patch("importlib.util.find_spec", return_value=None),
         ):
             result = _check_tts_backend()

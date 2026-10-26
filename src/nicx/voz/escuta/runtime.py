@@ -54,7 +54,7 @@ def server_base_url() -> str:
     da configuração. Sempre em 127.0.0.1."""
     port: Optional[int] = None
     try:
-        from nicx.comandos.daemon_cmd import _read_state
+        from nicx.comandos.sistema.daemon import _read_state
 
         state = _read_state()
         pid = state.get("pid")

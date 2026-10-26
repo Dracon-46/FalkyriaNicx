@@ -35,22 +35,12 @@ except ImportError:
     pass
 
 try:
-    import nicx.cerebro.agentes.react  # noqa: F401 -- backward-compat shim
-except ImportError:
-    pass
-
-try:
     import nicx.cerebro.agentes.conversa.rlm  # noqa: F401
 except ImportError:
     pass
 
 try:
     import nicx.cerebro.agentes.autonomos.operative  # noqa: F401
-except ImportError:
-    pass
-
-try:
-    import nicx.cerebro.agentes.monitor  # noqa: F401
 except ImportError:
     pass
 

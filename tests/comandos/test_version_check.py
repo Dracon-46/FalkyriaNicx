@@ -9,8 +9,8 @@ from unittest.mock import patch
 
 import pytest
 
-from nicx.comandos import _version_check
-from nicx.comandos._version_check import (
+from nicx.comandos.instalacao import _version_check
+from nicx.comandos.instalacao._version_check import (
     _check_disabled,
     _config_disabled,
     _fetch_latest_stable,
@@ -232,40 +232,42 @@ class TestCheckForUpdates:
         self, monkeypatch, version
     ):
         monkeypatch.setattr("nicx.__version__", version)
-        with patch("nicx.comandos._version_check._get_latest_version") as latest:
+        with patch(
+            "nicx.comandos.instalacao._version_check._get_latest_version"
+        ) as latest:
             _version_check._do_check()
         latest.assert_not_called()
 
-    @patch("nicx.comandos._version_check._do_check")
+    @patch("nicx.comandos.instalacao._version_check._do_check")
     def test_runs_for_ask_command(self, mock_do):
         check_for_updates("ask")
         mock_do.assert_called_once()
 
-    @patch("nicx.comandos._version_check._do_check")
+    @patch("nicx.comandos.instalacao._version_check._do_check")
     def test_runs_for_doctor_command(self, mock_do):
         """Widened list: doctor wasn't checked before."""
         check_for_updates("doctor")
         mock_do.assert_called_once()
 
-    @patch("nicx.comandos._version_check._do_check")
+    @patch("nicx.comandos.instalacao._version_check._do_check")
     def test_no_release_feed_never_checks(self, mock_do, monkeypatch):
         monkeypatch.setattr(_version_check, "_RELEASES_API", "")
         check_for_updates("ask")
         mock_do.assert_not_called()
 
-    @patch("nicx.comandos._version_check._do_check")
+    @patch("nicx.comandos.instalacao._version_check._do_check")
     def test_skips_unknown_command(self, mock_do):
         check_for_updates("_bootstrap")
         mock_do.assert_not_called()
 
-    @patch("nicx.comandos._version_check._do_check")
+    @patch("nicx.comandos.instalacao._version_check._do_check")
     def test_ci_env_short_circuits_widely(self, mock_do, monkeypatch):
         monkeypatch.setenv("CI", "1")
         check_for_updates("ask")
         mock_do.assert_not_called()
 
     @patch(
-        "nicx.comandos._version_check._do_check",
+        "nicx.comandos.instalacao._version_check._do_check",
         side_effect=Exception("boom"),
     )
     def test_exception_in_do_check_never_propagates(self, mock_do):

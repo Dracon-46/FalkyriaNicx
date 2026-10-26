@@ -1,4 +1,4 @@
-"""Tests for nicx.comandos._bg_state."""
+"""Tests for nicx.comandos.instalacao._bg_state."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from nicx.comandos import _bg_state
+from nicx.comandos.instalacao import _bg_state
 from nicx.nucleo import rust as _rust_bridge
 
 

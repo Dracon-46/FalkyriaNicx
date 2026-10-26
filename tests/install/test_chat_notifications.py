@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from nicx.comandos._bg_state import BgStatus
-from nicx.comandos._chat_notifications import NotificationDispatcher
+from nicx.comandos.conversa._chat_notifications import NotificationDispatcher
+from nicx.comandos.instalacao._bg_state import BgStatus
 
 
 def test_no_notifications_when_unchanged() -> None:

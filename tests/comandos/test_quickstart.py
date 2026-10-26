@@ -28,27 +28,31 @@ class TestQuickstartCommand:
         hw.gpu = MagicMock(name="Test GPU", vram_gb=24, count=1, vendor="nvidia")
 
         with (
-            patch("nicx.comandos.quickstart_cmd.detect_hardware", return_value=hw),
-            patch("nicx.comandos.quickstart_cmd.DEFAULT_CONFIG_PATH", config_path),
-            patch("nicx.comandos.quickstart_cmd.DEFAULT_CONFIG_DIR", tmp_path),
             patch(
-                "nicx.comandos.quickstart_cmd.generate_default_toml",
+                "nicx.comandos.instalacao.quickstart.detect_hardware", return_value=hw
+            ),
+            patch(
+                "nicx.comandos.instalacao.quickstart.DEFAULT_CONFIG_PATH", config_path
+            ),
+            patch("nicx.comandos.instalacao.quickstart.DEFAULT_CONFIG_DIR", tmp_path),
+            patch(
+                "nicx.comandos.instalacao.quickstart.generate_default_toml",
                 return_value="[engine]\n",
             ),
             patch(
-                "nicx.comandos.quickstart_cmd.recommend_engine",
+                "nicx.comandos.instalacao.quickstart.recommend_engine",
                 return_value="ollama",
             ),
             patch(
-                "nicx.comandos.quickstart_cmd._check_engine_health",
+                "nicx.comandos.instalacao.quickstart._check_engine_health",
                 return_value=True,
             ),
             patch(
-                "nicx.comandos.quickstart_cmd._check_model_available",
+                "nicx.comandos.instalacao.quickstart._check_model_available",
                 return_value=True,
             ),
             patch(
-                "nicx.comandos.quickstart_cmd._test_query",
+                "nicx.comandos.instalacao.quickstart._test_query",
                 return_value="Hello!",
             ),
         ):
@@ -70,27 +74,31 @@ class TestQuickstartCommand:
         hw.gpu = None
 
         with (
-            patch("nicx.comandos.quickstart_cmd.detect_hardware", return_value=hw),
-            patch("nicx.comandos.quickstart_cmd.DEFAULT_CONFIG_PATH", config_path),
-            patch("nicx.comandos.quickstart_cmd.DEFAULT_CONFIG_DIR", tmp_path),
             patch(
-                "nicx.comandos.quickstart_cmd.generate_default_toml",
+                "nicx.comandos.instalacao.quickstart.detect_hardware", return_value=hw
+            ),
+            patch(
+                "nicx.comandos.instalacao.quickstart.DEFAULT_CONFIG_PATH", config_path
+            ),
+            patch("nicx.comandos.instalacao.quickstart.DEFAULT_CONFIG_DIR", tmp_path),
+            patch(
+                "nicx.comandos.instalacao.quickstart.generate_default_toml",
                 return_value="[engine]\n",
             ),
             patch(
-                "nicx.comandos.quickstart_cmd.recommend_engine",
+                "nicx.comandos.instalacao.quickstart.recommend_engine",
                 return_value="ollama",
             ),
             patch(
-                "nicx.comandos.quickstart_cmd._check_engine_health",
+                "nicx.comandos.instalacao.quickstart._check_engine_health",
                 return_value=True,
             ),
             patch(
-                "nicx.comandos.quickstart_cmd._check_model_available",
+                "nicx.comandos.instalacao.quickstart._check_model_available",
                 return_value=True,
             ),
             patch(
-                "nicx.comandos.quickstart_cmd._test_query",
+                "nicx.comandos.instalacao.quickstart._test_query",
                 return_value="Hello!",
             ),
         ):
@@ -114,26 +122,32 @@ class TestQuickstartCommand:
         hw.gpu = None
 
         with (
-            patch("nicx.comandos.quickstart_cmd.detect_hardware", return_value=hw),
-            patch("nicx.comandos.quickstart_cmd.DEFAULT_CONFIG_PATH", config_path),
-            patch("nicx.comandos.quickstart_cmd.DEFAULT_CONFIG_DIR", tmp_path),
             patch(
-                "nicx.comandos.quickstart_cmd.generate_default_toml",
+                "nicx.comandos.instalacao.quickstart.detect_hardware", return_value=hw
+            ),
+            patch(
+                "nicx.comandos.instalacao.quickstart.DEFAULT_CONFIG_PATH", config_path
+            ),
+            patch("nicx.comandos.instalacao.quickstart.DEFAULT_CONFIG_DIR", tmp_path),
+            patch(
+                "nicx.comandos.instalacao.quickstart.generate_default_toml",
                 return_value="[engine]\nnew = true\n",
             ),
             patch(
-                "nicx.comandos.quickstart_cmd.recommend_engine",
+                "nicx.comandos.instalacao.quickstart.recommend_engine",
                 return_value="ollama",
             ),
             patch(
-                "nicx.comandos.quickstart_cmd._check_engine_health",
+                "nicx.comandos.instalacao.quickstart._check_engine_health",
                 return_value=True,
             ),
             patch(
-                "nicx.comandos.quickstart_cmd._check_model_available",
+                "nicx.comandos.instalacao.quickstart._check_model_available",
                 return_value=True,
             ),
-            patch("nicx.comandos.quickstart_cmd._test_query", return_value="Hello!"),
+            patch(
+                "nicx.comandos.instalacao.quickstart._test_query", return_value="Hello!"
+            ),
         ):
             runner = CliRunner()
             result = runner.invoke(cli, ["quickstart", "--force"])
@@ -151,19 +165,23 @@ class TestQuickstartCommand:
         hw.gpu = None
 
         with (
-            patch("nicx.comandos.quickstart_cmd.detect_hardware", return_value=hw),
-            patch("nicx.comandos.quickstart_cmd.DEFAULT_CONFIG_PATH", config_path),
-            patch("nicx.comandos.quickstart_cmd.DEFAULT_CONFIG_DIR", tmp_path),
             patch(
-                "nicx.comandos.quickstart_cmd.generate_default_toml",
+                "nicx.comandos.instalacao.quickstart.detect_hardware", return_value=hw
+            ),
+            patch(
+                "nicx.comandos.instalacao.quickstart.DEFAULT_CONFIG_PATH", config_path
+            ),
+            patch("nicx.comandos.instalacao.quickstart.DEFAULT_CONFIG_DIR", tmp_path),
+            patch(
+                "nicx.comandos.instalacao.quickstart.generate_default_toml",
                 return_value="[engine]\n",
             ),
             patch(
-                "nicx.comandos.quickstart_cmd.recommend_engine",
+                "nicx.comandos.instalacao.quickstart.recommend_engine",
                 return_value="ollama",
             ),
             patch(
-                "nicx.comandos.quickstart_cmd._check_engine_health",
+                "nicx.comandos.instalacao.quickstart._check_engine_health",
                 return_value=False,
             ),
         ):
@@ -186,31 +204,35 @@ class TestQuickstartCommand:
         hw.gpu = MagicMock(name="Apple GPU", vram_gb=16, count=1, vendor="apple")
 
         with (
-            patch("nicx.comandos.quickstart_cmd.detect_hardware", return_value=hw),
-            patch("nicx.comandos.quickstart_cmd.DEFAULT_CONFIG_PATH", config_path),
-            patch("nicx.comandos.quickstart_cmd.DEFAULT_CONFIG_DIR", tmp_path),
             patch(
-                "nicx.comandos.quickstart_cmd.generate_default_toml",
+                "nicx.comandos.instalacao.quickstart.detect_hardware", return_value=hw
+            ),
+            patch(
+                "nicx.comandos.instalacao.quickstart.DEFAULT_CONFIG_PATH", config_path
+            ),
+            patch("nicx.comandos.instalacao.quickstart.DEFAULT_CONFIG_DIR", tmp_path),
+            patch(
+                "nicx.comandos.instalacao.quickstart.generate_default_toml",
                 return_value='[engine]\ndefault = "mlx"\n',
             ),
             patch(
-                "nicx.comandos.quickstart_cmd.recommend_engine",
+                "nicx.comandos.instalacao.quickstart.recommend_engine",
                 return_value="mlx",
             ),
             patch(
-                "nicx.comandos.quickstart_cmd._check_engine_health",
+                "nicx.comandos.instalacao.quickstart._check_engine_health",
                 return_value=False,
             ),
             patch(
-                "nicx.comandos.quickstart_cmd._discover_healthy_engines",
+                "nicx.comandos.instalacao.quickstart._discover_healthy_engines",
                 return_value=["ollama"],
             ),
             patch(
-                "nicx.comandos.quickstart_cmd._check_model_available",
+                "nicx.comandos.instalacao.quickstart._check_model_available",
                 return_value=True,
             ),
             patch(
-                "nicx.comandos.quickstart_cmd._test_query",
+                "nicx.comandos.instalacao.quickstart._test_query",
                 return_value="Hello!",
             ),
         ):

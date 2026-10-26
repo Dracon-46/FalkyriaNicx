@@ -486,7 +486,7 @@ def stop() -> None:
     # `nicx gui` that dies on "Frontend port 5173 is unavailable".
     # Imported here rather than at module scope: gui_cmd is a sibling CLI
     # module and only `stop` needs it.
-    from nicx.comandos.gui_cmd import stop_frontend
+    from nicx.comandos.sistema.gui import stop_frontend
 
     frontend_pid = stop_frontend()
     if frontend_pid is not None:

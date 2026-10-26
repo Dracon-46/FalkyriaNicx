@@ -122,7 +122,7 @@ def test_active_config_controls_tools_instead_of_ambient_config(
     ToolRegistry.register_value("file_write", FileWriteTool)
 
     if entry_point == "cli_sdk":
-        from nicx.comandos.ask import _build_tools
+        from nicx.comandos.conversa.ask import _build_tools
 
         tools = _build_tools(["file_read", "file_write"], cfg, None, "")
     elif entry_point == "system":
@@ -162,7 +162,7 @@ def test_invalid_active_policy_cannot_fall_back_to_valid_ambient_config(
     ToolRegistry.register_value("file_read", FileReadTool)
     ToolRegistry.register_value("file_write", FileWriteTool)
     if entry_point == "cli_sdk":
-        from nicx.comandos.ask import _build_tools
+        from nicx.comandos.conversa.ask import _build_tools
 
         with pytest.raises(ValueError, match="allowed_dirs"):
             _build_tools(["file_read", "file_write"], cfg, None, "")

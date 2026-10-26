@@ -11,10 +11,10 @@ from nicx.comandos import cli
 
 def test_stop_unloads_the_model():
     with (
-        patch("nicx.comandos.gui_cmd.stop_frontend", return_value=None),
-        patch("nicx.comandos.daemon_cmd._read_pid", return_value=4321),
-        patch("nicx.comandos.daemon_cmd.terminate_process") as terminate,
-        patch("nicx.comandos.daemon_cmd.clear_server_state"),
+        patch("nicx.comandos.sistema.gui.stop_frontend", return_value=None),
+        patch("nicx.comandos.sistema.daemon._read_pid", return_value=4321),
+        patch("nicx.comandos.sistema.daemon.terminate_process") as terminate,
+        patch("nicx.comandos.sistema.daemon.clear_server_state"),
         patch("nicx.motores.ollama.unload_configured_model") as unload,
     ):
         result = CliRunner().invoke(cli, ["stop"])

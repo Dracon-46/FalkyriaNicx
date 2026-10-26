@@ -32,7 +32,7 @@ class TestConfigSet:
         env = {"NICX_CONFIG": str(config_file)}
         with (
             mock.patch.dict(os.environ, env),
-            mock.patch("nicx.comandos.config_cmd.httpx"),
+            mock.patch("nicx.comandos.instalacao.config.httpx"),
         ):
             result = CliRunner().invoke(
                 cli,
@@ -133,7 +133,7 @@ class TestConfigSet:
         env = {"NICX_CONFIG": str(config_file)}
         with (
             mock.patch.dict(os.environ, env),
-            mock.patch("nicx.comandos.config_cmd.httpx") as mock_httpx,
+            mock.patch("nicx.comandos.instalacao.config.httpx") as mock_httpx,
         ):
             mock_httpx.get.return_value = mock.Mock(status_code=200)
             result = CliRunner().invoke(
@@ -150,7 +150,7 @@ class TestConfigSet:
         env = {"NICX_CONFIG": str(config_file)}
         with (
             mock.patch.dict(os.environ, env),
-            mock.patch("nicx.comandos.config_cmd.httpx") as mock_httpx,
+            mock.patch("nicx.comandos.instalacao.config.httpx") as mock_httpx,
         ):
             mock_httpx.get.side_effect = Exception("Connection refused")
             result = CliRunner().invoke(

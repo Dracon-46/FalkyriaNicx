@@ -854,7 +854,7 @@ def ask(
             sys.exit(1)
     if capture_screen:
         try:
-            from nicx.comandos._screen import capture_screen_to_temp
+            from nicx.comandos.conversa._screen import capture_screen_to_temp
 
             _shot = capture_screen_to_temp()
             with open(_shot, "rb") as _fh:

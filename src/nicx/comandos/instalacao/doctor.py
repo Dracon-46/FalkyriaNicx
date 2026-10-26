@@ -470,7 +470,7 @@ def doctor(as_json: bool) -> None:
     console.print()
 
     # Background tasks section
-    from nicx.comandos._bg_state import get_status
+    from nicx.comandos.instalacao._bg_state import get_status
     from nicx.nucleo.paths import get_config_dir
 
     scripts_dir = get_config_dir() / ".scripts"

@@ -11,7 +11,7 @@ from click.testing import CliRunner
 from nicx.comandos import cli
 from nicx.nucleo.config import NicxConfig
 
-_ask_mod = importlib.import_module("nicx.comandos.ask")
+_ask_mod = importlib.import_module("nicx.comandos.conversa.ask")
 
 
 def _mock_engine():

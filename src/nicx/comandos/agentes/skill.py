@@ -148,7 +148,7 @@ def run(skill_name: str, arg: tuple):
     """Execute a stepped skill using configured security and tool permissions."""
     import nicx.ferramentas  # noqa: F401
     from nicx.comandos._tool_names import resolve_tool_names
-    from nicx.comandos.ask import _build_tools
+    from nicx.comandos.conversa.ask import _build_tools
     from nicx.ferramentas._stubs import ToolExecutor
     from nicx.nucleo.registry import ToolRegistry
     from nicx.seguranca import setup_security

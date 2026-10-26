@@ -1,11 +1,11 @@
-"""Tests for nicx.comandos._first_run.check_and_route."""
+"""Tests for nicx.comandos.instalacao._first_run.check_and_route."""
 
 from __future__ import annotations
 
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from nicx.comandos import _first_run
+from nicx.comandos.instalacao import _first_run
 
 
 def _ctx_with_invocation(name: str | None) -> MagicMock:
@@ -69,7 +69,9 @@ def test_root_group_invokes_guard_on_bare_nicx(
     def _recorder(ctx) -> None:
         calls.append(ctx.invoked_subcommand)
 
-    monkeypatch.setattr("nicx.comandos._first_run.check_and_route", _recorder)
+    monkeypatch.setattr(
+        "nicx.comandos.instalacao._first_run.check_and_route", _recorder
+    )
 
     from nicx.comandos import cli
 
@@ -89,7 +91,9 @@ def test_root_group_does_not_invoke_guard_on_subcommand(
     def _recorder(ctx) -> None:
         calls.append(ctx.invoked_subcommand)
 
-    monkeypatch.setattr("nicx.comandos._first_run.check_and_route", _recorder)
+    monkeypatch.setattr(
+        "nicx.comandos.instalacao._first_run.check_and_route", _recorder
+    )
 
     from nicx.comandos import cli
 

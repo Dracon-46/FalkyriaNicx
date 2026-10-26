@@ -11,11 +11,11 @@ from rich.console import Console
 from rich.markup import escape
 from rich.panel import Panel
 
-from nicx.comandos._analytics_consent import apply_analytics_choice
 from nicx.comandos._banner import print_banner
-from nicx.comandos._bootstrap import _DEFAULT_SOUL, detect_cloud_keys
-from nicx.comandos.model import find_model_spec, hf_download, ollama_pull
-from nicx.comandos.scan_cmd import PrivacyScanner
+from nicx.comandos.instalacao._analytics_consent import apply_analytics_choice
+from nicx.comandos.instalacao._bootstrap import _DEFAULT_SOUL, detect_cloud_keys
+from nicx.comandos.instalacao.scan import PrivacyScanner
+from nicx.comandos.recursos.model import find_model_spec, hf_download, ollama_pull
 from nicx.nucleo.config import (
     DEFAULT_CONFIG_DIR,
     DEFAULT_CONFIG_PATH,
@@ -341,12 +341,12 @@ def init(
     # Handle --preset: copy a starter config and return early
     if preset:
         examples_dir = (
-            Path(__file__).resolve().parents[2] / "configs" / "nicx" / "examples"
+            Path(__file__).resolve().parents[3] / "configs" / "nicx" / "examples"
         )
         # Also check installed package location
         if not examples_dir.exists():
             examples_dir = (
-                Path(__file__).resolve().parents[3] / "configs" / "nicx" / "examples"
+                Path(__file__).resolve().parents[4] / "configs" / "nicx" / "examples"
             )
         preset_path = examples_dir / f"{preset}.toml"
         if not preset_path.exists():

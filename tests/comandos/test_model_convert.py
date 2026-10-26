@@ -13,9 +13,9 @@ from unittest.mock import MagicMock
 import pytest
 from click.testing import CliRunner
 
-from nicx.comandos.model import model
+from nicx.comandos.recursos.model import model
 
-model_module = importlib.import_module("nicx.comandos.model")
+model_module = importlib.import_module("nicx.comandos.recursos.model")
 
 
 class TestModelConvert:

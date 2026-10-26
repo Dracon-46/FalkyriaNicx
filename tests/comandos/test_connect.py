@@ -13,7 +13,7 @@ def test_connect_list_no_connectors() -> None:
     """--list with an empty registry shows a 'no connectors' message."""
     runner = CliRunner()
     with mock.patch(
-        "nicx.comandos.connect_cmd.connect.__wrapped__"
+        "nicx.comandos.recursos.connect.connect.__wrapped__"
         if hasattr(cli, "__wrapped__")
         else "nicx.nucleo.registry.ConnectorRegistry.items",
         return_value=(),

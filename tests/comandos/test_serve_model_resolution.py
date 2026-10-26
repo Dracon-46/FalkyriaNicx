@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from nicx.comandos.serve import _resolve_server_model
+from nicx.comandos.sistema.serve import _resolve_server_model
 from nicx.nucleo.config import NicxConfig
 
 

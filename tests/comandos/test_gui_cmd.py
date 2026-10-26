@@ -10,7 +10,7 @@ from unittest import mock
 
 from click.testing import CliRunner
 
-from nicx.comandos import gui_cmd
+from nicx.comandos.sistema import gui as gui_cmd
 
 
 def test_gui_custom_ports_use_project_root_and_same_origin_proxy(

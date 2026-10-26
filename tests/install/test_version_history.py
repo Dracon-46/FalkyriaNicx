@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from nicx.comandos.self_update_cmd import _update_git_checkout
+from nicx.comandos.instalacao.self_update import _update_git_checkout
 
 ROOT = Path(__file__).resolve().parents[2]
 _RUN = subprocess.run
@@ -194,7 +194,9 @@ def test_update_recovers_version_before_reinstall_and_preserves_user_files(
     user_file.write_text("preserve this\n")
     head = _git(clone, "rev-parse", "HEAD")
     active_venv = tmp_path / "managed environment"
-    monkeypatch.setattr("nicx.comandos.self_update_cmd.sys.prefix", str(active_venv))
+    monkeypatch.setattr(
+        "nicx.comandos.instalacao.self_update.sys.prefix", str(active_venv)
+    )
     rebuild_versions: list[str] = []
 
     def run(command, **kwargs):
@@ -213,7 +215,7 @@ def test_update_recovers_version_before_reinstall_and_preserves_user_files(
         rebuild_versions.append(_git(clone, "describe", "--tags", "--long"))
         return subprocess.CompletedProcess(command, 0)
 
-    monkeypatch.setattr("nicx.comandos.self_update_cmd.subprocess.run", run)
+    monkeypatch.setattr("nicx.comandos.instalacao.self_update.subprocess.run", run)
     assert _update_git_checkout(clone) == 0
     assert _git(clone, "rev-parse", "--is-shallow-repository") == "false"
     assert _git(clone, "rev-parse", "HEAD") == head
@@ -239,7 +241,7 @@ def test_update_does_not_merge_or_reinstall_diverged_checkout(
         assert command[0] != "uv", "Failed Git update must not report a rebuilt package"
         return _RUN(command, **kwargs)
 
-    monkeypatch.setattr("nicx.comandos.self_update_cmd.subprocess.run", run)
+    monkeypatch.setattr("nicx.comandos.instalacao.self_update.subprocess.run", run)
     assert _update_git_checkout(clone) != 0
     assert _git(clone, "rev-parse", "HEAD") == original_head
     assert (clone / "local.txt").read_text() == "local work\n"

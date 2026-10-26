@@ -32,8 +32,8 @@ def check_and_route(ctx: click.Context) -> None:
         return
 
     # Late imports to avoid circular import with cli/__init__.py.
-    from nicx.comandos.chat_cmd import chat as chat_cmd
-    from nicx.comandos.init_cmd import init as init_cmd
+    from nicx.comandos.conversa.chat import chat as chat_cmd
+    from nicx.comandos.instalacao.init import init as init_cmd
 
     if _cfg.DEFAULT_CONFIG_PATH.exists():
         pick_bare = bool(getattr(ctx, "obj", None) and ctx.obj.get("pick_model_bare"))

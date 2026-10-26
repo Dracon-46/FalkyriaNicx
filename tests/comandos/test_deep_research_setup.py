@@ -71,7 +71,7 @@ def _create_fake_imessage_db(db_path: Path) -> None:
 
 def test_detect_local_sources(tmp_path: Path) -> None:
     """Auto-detection finds Apple Notes and iMessage when DBs exist."""
-    from nicx.comandos.deep_research_setup_cmd import detect_local_sources
+    from nicx.comandos.agentes.deep_research_setup import detect_local_sources
 
     notes_db = tmp_path / "NoteStore.sqlite"
     imessage_db = tmp_path / "chat.db"
@@ -90,7 +90,7 @@ def test_detect_local_sources(tmp_path: Path) -> None:
 
 def test_detect_skips_missing_sources(tmp_path: Path) -> None:
     """Auto-detection skips sources whose files don't exist."""
-    from nicx.comandos.deep_research_setup_cmd import detect_local_sources
+    from nicx.comandos.agentes.deep_research_setup import detect_local_sources
 
     sources = detect_local_sources(
         notes_db_path=tmp_path / "nonexistent.sqlite",
@@ -102,7 +102,7 @@ def test_detect_skips_missing_sources(tmp_path: Path) -> None:
 
 def test_detect_includes_obsidian_when_vault_exists(tmp_path: Path) -> None:
     """Auto-detection includes Obsidian when vault path exists."""
-    from nicx.comandos.deep_research_setup_cmd import detect_local_sources
+    from nicx.comandos.agentes.deep_research_setup import detect_local_sources
 
     vault = tmp_path / "vault"
     vault.mkdir()
@@ -119,7 +119,7 @@ def test_detect_includes_obsidian_when_vault_exists(tmp_path: Path) -> None:
 
 def test_ingest_sources(tmp_path: Path) -> None:
     """ingest_sources connects and ingests documents into KnowledgeStore."""
-    from nicx.comandos.deep_research_setup_cmd import (
+    from nicx.comandos.agentes.deep_research_setup import (
         detect_local_sources,
         ingest_sources,
     )
@@ -146,7 +146,7 @@ def test_ingest_sources(tmp_path: Path) -> None:
 
 def test_detect_token_sources_finds_connected(tmp_path: Path) -> None:
     """detect_token_sources finds sources with valid credential files."""
-    from nicx.comandos.deep_research_setup_cmd import detect_token_sources
+    from nicx.comandos.agentes.deep_research_setup import detect_token_sources
 
     connectors_dir = tmp_path / "connectors"
     connectors_dir.mkdir()
@@ -161,7 +161,7 @@ def test_detect_token_sources_finds_connected(tmp_path: Path) -> None:
 
 def test_detect_token_sources_skips_empty(tmp_path: Path) -> None:
     """detect_token_sources skips files with empty or invalid JSON."""
-    from nicx.comandos.deep_research_setup_cmd import detect_token_sources
+    from nicx.comandos.agentes.deep_research_setup import detect_token_sources
 
     connectors_dir = tmp_path / "connectors"
     connectors_dir.mkdir()
@@ -174,7 +174,7 @@ def test_detect_token_sources_skips_empty(tmp_path: Path) -> None:
 
 def test_detect_token_sources_empty_dir(tmp_path: Path) -> None:
     """detect_token_sources returns empty list when no credential files exist."""
-    from nicx.comandos.deep_research_setup_cmd import detect_token_sources
+    from nicx.comandos.agentes.deep_research_setup import detect_token_sources
 
     connectors_dir = tmp_path / "connectors"
     connectors_dir.mkdir()

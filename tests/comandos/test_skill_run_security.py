@@ -42,10 +42,10 @@ def skill_cli(tmp_path):
     cfg.learning.skills.overlay_dir = str(tmp_path / "overlays")
     bus = EventBus(record_history=True)
     with (
-        patch("nicx.comandos.skill_cmd._get_skill_paths", return_value=[tmp_path]),
-        patch("nicx.comandos.skill_cmd.load_config", return_value=cfg),
+        patch("nicx.comandos.agentes.skill._get_skill_paths", return_value=[tmp_path]),
+        patch("nicx.comandos.agentes.skill.load_config", return_value=cfg),
         patch("nicx.nucleo.config.load_config", return_value=cfg),
-        patch("nicx.comandos.skill_cmd.EventBus", return_value=bus),
+        patch("nicx.comandos.agentes.skill.EventBus", return_value=bus),
     ):
         yield tmp_path, cfg, bus
 

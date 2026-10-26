@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from nicx.cerebro.agentes.autonomos.digest_store import DigestStore
-from nicx.comandos.digest_cmd import (
+from nicx.comandos.agentes.digest import (
     _cancel_scheduler_tasks,
     _create_scheduler_task,
     _save_digest_schedule,

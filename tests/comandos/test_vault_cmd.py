@@ -8,7 +8,7 @@ from unittest import mock
 import pytest
 from click.testing import CliRunner
 
-from nicx.comandos.vault_cmd import vault
+from nicx.comandos.recursos.vault import vault
 
 
 class TestVaultCmd:
@@ -30,7 +30,7 @@ class TestVaultCmd:
 
     def test_vault_list_empty(self) -> None:
         with mock.patch(
-            "nicx.comandos.vault_cmd._VAULT_FILE",
+            "nicx.comandos.recursos.vault._VAULT_FILE",
             Path("/nonexistent/vault.enc"),
         ):
             result = CliRunner().invoke(vault, ["list"])
@@ -44,10 +44,10 @@ class TestVaultCmd:
         key_file = tmp_path / ".vault_key"
 
         with (
-            mock.patch("nicx.comandos.vault_cmd._VAULT_FILE", vault_file),
-            mock.patch("nicx.comandos.vault_cmd._VAULT_KEY_FILE", key_file),
+            mock.patch("nicx.comandos.recursos.vault._VAULT_FILE", vault_file),
+            mock.patch("nicx.comandos.recursos.vault._VAULT_KEY_FILE", key_file),
             mock.patch(
-                "nicx.comandos.vault_cmd.DEFAULT_CONFIG_DIR",
+                "nicx.comandos.recursos.vault.DEFAULT_CONFIG_DIR",
                 tmp_path,
             ),
         ):
@@ -64,7 +64,7 @@ class TestVaultCmd:
 
     def test_vault_remove_not_found(self) -> None:
         with mock.patch(
-            "nicx.comandos.vault_cmd._VAULT_FILE",
+            "nicx.comandos.recursos.vault._VAULT_FILE",
             Path("/nonexistent/vault.enc"),
         ):
             result = CliRunner().invoke(vault, ["remove", "nonexistent"])
