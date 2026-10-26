@@ -24,8 +24,8 @@ def _register_all():
     """Ensure agents and tools are registered."""
     from nicx.cerebro.agentes.codeact import CodeActAgent
     from nicx.cerebro.agentes.native_react import NativeReActAgent
-    from nicx.ferramentas.calculator import CalculatorTool
-    from nicx.ferramentas.think import ThinkTool
+    from nicx.ferramentas.agentes.calculator import CalculatorTool
+    from nicx.ferramentas.agentes.think import ThinkTool
 
     for key, cls in [
         ("native_react", NativeReActAgent),
@@ -79,7 +79,7 @@ class TestReActPipeline:
     def test_react_with_calculator_e2e(self):
         _register_all()
         from nicx.cerebro.agentes.native_react import NativeReActAgent
-        from nicx.ferramentas.calculator import CalculatorTool
+        from nicx.ferramentas.agentes.calculator import CalculatorTool
 
         responses = [
             _simple_response(
@@ -108,7 +108,7 @@ class TestReActPipeline:
     def test_react_with_think_tool(self):
         _register_all()
         from nicx.cerebro.agentes.native_react import NativeReActAgent
-        from nicx.ferramentas.think import ThinkTool
+        from nicx.ferramentas.agentes.think import ThinkTool
 
         responses = [
             _simple_response(
@@ -177,7 +177,7 @@ class TestCodeActPipeline:
     def test_codeact_code_execution_e2e(self):
         _register_all()
         from nicx.cerebro.agentes.codeact import CodeActAgent
-        from nicx.ferramentas.code_interpreter import (
+        from nicx.ferramentas.codigo.code_interpreter import (
             CodeInterpreterTool,
         )
 
@@ -244,11 +244,11 @@ class TestMCPIntegration:
     """MCP server + client with real tools."""
 
     def test_mcp_server_with_all_tools(self):
-        from nicx.ferramentas.calculator import CalculatorTool
+        from nicx.ferramentas.agentes.calculator import CalculatorTool
+        from nicx.ferramentas.agentes.think import ThinkTool
         from nicx.ferramentas.mcp.client import MCPClient
         from nicx.ferramentas.mcp.server import MCPServer
         from nicx.ferramentas.mcp.transport import InProcessTransport
-        from nicx.ferramentas.think import ThinkTool
 
         tools = [CalculatorTool(), ThinkTool()]
         server = MCPServer(tools)
@@ -283,7 +283,7 @@ class TestMCPIntegration:
         client.close()
 
     def test_mcp_unknown_tool_error(self):
-        from nicx.ferramentas.calculator import CalculatorTool
+        from nicx.ferramentas.agentes.calculator import CalculatorTool
         from nicx.ferramentas.mcp.client import MCPClient
         from nicx.ferramentas.mcp.protocol import MCPError
         from nicx.ferramentas.mcp.server import MCPServer
@@ -300,7 +300,7 @@ class TestMCPIntegration:
 
     def test_mcp_roundtrip_lifecycle(self):
         """Full lifecycle: init -> list -> call -> result."""
-        from nicx.ferramentas.calculator import CalculatorTool
+        from nicx.ferramentas.agentes.calculator import CalculatorTool
         from nicx.ferramentas.mcp.client import MCPClient
         from nicx.ferramentas.mcp.server import MCPServer
         from nicx.ferramentas.mcp.transport import InProcessTransport
@@ -358,7 +358,7 @@ class TestCrossEngineConsistency:
         """Tool calling works regardless of engine mock."""
         _register_all()
         from nicx.cerebro.agentes.native_react import NativeReActAgent
-        from nicx.ferramentas.calculator import CalculatorTool
+        from nicx.ferramentas.agentes.calculator import CalculatorTool
 
         for engine_name in ["vllm", "ollama"]:
             responses = [
@@ -392,7 +392,7 @@ class TestMemoryPipeline:
     """Index and retrieve across available backends."""
 
     def test_sqlite_index_and_retrieve(self, tmp_path):
-        from nicx.ferramentas.storage.sqlite import SQLiteMemory
+        from nicx.memoria.armazenamento.sqlite import SQLiteMemory
 
         backend = SQLiteMemory(db_path=str(tmp_path / "mem.db"))
         backend.store(
@@ -409,7 +409,7 @@ class TestMemoryPipeline:
 
     def test_bm25_index_and_retrieve(self, tmp_path):
         try:
-            from nicx.ferramentas.storage.bm25 import BM25Memory
+            from nicx.memoria.armazenamento.bm25 import BM25Memory
         except ImportError:
             pytest.skip("rank_bm25 not installed")
 

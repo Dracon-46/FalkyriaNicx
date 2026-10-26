@@ -188,7 +188,10 @@ def ensure_registries_populated() -> None:
     except Exception:
         pass
 
-    browser_modules = ("nicx.ferramentas.browser", "nicx.ferramentas.browser_axtree")
+    browser_modules = (
+        "nicx.ferramentas.web.browser",
+        "nicx.ferramentas.web.browser_axtree",
+    )
     for module_name in browser_modules:
         try:
             importlib.import_module(module_name)
@@ -206,9 +209,14 @@ def ensure_registries_populated() -> None:
                     pass
 
     if not ToolRegistry.keys():
+        from nicx.ferramentas import NOT_TOOL_MODULES
+
         for module_name in list(sys.modules):
             if (
                 module_name.startswith("nicx.ferramentas.")
+                # MCP e sandbox são infraestrutura: recarregar criaria
+                # cópias novas das classes (isinstance passaria a falhar).
+                and not module_name.startswith(NOT_TOOL_MODULES)
                 and not module_name.endswith("_stubs")
                 and not module_name.endswith("agent_tools")
             ):
@@ -280,10 +288,10 @@ def build_deep_research_tools(
 
     from nicx.conectores.retriever import TwoStageRetriever
     from nicx.conectores.store import KnowledgeStore
-    from nicx.ferramentas.knowledge_search import KnowledgeSearchTool
-    from nicx.ferramentas.knowledge_sql import KnowledgeSQLTool
-    from nicx.ferramentas.scan_chunks import ScanChunksTool
-    from nicx.ferramentas.think import ThinkTool
+    from nicx.ferramentas.agentes.think import ThinkTool
+    from nicx.ferramentas.conhecimento.knowledge_search import KnowledgeSearchTool
+    from nicx.ferramentas.conhecimento.knowledge_sql import KnowledgeSQLTool
+    from nicx.ferramentas.conhecimento.scan_chunks import ScanChunksTool
 
     store = KnowledgeStore(str(path))
     try:

@@ -280,10 +280,10 @@ def _launch_chat(store: KnowledgeStore, console: Console) -> None:
     """Start an interactive Deep Research chat session."""
     from nicx.cerebro.agentes.deep_research import DeepResearchAgent
     from nicx.conectores.retriever import TwoStageRetriever
-    from nicx.ferramentas.knowledge_search import KnowledgeSearchTool
-    from nicx.ferramentas.knowledge_sql import KnowledgeSQLTool
-    from nicx.ferramentas.scan_chunks import ScanChunksTool
-    from nicx.ferramentas.think import ThinkTool
+    from nicx.ferramentas.agentes.think import ThinkTool
+    from nicx.ferramentas.conhecimento.knowledge_search import KnowledgeSearchTool
+    from nicx.ferramentas.conhecimento.knowledge_sql import KnowledgeSQLTool
+    from nicx.ferramentas.conhecimento.scan_chunks import ScanChunksTool
     from nicx.motores.ollama import OllamaEngine
     from nicx.nucleo.config import load_config
     from nicx.nucleo.events import EventBus

@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, Tuple, Type, Typ
 
 if TYPE_CHECKING:
     from nicx.cerebro.agentes._stubs import BaseAgent
-    from nicx.ferramentas.storage._stubs import MemoryBackend
+    from nicx.memoria.armazenamento._stubs import MemoryBackend
     from nicx.memoria.store import FactStore
     from nicx.motores._stubs import InferenceEngine
 

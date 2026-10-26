@@ -156,8 +156,8 @@ Combines a sparse retriever and a dense retriever using Reciprocal Rank Fusion (
 - **Dependencies:** Depends on sub-backends
 
 ```python
-from nicx.ferramentas.storage.bm25 import BM25Memory
-from nicx.ferramentas.storage.faiss_backend import FAISSMemory
+from nicx.memoria.armazenamento.bm25 import BM25Memory
+from nicx.memoria.armazenamento.faiss_backend import FAISSMemory
 
 sparse = BM25Memory()
 dense = FAISSMemory()
@@ -173,7 +173,7 @@ backend = MemoryRegistry.create(
 ```
 
 !!! note "Backward compatibility"
-    The old `from nicx.memoria.bm25 import BM25Memory` still works via backward-compatibility shims, but new code should use the canonical `nicx.ferramentas.storage.*` imports.
+    The old `from nicx.memoria.bm25 import BM25Memory` still works via backward-compatibility shims, but new code should use the canonical `nicx.memoria.armazenamento.*` imports.
 
 | Parameter       | Default | Description                              |
 |-----------------|---------|------------------------------------------|
@@ -262,8 +262,8 @@ The ingestion pipeline automatically skips:
 
 ```python
 from pathlib import Path
-from nicx.ferramentas.storage.chunking import ChunkConfig
-from nicx.ferramentas.storage.ingest import ingest_path
+from nicx.memoria.armazenamento.chunking import ChunkConfig
+from nicx.memoria.armazenamento.ingest import ingest_path
 
 # Default chunking
 chunks = ingest_path(Path("./docs/"))

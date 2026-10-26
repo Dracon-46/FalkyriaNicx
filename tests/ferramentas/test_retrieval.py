@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from nicx.ferramentas.retrieval import RetrievalTool
-from nicx.ferramentas.storage._stubs import MemoryBackend, RetrievalResult
+from nicx.ferramentas.conhecimento.retrieval import RetrievalTool
+from nicx.memoria.armazenamento._stubs import MemoryBackend, RetrievalResult
 
 
 class _FakeBackend(MemoryBackend):

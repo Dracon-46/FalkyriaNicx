@@ -33,8 +33,8 @@ def _register_agents():
 
 
 def _register_tools():
-    from nicx.ferramentas.calculator import CalculatorTool
-    from nicx.ferramentas.think import ThinkTool
+    from nicx.ferramentas.agentes.calculator import CalculatorTool
+    from nicx.ferramentas.agentes.think import ThinkTool
 
     if not ToolRegistry.contains("calculator"):
         ToolRegistry.register_value("calculator", CalculatorTool)
@@ -101,7 +101,7 @@ class TestOrchestratorWithCalculator:
         _register_agents()
         _register_tools()
 
-        from nicx.ferramentas.calculator import CalculatorTool
+        from nicx.ferramentas.agentes.calculator import CalculatorTool
 
         engine = MagicMock()
         engine.engine_id = "mock"
@@ -265,8 +265,8 @@ class TestToolExecutorIntegration:
     def test_calculator_and_think(self):
         _register_tools()
         from nicx.ferramentas._stubs import ToolExecutor
-        from nicx.ferramentas.calculator import CalculatorTool
-        from nicx.ferramentas.think import ThinkTool
+        from nicx.ferramentas.agentes.calculator import CalculatorTool
+        from nicx.ferramentas.agentes.think import ThinkTool
 
         bus = EventBus(record_history=True)
         executor = ToolExecutor([CalculatorTool(), ThinkTool()], bus=bus)

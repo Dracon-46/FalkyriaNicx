@@ -195,8 +195,8 @@ How it works:
 
 ```python
 from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
-from nicx.ferramentas.calculator import CalculatorTool
-from nicx.ferramentas.think import ThinkTool
+from nicx.ferramentas.agentes.calculator import CalculatorTool
+from nicx.ferramentas.agentes.think import ThinkTool
 
 agent = OrchestratorAgent(
     engine,

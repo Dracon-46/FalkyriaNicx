@@ -23,7 +23,7 @@ def test_tool_events_and_persisted_trace_keep_credentials_private(
 ):
     from nicx.cerebro.agentes._stubs import AgentResult
     from nicx.ferramentas._stubs import ToolExecutor
-    from nicx.ferramentas.text_to_speech import TextToSpeechTool
+    from nicx.ferramentas.integracoes.text_to_speech import TextToSpeechTool
     from nicx.nucleo.events import EventBus, EventType
     from nicx.nucleo.registry import TTSRegistry
     from nicx.nucleo.types import StepType, ToolCall

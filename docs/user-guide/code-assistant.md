@@ -109,7 +109,7 @@ nicx ask "Run pytest tests/test_memory.py -v and fix any failures"
 nicx ask "Read utils.py and refactor the parse_config function to use dataclasses"
 
 # Generate tests
-nicx ask "Read src/nicx/ferramentas/calculator.py and write unit tests for it"
+nicx ask "Read src/nicx/ferramentas/agentes/calculator.py and write unit tests for it"
 
 # Shell tasks
 nicx ask "Find all Python files larger than 100KB in this repo"

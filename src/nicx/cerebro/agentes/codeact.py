@@ -101,7 +101,7 @@ class CodeActAgent(ToolUsingAgent):
             return text, False
         url = url_match.group(0).rstrip(".,;)")
         try:
-            from nicx.ferramentas.web_search import WebSearchTool
+            from nicx.ferramentas.web.web_search import WebSearchTool
             from nicx.seguranca.runtime import execute_secured_tool
 
             executor = self._executor

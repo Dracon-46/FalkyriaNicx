@@ -19,7 +19,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, List, Optional
 
 from nicx.conectores.store import KnowledgeStore
-from nicx.ferramentas.storage._stubs import RetrievalResult
+from nicx.memoria.armazenamento._stubs import RetrievalResult
 
 if TYPE_CHECKING:
     from nicx.conectores.embedding_store import EmbeddingStore

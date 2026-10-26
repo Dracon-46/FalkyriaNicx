@@ -10,7 +10,7 @@ from nicx.conectores.obsidian import ObsidianConnector
 from nicx.conectores.pipeline import IngestionPipeline
 from nicx.conectores.store import KnowledgeStore
 from nicx.conectores.sync_engine import SyncEngine
-from nicx.ferramentas.knowledge_search import KnowledgeSearchTool
+from nicx.ferramentas.conhecimento.knowledge_search import KnowledgeSearchTool
 
 # ---------------------------------------------------------------------------
 # Fixtures

@@ -31,7 +31,7 @@ def _fake_engine() -> MagicMock:
 
 
 def test_scan_finds_semantic_matches(store: KnowledgeStore) -> None:
-    from nicx.ferramentas.scan_chunks import ScanChunksTool
+    from nicx.ferramentas.conhecimento.scan_chunks import ScanChunksTool
 
     engine = _fake_engine()
     tool = ScanChunksTool(store=store, engine=engine, model="test")
@@ -42,7 +42,7 @@ def test_scan_finds_semantic_matches(store: KnowledgeStore) -> None:
 
 
 def test_scan_respects_source_filter(store: KnowledgeStore) -> None:
-    from nicx.ferramentas.scan_chunks import ScanChunksTool
+    from nicx.ferramentas.conhecimento.scan_chunks import ScanChunksTool
 
     engine = _fake_engine()
     tool = ScanChunksTool(store=store, engine=engine, model="test")
@@ -55,7 +55,7 @@ def test_scan_respects_source_filter(store: KnowledgeStore) -> None:
 
 
 def test_scan_empty_store(tmp_path: Path) -> None:
-    from nicx.ferramentas.scan_chunks import ScanChunksTool
+    from nicx.ferramentas.conhecimento.scan_chunks import ScanChunksTool
 
     ks = KnowledgeStore(str(tmp_path / "empty.db"))
     engine = _fake_engine()
@@ -66,7 +66,7 @@ def test_scan_empty_store(tmp_path: Path) -> None:
 
 
 def test_registered() -> None:
-    from nicx.ferramentas.scan_chunks import ScanChunksTool
+    from nicx.ferramentas.conhecimento.scan_chunks import ScanChunksTool
 
     ToolRegistry.register_value("scan_chunks", ScanChunksTool)
     assert ToolRegistry.contains("scan_chunks")

@@ -61,39 +61,39 @@ def _make_import_error_session():
 
 class TestBrowserNavigateTool:
     def test_spec_name_and_category(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         tool = BrowserNavigateTool()
         assert tool.spec.name == "browser_navigate"
         assert tool.spec.category == "browser"
 
     def test_spec_requires_url_parameter(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         tool = BrowserNavigateTool()
         assert "url" in tool.spec.parameters["properties"]
         assert "url" in tool.spec.parameters["required"]
 
     def test_spec_has_wait_for_parameter(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         tool = BrowserNavigateTool()
         assert "wait_for" in tool.spec.parameters["properties"]
 
     def test_spec_required_capabilities(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         tool = BrowserNavigateTool()
         assert "network:fetch" in tool.spec.required_capabilities
 
     def test_tool_id(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         tool = BrowserNavigateTool()
         assert tool.tool_id == "browser_navigate"
 
     def test_execute_no_url(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         tool = BrowserNavigateTool()
         result = tool.execute(url="")
@@ -101,7 +101,7 @@ class TestBrowserNavigateTool:
         assert "No URL" in result.content
 
     def test_execute_no_url_param(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         tool = BrowserNavigateTool()
         result = tool.execute()
@@ -109,17 +109,17 @@ class TestBrowserNavigateTool:
         assert "No URL" in result.content
 
     def test_execute_playwright_not_installed(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         session = _make_import_error_session()
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserNavigateTool()
             result = tool.execute(url="https://example.com")
         assert result.success is False
         assert "playwright not installed" in result.content
 
     def test_execute_ssrf_blocked(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         mock_ssrf_module = MagicMock()
         mock_ssrf_module.check_ssrf.return_value = (
@@ -146,7 +146,7 @@ class TestBrowserNavigateTool:
         blocked URL is rejected even though navigation would otherwise
         succeed, proving the check runs unconditionally.
         """
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         mock_ssrf_module = MagicMock()
         mock_ssrf_module.check_ssrf.return_value = (
@@ -155,7 +155,7 @@ class TestBrowserNavigateTool:
         page = _make_mock_page()
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             with patch.dict(
                 "sys.modules",
                 {"nicx.seguranca.ssrf": mock_ssrf_module},
@@ -169,14 +169,14 @@ class TestBrowserNavigateTool:
 
     def test_execute_allows_public_url(self):
         """The always-on SSRF check must not break legitimate navigation."""
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         mock_ssrf_module = MagicMock()
         mock_ssrf_module.check_ssrf.return_value = None  # public URL, allowed
         page = _make_mock_page()
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             with patch.dict(
                 "sys.modules",
                 {"nicx.seguranca.ssrf": mock_ssrf_module},
@@ -187,14 +187,14 @@ class TestBrowserNavigateTool:
         assert result.success is True
 
     def test_execute_success(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         page = _make_mock_page()
         page.title.return_value = "Example Domain"
         page.inner_text.return_value = "Example page content"
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserNavigateTool()
             result = tool.execute(url="https://example.com")
 
@@ -206,12 +206,12 @@ class TestBrowserNavigateTool:
         assert result.metadata["status"] == 200
 
     def test_execute_with_wait_for(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         page = _make_mock_page()
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserNavigateTool()
             tool.execute(url="https://example.com", wait_for="networkidle")
 
@@ -220,25 +220,25 @@ class TestBrowserNavigateTool:
         )
 
     def test_execute_invalid_wait_for_defaults_to_load(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         page = _make_mock_page()
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserNavigateTool()
             tool.execute(url="https://example.com", wait_for="invalid")
 
         page.goto.assert_called_once_with("https://example.com", wait_until="load")
 
     def test_execute_content_truncation(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         page = _make_mock_page()
         page.inner_text.return_value = "x" * 6000
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserNavigateTool()
             result = tool.execute(url="https://example.com")
 
@@ -246,7 +246,7 @@ class TestBrowserNavigateTool:
         assert "[Content truncated]" in result.content
 
     def test_execute_navigation_error(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         page = _make_mock_page()
         page.goto.side_effect = Exception("net::ERR_NAME_NOT_RESOLVED")
@@ -254,7 +254,7 @@ class TestBrowserNavigateTool:
 
         with (
             patch("nicx.seguranca.ssrf.check_ssrf", return_value=None),
-            patch("nicx.ferramentas.browser._session", session),
+            patch("nicx.ferramentas.web.browser._session", session),
         ):
             tool = BrowserNavigateTool()
             result = tool.execute(url="https://nonexistent.example")
@@ -263,7 +263,7 @@ class TestBrowserNavigateTool:
         assert "Navigation error" in result.content
 
     def test_to_openai_function(self):
-        from nicx.ferramentas.browser import BrowserNavigateTool
+        from nicx.ferramentas.web.browser import BrowserNavigateTool
 
         tool = BrowserNavigateTool()
         fn = tool.to_openai_function()
@@ -279,14 +279,14 @@ class TestBrowserNavigateTool:
 
 class TestBrowserClickTool:
     def test_spec_name_and_category(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         tool = BrowserClickTool()
         assert tool.spec.name == "browser_click"
         assert tool.spec.category == "browser"
 
     def test_spec_advertises_selector_and_aliases(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         tool = BrowserClickTool()
         properties = tool.spec.parameters["properties"]
@@ -301,19 +301,19 @@ class TestBrowserClickTool:
         ]
 
     def test_spec_has_by_text_parameter(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         tool = BrowserClickTool()
         assert "by_text" in tool.spec.parameters["properties"]
 
     def test_tool_id(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         tool = BrowserClickTool()
         assert tool.tool_id == "browser_click"
 
     def test_execute_no_selector(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         tool = BrowserClickTool()
         result = tool.execute(selector="")
@@ -321,7 +321,7 @@ class TestBrowserClickTool:
         assert "No selector" in result.content
 
     def test_execute_no_selector_param(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         tool = BrowserClickTool()
         result = tool.execute()
@@ -329,7 +329,7 @@ class TestBrowserClickTool:
         assert "No selector" in result.content
 
     def test_resolver_skips_hidden_duplicate_match(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         class Match:
             def __init__(self, *, visible=True, enabled=True):
@@ -373,7 +373,7 @@ class TestBrowserClickTool:
         assert visible.clicked is True
 
     def test_resolver_applies_ordinal_after_actionability_filter(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         class Match:
             def __init__(self, *, visible=True):
@@ -417,7 +417,7 @@ class TestBrowserClickTool:
         assert second_visible.clicked is False
 
     def test_resolver_clicks_fourth_actionable_role_match(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         class Match:
             def __init__(self):
@@ -459,22 +459,22 @@ class TestBrowserClickTool:
         assert [match.clicked for match in buttons] == [False, False, False, True]
 
     def test_every_supported_ordinal_is_a_description_stopword(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         assert set(BrowserClickTool._ORDINALS) <= BrowserClickTool._DESC_STOPWORDS
 
     def test_execute_playwright_not_installed(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         session = _make_import_error_session()
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserClickTool()
             result = tool.execute(selector="#btn")
         assert result.success is False
         assert "playwright not installed" in result.content
 
     def test_execute_click_by_css(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         page = _make_mock_page()
         page.frames = [page]
@@ -487,7 +487,7 @@ class TestBrowserClickTool:
         page.get_by_role.return_value.count.return_value = 0
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserClickTool()
             result = tool.execute(selector="#submit-btn")
 
@@ -498,7 +498,7 @@ class TestBrowserClickTool:
         assert result.metadata["by_text"] is False
 
     def test_execute_click_by_text(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         page = _make_mock_page()
         page.frames = [page]
@@ -509,7 +509,7 @@ class TestBrowserClickTool:
         page.get_by_text.return_value.nth.return_value = match
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserClickTool()
             result = tool.execute(selector="Sign In", by_text=True)
 
@@ -519,7 +519,7 @@ class TestBrowserClickTool:
         assert result.metadata["by_text"] is True
 
     def test_execute_click_error(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         page = _make_mock_page()
         page.frames = [page]
@@ -533,7 +533,7 @@ class TestBrowserClickTool:
         page.get_by_role.return_value.count.return_value = 0
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserClickTool()
             result = tool.execute(selector="#nonexistent")
 
@@ -541,7 +541,7 @@ class TestBrowserClickTool:
         assert "Click error" in result.content
 
     def test_to_openai_function(self):
-        from nicx.ferramentas.browser import BrowserClickTool
+        from nicx.ferramentas.web.browser import BrowserClickTool
 
         tool = BrowserClickTool()
         fn = tool.to_openai_function()
@@ -556,14 +556,14 @@ class TestBrowserClickTool:
 
 class TestBrowserTypeTool:
     def test_spec_name_and_category(self):
-        from nicx.ferramentas.browser import BrowserTypeTool
+        from nicx.ferramentas.web.browser import BrowserTypeTool
 
         tool = BrowserTypeTool()
         assert tool.spec.name == "browser_type"
         assert tool.spec.category == "browser"
 
     def test_spec_requires_selector_and_text(self):
-        from nicx.ferramentas.browser import BrowserTypeTool
+        from nicx.ferramentas.web.browser import BrowserTypeTool
 
         tool = BrowserTypeTool()
         assert "selector" in tool.spec.parameters["properties"]
@@ -572,19 +572,19 @@ class TestBrowserTypeTool:
         assert "text" in tool.spec.parameters["required"]
 
     def test_spec_has_clear_parameter(self):
-        from nicx.ferramentas.browser import BrowserTypeTool
+        from nicx.ferramentas.web.browser import BrowserTypeTool
 
         tool = BrowserTypeTool()
         assert "clear" in tool.spec.parameters["properties"]
 
     def test_tool_id(self):
-        from nicx.ferramentas.browser import BrowserTypeTool
+        from nicx.ferramentas.web.browser import BrowserTypeTool
 
         tool = BrowserTypeTool()
         assert tool.tool_id == "browser_type"
 
     def test_execute_no_selector(self):
-        from nicx.ferramentas.browser import BrowserTypeTool
+        from nicx.ferramentas.web.browser import BrowserTypeTool
 
         tool = BrowserTypeTool()
         result = tool.execute(selector="", text="hello")
@@ -592,7 +592,7 @@ class TestBrowserTypeTool:
         assert "No selector" in result.content
 
     def test_execute_no_text(self):
-        from nicx.ferramentas.browser import BrowserTypeTool
+        from nicx.ferramentas.web.browser import BrowserTypeTool
 
         tool = BrowserTypeTool()
         result = tool.execute(selector="#input", text="")
@@ -600,29 +600,29 @@ class TestBrowserTypeTool:
         assert "No text" in result.content
 
     def test_execute_no_params(self):
-        from nicx.ferramentas.browser import BrowserTypeTool
+        from nicx.ferramentas.web.browser import BrowserTypeTool
 
         tool = BrowserTypeTool()
         result = tool.execute()
         assert result.success is False
 
     def test_execute_playwright_not_installed(self):
-        from nicx.ferramentas.browser import BrowserTypeTool
+        from nicx.ferramentas.web.browser import BrowserTypeTool
 
         session = _make_import_error_session()
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserTypeTool()
             result = tool.execute(selector="#input", text="hello")
         assert result.success is False
         assert "playwright not installed" in result.content
 
     def test_execute_fill_clear_true(self):
-        from nicx.ferramentas.browser import BrowserTypeTool
+        from nicx.ferramentas.web.browser import BrowserTypeTool
 
         page = _make_mock_page()
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserTypeTool()
             result = tool.execute(selector="#search", text="query", clear=True)
 
@@ -633,12 +633,12 @@ class TestBrowserTypeTool:
 
     def test_execute_fill_default_clear(self):
         """Default clear=True should use page.fill()."""
-        from nicx.ferramentas.browser import BrowserTypeTool
+        from nicx.ferramentas.web.browser import BrowserTypeTool
 
         page = _make_mock_page()
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserTypeTool()
             result = tool.execute(selector="#search", text="query")
 
@@ -646,12 +646,12 @@ class TestBrowserTypeTool:
         page.fill.assert_called_once_with("#search", "query")
 
     def test_execute_type_clear_false(self):
-        from nicx.ferramentas.browser import BrowserTypeTool
+        from nicx.ferramentas.web.browser import BrowserTypeTool
 
         page = _make_mock_page()
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserTypeTool()
             result = tool.execute(selector="#search", text="query", clear=False)
 
@@ -660,13 +660,13 @@ class TestBrowserTypeTool:
         page.fill.assert_not_called()
 
     def test_execute_type_error(self):
-        from nicx.ferramentas.browser import BrowserTypeTool
+        from nicx.ferramentas.web.browser import BrowserTypeTool
 
         page = _make_mock_page()
         page.fill.side_effect = Exception("Element not editable")
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserTypeTool()
             result = tool.execute(selector="#readonly", text="hello")
 
@@ -674,7 +674,7 @@ class TestBrowserTypeTool:
         assert "Type error" in result.content
 
     def test_to_openai_function(self):
-        from nicx.ferramentas.browser import BrowserTypeTool
+        from nicx.ferramentas.web.browser import BrowserTypeTool
 
         tool = BrowserTypeTool()
         fn = tool.to_openai_function()
@@ -689,14 +689,14 @@ class TestBrowserTypeTool:
 
 class TestBrowserScreenshotTool:
     def test_spec_name_and_category(self):
-        from nicx.ferramentas.browser import BrowserScreenshotTool
+        from nicx.ferramentas.web.browser import BrowserScreenshotTool
 
         tool = BrowserScreenshotTool()
         assert tool.spec.name == "browser_screenshot"
         assert tool.spec.category == "browser"
 
     def test_spec_has_path_and_full_page(self):
-        from nicx.ferramentas.browser import BrowserScreenshotTool
+        from nicx.ferramentas.web.browser import BrowserScreenshotTool
 
         tool = BrowserScreenshotTool()
         props = tool.spec.parameters["properties"]
@@ -704,36 +704,36 @@ class TestBrowserScreenshotTool:
         assert "full_page" in props
 
     def test_spec_no_required_params(self):
-        from nicx.ferramentas.browser import BrowserScreenshotTool
+        from nicx.ferramentas.web.browser import BrowserScreenshotTool
 
         tool = BrowserScreenshotTool()
         assert "required" not in tool.spec.parameters
 
     def test_tool_id(self):
-        from nicx.ferramentas.browser import BrowserScreenshotTool
+        from nicx.ferramentas.web.browser import BrowserScreenshotTool
 
         tool = BrowserScreenshotTool()
         assert tool.tool_id == "browser_screenshot"
 
     def test_execute_playwright_not_installed(self):
-        from nicx.ferramentas.browser import BrowserScreenshotTool
+        from nicx.ferramentas.web.browser import BrowserScreenshotTool
 
         session = _make_import_error_session()
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserScreenshotTool()
             result = tool.execute()
         assert result.success is False
         assert "playwright not installed" in result.content
 
     def test_execute_screenshot_basic(self):
-        from nicx.ferramentas.browser import BrowserScreenshotTool
+        from nicx.ferramentas.web.browser import BrowserScreenshotTool
 
         fake_png = b"\x89PNG\x00screenshot-data"
         page = _make_mock_page()
         page.screenshot.return_value = fake_png
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserScreenshotTool()
             result = tool.execute()
 
@@ -745,13 +745,13 @@ class TestBrowserScreenshotTool:
         page.screenshot.assert_called_once_with(full_page=False)
 
     def test_execute_screenshot_full_page(self):
-        from nicx.ferramentas.browser import BrowserScreenshotTool
+        from nicx.ferramentas.web.browser import BrowserScreenshotTool
 
         page = _make_mock_page()
         page.screenshot.return_value = b"png-data"
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserScreenshotTool()
             result = tool.execute(full_page=True)
 
@@ -760,7 +760,7 @@ class TestBrowserScreenshotTool:
         page.screenshot.assert_called_once_with(full_page=True)
 
     def test_execute_screenshot_save_to_file(self, tmp_path):
-        from nicx.ferramentas.browser import BrowserScreenshotTool
+        from nicx.ferramentas.web.browser import BrowserScreenshotTool
 
         fake_png = b"\x89PNGscreenshot"
         page = _make_mock_page()
@@ -769,7 +769,7 @@ class TestBrowserScreenshotTool:
 
         save_path = str(tmp_path / "test_screenshot.png")
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserScreenshotTool()
             result = tool.execute(path=save_path)
 
@@ -780,13 +780,13 @@ class TestBrowserScreenshotTool:
             assert f.read() == fake_png
 
     def test_execute_screenshot_error(self):
-        from nicx.ferramentas.browser import BrowserScreenshotTool
+        from nicx.ferramentas.web.browser import BrowserScreenshotTool
 
         page = _make_mock_page()
         page.screenshot.side_effect = Exception("Browser crashed")
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserScreenshotTool()
             result = tool.execute()
 
@@ -794,7 +794,7 @@ class TestBrowserScreenshotTool:
         assert "Screenshot error" in result.content
 
     def test_to_openai_function(self):
-        from nicx.ferramentas.browser import BrowserScreenshotTool
+        from nicx.ferramentas.web.browser import BrowserScreenshotTool
 
         tool = BrowserScreenshotTool()
         fn = tool.to_openai_function()
@@ -809,14 +809,14 @@ class TestBrowserScreenshotTool:
 
 class TestBrowserExtractTool:
     def test_spec_name_and_category(self):
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         tool = BrowserExtractTool()
         assert tool.spec.name == "browser_extract"
         assert tool.spec.category == "browser"
 
     def test_spec_has_selector_and_extract_type(self):
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         tool = BrowserExtractTool()
         props = tool.spec.parameters["properties"]
@@ -824,23 +824,23 @@ class TestBrowserExtractTool:
         assert "extract_type" in props
 
     def test_tool_id(self):
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         tool = BrowserExtractTool()
         assert tool.tool_id == "browser_extract"
 
     def test_execute_playwright_not_installed(self):
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         session = _make_import_error_session()
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserExtractTool()
             result = tool.execute()
         assert result.success is False
         assert "playwright not installed" in result.content
 
     def test_execute_invalid_extract_type(self):
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         tool = BrowserExtractTool()
         result = tool.execute(extract_type="images")
@@ -848,13 +848,13 @@ class TestBrowserExtractTool:
         assert "Invalid extract_type" in result.content
 
     def test_execute_extract_text(self):
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         page = _make_mock_page()
         page.inner_text.return_value = "Page text content here"
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserExtractTool()
             result = tool.execute(extract_type="text")
 
@@ -864,13 +864,13 @@ class TestBrowserExtractTool:
         assert result.metadata["extract_type"] == "text"
 
     def test_execute_extract_text_custom_selector(self):
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         page = _make_mock_page()
         page.inner_text.return_value = "Article content"
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserExtractTool()
             result = tool.execute(selector="#article", extract_type="text")
 
@@ -880,13 +880,13 @@ class TestBrowserExtractTool:
 
     def test_execute_extract_text_default(self):
         """Default extract_type should be 'text'."""
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         page = _make_mock_page()
         page.inner_text.return_value = "Default text"
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserExtractTool()
             result = tool.execute()
 
@@ -894,13 +894,13 @@ class TestBrowserExtractTool:
         assert result.content == "Default text"
 
     def test_execute_extract_text_truncation(self):
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         page = _make_mock_page()
         page.inner_text.return_value = "a" * 12000
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserExtractTool()
             result = tool.execute(extract_type="text")
 
@@ -910,7 +910,7 @@ class TestBrowserExtractTool:
         assert len(result.content) < 11000
 
     def test_execute_extract_links(self):
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         page = _make_mock_page()
         page.eval_on_selector_all.return_value = [
@@ -919,7 +919,7 @@ class TestBrowserExtractTool:
         ]
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserExtractTool()
             result = tool.execute(extract_type="links")
 
@@ -929,13 +929,13 @@ class TestBrowserExtractTool:
         assert result.metadata["num_links"] == 2
 
     def test_execute_extract_links_empty(self):
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         page = _make_mock_page()
         page.eval_on_selector_all.return_value = []
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserExtractTool()
             result = tool.execute(extract_type="links")
 
@@ -944,7 +944,7 @@ class TestBrowserExtractTool:
         assert result.metadata["num_links"] == 0
 
     def test_execute_extract_tables(self):
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         page = _make_mock_page()
         page.eval_on_selector_all.return_value = [
@@ -953,7 +953,7 @@ class TestBrowserExtractTool:
         ]
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserExtractTool()
             result = tool.execute(extract_type="tables")
 
@@ -963,13 +963,13 @@ class TestBrowserExtractTool:
         assert result.metadata["num_tables"] == 2
 
     def test_execute_extract_tables_empty(self):
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         page = _make_mock_page()
         page.eval_on_selector_all.return_value = []
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserExtractTool()
             result = tool.execute(extract_type="tables")
 
@@ -977,13 +977,13 @@ class TestBrowserExtractTool:
         assert result.content == "No tables found."
 
     def test_execute_extract_error(self):
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         page = _make_mock_page()
         page.inner_text.side_effect = Exception("Selector not found")
         session = _make_mock_session(page)
 
-        with patch("nicx.ferramentas.browser._session", session):
+        with patch("nicx.ferramentas.web.browser._session", session):
             tool = BrowserExtractTool()
             result = tool.execute(selector="#missing", extract_type="text")
 
@@ -991,7 +991,7 @@ class TestBrowserExtractTool:
         assert "Extract error" in result.content
 
     def test_to_openai_function(self):
-        from nicx.ferramentas.browser import BrowserExtractTool
+        from nicx.ferramentas.web.browser import BrowserExtractTool
 
         tool = BrowserExtractTool()
         fn = tool.to_openai_function()
@@ -1006,7 +1006,7 @@ class TestBrowserExtractTool:
 
 class TestBrowserSession:
     def test_session_close_resets_state(self):
-        from nicx.ferramentas.browser import _BrowserSession
+        from nicx.ferramentas.web.browser import _BrowserSession
 
         session = _BrowserSession()
         session._playwright = MagicMock()
@@ -1020,7 +1020,7 @@ class TestBrowserSession:
         assert session._page is None
 
     def test_session_close_noop_when_not_initialized(self):
-        from nicx.ferramentas.browser import _BrowserSession
+        from nicx.ferramentas.web.browser import _BrowserSession
 
         session = _BrowserSession()
         # Should not raise
@@ -1028,7 +1028,7 @@ class TestBrowserSession:
         assert session._playwright is None
 
     def test_session_ensure_browser_import_error(self):
-        from nicx.ferramentas.browser import _BrowserSession
+        from nicx.ferramentas.web.browser import _BrowserSession
 
         session = _BrowserSession()
 
@@ -1046,7 +1046,7 @@ class TestBrowserSession:
                 session._ensure_browser()
 
     def test_session_page_reuses_existing(self):
-        from nicx.ferramentas.browser import _BrowserSession
+        from nicx.ferramentas.web.browser import _BrowserSession
 
         session = _BrowserSession()
         mock_page = MagicMock()
@@ -1066,7 +1066,7 @@ class TestRegistryIntegration:
     def test_all_tools_registered(self):
         # Registration happens at import time via @ToolRegistry.register.
         # Other test modules may clear the registry, so re-register if needed.
-        from nicx.ferramentas.browser import (
+        from nicx.ferramentas.web.browser import (
             BrowserClickTool,
             BrowserExtractTool,
             BrowserNavigateTool,
@@ -1092,7 +1092,7 @@ class TestRegistryIntegration:
         assert ToolRegistry.contains("browser_extract")
 
     def test_module_exports(self):
-        from nicx.ferramentas.browser import __all__
+        from nicx.ferramentas.web.browser import __all__
 
         assert "BrowserNavigateTool" in __all__
         assert "BrowserClickTool" in __all__

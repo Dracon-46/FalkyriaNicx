@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from nicx.ferramentas.storage._stubs import MemoryBackend, RetrievalResult
+from nicx.memoria.armazenamento._stubs import MemoryBackend, RetrievalResult
 
 
 class _DummyStorage(MemoryBackend):
@@ -67,20 +67,20 @@ class TestStorageStubs:
 
     def test_backward_compat_import(self) -> None:
         """Memory imports should still work via shim."""
-        from nicx.ferramentas.storage._stubs import MemoryBackend as MB
-        from nicx.ferramentas.storage._stubs import RetrievalResult as RR
+        from nicx.memoria.armazenamento._stubs import MemoryBackend as MB
+        from nicx.memoria.armazenamento._stubs import RetrievalResult as RR
 
         assert MB is MemoryBackend
         assert RR is RetrievalResult
 
     def test_canonical_import(self) -> None:
         """Canonical import from tools.storage should work."""
-        from nicx.ferramentas.storage._stubs import MemoryBackend as MB
+        from nicx.memoria.armazenamento._stubs import MemoryBackend as MB
 
         assert MB is MemoryBackend
 
     def test_sqlite_backward_compat(self) -> None:
         """SQLiteMemory should be importable from the canonical location."""
-        from nicx.ferramentas.storage.sqlite import SQLiteMemory as S1
+        from nicx.memoria.armazenamento.sqlite import SQLiteMemory as S1
 
         assert S1 is not None

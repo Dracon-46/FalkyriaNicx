@@ -7,7 +7,7 @@ import sqlite3
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from nicx.ferramentas.storage._stubs import (
+from nicx.memoria.armazenamento._stubs import (
     MemoryBackend,
     MemoryBackendUnavailable,
     RetrievalResult,

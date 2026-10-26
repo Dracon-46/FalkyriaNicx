@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from nicx.cerebro.habilidades.executor import SkillExecutor
 from nicx.cerebro.habilidades.tool_adapter import SkillTool
 from nicx.cerebro.habilidades.types import SkillManifest, SkillStep
-from nicx.ferramentas.repl import ReplTool
+from nicx.ferramentas.codigo.repl import ReplTool
 from nicx.nucleo.config import NicxConfig
 from nicx.nucleo.sistema import SystemBuilder
 from nicx.nucleo.types import ToolCall

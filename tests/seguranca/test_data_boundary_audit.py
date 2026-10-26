@@ -1498,7 +1498,7 @@ class TestWebSearchDestination:
         assert _web_search_destination() == "Firecrawl search API"
 
     def test_blank_firecrawl_configuration_matches_runtime(self, monkeypatch):
-        from nicx.ferramentas.web_search import WebSearchTool
+        from nicx.ferramentas.web.web_search import WebSearchTool
         from nicx.seguranca.data_boundary_audit import _web_search_destination
 
         self._clear(monkeypatch)
@@ -1530,7 +1530,7 @@ class TestWebSearchDestination:
     def test_matches_the_tool_resolution(self, monkeypatch):
         """Guard against the audit's copy of the precedence rule drifting from
         WebSearchTool._resolve_engine, which is the source of truth."""
-        from nicx.ferramentas.web_search import WebSearchTool
+        from nicx.ferramentas.web.web_search import WebSearchTool
         from nicx.seguranca.data_boundary_audit import _web_search_destination
 
         labels = {

@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, List, Optional, Sequence
 
-from nicx.ferramentas.storage._stubs import MemoryBackend, RetrievalResult
+from nicx.memoria.armazenamento._stubs import MemoryBackend, RetrievalResult
 from nicx.memoria.store import RECALLABLE_TRUST_TIERS
 from nicx.nucleo.events import EventType, get_event_bus
 from nicx.nucleo.types import Message, Role

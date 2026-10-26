@@ -17,8 +17,8 @@ except ImportError as _faiss_exc:
         "pip install faiss-cpu  (or faiss-gpu)"
     ) from _faiss_exc
 
-from nicx.ferramentas.storage._stubs import MemoryBackend, RetrievalResult
-from nicx.ferramentas.storage.embeddings import (
+from nicx.memoria.armazenamento._stubs import MemoryBackend, RetrievalResult
+from nicx.memoria.armazenamento.embeddings import (
     Embedder,
     SentenceTransformerEmbedder,
 )

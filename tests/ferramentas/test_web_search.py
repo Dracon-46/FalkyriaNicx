@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from nicx.ferramentas.web_search import WebSearchTool
+from nicx.ferramentas.web.web_search import WebSearchTool
 from nicx.nucleo.registry import ToolRegistry
 
 
@@ -422,7 +422,7 @@ class TestUrlNormalization:
 class TestUrlFetching:
     def _mock_ssrf(self, monkeypatch):
         """Stub out the SSRF check (requires Rust backend)."""
-        import nicx.ferramentas.web_search as _ws
+        import nicx.ferramentas.web.web_search as _ws
 
         monkeypatch.setattr(_ws, "check_ssrf", lambda url: None)
 
@@ -486,7 +486,7 @@ class TestUrlFetching:
 class TestFetchRedirectSession:
     @pytest.fixture(autouse=True)
     def _guard(self, monkeypatch):
-        import nicx.ferramentas.web_search as web_search
+        import nicx.ferramentas.web.web_search as web_search
 
         guard = MagicMock(return_value=None)
         monkeypatch.setattr(web_search, "check_ssrf", guard)
@@ -612,7 +612,7 @@ class TestFetchRedirectSession:
 class TestExecuteWithUrl:
     def _mock_ssrf(self, monkeypatch):
         """Stub out the SSRF check (requires Rust backend)."""
-        import nicx.ferramentas.web_search as _ws
+        import nicx.ferramentas.web.web_search as _ws
 
         monkeypatch.setattr(_ws, "check_ssrf", lambda url: None)
 
@@ -651,7 +651,7 @@ class TestExecuteWithUrl:
 
     def test_execute_url_ssrf_blocked(self, monkeypatch):
         """SSRF check rejects unsafe URLs before any HTTP request."""
-        import nicx.ferramentas.web_search as _ws
+        import nicx.ferramentas.web.web_search as _ws
 
         monkeypatch.setattr(
             _ws,
@@ -684,7 +684,7 @@ class TestExecuteWithUrl:
         """Every URL redirect hop must be checked for SSRF."""
         import httpx
 
-        import nicx.ferramentas.web_search as _ws
+        import nicx.ferramentas.web.web_search as _ws
 
         requests = []
 
@@ -729,7 +729,7 @@ class TestExecuteWithUrl:
         """Public relative redirects still work when checked hop by hop."""
         import httpx
 
-        import nicx.ferramentas.web_search as _ws
+        import nicx.ferramentas.web.web_search as _ws
 
         requests = []
 
@@ -1388,7 +1388,7 @@ class TestFirecrawlSearch:
 
 class TestFirecrawlScrapeExtraction:
     def _mock_ssrf(self, monkeypatch):
-        import nicx.ferramentas.web_search as _ws
+        import nicx.ferramentas.web.web_search as _ws
 
         monkeypatch.setattr(_ws, "check_ssrf", lambda url: None)
 
@@ -1498,7 +1498,7 @@ class TestFirecrawlScrapeExtraction:
     def test_url_branch_ssrf_blocked_before_scrape_call(self, monkeypatch):
         """The scrape upgrade must not become an SSRF bypass."""
         monkeypatch.setenv("FIRECRAWL_API_KEY", "fc-test")
-        import nicx.ferramentas.web_search as _ws
+        import nicx.ferramentas.web.web_search as _ws
 
         monkeypatch.setattr(_ws, "check_ssrf", lambda url: "private IP blocked")
         import httpx
@@ -1546,7 +1546,9 @@ class TestFirecrawlCredentialSafety:
             data = {"web": []} if mode == "search" else {"markdown": "Page text"}
             return httpx.Response(200, json={"success": True, "data": data})
 
-        monkeypatch.setattr("nicx.ferramentas.web_search.check_ssrf", lambda url: None)
+        monkeypatch.setattr(
+            "nicx.ferramentas.web.web_search.check_ssrf", lambda url: None
+        )
         query = "https://example.test/article" if mode == "scrape" else "test query"
         with httpx.Client(
             transport=httpx.MockTransport(respond), trust_env=False
@@ -1605,7 +1607,9 @@ class TestFirecrawlCredentialSafety:
         )
         monkeypatch.setattr(tool, "_duckduckgo_search", lambda *a: "Search fallback")
         monkeypatch.setattr(tool, "_fetch_url", lambda *a: "Local fallback")
-        monkeypatch.setattr("nicx.ferramentas.web_search.check_ssrf", lambda url: None)
+        monkeypatch.setattr(
+            "nicx.ferramentas.web.web_search.check_ssrf", lambda url: None
+        )
         query = "https://example.test/article" if mode == "scrape" else "test query"
 
         with caplog.at_level("WARNING"):
@@ -1701,7 +1705,7 @@ class TestFallbackVisibility:
 
 class TestYouComContentsExtraction:
     def _mock_ssrf(self, monkeypatch):
-        import nicx.ferramentas.web_search as _ws
+        import nicx.ferramentas.web.web_search as _ws
 
         monkeypatch.setattr(_ws, "check_ssrf", lambda url: None)
 
@@ -1770,7 +1774,7 @@ class TestYouComContentsExtraction:
     def test_url_branch_ssrf_blocked_before_contents_call(self, monkeypatch):
         """The Contents upgrade must not become an SSRF bypass."""
         monkeypatch.setenv("YOUDOTCOM_API_KEY", "ydc-key")
-        import nicx.ferramentas.web_search as _ws
+        import nicx.ferramentas.web.web_search as _ws
 
         monkeypatch.setattr(_ws, "check_ssrf", lambda url: "private IP blocked")
         import httpx

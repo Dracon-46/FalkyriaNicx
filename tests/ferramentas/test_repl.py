@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import time
 
-from nicx.ferramentas.repl import ReplTool
+from nicx.ferramentas.codigo.repl import ReplTool
 from nicx.nucleo.registry import ToolRegistry
 
 

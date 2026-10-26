@@ -8,9 +8,9 @@ faiss = pytest.importorskip("faiss")
 
 import numpy as np  # noqa: E402
 
-from nicx.ferramentas.storage._stubs import RetrievalResult  # noqa: E402
-from nicx.ferramentas.storage.embeddings import Embedder  # noqa: E402
-from nicx.ferramentas.storage.faiss_backend import (  # noqa: E402
+from nicx.memoria.armazenamento._stubs import RetrievalResult  # noqa: E402
+from nicx.memoria.armazenamento.embeddings import Embedder  # noqa: E402
+from nicx.memoria.armazenamento.faiss_backend import (  # noqa: E402
     FAISSMemory,
 )
 from nicx.nucleo.events import (  # noqa: E402
@@ -164,7 +164,7 @@ def test_event_bus_store():
     bus = EventBus(record_history=True)
     backend = _make_backend()
 
-    import nicx.ferramentas.storage.faiss_backend as mod
+    import nicx.memoria.armazenamento.faiss_backend as mod
 
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus
@@ -184,7 +184,7 @@ def test_event_bus_retrieve():
     backend = _make_backend()
     backend.store("searchable content for events")
 
-    import nicx.ferramentas.storage.faiss_backend as mod
+    import nicx.memoria.armazenamento.faiss_backend as mod
 
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus

@@ -28,7 +28,7 @@ import re
 from typing import Any, Dict, List, Optional, Tuple
 
 from nicx.ferramentas._stubs import BaseTool, ToolSpec
-from nicx.ferramentas.approval_store import (
+from nicx.ferramentas.agentes.approval_store import (
     DECISION_ALWAYS_APPROVE,
     DECISION_ALWAYS_DENY,
     STATUS_APPROVED,

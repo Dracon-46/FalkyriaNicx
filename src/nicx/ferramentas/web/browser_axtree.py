@@ -16,9 +16,9 @@ from nicx.nucleo.types import ToolResult
 
 # Re-use the shared browser session from the browser module.
 # This is imported at module level so tests can patch
-# ``nicx.ferramentas.browser_axtree._session``.
+# ``nicx.ferramentas.web.browser_axtree._session``.
 try:
-    from nicx.ferramentas.browser import _session
+    from nicx.ferramentas.web.browser import _session
 except Exception:  # pragma: no cover — optional dependency
     _session = None  # type: ignore[assignment]
 

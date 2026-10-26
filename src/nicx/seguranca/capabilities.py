@@ -280,8 +280,8 @@ DEFAULT_TOOL_CAPABILITIES: Dict[str, List[str]] = {
 }
 
 _SAFE_BUILTIN_PROVENANCE = {
-    "calculator": ("nicx.ferramentas.calculator", "CalculatorTool"),
-    "think": ("nicx.ferramentas.think", "ThinkTool"),
+    "calculator": ("nicx.ferramentas.agentes.calculator", "CalculatorTool"),
+    "think": ("nicx.ferramentas.agentes.think", "ThinkTool"),
 }
 
 
@@ -300,7 +300,7 @@ def canonical_tool_capabilities(tool: Any) -> List[str]:
         or module == "nicx.agenda.tools"
         or module.startswith("nicx.acoes.")
     )
-    if module == "nicx.ferramentas.mcp_adapter":
+    if module == "nicx.ferramentas.integracoes.mcp_adapter":
         # MCP tool names are remote-controlled.  Resolve adapter provenance
         # before the name table so a server cannot impersonate a reviewed-safe
         # local tool such as ``calculator`` or ``think``.

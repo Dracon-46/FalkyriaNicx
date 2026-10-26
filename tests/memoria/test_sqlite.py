@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from nicx.ferramentas.storage.sqlite import SQLiteMemory
+from nicx.memoria.armazenamento.sqlite import SQLiteMemory
 from nicx.nucleo.events import EventBus, EventType
 from nicx.nucleo.registry import MemoryRegistry
 
@@ -146,7 +146,7 @@ def test_event_bus_integration_store(tmp_path: Path):
     bus = EventBus(record_history=True)
     backend = _make_backend(tmp_path)
     # Monkey-patch the global bus for this test
-    import nicx.ferramentas.storage.sqlite as mod
+    import nicx.memoria.armazenamento.sqlite as mod
 
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus
@@ -164,7 +164,7 @@ def test_event_bus_integration_retrieve(tmp_path: Path):
     bus = EventBus(record_history=True)
     backend = _make_backend(tmp_path)
     backend.store("searchable content for events")
-    import nicx.ferramentas.storage.sqlite as mod
+    import nicx.memoria.armazenamento.sqlite as mod
 
     original = mod.get_event_bus
     mod.get_event_bus = lambda: bus

@@ -120,7 +120,7 @@ class _FinalOnlyEngine:
 
 @pytest.mark.asyncio
 async def test_sse_file_tools_keep_application_directory_policy(tmp_path, monkeypatch):
-    from nicx.ferramentas.file_read import FileReadTool
+    from nicx.ferramentas.arquivos.file_read import FileReadTool
     from nicx.nucleo.config import NicxConfig
     from nicx.servidor.agent_manager_routes import _stream_managed_agent
 
@@ -370,7 +370,7 @@ async def test_sse_memory_tools_resolve_backend_when_context_injection_is_off(
 ) -> None:
     """Prompt context opt-out must not disable explicit memory tools."""
 
-    from nicx.ferramentas.storage_tools import MemoryStoreTool
+    from nicx.ferramentas.conhecimento.storage_tools import MemoryStoreTool
     from nicx.servidor import agent_manager_routes as routes
 
     if not ToolRegistry.contains("memory_store"):

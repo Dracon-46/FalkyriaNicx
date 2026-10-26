@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from nicx.ferramentas.storage.chunking import ChunkConfig, chunk_text
+from nicx.memoria.armazenamento.chunking import ChunkConfig, chunk_text
 
 
 def test_empty_string_returns_empty():

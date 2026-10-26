@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any, Dict, List, Optional
 
-from nicx.ferramentas.storage._stubs import MemoryBackend, RetrievalResult
+from nicx.memoria.armazenamento._stubs import MemoryBackend, RetrievalResult
 from nicx.nucleo.events import EventType, get_event_bus
 from nicx.nucleo.registry import MemoryRegistry
 from nicx.nucleo.rust import get_rust_module

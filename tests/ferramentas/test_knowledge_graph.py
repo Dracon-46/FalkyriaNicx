@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from nicx.ferramentas.storage.knowledge_graph import (
+from nicx.memoria.armazenamento.knowledge_graph import (
     Entity,
     KnowledgeGraphMemory,
     Relation,

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from nicx.ferramentas.file_read import FileReadTool
+from nicx.ferramentas.arquivos.file_read import FileReadTool
 
 
 class TestFileReadTool:

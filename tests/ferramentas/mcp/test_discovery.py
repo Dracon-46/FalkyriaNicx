@@ -36,7 +36,7 @@ def builder():
 _PATCH_HTTP = "nicx.ferramentas.mcp.transport.StreamableHTTPTransport"
 _PATCH_STDIO = "nicx.ferramentas.mcp.transport.StdioTransport"
 _PATCH_CLIENT = "nicx.ferramentas.mcp.client.MCPClient"
-_PATCH_PROVIDER = "nicx.ferramentas.mcp_adapter.MCPToolProvider"
+_PATCH_PROVIDER = "nicx.ferramentas.integracoes.mcp_adapter.MCPToolProvider"
 _PATCH_LOGGER = "nicx.nucleo.sistema.builder.logger"
 
 

@@ -10,8 +10,8 @@ from rich.console import Console
 from rich.progress import track
 from rich.table import Table
 
-from nicx.ferramentas.storage.chunking import ChunkConfig
-from nicx.ferramentas.storage.ingest import ingest_path
+from nicx.memoria.armazenamento.chunking import ChunkConfig
+from nicx.memoria.armazenamento.ingest import ingest_path
 from nicx.nucleo.config import load_config
 from nicx.nucleo.registry import MemoryRegistry
 
@@ -22,7 +22,7 @@ def _get_backend(backend_key: str | None = None):
     key = backend_key or config.memory.default_backend
 
     # Ensure backends are registered
-    import nicx.ferramentas.storage  # noqa: F401
+    import nicx.memoria.armazenamento  # noqa: F401
 
     if not MemoryRegistry.contains(key):
         raise click.ClickException(

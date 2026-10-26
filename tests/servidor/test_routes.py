@@ -1464,7 +1464,7 @@ class TestIdentityPromptInjection:
         ]
 
     def test_memory_context_does_not_suppress_identity_injection(self):
-        from nicx.ferramentas.storage.context import build_context_message
+        from nicx.memoria.armazenamento.context import build_context_message
         from nicx.nucleo.types import Message, Role
         from nicx.servidor.routes import _ensure_identity_prompt
 

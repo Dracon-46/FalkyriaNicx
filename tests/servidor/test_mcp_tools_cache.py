@@ -64,7 +64,9 @@ def test_returns_tools_from_mcp_server(mock_load_config: MagicMock):
     with (
         patch("nicx.ferramentas.mcp.transport.StreamableHTTPTransport"),
         patch("nicx.ferramentas.mcp.client.MCPClient"),
-        patch("nicx.ferramentas.mcp_adapter.MCPToolProvider") as MockProvider,
+        patch(
+            "nicx.ferramentas.integracoes.mcp_adapter.MCPToolProvider"
+        ) as MockProvider,
     ):
         MockProvider.return_value.discover.return_value = [mock_adapter]
 
@@ -97,7 +99,7 @@ def test_returns_tools_from_external_mcp_file(
     with (
         patch("nicx.ferramentas.mcp.transport.StreamableHTTPTransport"),
         patch("nicx.ferramentas.mcp.client.MCPClient"),
-        patch("nicx.ferramentas.mcp_adapter.MCPToolProvider") as provider,
+        patch("nicx.ferramentas.integracoes.mcp_adapter.MCPToolProvider") as provider,
     ):
         provider.return_value.discover.return_value = [mock_adapter]
         tools, adapters = _get_mcp_tools(_FakeAppState())
@@ -121,7 +123,9 @@ def test_caches_successful_discovery(mock_load_config: MagicMock):
     with (
         patch("nicx.ferramentas.mcp.transport.StreamableHTTPTransport"),
         patch("nicx.ferramentas.mcp.client.MCPClient"),
-        patch("nicx.ferramentas.mcp_adapter.MCPToolProvider") as MockProvider,
+        patch(
+            "nicx.ferramentas.integracoes.mcp_adapter.MCPToolProvider"
+        ) as MockProvider,
     ):
         MockProvider.return_value.discover.return_value = [mock_adapter]
 
@@ -151,7 +155,9 @@ def test_does_not_cache_empty_results(mock_load_config: MagicMock):
     with (
         patch("nicx.ferramentas.mcp.transport.StreamableHTTPTransport"),
         patch("nicx.ferramentas.mcp.client.MCPClient") as MockClient,
-        patch("nicx.ferramentas.mcp_adapter.MCPToolProvider") as MockProvider,
+        patch(
+            "nicx.ferramentas.integracoes.mcp_adapter.MCPToolProvider"
+        ) as MockProvider,
     ):
         # First call: discovery returns empty
         MockProvider.return_value.discover.return_value = []

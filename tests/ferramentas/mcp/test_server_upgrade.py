@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from nicx.ferramentas.calculator import CalculatorTool
+from nicx.ferramentas.agentes.calculator import CalculatorTool
+from nicx.ferramentas.agentes.think import ThinkTool
 from nicx.ferramentas.mcp.protocol import MCPRequest
 from nicx.ferramentas.mcp.server import MCPServer
-from nicx.ferramentas.think import ThinkTool
 
 
 @pytest.fixture
@@ -112,7 +112,7 @@ class TestAutoDiscovery:
 
 class TestStorageToolAnnotations:
     def test_memory_store_destructive(self):
-        from nicx.ferramentas.storage_tools import MemoryStoreTool
+        from nicx.ferramentas.conhecimento.storage_tools import MemoryStoreTool
 
         server = MCPServer([MemoryStoreTool()])
         req = MCPRequest(method="tools/list", id=1)
@@ -122,7 +122,7 @@ class TestStorageToolAnnotations:
         assert tool["annotations"]["readOnlyHint"] is False
 
     def test_memory_retrieve_read_only(self):
-        from nicx.ferramentas.storage_tools import MemoryRetrieveTool
+        from nicx.ferramentas.conhecimento.storage_tools import MemoryRetrieveTool
 
         server = MCPServer([MemoryRetrieveTool()])
         req = MCPRequest(method="tools/list", id=1)

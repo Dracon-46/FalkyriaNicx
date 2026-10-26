@@ -10,12 +10,12 @@ from unittest.mock import MagicMock
 import pytest
 
 from nicx.ferramentas._stubs import ToolSpec
-from nicx.ferramentas.calculator import CalculatorTool
+from nicx.ferramentas.agentes.calculator import CalculatorTool
+from nicx.ferramentas.agentes.think import ThinkTool
 from nicx.ferramentas.mcp.client import MCPClient
 from nicx.ferramentas.mcp.protocol import MCPError, MCPResponse
 from nicx.ferramentas.mcp.server import MCPServer
 from nicx.ferramentas.mcp.transport import InProcessTransport
-from nicx.ferramentas.think import ThinkTool
 
 
 @pytest.fixture

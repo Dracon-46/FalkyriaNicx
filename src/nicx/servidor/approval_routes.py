@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, Optional
 
-from nicx.ferramentas.approval_store import (
+from nicx.ferramentas.agentes.approval_store import (
     STATUS_APPROVED,
     STATUS_DENIED,
     ApprovalStore,

@@ -43,7 +43,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from nicx.cerebro.agentes._stubs import AgentContext, AgentResult, ToolUsingAgent
-from nicx.ferramentas.approval_store import (
+from nicx.ferramentas.agentes.approval_store import (
     DECISION_ALWAYS_APPROVE,
     DECISION_ALWAYS_DENY,
     STATUS_APPROVED,
@@ -51,7 +51,7 @@ from nicx.ferramentas.approval_store import (
     TIER_TRIVIAL,
     ApprovalStore,
 )
-from nicx.ferramentas.proactive_tools import get_store
+from nicx.ferramentas.agentes.proactive_tools import get_store
 from nicx.nucleo.config import load_config
 from nicx.nucleo.paths import get_config_dir
 from nicx.nucleo.registry import AgentRegistry
@@ -328,15 +328,15 @@ class ProactiveAgent(ToolUsingAgent):
         self._notification_channel = notification_channel
         self._notification_destination = self._notification_channel_id.partition(":")[2]
 
-        from nicx.ferramentas.channel_tools import ChannelSendTool
-        from nicx.ferramentas.digest_collect import DigestCollectTool
-        from nicx.ferramentas.proactive_tools import (
+        from nicx.ferramentas.agentes.digest_collect import DigestCollectTool
+        from nicx.ferramentas.agentes.proactive_tools import (
             CheckPermissionTool,
             ExecutePendingActionsTool,
             GetPendingActionsTool,
             QueueActionTool,
             RecordDecisionTool,
         )
+        from nicx.ferramentas.integracoes.channel_tools import ChannelSendTool
 
         proactive_tools = [
             DigestCollectTool(),

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, List, Optional, Protocol
 
 if TYPE_CHECKING:
     from nicx.ferramentas._stubs import BaseTool
-    from nicx.ferramentas.storage._stubs import MemoryBackend
+    from nicx.memoria.armazenamento._stubs import MemoryBackend
     from nicx.memoria.sessoes.session import SessionStore
     from nicx.motores._stubs import InferenceEngine
     from nicx.nucleo.config import NicxConfig

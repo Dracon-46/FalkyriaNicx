@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     from nicx.ferramentas.mcp.client import MCPClient
     from nicx.ferramentas.mcp.server import MCPServer
     from nicx.ferramentas.sandbox.runner import ContainerRunner
-    from nicx.ferramentas.storage._stubs import MemoryBackend
+    from nicx.memoria.armazenamento._stubs import MemoryBackend
     from nicx.memoria.sessoes.session import SessionStore
     from nicx.nucleo.sistema.orchestrator import QueryOrchestrator
     from nicx.registros.rastros.collector import TraceCollector

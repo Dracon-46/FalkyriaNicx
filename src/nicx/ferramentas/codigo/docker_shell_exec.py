@@ -1,13 +1,13 @@
 """Container-scoped shell executor.
 
 Runs commands inside the currently-active TB v2.1 task container (set via
-:func:`nicx.ferramentas.docker_shell_exec.set_active_container`). When no
+:func:`nicx.ferramentas.codigo.docker_shell_exec.set_active_container`). When no
 container is active the tool refuses to run — it is explicitly not a
 host-shell alternative.
 
 The expected lifecycle is:
 
-    from nicx.ferramentas.docker_shell_exec import set_active_container
+    from nicx.ferramentas.codigo.docker_shell_exec import set_active_container
 
     set_active_container(container_name)
     try:

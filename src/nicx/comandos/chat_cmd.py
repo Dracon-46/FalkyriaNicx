@@ -439,11 +439,11 @@ def chat(
         agent_context_message = None
         if config.agent.context_from_memory:
             try:
-                from nicx.ferramentas.storage.context import (
+                from nicx.memoria import load_configured_facts
+                from nicx.memoria.armazenamento.context import (
                     ContextConfig,
                     inject_context,
                 )
-                from nicx.memoria import load_configured_facts
 
                 if memory_service is not None and hasattr(memory_service, "list_facts"):
                     facts = memory_service.list_facts()

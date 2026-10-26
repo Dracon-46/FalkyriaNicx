@@ -157,7 +157,7 @@ def test_configured_tools_normalize_lists_and_comma_separated_strings(
 def test_managed_file_tools_use_application_policy(
     tmp_path, monkeypatch, custom_spec, invalid_policy
 ):
-    from nicx.ferramentas.file_read import FileReadTool
+    from nicx.ferramentas.arquivos.file_read import FileReadTool
     from nicx.nucleo.config import NicxConfig
 
     cfg = NicxConfig()

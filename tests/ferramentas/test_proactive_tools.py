@@ -6,13 +6,16 @@ import json
 
 import pytest
 
-from nicx.ferramentas.approval_store import (
+from nicx.ferramentas.agentes.approval_store import (
     STATUS_APPROVED,
     STATUS_EXECUTED,
     TIER_LOW,
     ApprovalStore,
 )
-from nicx.ferramentas.proactive_tools import ExecutePendingActionsTool, QueueActionTool
+from nicx.ferramentas.agentes.proactive_tools import (
+    ExecutePendingActionsTool,
+    QueueActionTool,
+)
 
 
 def _approved_sms_draft(store: ApprovalStore, payload: dict[str, str]):

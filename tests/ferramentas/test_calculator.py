@@ -6,7 +6,7 @@ import math
 
 import pytest
 
-from nicx.ferramentas.calculator import CalculatorTool, safe_eval
+from nicx.ferramentas.agentes.calculator import CalculatorTool, safe_eval
 
 
 class TestSafeEval:

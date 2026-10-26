@@ -151,8 +151,8 @@ The `build_tool_descriptions()` function is the **single source of truth** for g
 
 ```python
 from nicx.ferramentas._stubs import build_tool_descriptions
-from nicx.ferramentas.calculator import CalculatorTool
-from nicx.ferramentas.think import ThinkTool
+from nicx.ferramentas.agentes.calculator import CalculatorTool
+from nicx.ferramentas.agentes.think import ThinkTool
 
 tools = [CalculatorTool(), ThinkTool()]
 desc = build_tool_descriptions(tools)
@@ -237,7 +237,7 @@ Evaluates mathematical expressions safely using Python's `ast` module. No arbitr
 **Example:**
 
 ```python
-from nicx.ferramentas.calculator import CalculatorTool
+from nicx.ferramentas.agentes.calculator import CalculatorTool
 
 calc = CalculatorTool()
 result = calc.execute(expression="sqrt(144) + 3**2")
@@ -260,7 +260,7 @@ A zero-cost reasoning scratchpad. The input is echoed back as the output, allowi
 **Example:**
 
 ```python
-from nicx.ferramentas.think import ThinkTool
+from nicx.ferramentas.agentes.think import ThinkTool
 
 think = ThinkTool()
 result = think.execute(thought="Let me break this problem into steps...")
@@ -294,7 +294,7 @@ Searches the memory backend for relevant context and returns formatted results w
 **Example:**
 
 ```python
-from nicx.ferramentas.retrieval import RetrievalTool
+from nicx.ferramentas.conhecimento.retrieval import RetrievalTool
 from nicx.memoria.sqlite import SQLiteMemory
 
 backend = SQLiteMemory(db_path="./memory.db")
@@ -326,7 +326,7 @@ Delegates a sub-query to an inference engine. Useful for summarization, sub-ques
 **Example:**
 
 ```python
-from nicx.ferramentas.llm_tool import LLMTool
+from nicx.ferramentas.agentes.llm_tool import LLMTool
 
 llm = LLMTool(engine=my_engine, model="qwen3:8b")
 result = llm.execute(
@@ -365,7 +365,7 @@ Reads file contents with safety validations. Supports optional directory restric
 **Example:**
 
 ```python
-from nicx.ferramentas.file_read import FileReadTool
+from nicx.ferramentas.arquivos.file_read import FileReadTool
 
 reader = FileReadTool(allowed_dirs=["/home/user/projects"])
 result = reader.execute(path="/home/user/projects/README.md", max_lines=50)

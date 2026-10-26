@@ -10,7 +10,7 @@ import pytest
 
 from nicx.conectores.retriever import ColBERTReranker, Reranker, TwoStageRetriever
 from nicx.conectores.store import KnowledgeStore
-from nicx.ferramentas.storage._stubs import RetrievalResult
+from nicx.memoria.armazenamento._stubs import RetrievalResult
 
 
 def _has_torch() -> bool:

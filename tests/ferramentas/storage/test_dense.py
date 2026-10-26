@@ -19,13 +19,13 @@ from pathlib import Path
 import httpx
 import pytest
 
-from nicx.ferramentas.storage.dense import (
+from nicx.memoria.armazenamento.dense import (
     DenseMemory,
     MdChunk,
     chunk_markdown,
     dedupe_chunks,
 )
-from nicx.ferramentas.storage.embeddings import OllamaEmbedder
+from nicx.memoria.armazenamento.embeddings import OllamaEmbedder
 
 _FIXTURE_DIR = Path(__file__).resolve().parents[2] / "fixtures" / "docs"
 _EMBED_MODEL = "nomic-embed-text"

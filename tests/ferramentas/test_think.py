@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from nicx.ferramentas.think import ThinkTool
+from nicx.ferramentas.agentes.think import ThinkTool
 
 
 class TestThinkTool:

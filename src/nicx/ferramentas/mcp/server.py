@@ -102,37 +102,37 @@ class MCPServer:
 
         # Built-in API tools
         try:
-            from nicx.ferramentas.calculator import CalculatorTool
+            from nicx.ferramentas.agentes.calculator import CalculatorTool
 
             _tool_classes.append(CalculatorTool)
         except ImportError:
             pass
         try:
-            from nicx.ferramentas.think import ThinkTool
+            from nicx.ferramentas.agentes.think import ThinkTool
 
             _tool_classes.append(ThinkTool)
         except ImportError:
             pass
         try:
-            from nicx.ferramentas.file_read import FileReadTool
+            from nicx.ferramentas.arquivos.file_read import FileReadTool
 
             _tool_classes.append(FileReadTool)
         except ImportError:
             pass
         try:
-            from nicx.ferramentas.web_search import WebSearchTool
+            from nicx.ferramentas.web.web_search import WebSearchTool
 
             _tool_classes.append(WebSearchTool)
         except ImportError:
             pass
         try:
-            from nicx.ferramentas.code_interpreter import CodeInterpreterTool
+            from nicx.ferramentas.codigo.code_interpreter import CodeInterpreterTool
 
             _tool_classes.append(CodeInterpreterTool)
         except ImportError:
             pass
         try:
-            from nicx.ferramentas.repl import ReplTool
+            from nicx.ferramentas.codigo.repl import ReplTool
 
             _tool_classes.append(ReplTool)
         except ImportError:
@@ -140,7 +140,7 @@ class MCPServer:
 
         # Storage MCP tools
         try:
-            from nicx.ferramentas.storage_tools import (
+            from nicx.ferramentas.conhecimento.storage_tools import (
                 MemoryIndexTool,
                 MemoryRetrieveTool,
                 MemorySearchTool,
@@ -160,7 +160,7 @@ class MCPServer:
 
         # Channel MCP tools
         try:
-            from nicx.ferramentas.channel_tools import (
+            from nicx.ferramentas.integracoes.channel_tools import (
                 ChannelListTool,
                 ChannelSendTool,
                 ChannelStatusTool,
@@ -178,7 +178,7 @@ class MCPServer:
 
         # LM tool (needs engine/model — instantiate with None)
         try:
-            from nicx.ferramentas.llm_tool import LLMTool
+            from nicx.ferramentas.agentes.llm_tool import LLMTool
 
             _tool_classes.append(LLMTool)
         except ImportError:
@@ -186,7 +186,7 @@ class MCPServer:
 
         # Retrieval tool (needs backend — instantiate with None)
         try:
-            from nicx.ferramentas.retrieval import RetrievalTool
+            from nicx.ferramentas.conhecimento.retrieval import RetrievalTool
 
             _tool_classes.append(RetrievalTool)
         except ImportError:

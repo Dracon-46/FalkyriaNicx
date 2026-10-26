@@ -48,11 +48,11 @@ def _register_agents():
 
 def _register_tools():
     """Re-register tools after registry clear."""
-    from nicx.ferramentas.calculator import CalculatorTool
-    from nicx.ferramentas.file_read import FileReadTool
-    from nicx.ferramentas.llm_tool import LLMTool
-    from nicx.ferramentas.retrieval import RetrievalTool
-    from nicx.ferramentas.think import ThinkTool
+    from nicx.ferramentas.agentes.calculator import CalculatorTool
+    from nicx.ferramentas.agentes.llm_tool import LLMTool
+    from nicx.ferramentas.agentes.think import ThinkTool
+    from nicx.ferramentas.arquivos.file_read import FileReadTool
+    from nicx.ferramentas.conhecimento.retrieval import RetrievalTool
     from nicx.nucleo.registry import ToolRegistry
 
     for name, cls in [

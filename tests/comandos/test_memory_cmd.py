@@ -8,7 +8,7 @@ from pathlib import Path
 from click.testing import CliRunner
 
 from nicx.comandos import cli
-from nicx.ferramentas.storage.sqlite import SQLiteMemory
+from nicx.memoria.armazenamento.sqlite import SQLiteMemory
 from nicx.memoria.store import LocalFactStore
 from nicx.nucleo.registry import MemoryRegistry
 

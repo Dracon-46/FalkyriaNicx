@@ -5,8 +5,8 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from nicx.ferramentas._stubs import BaseTool, ToolSpec
-from nicx.ferramentas.storage._stubs import MemoryBackend
-from nicx.ferramentas.storage.context import format_context
+from nicx.memoria.armazenamento._stubs import MemoryBackend
+from nicx.memoria.armazenamento.context import format_context
 from nicx.nucleo.registry import ToolRegistry
 from nicx.nucleo.types import ToolResult
 

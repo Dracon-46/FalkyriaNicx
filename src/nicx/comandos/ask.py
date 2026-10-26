@@ -282,7 +282,7 @@ def _get_memory_backend(config):
     tool is the hallucination vector.
     """
     try:
-        import nicx.ferramentas.storage  # noqa: F401
+        import nicx.memoria.armazenamento  # noqa: F401
         from nicx.nucleo.registry import MemoryRegistry
 
         key = config.memory.default_backend
@@ -553,7 +553,7 @@ def _run_agent(
     # Inject memory context into conversation if available
     if config.agent.context_from_memory:
         try:
-            from nicx.ferramentas.storage.context import ContextConfig, inject_context
+            from nicx.memoria.armazenamento.context import ContextConfig, inject_context
 
             backend = _get_memory_backend(config)
             facts = _get_memory_facts(config)
@@ -1217,7 +1217,7 @@ def ask(
     # Memory-augmented context injection
     if not no_context and config.agent.context_from_memory:
         try:
-            from nicx.ferramentas.storage.context import (
+            from nicx.memoria.armazenamento.context import (
                 ContextConfig,
                 inject_context,
             )

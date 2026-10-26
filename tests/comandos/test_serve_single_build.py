@@ -23,6 +23,7 @@ import pytest
 from click.testing import CliRunner
 
 from nicx.comandos import cli
+from nicx.ferramentas import NOT_TOOL_MODULES
 
 pytest.importorskip("fastapi")
 pytest.importorskip("uvicorn")
@@ -54,7 +55,7 @@ def _repopulate_registries() -> None:
 
     import nicx.cerebro.agentes  # noqa: F401
     import nicx.ferramentas  # noqa: F401
-    import nicx.ferramentas.storage  # noqa: F401
+    import nicx.memoria.armazenamento  # noqa: F401
     from nicx.nucleo.registry import (
         AgentRegistry,
         MemoryRegistry,
@@ -75,6 +76,9 @@ def _repopulate_registries() -> None:
         for mod_name in list(sys.modules):
             if (
                 mod_name.startswith("nicx.ferramentas.")
+                # MCP e sandbox são infraestrutura: recarregar criaria
+                # cópias novas das classes (isinstance passaria a falhar).
+                and not mod_name.startswith(NOT_TOOL_MODULES)
                 and not mod_name.endswith("_stubs")
                 and not mod_name.endswith("agent_tools")
             ):
@@ -86,7 +90,7 @@ def _repopulate_registries() -> None:
     if not MemoryRegistry.keys():
         for mod_name in list(sys.modules):
             if mod_name.startswith(
-                "nicx.ferramentas.storage."
+                "nicx.memoria.armazenamento."
             ) and not mod_name.endswith("_stubs"):
                 try:
                     importlib.reload(sys.modules[mod_name])

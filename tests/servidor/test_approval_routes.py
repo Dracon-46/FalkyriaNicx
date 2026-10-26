@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from nicx.ferramentas.approval_store import (
+from nicx.ferramentas.agentes.approval_store import (
     STATUS_APPROVED,
     STATUS_DENIED,
     STATUS_PENDING,

@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from nicx.conectores.store import KnowledgeStore
-from nicx.ferramentas.knowledge_search import KnowledgeSearchTool
+from nicx.ferramentas.conhecimento.knowledge_search import KnowledgeSearchTool
 from nicx.nucleo.registry import ToolRegistry
 
 # ---------------------------------------------------------------------------
@@ -190,7 +190,7 @@ class TestKnowledgeSearchTool:
         plain import won't re-execute the ``@ToolRegistry.register`` decorator,
         so we explicitly reload the module.
         """
-        mod_name = "nicx.ferramentas.knowledge_search"
+        mod_name = "nicx.ferramentas.conhecimento.knowledge_search"
         if mod_name in sys.modules:
             importlib.reload(sys.modules[mod_name])
         else:

@@ -105,7 +105,7 @@ def test_extracted_facts_reach_model_context_end_to_end(tmp_path):
     per-layer tests can each pass while the pipeline as a whole recalls
     nothing.
     """
-    from nicx.ferramentas.storage.context import inject_context
+    from nicx.memoria.armazenamento.context import inject_context
     from nicx.nucleo.types import Message, Role
 
     svc = _service(

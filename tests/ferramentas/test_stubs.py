@@ -7,7 +7,7 @@ import json
 import pytest
 
 from nicx.ferramentas._stubs import BaseTool, ToolExecutor, ToolSpec
-from nicx.ferramentas.code_interpreter import CodeInterpreterTool
+from nicx.ferramentas.codigo.code_interpreter import CodeInterpreterTool
 from nicx.nucleo.events import EventBus, EventType
 from nicx.nucleo.types import ToolCall, ToolResult
 from nicx.seguranca.capabilities import DEFAULT_TOOL_CAPABILITIES

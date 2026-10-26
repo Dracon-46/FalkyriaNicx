@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from nicx.ferramentas.storage._stubs import MemoryBackend, RetrievalResult
+from nicx.memoria.armazenamento._stubs import MemoryBackend, RetrievalResult
 from nicx.nucleo.events import EventType, get_event_bus
 from nicx.nucleo.registry import MemoryRegistry
 
