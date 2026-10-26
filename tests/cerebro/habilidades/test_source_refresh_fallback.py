@@ -9,19 +9,16 @@ import pytest
 from click.testing import CliRunner
 
 from nicx.cerebro.habilidades.sources.github import GitHubResolver
-from nicx.cerebro.habilidades.sources.hermes import HermesResolver
-from nicx.cerebro.habilidades.sources.openclaw import OpenClawResolver
 from nicx.comandos import cli
 from nicx.nucleo.config import NicxConfig, SkillSourceConfig
 
 
-@pytest.fixture(params=["hermes", "openclaw", "github"])
+@pytest.fixture(params=["github"])
 def resolver(request, tmp_path):
     root = tmp_path / "cache"
     kind = request.param
-    if kind == "github":
-        return GitHubResolver(root, "https://example.invalid/skills.git")
-    return {"hermes": HermesResolver, "openclaw": OpenClawResolver}[kind](root)
+    assert kind == "github"
+    return GitHubResolver(root, "https://example.invalid/skills.git")
 
 
 def cached_skill(resolver):

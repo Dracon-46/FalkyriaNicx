@@ -11,8 +11,8 @@ from click.testing import CliRunner
 from nicx.comandos import cli
 
 
-def _build_fake_hermes_cache(cache_root: Path) -> None:
-    """Build a minimal fake Hermes cache for testing."""
+def _build_fake_github_cache(cache_root: Path) -> None:
+    """Build a minimal fake GitHub skills cache for testing."""
     skills_root = cache_root / "skills"
     (skills_root / "research" / "research-skill").mkdir(parents=True)
     (skills_root / "research" / "research-skill" / "SKILL.md").write_text(
@@ -25,32 +25,30 @@ def _build_fake_hermes_cache(cache_root: Path) -> None:
             Use the Bash tool to fetch data, then Read the file.
         """)
     )
-    # Fake .git so HermesResolver doesn't try to clone
+    # Fake .git so the resolver doesn't try to clone
     (cache_root / ".git").mkdir()
 
 
 class TestCliInstallE2E:
-    def test_install_hermes_skill_e2e(self, tmp_path: Path) -> None:
-        """nicx skill install hermes:research-skill installs to target dir."""
-        from nicx.cerebro.habilidades.sources.hermes import HermesResolver
+    def test_install_github_skill_e2e(self, tmp_path: Path) -> None:
+        """nicx skill install github:research-skill installs to target dir."""
+        from nicx.cerebro.habilidades.sources.github import GitHubResolver
 
-        cache = tmp_path / "hermes-cache"
+        cache = tmp_path / "github-cache"
         target = tmp_path / "target"
-        _build_fake_hermes_cache(cache)
+        _build_fake_github_cache(cache)
 
-        # Create a HermesResolver pointed at the fake cache
+        # A GitHubResolver pointed at the fake cache
         def _make_resolver(*_args, **_kwargs):
-            r = HermesResolver.__new__(HermesResolver)
-            r._cache_root = cache
-            return r
+            return GitHubResolver(cache, "https://example.invalid/skills.git")
 
         # Patch the helper that builds resolvers in the CLI
         with patch(
             "nicx.comandos.agentes.skill._get_resolver",
             lambda src, url="": _make_resolver(),
         ):
-            # Patch HermesResolver.sync to no-op (cache is already built)
-            with patch.object(HermesResolver, "sync", lambda self: None):
+            # sync is a no-op: the cache is already built
+            with patch.object(GitHubResolver, "sync", lambda self: None):
                 # Patch the SkillImporter constructor used inside the install
                 # command so it writes to our test target instead of
                 # ~/.nicx/skills/.
@@ -68,13 +66,13 @@ class TestCliInstallE2E:
 
                 with patch.object(_SI, "__init__", patched_init):
                     result = CliRunner().invoke(
-                        cli, ["skill", "install", "hermes:research-skill"]
+                        cli, ["skill", "install", "github:research-skill"]
                     )
 
         assert result.exit_code == 0, result.output
         assert "Installed" in result.output
 
-        installed = target / "hermes" / "research-skill" / "SKILL.md"
+        installed = target / "github" / "research-skill" / "SKILL.md"
         assert installed.exists(), (
             f"Expected {installed} to exist; output:\n{result.output}"
         )
