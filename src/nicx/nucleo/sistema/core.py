@@ -23,9 +23,9 @@ if TYPE_CHECKING:
     from nicx.agenda.store import SchedulerStore
     from nicx.canais._stubs import BaseChannel
     from nicx.cerebro.agentes._stubs import BaseAgent
-    from nicx.cerebro.agentes.executor import AgentExecutor
-    from nicx.cerebro.agentes.manager import AgentManager
-    from nicx.cerebro.agentes.scheduler import AgentScheduler
+    from nicx.cerebro.agentes.gestao.executor import AgentExecutor
+    from nicx.cerebro.agentes.gestao.manager import AgentManager
+    from nicx.cerebro.agentes.gestao.scheduler import AgentScheduler
     from nicx.cerebro.fluxos.engine import WorkflowEngine
     from nicx.cerebro.habilidades.manager import SkillManager
     from nicx.cerebro.operadores.manager import OperatorManager

@@ -95,7 +95,7 @@ def imessage_start(
         )
         console.print("Press Ctrl+C to stop.\n")
 
-        from nicx.cerebro.agentes.deep_research import (
+        from nicx.cerebro.agentes.pesquisa.deep_research import (
             DeepResearchAgent,
         )
         from nicx.conectores.retriever import (

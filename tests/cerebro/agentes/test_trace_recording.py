@@ -5,8 +5,8 @@ from __future__ import annotations
 from unittest.mock import patch
 
 from nicx.cerebro.agentes._stubs import AgentResult
-from nicx.cerebro.agentes.executor import AgentExecutor
-from nicx.cerebro.agentes.manager import AgentManager
+from nicx.cerebro.agentes.gestao.executor import AgentExecutor
+from nicx.cerebro.agentes.gestao.manager import AgentManager
 from nicx.nucleo.events import EventBus, EventType
 from nicx.registros.rastros.store import TraceStore
 

@@ -9,9 +9,9 @@ if TYPE_CHECKING:
     from nicx.agenda.scheduler import TaskScheduler
     from nicx.agenda.store import SchedulerStore
     from nicx.cerebro.agentes._stubs import BaseAgent
-    from nicx.cerebro.agentes.executor import AgentExecutor
-    from nicx.cerebro.agentes.manager import AgentManager
-    from nicx.cerebro.agentes.scheduler import AgentScheduler
+    from nicx.cerebro.agentes.gestao.executor import AgentExecutor
+    from nicx.cerebro.agentes.gestao.manager import AgentManager
+    from nicx.cerebro.agentes.gestao.scheduler import AgentScheduler
     from nicx.registros.rastros.collector import TraceCollector
     from nicx.registros.rastros.store import TraceStore
     from nicx.registros.telemetria.gpu_monitor import GpuMonitor

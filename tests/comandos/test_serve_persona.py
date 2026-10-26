@@ -51,10 +51,10 @@ def test_serve_wires_persona_builder_into_served_agent(
     """The agent built on the serve path must carry a SystemPromptBuilder whose
     assembled prompt includes SOUL.md content (regression for the HTTP persona
     loss)."""
-    from nicx.cerebro.agentes.monitor_operative import MonitorOperativeAgent
-    from nicx.cerebro.agentes.operative import OperativeAgent
-    from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
-    from nicx.cerebro.agentes.simple import SimpleAgent
+    from nicx.cerebro.agentes.autonomos.monitor_operative import MonitorOperativeAgent
+    from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
+    from nicx.cerebro.agentes.conversa.orchestrator import OrchestratorAgent
+    from nicx.cerebro.agentes.conversa.simple import SimpleAgent
     from nicx.nucleo.config import NicxConfig
     from nicx.nucleo.registry import AgentRegistry
 

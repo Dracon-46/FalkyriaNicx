@@ -278,7 +278,7 @@ def ingest_sources(
 
 def _launch_chat(store: KnowledgeStore, console: Console) -> None:
     """Start an interactive Deep Research chat session."""
-    from nicx.cerebro.agentes.deep_research import DeepResearchAgent
+    from nicx.cerebro.agentes.pesquisa.deep_research import DeepResearchAgent
     from nicx.conectores.retriever import TwoStageRetriever
     from nicx.ferramentas.agentes.think import ThinkTool
     from nicx.ferramentas.conhecimento.knowledge_search import KnowledgeSearchTool

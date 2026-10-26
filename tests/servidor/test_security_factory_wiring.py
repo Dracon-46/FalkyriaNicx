@@ -117,8 +117,8 @@ def test_factory_propagates_strict_security_setup_failure(monkeypatch) -> None:
 
 
 def test_factory_synchronizes_prebuilt_rlm_lazy_executor_runtime(monkeypatch) -> None:
-    from nicx.cerebro.agentes.rlm import RLMAgent
-    from nicx.cerebro.agentes.rlm_repl import RLMRepl
+    from nicx.cerebro.agentes.conversa.rlm import RLMAgent
+    from nicx.cerebro.agentes.conversa.rlm_repl import RLMRepl
 
     engine = MagicMock()
     engine.generate.side_effect = [
@@ -180,7 +180,7 @@ def test_factory_synchronizes_prebuilt_rlm_lazy_executor_runtime(monkeypatch) ->
 def test_factory_preserves_prebuilt_rlm_policy_and_limiter_while_reidentifying() -> (
     None
 ):
-    from nicx.cerebro.agentes.rlm import RLMAgent
+    from nicx.cerebro.agentes.conversa.rlm import RLMAgent
 
     engine = MagicMock()
     agent_policy = CapabilityPolicy(default_deny=True)
@@ -213,7 +213,7 @@ def test_factory_preserves_prebuilt_rlm_policy_and_limiter_while_reidentifying()
 
 
 def test_factory_overrides_prebuilt_executor_identity_at_server_boundary() -> None:
-    from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
+    from nicx.cerebro.agentes.conversa.orchestrator import OrchestratorAgent
     from nicx.ferramentas._stubs import BaseTool, ToolSpec
     from nicx.nucleo.types import ToolCall, ToolResult
 

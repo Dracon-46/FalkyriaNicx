@@ -245,7 +245,7 @@ class TestChatPickerIntegration:
     def test_native_react_gets_engine_options_via_setattr(self) -> None:
         """NativeReActAgent rejects engine_options kwarg; chat uses setattr."""
         import nicx.cerebro.agentes  # noqa: F401
-        from nicx.cerebro.agentes.native_react import NativeReActAgent
+        from nicx.cerebro.agentes.conversa.native_react import NativeReActAgent
         from nicx.nucleo.registry import AgentRegistry
 
         if not AgentRegistry.contains("native_react"):

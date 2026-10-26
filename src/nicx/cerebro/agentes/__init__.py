@@ -15,22 +15,22 @@ logger = logging.getLogger(__name__)
 
 # Import agent modules to trigger @AgentRegistry.register() decorators
 try:
-    import nicx.cerebro.agentes.simple  # noqa: F401
+    import nicx.cerebro.agentes.conversa.simple  # noqa: F401
 except ImportError:
     pass
 
 try:
-    import nicx.cerebro.agentes.orchestrator  # noqa: F401
+    import nicx.cerebro.agentes.conversa.orchestrator  # noqa: F401
 except ImportError:
     pass
 
 try:
-    import nicx.cerebro.agentes.native_react  # noqa: F401
+    import nicx.cerebro.agentes.conversa.native_react  # noqa: F401
 except ImportError:
     pass
 
 try:
-    import nicx.cerebro.agentes.codeact  # noqa: F401
+    import nicx.cerebro.agentes.conversa.codeact  # noqa: F401
 except ImportError:
     pass
 
@@ -40,12 +40,12 @@ except ImportError:
     pass
 
 try:
-    import nicx.cerebro.agentes.rlm  # noqa: F401
+    import nicx.cerebro.agentes.conversa.rlm  # noqa: F401
 except ImportError:
     pass
 
 try:
-    import nicx.cerebro.agentes.operative  # noqa: F401
+    import nicx.cerebro.agentes.autonomos.operative  # noqa: F401
 except ImportError:
     pass
 
@@ -55,17 +55,17 @@ except ImportError:
     pass
 
 try:
-    import nicx.cerebro.agentes.monitor_operative  # noqa: F401
+    import nicx.cerebro.agentes.autonomos.monitor_operative  # noqa: F401
 except ImportError:
     pass
 
 try:
-    import nicx.cerebro.agentes.deep_research  # noqa: F401
+    import nicx.cerebro.agentes.pesquisa.deep_research  # noqa: F401
 except ImportError:
     pass
 
 try:
-    import nicx.cerebro.agentes.morning_digest  # noqa: F401
+    import nicx.cerebro.agentes.autonomos.morning_digest  # noqa: F401
 except ImportError:
     pass
 

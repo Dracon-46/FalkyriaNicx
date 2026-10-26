@@ -12,7 +12,7 @@ from rich.table import Table
 
 def _get_manager():
     """Get or create the AgentManager singleton."""
-    from nicx.cerebro.agentes.manager import AgentManager
+    from nicx.cerebro.agentes.gestao.manager import AgentManager
     from nicx.nucleo.config import load_config
     from nicx.nucleo.paths import get_config_dir
 
@@ -300,7 +300,7 @@ def templates() -> None:
     """List available agent templates."""
     console = Console(stderr=True)
     try:
-        from nicx.cerebro.agentes.manager import AgentManager
+        from nicx.cerebro.agentes.gestao.manager import AgentManager
 
         tpls = AgentManager.list_templates()
         if not tpls:
@@ -405,7 +405,7 @@ def _run_tick_with_live_trace(executor, agent_id: str, console: Console) -> None
 @agent.command()
 def launch():
     """Interactive agent launcher."""
-    from nicx.cerebro.agentes.manager import AgentManager as _AM
+    from nicx.cerebro.agentes.gestao.manager import AgentManager as _AM
 
     templates = _AM.list_templates()
     click.echo("Available templates:")

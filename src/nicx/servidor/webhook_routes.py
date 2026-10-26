@@ -191,7 +191,7 @@ def create_webhook_router(
             else:
                 # Direct agent fallback
                 try:
-                    from nicx.cerebro.agentes.deep_research import (
+                    from nicx.cerebro.agentes.pesquisa.deep_research import (
                         DeepResearchAgent,
                     )
                     from nicx.servidor.agent_manager_routes import (

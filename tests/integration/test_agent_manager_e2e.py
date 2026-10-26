@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from nicx.cerebro.agentes.manager import AgentManager
+from nicx.cerebro.agentes.gestao.manager import AgentManager
 
 
 @pytest.fixture

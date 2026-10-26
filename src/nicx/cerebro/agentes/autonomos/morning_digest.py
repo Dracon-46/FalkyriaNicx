@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any, List, Optional
 
 from nicx.cerebro.agentes._stubs import AgentContext, AgentResult, ToolUsingAgent
-from nicx.cerebro.agentes.digest_store import DigestArtifact, DigestStore
+from nicx.cerebro.agentes.autonomos.digest_store import DigestArtifact, DigestStore
 from nicx.nucleo.paths import get_config_dir
 from nicx.nucleo.registry import AgentRegistry
 from nicx.nucleo.types import Message, Role, ToolCall

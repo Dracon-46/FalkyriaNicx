@@ -88,7 +88,7 @@ def _restore_sendblue_bindings(app: FastAPI) -> None:
 
                         tools = _build_deep_research_tools(engine=engine, model="")
                         if tools:
-                            from nicx.cerebro.agentes.deep_research import (
+                            from nicx.cerebro.agentes.pesquisa.deep_research import (
                                 DeepResearchAgent,
                             )
 

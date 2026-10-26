@@ -8,7 +8,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from nicx.cerebro.agentes._stubs import AgentResult
-from nicx.cerebro.agentes.deep_research import DeepResearchAgent
+from nicx.cerebro.agentes.pesquisa.deep_research import DeepResearchAgent
 from nicx.conectores.store import KnowledgeStore
 from nicx.ferramentas.conhecimento.knowledge_search import KnowledgeSearchTool
 from nicx.nucleo.registry import AgentRegistry

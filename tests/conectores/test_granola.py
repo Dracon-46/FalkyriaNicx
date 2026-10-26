@@ -362,7 +362,7 @@ def test_end_to_end_ingest_and_search(
     # different from the API note_id.
     assert target.url == _NOTE_1_WEB_URL
 
-    from nicx.cerebro.agentes.research_loop import (  # noqa: PLC0415
+    from nicx.cerebro.agentes.pesquisa.research_loop import (  # noqa: PLC0415
         _hit_url,
         build_sources_for_client,
     )

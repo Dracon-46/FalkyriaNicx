@@ -20,8 +20,8 @@ from typing import Any, Dict, List, Optional
 from unittest.mock import MagicMock
 
 from nicx.canais._stubs import BaseChannel, ChannelMessage, ChannelStatus
-from nicx.cerebro.agentes.channel_agent import ChannelAgent
-from nicx.cerebro.agentes.deep_research import DeepResearchAgent
+from nicx.cerebro.agentes.autonomos.channel_agent import ChannelAgent
+from nicx.cerebro.agentes.pesquisa.deep_research import DeepResearchAgent
 from nicx.conectores._stubs import Document
 from nicx.conectores.pipeline import IngestionPipeline
 from nicx.conectores.retriever import TwoStageRetriever

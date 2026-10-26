@@ -482,7 +482,7 @@ name = "Discovered"
 
 class TestOperativeAgent:
     def test_init_defaults(self):
-        from nicx.cerebro.agentes.operative import OperativeAgent
+        from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
 
         engine = FakeEngine()
         with patch(
@@ -496,12 +496,12 @@ class TestOperativeAgent:
         assert agent._max_turns == 20
 
     def test_accepts_tools(self):
-        from nicx.cerebro.agentes.operative import OperativeAgent
+        from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
 
         assert OperativeAgent.accepts_tools is True
 
     def test_run_with_system_prompt(self):
-        from nicx.cerebro.agentes.operative import OperativeAgent
+        from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
 
         engine = FakeEngine([{"content": "Response with prompt."}])
         agent = OperativeAgent(
@@ -520,7 +520,7 @@ class TestOperativeAgent:
         )
 
     def test_run_loads_session(self):
-        from nicx.cerebro.agentes.operative import OperativeAgent
+        from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
 
         session_store = FakeSessionStore()
         # Pre-populate session with history
@@ -541,7 +541,7 @@ class TestOperativeAgent:
         assert result.content == "New tick done."
 
     def test_run_saves_session(self):
-        from nicx.cerebro.agentes.operative import OperativeAgent
+        from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
 
         session_store = FakeSessionStore()
 
@@ -561,7 +561,7 @@ class TestOperativeAgent:
         assert saved[1]["content"] == "Tick response."
 
     def test_run_recalls_state(self):
-        from nicx.cerebro.agentes.operative import OperativeAgent
+        from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
 
         memory = FakeMemoryBackend()
         memory.store("operator:recall_test:state", '{"last_run": "2024-01-01"}')
@@ -583,7 +583,7 @@ class TestOperativeAgent:
         assert any("Previous State" in m.content for m in sys_msgs)
 
     def test_run_tool_loop(self):
-        from nicx.cerebro.agentes.operative import OperativeAgent
+        from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
         from nicx.ferramentas._stubs import BaseTool
 
         # Mock tool
@@ -623,7 +623,7 @@ class TestOperativeAgent:
         assert result.turns == 2
 
     def test_run_without_persistence(self):
-        from nicx.cerebro.agentes.operative import OperativeAgent
+        from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
 
         engine = FakeEngine([{"content": "No persistence needed."}])
         agent = OperativeAgent(engine, "test-model")
@@ -631,7 +631,7 @@ class TestOperativeAgent:
         assert result.content == "No persistence needed."
 
     def test_run_auto_persists_state(self):
-        from nicx.cerebro.agentes.operative import OperativeAgent
+        from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
 
         memory = FakeMemoryBackend()
 
@@ -649,7 +649,7 @@ class TestOperativeAgent:
         assert "Tick complete." in state
 
     def test_blank_result_preserves_previous_state(self):
-        from nicx.cerebro.agentes.operative import OperativeAgent
+        from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
 
         memory = FakeMemoryBackend()
         state_key = "operator:persist_test:state"
@@ -666,7 +666,7 @@ class TestOperativeAgent:
         assert memory.retrieve(state_key) == "waiting for a reply"
 
     def test_max_turns_exceeded(self):
-        from nicx.cerebro.agentes.operative import OperativeAgent
+        from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
 
         # Engine always returns tool calls, never a final answer
         responses = [
@@ -878,7 +878,7 @@ class TestAgentRegistration:
 
         # Re-register if cleared by another test
         if not AgentRegistry.contains("operative"):
-            from nicx.cerebro.agentes.operative import OperativeAgent
+            from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
 
             AgentRegistry.register_value("operative", OperativeAgent)
 

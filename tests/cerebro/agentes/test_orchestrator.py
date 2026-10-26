@@ -7,7 +7,7 @@ import time
 from unittest.mock import MagicMock
 
 from nicx.cerebro.agentes._stubs import AgentContext
-from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
+from nicx.cerebro.agentes.conversa.orchestrator import OrchestratorAgent
 from nicx.ferramentas._stubs import BaseTool, ToolSpec
 from nicx.nucleo.events import EventBus, EventType
 from nicx.nucleo.types import Conversation, Message, Role, ToolResult

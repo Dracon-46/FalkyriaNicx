@@ -81,7 +81,7 @@ def _resolve_research_model(model_name: str | None, config: NicxConfig | None) -
     straight to the legacy fallback, which 404s on any install that never
     pulled gemma4.
     """
-    from nicx.cerebro.agentes.research_loop import DEFAULT_PLANNER_MODEL
+    from nicx.cerebro.agentes.pesquisa.research_loop import DEFAULT_PLANNER_MODEL
 
     candidates = [model_name]
     if config is not None:
@@ -109,7 +109,7 @@ def _run_research(
     from rich.markdown import Markdown
     from rich.theme import Theme
 
-    from nicx.cerebro.agentes.research_loop import ResearchAgent
+    from nicx.cerebro.agentes.pesquisa.research_loop import ResearchAgent
     from nicx.conectores.embeddings import OllamaEmbedder
     from nicx.conectores.hybrid_search import HybridSearch
     from nicx.conectores.store import KnowledgeStore

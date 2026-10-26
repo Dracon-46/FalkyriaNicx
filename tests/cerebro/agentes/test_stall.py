@@ -4,8 +4,8 @@ import time
 from unittest.mock import patch
 
 from nicx.cerebro.agentes._stubs import AgentResult
-from nicx.cerebro.agentes.executor import AgentExecutor
-from nicx.cerebro.agentes.manager import AgentManager
+from nicx.cerebro.agentes.gestao.executor import AgentExecutor
+from nicx.cerebro.agentes.gestao.manager import AgentManager
 from nicx.nucleo.events import EventBus, EventType
 
 
@@ -69,7 +69,7 @@ def test_reconcile_detects_stalled_agent(tmp_path):
     mgr = AgentManager(str(tmp_path / "test.db"))
     bus = EventBus(record_history=True)
     executor = AgentExecutor(mgr, bus)
-    from nicx.cerebro.agentes.scheduler import AgentScheduler
+    from nicx.cerebro.agentes.gestao.scheduler import AgentScheduler
 
     scheduler = AgentScheduler(mgr, executor, event_bus=bus)
 
@@ -99,7 +99,7 @@ def test_reconcile_skips_active_agent(tmp_path):
     mgr = AgentManager(str(tmp_path / "test.db"))
     bus = EventBus(record_history=True)
     executor = AgentExecutor(mgr, bus)
-    from nicx.cerebro.agentes.scheduler import AgentScheduler
+    from nicx.cerebro.agentes.gestao.scheduler import AgentScheduler
 
     scheduler = AgentScheduler(mgr, executor, event_bus=bus)
 
@@ -118,7 +118,7 @@ def test_reconcile_retries_exhausted_sets_error(tmp_path):
     mgr = AgentManager(str(tmp_path / "test.db"))
     bus = EventBus()
     executor = AgentExecutor(mgr, bus)
-    from nicx.cerebro.agentes.scheduler import AgentScheduler
+    from nicx.cerebro.agentes.gestao.scheduler import AgentScheduler
 
     scheduler = AgentScheduler(mgr, executor, event_bus=bus)
 

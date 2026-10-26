@@ -36,7 +36,7 @@ def _register_agents():
     so ``nicx ask "..."`` (without ``--agent``) routes through SimpleAgent.
     Without this re-registration, that path raises ``Unknown agent: simple``.
     """
-    from nicx.cerebro.agentes.simple import SimpleAgent
+    from nicx.cerebro.agentes.conversa.simple import SimpleAgent
     from nicx.nucleo.registry import AgentRegistry
 
     if not AgentRegistry.contains("simple"):

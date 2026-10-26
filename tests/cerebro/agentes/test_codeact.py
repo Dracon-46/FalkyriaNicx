@@ -5,7 +5,7 @@ from __future__ import annotations
 from unittest.mock import MagicMock
 
 from nicx.cerebro.agentes._stubs import AgentContext
-from nicx.cerebro.agentes.codeact import CodeActAgent
+from nicx.cerebro.agentes.conversa.codeact import CodeActAgent
 from nicx.ferramentas._stubs import BaseTool, ToolSpec
 from nicx.nucleo.events import EventBus, EventType
 from nicx.nucleo.registry import AgentRegistry

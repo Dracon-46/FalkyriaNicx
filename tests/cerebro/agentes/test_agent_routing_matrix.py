@@ -7,10 +7,10 @@ from unittest.mock import MagicMock
 import pytest
 
 from nicx.cerebro.agentes._stubs import AgentResult
-from nicx.cerebro.agentes.codeact import CodeActAgent
-from nicx.cerebro.agentes.native_react import NativeReActAgent
-from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
-from nicx.cerebro.agentes.simple import SimpleAgent
+from nicx.cerebro.agentes.conversa.codeact import CodeActAgent
+from nicx.cerebro.agentes.conversa.native_react import NativeReActAgent
+from nicx.cerebro.agentes.conversa.orchestrator import OrchestratorAgent
+from nicx.cerebro.agentes.conversa.simple import SimpleAgent
 from nicx.nucleo.events import EventBus, EventType
 
 # ---------------------------------------------------------------------------

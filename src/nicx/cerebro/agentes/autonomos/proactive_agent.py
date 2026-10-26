@@ -30,7 +30,7 @@ Scheduling
 The agent self-registers a 5am daily cron task when ``register_cron`` is
 called from your app startup:
 
-    from nicx.cerebro.agentes.proactive_agent import register_cron
+    from nicx.cerebro.agentes.autonomos.proactive_agent import register_cron
     register_cron(scheduler, notification_channel_id="your-channel-id")
 """
 

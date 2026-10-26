@@ -23,8 +23,8 @@ from nicx.nucleo.types import (
 
 
 def _register_agents():
-    from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
-    from nicx.cerebro.agentes.simple import SimpleAgent
+    from nicx.cerebro.agentes.conversa.orchestrator import OrchestratorAgent
+    from nicx.cerebro.agentes.conversa.simple import SimpleAgent
 
     if not AgentRegistry.contains("simple"):
         AgentRegistry.register_value("simple", SimpleAgent)

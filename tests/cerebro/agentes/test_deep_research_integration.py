@@ -16,7 +16,7 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from nicx.cerebro.agentes.deep_research import DeepResearchAgent
+from nicx.cerebro.agentes.pesquisa.deep_research import DeepResearchAgent
 from nicx.conectores._stubs import Document
 from nicx.conectores.pipeline import IngestionPipeline
 from nicx.conectores.retriever import TwoStageRetriever

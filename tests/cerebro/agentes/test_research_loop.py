@@ -12,7 +12,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from nicx.cerebro.agentes.research_loop import (
+from nicx.cerebro.agentes.pesquisa.research_loop import (
     SEARCH_TOOL_SPEC,
     SYSTEM_PROMPT,
     ResearchAgent,

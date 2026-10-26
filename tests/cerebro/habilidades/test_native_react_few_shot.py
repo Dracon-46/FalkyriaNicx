@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-from nicx.cerebro.agentes.native_react import REACT_SYSTEM_PROMPT, NativeReActAgent
+from nicx.cerebro.agentes.conversa.native_react import (
+    REACT_SYSTEM_PROMPT,
+    NativeReActAgent,
+)
 
 
 class _StubEngine:

@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from nicx.cerebro.agentes.research_loop import DEFAULT_PLANNER_MODEL
+from nicx.cerebro.agentes.pesquisa.research_loop import DEFAULT_PLANNER_MODEL
 from nicx.nucleo.config import NicxConfig
 from nicx.servidor import research_router
 

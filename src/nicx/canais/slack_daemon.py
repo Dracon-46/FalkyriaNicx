@@ -50,7 +50,7 @@ def run_slack_daemon(
     from slack_bolt import App
     from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-    from nicx.cerebro.agentes.deep_research import DeepResearchAgent
+    from nicx.cerebro.agentes.pesquisa.deep_research import DeepResearchAgent
     from nicx.motores.ollama import OllamaEngine
     from nicx.nucleo.config import load_config
     from nicx.nucleo.events import EventBus
