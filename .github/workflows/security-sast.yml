@@ -1,11 +1,17 @@
 name: security-sast
 
 # Static application-security testing for Python code and locked dependencies.
+# Dependências mudaram, toda segunda, ou sob demanda (cota de Actions).
 on:
   push:
     branches: [main]
-  pull_request:
+    paths:
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/security-sast.yml'
   workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * 1'  # segunda, 6h em Brasília
 
 permissions:
   contents: read

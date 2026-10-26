@@ -1,10 +1,21 @@
 name: CI
 
+# Repositório privado: cada minuto de Actions conta na cota grátis (Windows
+# conta em dobro). A cada push só lint e testes no Linux; Windows roda toda
+# segunda ou sob demanda; Rust tem workflow próprio (rust.yml).
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'assets/**'
+      - 'frontend/**'
+      - 'supabase/**'
+      - '.github/ISSUE_TEMPLATE/**'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * 1'  # segunda, 6h em Brasília
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -101,6 +112,8 @@ jobs:
   # All `run:` steps use static commands only (no `github.event.*`
   # interpolation), so there is no workflow-injection surface here.
   test-windows:
+    # Só na rodada semanal ou sob demanda: minuto de Windows conta em dobro.
+    if: github.event_name != 'push'
     runs-on: windows-latest
     strategy:
       fail-fast: false
@@ -154,32 +167,3 @@ jobs:
         shell: bash
         run: |
           uv run nicx --version
-
-  rust:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: rust
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy
-
-      - name: Cargo cache
-        uses: actions/cache@v6
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            rust/target
-          key: rust-${{ runner.os }}-${{ hashFiles('rust/Cargo.lock') }}
-          restore-keys: rust-${{ runner.os }}-
-
-      - name: Clippy
-        run: cargo clippy --workspace --all-targets -- -D warnings
-
-      - name: Test
-        run: cargo test --workspace

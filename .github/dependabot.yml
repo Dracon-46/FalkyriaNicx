@@ -4,7 +4,7 @@ updates:
     directory: "/frontend"
     open-pull-requests-limit: 2
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     groups:
       frontend-minor-patch:
         patterns:
@@ -17,7 +17,7 @@ updates:
     directory: "/frontend/src-tauri"
     open-pull-requests-limit: 2
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     groups:
       tauri-minor-patch:
         patterns:
@@ -34,7 +34,7 @@ updates:
         update-types: ["version-update:semver-major"]
     open-pull-requests-limit: 2
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     groups:
       rust-minor-patch:
         patterns:
@@ -47,7 +47,7 @@ updates:
     directory: "/"
     open-pull-requests-limit: 2
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     groups:
       python-minor-patch:
         patterns:
@@ -60,7 +60,7 @@ updates:
     directory: "/"
     open-pull-requests-limit: 2
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     groups:
       actions-minor-patch:
         patterns:
