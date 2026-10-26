@@ -1,7 +1,7 @@
 """ToolTranslator — translate external tool names to Nicx equivalents.
 
-External skill libraries (Hermes Agent, OpenClaw) reference tools by Claude
-Code's standard tool names (Bash, Read, Write, etc.).  Nicx uses
+Skills written for other assistants usually reference tools by the common
+names (Bash, Read, Write, etc.).  Nicx uses
 different names (shell_exec, file_read, file_write).  This module translates
 those references in skill markdown bodies and ``allowed-tools`` fields.
 

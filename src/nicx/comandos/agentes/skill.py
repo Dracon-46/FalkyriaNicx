@@ -208,7 +208,7 @@ def _parse_source_query(query: str) -> tuple[str, str]:
     """
     if ":" not in query:
         raise click.BadParameter(
-            f"Expected '<source>:<name>' format (e.g. 'hermes:apple-notes'), "
+            f"Expected '<source>:<name>' (e.g. 'github:apple-notes' with --url), "
             f"got: {query!r}"
         )
     source, _, name = query.partition(":")
@@ -221,14 +221,6 @@ def _parse_source_query(query: str) -> tuple[str, str]:
 
 def _get_resolver(source: str, url: str = ""):
     """Return a resolver instance for the given source name."""
-    if source == "hermes":
-        from nicx.cerebro.habilidades.sources.hermes import HermesResolver
-
-        return HermesResolver()
-    if source == "openclaw":
-        from nicx.cerebro.habilidades.sources.openclaw import OpenClawResolver
-
-        return OpenClawResolver()
     if source == "github":
         if not url:
             raise click.BadParameter("github source requires --url")
@@ -280,7 +272,7 @@ def _sync_resolver(resolver, console: Console) -> None:
 def install(query: str, with_scripts: bool, force: bool, url: str, yes_dangerous: bool):
     """Install a skill from a source.
 
-    Example: ``nicx skill install hermes:apple-notes``
+    Example: ``nicx skill install github:apple-notes --url <repositório>``
     """
     console = Console()
     source, name = _parse_source_query(query)
@@ -292,7 +284,7 @@ def install(query: str, with_scripts: bool, force: bool, url: str, yes_dangerous
         console.print(f"[red]Failed to sync source {source}: {exc}[/red]")
         raise SystemExit(1)
 
-    # Support category/name queries (e.g. openclaw:owner/slug, hermes:apple/apple-notes)
+    # Support category/name queries (e.g. github:apple/apple-notes)
     if "/" in name:
         category, _, skill_name = name.partition("/")
         matches = [
