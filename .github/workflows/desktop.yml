@@ -81,7 +81,7 @@ jobs:
           uv sync --locked --extra dev --extra desktop --extra inference-cloud --extra inference-google --group desktop-native
           uv run python -c "import sysconfig, nicx_rust; assert sysconfig.get_platform() == 'win-amd64'; print('x64 backend and Rust extension import OK')"
           uv run nicx --version
-          uv run pytest tests/hardware/test_hardware_profiles.py tests/core/test_utils.py -q
+          uv run pytest tests/hardware/test_hardware_profiles.py tests/nucleo/test_utils.py -q
 
       - name: Download ARM64 Ollama and stage test bundle
         shell: bash

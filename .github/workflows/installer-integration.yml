@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'scripts/install/**'
-      - 'src/nicx/cli/**'
+      - 'src/nicx/comandos/**'
       - 'tests/install/**'
       - '.github/workflows/installer-integration.yml'
   schedule:
