@@ -89,7 +89,8 @@ impl MemoryBackend for BM25Memory {
         source: &str,
         metadata: Option<&Value>,
     ) -> Result<String, NicxError> {
-        let doc_id = Uuid::new_v4().to_string();
+        // 32 hex characters, like the Python memory backends.
+        let doc_id = Uuid::new_v4().simple().to_string();
         let terms = Self::tokenize(content);
         let term_count = terms.values().sum();
         let meta: HashMap<String, Value> = metadata
@@ -192,5 +193,20 @@ mod tests {
         let mem = BM25Memory::default();
         let results = mem.retrieve("anything", 5).unwrap();
         assert!(results.is_empty());
+    }
+
+    #[test]
+    fn test_bm25_delete_and_clear() {
+        let mem = BM25Memory::default();
+        let id = mem.store("Rust is fast", "doc1", None).unwrap();
+        mem.store("Python is easy", "doc2", None).unwrap();
+        assert_eq!(id.len(), 32);
+
+        assert!(mem.delete(&id).unwrap());
+        assert!(!mem.delete(&id).unwrap());
+        assert_eq!(mem.count().unwrap(), 1);
+
+        mem.clear().unwrap();
+        assert_eq!(mem.count().unwrap(), 0);
     }
 }
