@@ -1,212 +1,29 @@
----
-title: Nicx
-description: Falkyria's personal AI, running on your own hardware
-search:
-  boost: 2
-hide:
-  - navigation
----
-
-# Nicx — the AI of Falkyria
-
-<p class="hero-tagline">
-Nicx is Falkyria's AI: a framework for composable, on-device AI systems.
-Build personal AI that runs on your hardware. Cloud APIs are optional.
-</p>
-
-<div class="grid cards" markdown>
-
--   :material-image-multiple:{ .lg .middle } **See what people use it for**
-
-    ---
-
-    A gallery of real setups — morning briefs that summarize your overnight Slack and email, a Discord companion that knows your calendar, a code reviewer that works at 30,000 feet. Outcome-first, with links to the docs that explain how to build each one.
-
-    [:octicons-arrow-right-24: Browse the Showcase](showcase/index.md)
-
-</div>
-
----
-
-## Why Nicx?
-
-Personal AI agents are exploding in popularity, but nearly all of them still route intelligence through cloud APIs. Your "personal" AI continues to depend on someone else's server. At the same time, local language models already handle most everyday chat and reasoning queries, and their efficiency keeps improving year over year. The models and hardware are increasingly ready. What has been missing is the software stack to make local-first personal AI practical.
-
-Nicx is that stack. It is a framework for local-first personal AI, built around three core ideas: shared primitives for building on-device agents; evaluations that treat energy, FLOPs, latency, and dollar cost as first-class constraints alongside accuracy; and a learning loop that improves models using local trace data. The goal is simple: make it possible to build personal AI agents that run locally by default, calling the cloud only when truly necessary. Nicx aims to be both an experimentation platform and a production foundation for local AI.
-
----
-
-## Get Started
-
-=== "Browser App"
-
-    Run the full chat UI locally with one script:
-
-    ```bash
-    git clone https://github.com/Dracon-46/FalkyriaNicx.git
-    cd FalkyriaNicx
-    ./scripts/quickstart.sh
-    ```
-
-    This installs dependencies, starts Ollama + a local model, launches the backend
-    and frontend, and opens `http://localhost:5173` in your browser.
-
-=== "Desktop App"
-
-    The desktop app is a native window for the Nicx UI.
-    The backend (Ollama + inference) runs on your machine — start it first, then open the app.
-
-    **Step 1.** Start the backend:
-
-    ```bash
-    git clone https://github.com/Dracon-46/FalkyriaNicx.git
-    cd FalkyriaNicx
-    ./scripts/quickstart.sh
-    ```
-
-    **Step 2.** Download and open the desktop app:
-
-    [Download the latest release](https://github.com/Dracon-46/FalkyriaNicx/releases/latest){ .md-button .md-button--primary }
-
-    Installers are published for macOS, Windows, Linux (DEB), and Linux (RPM). See the [Downloads](downloads.md) page for details.
-
-    The app connects to `http://localhost:8000` automatically.
-
-    !!! warning "macOS first launch"
-
-        Run `xattr -cr /Applications/Nicx.app` if the app shows as "damaged".
-
-=== "Python SDK"
-
-    ```python
-    from nicx import Nicx
-
-    j = Nicx()                              # auto-detect engine
-    response = j.ask("Explain quicksort.")
-    print(response)
-    ```
-
-    For more control, use `ask_full()` to get usage stats, model info, and tool results:
-
-    ```python
-    result = j.ask_full(
-        "What is 2 + 2?",
-        agent="orchestrator",
-        tools=["calculator"],
-    )
-    print(result["content"])       # "4"
-    print(result["tool_results"])  # [{tool_name: "calculator", ...}]
-    ```
-
-=== "CLI"
-
-    ```bash
-    nicx ask "What is the capital of France?"
-
-    nicx ask --agent orchestrator --tools calculator "What is 137 * 42?"
-
-    nicx serve --port 8000
-
-    nicx memory index ./docs/
-    nicx memory search "configuration options"
-    ```
-
----
-
-## Five Primitives for Personal AI
-
-Nicx is built around five composable layers. Each has a clean interface and can be swapped independently.
-
-1. **Intelligence** — Pick a model, or let Nicx pick one for your hardware. Manages the full catalog of local models across providers.
-2. **Engine** — The inference runtime: [Ollama](https://ollama.com), [vLLM](https://github.com/vllm-project/vllm), [SGLang](https://github.com/sgl-project/sglang), [llama.cpp](https://github.com/ggerganov/llama.cpp), cloud APIs, and more. Auto-detects your hardware and recommends the best fit.
-3. **Agents** — Multi-step reasoning with tool use. Eight built-in agent types from simple chat to orchestrated workflows.
-4. **Tools & Memory** — Web search, calculator, file I/O, code interpreter, retrieval, persistent local state, and any external MCP server.
-5. **Learning** — Your AI gets better over time. Every interaction generates traces that drive automatic improvements to model weights, prompts, and agent behavior.
-
----
-
-## Key Features
-
-<div class="grid cards" markdown>
-
--   **10+ Engine Backends**
-
-    ---
-
-    [Ollama](https://ollama.com), [vLLM](https://github.com/vllm-project/vllm), [SGLang](https://github.com/sgl-project/sglang), [llama.cpp](https://github.com/ggerganov/llama.cpp), [MLX](https://github.com/ml-explore/mlx), [Exo](https://github.com/exo-explore/exo), [LiteLLM](https://github.com/BerriAI/litellm), cloud (OpenAI/Anthropic/Google), and more. Same `InferenceEngine` interface, swap freely.
-
--   **Automated Workflows**
-
-    ---
-
-    Cron-based agents that monitor, summarize, and act. Code review, email triage, research digests — running 24/7 on your hardware.
-
--   **Hardware-Aware**
-
-    ---
-
-    Auto-detects GPU vendor, model, and VRAM. Recommends the optimal engine for your hardware.
-
--   **Offline-First**
-
-    ---
-
-    All core functionality works without a network connection. Cloud APIs are optional extras.
-
--   **OpenAI-Compatible API**
-
-    ---
-
-    `nicx serve` starts a FastAPI server with SSE streaming. Drop-in replacement for OpenAI clients.
-
--   **Energy & Cost Tracking**
-
-    ---
-
-    Built-in telemetry for GPU power draw, token costs, and latency. See exactly what each query costs in watts and dollars.
-
-</div>
-
----
-
-## Documentation
-
-<div class="grid cards" markdown>
-
--   **[Getting Started](getting-started/installation.md)**
-
-    ---
-
-    Install Nicx, configure your first engine, and run your first query.
-
--   **[User Guide](user-guide/cli.md)**
-
-    ---
-
-    CLI, Python SDK, and guides for [Morning Digest](user-guide/morning-digest.md), [Deep Research](user-guide/deep-research.md), [Code Assistant](user-guide/code-assistant.md), [Scheduled Monitor](user-guide/scheduled-monitor.md), [Simple Chat](user-guide/chat-simple.md), [Evaluations](user-guide/evaluations.md), agents, memory, tools, and telemetry.
-
--   **[Architecture](architecture/overview.md)**
-
-    ---
-
-    Five-primitive design, registry pattern, query flow, and cross-cutting learning.
-
--   **[API Reference](api-reference/nicx/index.md)**
-
-    ---
-
-    Auto-generated reference for every module.
-
--   **[Deployment](deployment/docker.md)**
-
-    ---
-
-    Docker, systemd, launchd. GPU-accelerated container images.
-
--   **[Development](development/contributing.md)**
-
-    ---
-
-    Contributing guide, project structure, and extension patterns.
-
-</div>
+# Nicx
+
+O **Nicx** é a inteligência artificial da **Falkyria**. Ele conversa em
+português do Brasil, por texto ou voz, e roda inteiro no seu computador: o
+modelo de linguagem (via Ollama), o reconhecimento de fala e a voz ficam na
+máquina, sem API paga e sem mandar suas conversas para fora.
+
+O que ele faz hoje:
+
+- **Conversa** pelo app, pelo terminal (`nicx chat`) ou pela voz, com um
+  mascote animado.
+- **Age no computador** na hora: volume, mídia, abrir apps e sites, pesquisar,
+  hora, data, bateria, bloquear a tela ("aumenta o volume", "abre o YouTube").
+- **Pesquisa e usa ferramentas** quando precisa: busca na web, arquivos,
+  Python, comandos, base de conhecimento.
+- **Escuta "Nicx, ligar"** (desligado por padrão) e abre o mascote flutuante
+  para uma conversa por voz.
+- **Respeita a privacidade**: estatísticas de uso só com consentimento, para o
+  Supabase da Falkyria, sem o conteúdo das conversas.
+
+## Páginas
+
+- [Instalação](instalacao.md): o que instalar e como rodar.
+- [Uso](uso.md): comandos, app, voz e ações rápidas.
+- [Configuração](configuracao.md): o `config.toml` e as opções principais.
+- [Arquitetura](arquitetura.md): pastas e o caminho de uma pergunta.
+- [Voz](voz.md): reconhecimento de fala, voz do Nicx e "Nicx, ligar".
+- [Privacidade](privacidade.md): o que é coletado, quando e como apagar.
+- [Desenvolvimento](desenvolvimento.md): testes, extensão Rust e CI.
