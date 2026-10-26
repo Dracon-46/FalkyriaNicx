@@ -445,7 +445,7 @@ def test_end_to_end_ingest_and_search(
     assert target.document_id == "slack:acme:C001:1710500000.000100"
 
     # And the research-loop builder reconstructs the workspace permalink.
-    from nicx.cerebro.agentes.research_loop import _hit_url  # noqa: PLC0415
+    from nicx.cerebro.agentes.pesquisa.research_loop import _hit_url  # noqa: PLC0415
 
     assert _hit_url(target.source, target.document_id) == (
         "https://acme.slack.com/archives/C001/p1710500000000100"

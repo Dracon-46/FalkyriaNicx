@@ -1,12 +1,12 @@
 """Tests for structured error_detail in executor traces."""
 
 from nicx.cerebro.agentes.errors import EscalateError, FatalError, RetryableError
-from nicx.cerebro.agentes.executor import AgentExecutor
+from nicx.cerebro.agentes.gestao.executor import AgentExecutor
 from nicx.nucleo.events import EventBus
 
 
 def test_build_error_detail_fatal(tmp_path):
-    from nicx.cerebro.agentes.manager import AgentManager
+    from nicx.cerebro.agentes.gestao.manager import AgentManager
 
     mgr = AgentManager(db_path=str(tmp_path / "agents.db"))
     exe = AgentExecutor(manager=mgr, event_bus=EventBus())
@@ -18,7 +18,7 @@ def test_build_error_detail_fatal(tmp_path):
 
 
 def test_build_error_detail_retryable(tmp_path):
-    from nicx.cerebro.agentes.manager import AgentManager
+    from nicx.cerebro.agentes.gestao.manager import AgentManager
 
     mgr = AgentManager(db_path=str(tmp_path / "agents.db"))
     exe = AgentExecutor(manager=mgr, event_bus=EventBus())
@@ -29,7 +29,7 @@ def test_build_error_detail_retryable(tmp_path):
 
 
 def test_build_error_detail_escalate(tmp_path):
-    from nicx.cerebro.agentes.manager import AgentManager
+    from nicx.cerebro.agentes.gestao.manager import AgentManager
 
     mgr = AgentManager(db_path=str(tmp_path / "agents.db"))
     exe = AgentExecutor(manager=mgr, event_bus=EventBus())

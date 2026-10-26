@@ -13,11 +13,11 @@ import re
 from typing import Any, Dict, List, Optional
 
 from nicx.cerebro.agentes._stubs import AgentContext, AgentResult, ToolUsingAgent
+from nicx.cerebro.agentes.conversa.rlm_repl import RLMRepl
 from nicx.cerebro.agentes.prompt_loader import (
     load_few_shot_exemplars,
     load_system_prompt_override,
 )
-from nicx.cerebro.agentes.rlm_repl import RLMRepl
 from nicx.ferramentas._stubs import (
     BaseTool,
     ToolExecutor,

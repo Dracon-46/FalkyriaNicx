@@ -5,9 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from nicx.cerebro.agentes.executor import AgentExecutor
-from nicx.cerebro.agentes.manager import AgentManager
-from nicx.cerebro.agentes.scheduler import AgentScheduler
+from nicx.cerebro.agentes.gestao.executor import AgentExecutor
+from nicx.cerebro.agentes.gestao.manager import AgentManager
+from nicx.cerebro.agentes.gestao.scheduler import AgentScheduler
 from nicx.nucleo.events import EventBus
 from tests.cerebro.agentes.fake_engine import FakeEngine
 

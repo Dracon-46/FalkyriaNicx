@@ -96,7 +96,7 @@ class TestNicxAsk:
             j.close()
 
     def test_simple_agent_ignores_tool_security_kwargs(self):
-        from nicx.cerebro.agentes.simple import SimpleAgent
+        from nicx.cerebro.agentes.conversa.simple import SimpleAgent
         from nicx.nucleo.registry import AgentRegistry
         from nicx.seguranca import SecurityContext
 
@@ -166,7 +166,7 @@ class TestNicxAsk:
         assert limiter.keys == ["direct-sdk:agent_run"]
 
     def test_ask_with_agent_wires_persona(self, tmp_path):
-        from nicx.cerebro.agentes.simple import SimpleAgent
+        from nicx.cerebro.agentes.conversa.simple import SimpleAgent
         from nicx.nucleo.registry import AgentRegistry
 
         soul = tmp_path / "SOUL.md"

@@ -20,7 +20,7 @@ from nicx.cerebro.agentes.tool_resolver import resolve_agent_tools
 from nicx.nucleo.events import EventBus, EventType
 
 if TYPE_CHECKING:
-    from nicx.cerebro.agentes.manager import AgentManager
+    from nicx.cerebro.agentes.gestao.manager import AgentManager
 
 logger = logging.getLogger(__name__)
 
@@ -168,7 +168,7 @@ class AgentExecutor:
         # and use the standard secured function-calling agent for this
         # ephemeral turn instead of silently ignoring ``tools``.
         import nicx.ferramentas  # noqa: F401
-        from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
+        from nicx.cerebro.agentes.conversa.orchestrator import OrchestratorAgent
         from nicx.ferramentas._stubs import BaseTool
         from nicx.nucleo.registry import ToolRegistry
 
@@ -485,7 +485,7 @@ class AgentExecutor:
             # same capability for immediate/scheduled ticks instead of
             # silently discarding the resolved toolkit for SimpleAgent and
             # other explicitly compatible non-tool classes.
-            from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
+            from nicx.cerebro.agentes.conversa.orchestrator import OrchestratorAgent
 
             execution_agent_cls = OrchestratorAgent
             logger.info(

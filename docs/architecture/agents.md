@@ -152,7 +152,7 @@ How it works:
 4. Calls `_emit_turn_end()` and returns an `AgentResult` with `turns=1`
 
 ```python
-from nicx.cerebro.agentes.simple import SimpleAgent
+from nicx.cerebro.agentes.conversa.simple import SimpleAgent
 
 agent = SimpleAgent(engine, model="qwen3:8b", bus=bus)
 result = agent.run("What is the capital of France?")
@@ -194,7 +194,7 @@ How it works:
 4. If `max_turns` is exceeded, returns the last content or a warning message
 
 ```python
-from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
+from nicx.cerebro.agentes.conversa.orchestrator import OrchestratorAgent
 from nicx.ferramentas.agentes.calculator import CalculatorTool
 from nicx.ferramentas.agentes.think import ThinkTool
 
@@ -243,7 +243,7 @@ How it works:
     The old `from nicx.cerebro.agentes.react import ReActAgent` import path still works via a backward-compat shim. The registry alias `"react"` also maps to `NativeReActAgent`.
 
 ```python
-from nicx.cerebro.agentes.native_react import NativeReActAgent
+from nicx.cerebro.agentes.conversa.native_react import NativeReActAgent
 
 agent = NativeReActAgent(
     engine,
@@ -272,7 +272,7 @@ How it works:
 4. Handles context window overflow with automatic truncation
 
 ```python
-from nicx.cerebro.agentes.codeact import CodeActAgent
+from nicx.cerebro.agentes.conversa.codeact import CodeActAgent
 
 agent = CodeActAgent(
     engine,
@@ -324,7 +324,7 @@ The agent supports configurable sub-model parameters for recursive calls:
 | `system_prompt` | `RLM_SYSTEM_PROMPT` | Override the system prompt |
 
 ```python
-from nicx.cerebro.agentes.rlm import RLMAgent
+from nicx.cerebro.agentes.conversa.rlm import RLMAgent
 
 agent = RLMAgent(
     engine,

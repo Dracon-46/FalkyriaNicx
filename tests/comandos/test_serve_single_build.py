@@ -176,7 +176,7 @@ def _run_serve(
             build_spy,
         ),
         patch(
-            "nicx.cerebro.agentes.executor.AgentExecutor.set_system",
+            "nicx.cerebro.agentes.gestao.executor.AgentExecutor.set_system",
             set_system_spy,
         ),
         patch("nicx.servidor.daemon.run_server", lambda *a, **k: None),

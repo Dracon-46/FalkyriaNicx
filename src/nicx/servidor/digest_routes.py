@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from nicx.cerebro.agentes.digest_store import DigestStore
+from nicx.cerebro.agentes.autonomos.digest_store import DigestStore
 from nicx.comandos.digest_cmd import (
     _cancel_scheduler_tasks,
     _create_scheduler_task,

@@ -7,8 +7,8 @@ import json
 import pytest
 
 from nicx.cerebro.agentes._stubs import AgentResult
-from nicx.cerebro.agentes.executor import AgentExecutor, _tool_calls_for_storage
-from nicx.cerebro.agentes.manager import AgentManager
+from nicx.cerebro.agentes.gestao.executor import AgentExecutor, _tool_calls_for_storage
+from nicx.cerebro.agentes.gestao.manager import AgentManager
 from nicx.nucleo.events import EventBus
 from nicx.nucleo.types import ToolResult
 

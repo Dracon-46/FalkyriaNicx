@@ -233,7 +233,7 @@ Each step in a trace records a single action the agent took.
 The `TraceCollector` wraps any `BaseAgent` to automatically record a `Trace` for every `run()` call. It subscribes to event bus events during execution and converts them into `TraceStep` objects.
 
 ```python
-from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
+from nicx.cerebro.agentes.conversa.orchestrator import OrchestratorAgent
 from nicx.registros.rastros.collector import TraceCollector
 from nicx.registros.rastros.store import TraceStore
 from nicx.nucleo.events import EventBus

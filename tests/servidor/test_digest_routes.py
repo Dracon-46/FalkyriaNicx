@@ -10,7 +10,7 @@ import pytest
 
 pytest.importorskip("fastapi", reason="nicx[server] not installed")
 
-from nicx.cerebro.agentes.digest_store import DigestArtifact, DigestStore
+from nicx.cerebro.agentes.autonomos.digest_store import DigestArtifact, DigestStore
 
 
 @pytest.fixture()
@@ -40,7 +40,7 @@ def _make_app(db_path: str):
 
     from fastapi import FastAPI
 
-    from nicx.cerebro.agentes.digest_store import DigestStore
+    from nicx.cerebro.agentes.autonomos.digest_store import DigestStore
     from nicx.servidor.digest_routes import create_digest_router
 
     # Patch get_today to fall back to get_latest — avoids timezone issues in CI

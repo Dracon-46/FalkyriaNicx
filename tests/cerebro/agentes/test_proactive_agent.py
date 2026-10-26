@@ -8,7 +8,7 @@ import pytest
 
 from nicx.agenda.scheduler import TaskScheduler
 from nicx.agenda.store import SchedulerStore
-from nicx.cerebro.agentes.proactive_agent import (
+from nicx.cerebro.agentes.autonomos.proactive_agent import (
     _PROACTIVE_CRON_PROMPT,
     _build_notification_channel,
     register_cron,

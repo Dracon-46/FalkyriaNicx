@@ -12,7 +12,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from nicx.cerebro.agentes.manager import AgentManager
+from nicx.cerebro.agentes.gestao.manager import AgentManager
 from nicx.ferramentas import NOT_TOOL_MODULES
 
 
@@ -293,7 +293,7 @@ class TestAgentManagerRoutes:
     def test_remote_tick_facade_carries_policy_and_limiter(
         self, manager, client, monkeypatch, route_kind
     ):
-        from nicx.cerebro.agentes import executor as executor_module
+        from nicx.cerebro.agentes.gestao import executor as executor_module
 
         captured = []
 
@@ -337,7 +337,7 @@ class TestAgentManagerRoutes:
 
 def test_run_agent_concurrent_returns_409(tmp_path):
     """Rapid Run Now clicks should not spawn multiple ticks."""
-    from nicx.cerebro.agentes.manager import AgentManager
+    from nicx.cerebro.agentes.gestao.manager import AgentManager
 
     mgr = AgentManager(db_path=str(tmp_path / "test.db"))
     agent = mgr.create_agent("Test", config={"schedule_type": "manual"})

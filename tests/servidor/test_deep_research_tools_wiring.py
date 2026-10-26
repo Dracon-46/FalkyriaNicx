@@ -290,7 +290,7 @@ async def test_disconnected_research_stream_keeps_tick_until_worker_finishes(
     import threading
 
     from nicx.cerebro.agentes._stubs import AgentResult
-    from nicx.cerebro.agentes.manager import AgentManager
+    from nicx.cerebro.agentes.gestao.manager import AgentManager
     from nicx.servidor import agent_manager_routes as routes
 
     started = threading.Event()
@@ -311,7 +311,7 @@ async def test_disconnected_research_stream_keeps_tick_until_worker_finishes(
 
     monkeypatch.setattr(routes, "resolve_agent_tools", lambda *args, **kwargs: toolkit)
     monkeypatch.setattr(
-        "nicx.cerebro.agentes.deep_research.DeepResearchAgent",
+        "nicx.cerebro.agentes.pesquisa.deep_research.DeepResearchAgent",
         BlockedResearchAgent,
     )
     manager = AgentManager(str(tmp_path / "agents.db"))

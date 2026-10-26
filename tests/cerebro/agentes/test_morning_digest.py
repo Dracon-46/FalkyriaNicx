@@ -10,14 +10,14 @@ from nicx.nucleo.types import ToolResult
 
 
 def test_morning_digest_registered():
-    from nicx.cerebro.agentes.morning_digest import MorningDigestAgent
+    from nicx.cerebro.agentes.autonomos.morning_digest import MorningDigestAgent
 
     AgentRegistry.register_value("morning_digest", MorningDigestAgent)
     assert AgentRegistry.contains("morning_digest")
 
 
 def test_morning_digest_run(tmp_path):
-    from nicx.cerebro.agentes.morning_digest import MorningDigestAgent
+    from nicx.cerebro.agentes.autonomos.morning_digest import MorningDigestAgent
 
     mock_engine = MagicMock()
     mock_engine.generate.return_value = {
@@ -76,7 +76,7 @@ def test_morning_digest_run(tmp_path):
 
 
 def test_load_persona():
-    from nicx.cerebro.agentes.morning_digest import _load_persona
+    from nicx.cerebro.agentes.autonomos.morning_digest import _load_persona
 
     # Nonexistent persona returns empty string
     result = _load_persona("nonexistent_persona_xyz")

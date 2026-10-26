@@ -12,8 +12,8 @@ from zoneinfo import ZoneInfo
 from nicx.nucleo.events import EventType
 
 if TYPE_CHECKING:
-    from nicx.cerebro.agentes.executor import AgentExecutor
-    from nicx.cerebro.agentes.manager import AgentManager
+    from nicx.cerebro.agentes.gestao.executor import AgentExecutor
+    from nicx.cerebro.agentes.gestao.manager import AgentManager
 
 logger = logging.getLogger(__name__)
 

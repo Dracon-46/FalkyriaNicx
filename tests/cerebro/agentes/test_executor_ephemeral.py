@@ -7,7 +7,7 @@ REGISTRY_PATH = "nicx.nucleo.registry.AgentRegistry.get"
 
 
 def test_run_ephemeral_creates_and_runs_agent():
-    from nicx.cerebro.agentes.executor import AgentExecutor
+    from nicx.cerebro.agentes.gestao.executor import AgentExecutor
 
     manager = MagicMock()
     executor = AgentExecutor(manager=manager, event_bus=MagicMock())
@@ -27,7 +27,7 @@ def test_run_ephemeral_creates_and_runs_agent():
 
 
 def test_run_ephemeral_passes_input():
-    from nicx.cerebro.agentes.executor import AgentExecutor
+    from nicx.cerebro.agentes.gestao.executor import AgentExecutor
 
     manager = MagicMock()
     executor = AgentExecutor(manager=manager, event_bus=MagicMock())
@@ -47,8 +47,8 @@ def test_run_ephemeral_passes_input():
 
 
 def test_run_ephemeral_resolves_tools_and_preserves_security():
-    from nicx.cerebro.agentes.executor import AgentExecutor
-    from nicx.cerebro.agentes.simple import SimpleAgent
+    from nicx.cerebro.agentes.conversa.simple import SimpleAgent
+    from nicx.cerebro.agentes.gestao.executor import AgentExecutor
     from nicx.ferramentas._stubs import BaseTool, ToolSpec
     from nicx.nucleo.events import EventBus
     from nicx.nucleo.registry import AgentRegistry, ToolRegistry

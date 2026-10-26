@@ -13,7 +13,7 @@ from nicx.canais._stubs import (
     ChannelStatus,
 )
 from nicx.cerebro.agentes._stubs import AgentResult
-from nicx.cerebro.agentes.channel_agent import ChannelAgent, classify_query
+from nicx.cerebro.agentes.autonomos.channel_agent import ChannelAgent, classify_query
 
 # ---------------------------------------------------------------------------
 # FakeChannel test helper

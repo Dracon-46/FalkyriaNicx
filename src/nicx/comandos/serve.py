@@ -576,7 +576,7 @@ def serve(
     agent_manager = None
     if config.agent_manager.enabled:
         try:
-            from nicx.cerebro.agentes.manager import AgentManager
+            from nicx.cerebro.agentes.gestao.manager import AgentManager
 
             am_db = config.agent_manager.db_path or str(get_config_dir() / "agents.db")
             # The server owns the scheduler and is the authoritative tick
@@ -590,8 +590,8 @@ def serve(
     agent_scheduler = None
     if agent_manager is not None:
         try:
-            from nicx.cerebro.agentes.executor import AgentExecutor
-            from nicx.cerebro.agentes.scheduler import AgentScheduler
+            from nicx.cerebro.agentes.gestao.executor import AgentExecutor
+            from nicx.cerebro.agentes.gestao.scheduler import AgentScheduler
 
             _trace_store = None
             try:

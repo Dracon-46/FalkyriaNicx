@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from nicx.cerebro.agentes.executor import AgentExecutor
-from nicx.cerebro.agentes.manager import AgentManager
-from nicx.cerebro.agentes.scheduler import AgentScheduler
+from nicx.cerebro.agentes.gestao.executor import AgentExecutor
+from nicx.cerebro.agentes.gestao.manager import AgentManager
+from nicx.cerebro.agentes.gestao.scheduler import AgentScheduler
 from nicx.nucleo.events import EventBus
 from tests.cerebro.agentes.fake_engine import FakeEngine
 from tests.cerebro.agentes.scenario_harness import FakeSystem, ScenarioHarness
@@ -15,7 +15,7 @@ from tests.cerebro.agentes.scenario_harness import FakeSystem, ScenarioHarness
 @pytest.fixture
 def scenario_harness(tmp_path):
     """Wire up real components for agent lifecycle testing."""
-    from nicx.cerebro.agentes.monitor_operative import MonitorOperativeAgent
+    from nicx.cerebro.agentes.autonomos.monitor_operative import MonitorOperativeAgent
     from nicx.nucleo.registry import AgentRegistry
 
     # Re-register agent types (conftest auto-clears registries)

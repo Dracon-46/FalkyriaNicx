@@ -10,7 +10,7 @@ import click
 from rich.console import Console
 from rich.markdown import Markdown
 
-from nicx.cerebro.agentes.digest_store import DigestStore
+from nicx.cerebro.agentes.autonomos.digest_store import DigestStore
 from nicx.nucleo.config import DEFAULT_CONFIG_PATH, load_config
 
 

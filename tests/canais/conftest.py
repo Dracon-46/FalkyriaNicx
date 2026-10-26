@@ -15,10 +15,10 @@ from tests.cerebro.agentes.scenario_harness import FakeSystem, ScenarioHarness
 @pytest.fixture
 def scenario_harness(tmp_path):
     """Wire up real components for agent lifecycle testing (channels copy)."""
-    from nicx.cerebro.agentes.executor import AgentExecutor
-    from nicx.cerebro.agentes.manager import AgentManager
-    from nicx.cerebro.agentes.monitor_operative import MonitorOperativeAgent
-    from nicx.cerebro.agentes.scheduler import AgentScheduler
+    from nicx.cerebro.agentes.autonomos.monitor_operative import MonitorOperativeAgent
+    from nicx.cerebro.agentes.gestao.executor import AgentExecutor
+    from nicx.cerebro.agentes.gestao.manager import AgentManager
+    from nicx.cerebro.agentes.gestao.scheduler import AgentScheduler
     from nicx.nucleo.registry import AgentRegistry
 
     if not AgentRegistry.contains("monitor_operative"):

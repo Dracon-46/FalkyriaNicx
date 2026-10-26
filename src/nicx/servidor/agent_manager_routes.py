@@ -7,7 +7,7 @@ import re as _re
 import threading
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from nicx.cerebro.agentes.manager import AgentManager
+from nicx.cerebro.agentes.gestao.manager import AgentManager
 from nicx.cerebro.agentes.tool_resolver import (
     BROWSER_SUB_TOOLS as _BROWSER_SUB_TOOLS,
 )
@@ -998,7 +998,9 @@ async def _stream_managed_agent(
                 import queue
                 import time as _dr_time
 
-                from nicx.cerebro.agentes.deep_research import DeepResearchAgent
+                from nicx.cerebro.agentes.pesquisa import deep_research
+
+                DeepResearchAgent = deep_research.DeepResearchAgent
 
                 progress_q: queue.Queue = queue.Queue()
 
@@ -1735,7 +1737,7 @@ def create_agent_manager_router(
 
         def _run_tick():
             try:
-                from nicx.cerebro.agentes.executor import AgentExecutor
+                from nicx.cerebro.agentes.gestao.executor import AgentExecutor
 
                 _ts = getattr(app_state, "trace_store", None)
                 executor = AgentExecutor(
@@ -1870,9 +1872,9 @@ def create_agent_manager_router(
                         if engine:
                             tools = _build_deep_research_tools(engine=engine, model="")
                             if tools:
-                                from nicx.cerebro.agentes.deep_research import (
-                                    DeepResearchAgent,
-                                )
+                                from nicx.cerebro.agentes.pesquisa import deep_research
+
+                                DeepResearchAgent = deep_research.DeepResearchAgent
 
                                 agent_inst = DeepResearchAgent(
                                     engine=engine,
@@ -1948,9 +1950,9 @@ def create_agent_manager_router(
                         if engine:
                             tools = _build_deep_research_tools(engine=engine, model="")
                             if tools:
-                                from nicx.cerebro.agentes.deep_research import (
-                                    DeepResearchAgent,
-                                )
+                                from nicx.cerebro.agentes.pesquisa import deep_research
+
+                                DeepResearchAgent = deep_research.DeepResearchAgent
 
                                 model_name = getattr(engine, "_model", "") or getattr(
                                     request.app.state,
@@ -2121,7 +2123,7 @@ def create_agent_manager_router(
             # Re-use the server's existing system (correct model/engine).
             import time as _time
 
-            from nicx.cerebro.agentes.executor import AgentExecutor
+            from nicx.cerebro.agentes.gestao.executor import AgentExecutor
 
             _app_state = request.app.state
             _srv_engine = getattr(_app_state, "engine", None)

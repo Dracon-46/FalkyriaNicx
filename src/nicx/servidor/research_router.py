@@ -1,6 +1,6 @@
 """HTTP route: ``POST /api/research`` — agentic research over the knowledge store.
 
-Drives :class:`nicx.cerebro.agentes.research_loop.ResearchAgent` and streams a
+Drives :class:`nicx.cerebro.agentes.pesquisa.research_loop.ResearchAgent` and streams a
 custom SSE event schema back to the client:
 
 * ``search_call``     — about to invoke ``HybridSearch.search`` (with arguments)
@@ -31,7 +31,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from nicx.cerebro.agentes.research_loop import (
+from nicx.cerebro.agentes.pesquisa.research_loop import (
     DEFAULT_PLANNER_MODEL,
     ResearchAgent,
 )

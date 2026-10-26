@@ -7,7 +7,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-from nicx.cerebro.agentes.digest_store import DigestArtifact, DigestStore
+from nicx.cerebro.agentes.autonomos.digest_store import DigestArtifact, DigestStore
 
 
 def test_digest_command_exists():

@@ -541,7 +541,7 @@ The `OperativeAgent` is a persistent, scheduled autonomous agent with built-in s
 **When to use:** For autonomous agents that run on a schedule (e.g., via `TaskScheduler`) and need to maintain state between invocations. The agent automatically manages session history and state persistence across ticks.
 
 ```python
-from nicx.cerebro.agentes.operative import OperativeAgent
+from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
 
 agent = OperativeAgent(
     engine,
@@ -608,7 +608,7 @@ The `MonitorOperativeAgent` is a long-horizon agent with four configurable strat
 **When to use:** For long-horizon benchmark evaluation and complex multi-step tasks that benefit from configurable strategies for memory management, context compression, and task decomposition. Particularly useful for benchmarks like GAIA, FRAMES, and LifelongAgent where strategy selection impacts performance.
 
 ```python
-from nicx.cerebro.agentes.monitor_operative import MonitorOperativeAgent
+from nicx.cerebro.agentes.autonomos.monitor_operative import MonitorOperativeAgent
 
 agent = MonitorOperativeAgent(
     engine,
@@ -660,7 +660,7 @@ See also the [`ContainerRunner`](#containerrunner) reference below, which manage
 
 ```python
 from nicx.ferramentas.sandbox import ContainerRunner, SandboxedAgent
-from nicx.cerebro.agentes.simple import SimpleAgent
+from nicx.cerebro.agentes.conversa.simple import SimpleAgent
 
 runner = ContainerRunner(
     image="nicx-sandbox:latest",

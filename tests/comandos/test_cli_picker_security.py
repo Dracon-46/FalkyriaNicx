@@ -141,7 +141,7 @@ class TestTtyGates:
 class TestAgentEngineOptionsIsolation:
     def test_engine_options_merge_does_not_leak_extra_keys(self) -> None:
         from nicx.cerebro.agentes._stubs import _ALLOWED_ENGINE_OPTION_KEYS
-        from nicx.cerebro.agentes.simple import SimpleAgent
+        from nicx.cerebro.agentes.conversa.simple import SimpleAgent
         from nicx.nucleo.registry import AgentRegistry
         from nicx.nucleo.types import Message, Role
 

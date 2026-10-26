@@ -53,7 +53,7 @@ class TestPersonaSections:
 
 class TestApplyPersona:
     def test_appends_to_base_prompt(self, tmp_path):
-        from nicx.cerebro.agentes.simple import SimpleAgent
+        from nicx.cerebro.agentes.conversa.simple import SimpleAgent
 
         agent = SimpleAgent(object(), "m", prompt_builder=_builder_with_soul(tmp_path))
         out = agent._apply_persona("MONITOR INSTRUCTIONS")
@@ -61,7 +61,7 @@ class TestApplyPersona:
         assert "You are Kira." in out
 
     def test_noop_without_builder(self):
-        from nicx.cerebro.agentes.simple import SimpleAgent
+        from nicx.cerebro.agentes.conversa.simple import SimpleAgent
 
         agent = SimpleAgent(object(), "m")
         assert agent._apply_persona("BASE") == "BASE"
@@ -71,7 +71,9 @@ class TestPersistentAgentsReceivePromptBuilder:
     """The __init__ chain must forward prompt_builder through to BaseAgent."""
 
     def test_monitor_operative_forwards_prompt_builder(self, tmp_path):
-        from nicx.cerebro.agentes.monitor_operative import MonitorOperativeAgent
+        from nicx.cerebro.agentes.autonomos.monitor_operative import (
+            MonitorOperativeAgent,
+        )
 
         builder = _builder_with_soul(tmp_path)
         agent = MonitorOperativeAgent(object(), "m", prompt_builder=builder)
@@ -81,7 +83,7 @@ class TestPersistentAgentsReceivePromptBuilder:
         assert "You are Kira." in applied
 
     def test_operative_forwards_prompt_builder(self, tmp_path):
-        from nicx.cerebro.agentes.operative import OperativeAgent
+        from nicx.cerebro.agentes.autonomos.operative import OperativeAgent
 
         builder = _builder_with_soul(tmp_path)
         agent = OperativeAgent(object(), "m", prompt_builder=builder)
@@ -89,7 +91,9 @@ class TestPersistentAgentsReceivePromptBuilder:
         assert "You are Kira." in agent._apply_persona("OP INSTRUCTIONS")
 
     def test_monitor_operative_without_builder_is_unaffected(self):
-        from nicx.cerebro.agentes.monitor_operative import MonitorOperativeAgent
+        from nicx.cerebro.agentes.autonomos.monitor_operative import (
+            MonitorOperativeAgent,
+        )
 
         agent = MonitorOperativeAgent(object(), "m")
         assert agent._prompt_builder is None

@@ -240,7 +240,7 @@ class TestMemoryServiceWiring:
 
 class TestChatCompletions:
     def test_server_agent_cannot_use_default_grant_after_explicit_deny(self):
-        from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
+        from nicx.cerebro.agentes.conversa.orchestrator import OrchestratorAgent
         from nicx.ferramentas._stubs import BaseTool, ToolSpec
         from nicx.nucleo.types import ToolResult
 
@@ -660,7 +660,7 @@ class TestChatCompletions:
 
     def test_streaming_without_client_tools_uses_configured_agent(self):
         """Server-side tools remain available to streaming web clients."""
-        from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
+        from nicx.cerebro.agentes.conversa.orchestrator import OrchestratorAgent
         from nicx.ferramentas._stubs import BaseTool, ToolSpec
         from nicx.nucleo.types import ToolResult
 
@@ -1123,7 +1123,7 @@ class TestIdentityPromptInjection:
         ]
 
     def test_agent_path_folds_history_into_one_identity_system_message(self):
-        from nicx.cerebro.agentes.simple import SimpleAgent
+        from nicx.cerebro.agentes.conversa.simple import SimpleAgent
         from nicx.cerebro.prompt.builder import SystemPromptBuilder
 
         captured: list = []
@@ -1307,7 +1307,7 @@ class TestIdentityPromptInjection:
         assert assistant.tool_calls[0].arguments == '{"query":"jazz"}'
 
     def test_agent_does_not_rebuild_identity_already_merged_with_memory(self):
-        from nicx.cerebro.agentes.simple import SimpleAgent
+        from nicx.cerebro.agentes.conversa.simple import SimpleAgent
         from nicx.cerebro.prompt.builder import SystemPromptBuilder
         from nicx.memoria.store import Fact
 

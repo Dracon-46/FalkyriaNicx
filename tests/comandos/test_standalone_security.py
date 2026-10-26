@@ -45,7 +45,9 @@ def test_deep_research_setup_chat_wires_security(monkeypatch):
     monkeypatch.setattr("nicx.nucleo.config.load_config", lambda: NicxConfig())
     monkeypatch.setattr("nicx.motores.ollama.OllamaEngine", lambda: raw_engine)
     monkeypatch.setattr("nicx.seguranca.setup_security", setup)
-    monkeypatch.setattr("nicx.cerebro.agentes.deep_research.DeepResearchAgent", _Agent)
+    monkeypatch.setattr(
+        "nicx.cerebro.agentes.pesquisa.deep_research.DeepResearchAgent", _Agent
+    )
     console = MagicMock()
     console.input.return_value = "/quit"
 
@@ -81,7 +83,9 @@ def test_imessage_foreground_wires_security(monkeypatch):
     monkeypatch.setattr("nicx.nucleo.config.load_config", lambda: NicxConfig())
     monkeypatch.setattr("nicx.motores.ollama.OllamaEngine", lambda: raw_engine)
     monkeypatch.setattr("nicx.seguranca.setup_security", setup)
-    monkeypatch.setattr("nicx.cerebro.agentes.deep_research.DeepResearchAgent", _Agent)
+    monkeypatch.setattr(
+        "nicx.cerebro.agentes.pesquisa.deep_research.DeepResearchAgent", _Agent
+    )
 
     result = CliRunner().invoke(
         imessage_start,
@@ -151,7 +155,9 @@ def test_slack_daemon_wires_security(monkeypatch, tmp_path):
     monkeypatch.setattr("nicx.nucleo.config.load_config", lambda: NicxConfig())
     monkeypatch.setattr("nicx.motores.ollama.OllamaEngine", lambda: raw_engine)
     monkeypatch.setattr("nicx.seguranca.setup_security", setup)
-    monkeypatch.setattr("nicx.cerebro.agentes.deep_research.DeepResearchAgent", _Agent)
+    monkeypatch.setattr(
+        "nicx.cerebro.agentes.pesquisa.deep_research.DeepResearchAgent", _Agent
+    )
     monkeypatch.setattr(
         "nicx.servidor.agent_manager_routes._build_deep_research_tools",
         lambda **kwargs: [],

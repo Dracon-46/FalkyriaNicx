@@ -199,7 +199,7 @@ class TestIncludeAllRoutesBusWiring:
         ],
     )
     def test_managed_agent_run_paths_publish_to_app_bus(self, path, payload):
-        from nicx.cerebro.agentes.executor import AgentExecutor
+        from nicx.cerebro.agentes.gestao.executor import AgentExecutor
         from nicx.nucleo.events import reset_event_bus
         from nicx.servidor.api_routes import include_all_routes
 

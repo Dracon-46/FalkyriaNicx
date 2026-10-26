@@ -2,7 +2,7 @@
 
 from unittest.mock import MagicMock
 
-from nicx.cerebro.agentes.monitor_operative import MonitorOperativeAgent
+from nicx.cerebro.agentes.autonomos.monitor_operative import MonitorOperativeAgent
 from nicx.nucleo.registry import AgentRegistry
 
 
@@ -22,7 +22,7 @@ class TestMonitorOperativeAgent:
     def test_registration(self) -> None:
         # Import triggers registration; re-register after autouse fixture
         # clears the registry (same pattern as test_monitor.py)
-        import nicx.cerebro.agentes.monitor_operative  # noqa: F401
+        import nicx.cerebro.agentes.autonomos.monitor_operative  # noqa: F401
 
         if not AgentRegistry.contains("monitor_operative"):
             AgentRegistry.register_value("monitor_operative", MonitorOperativeAgent)

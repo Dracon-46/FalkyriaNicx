@@ -10,8 +10,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from nicx.cerebro.agentes._stubs import AgentResult
-from nicx.cerebro.agentes.executor import AgentExecutor
-from nicx.cerebro.agentes.manager import AgentManager
+from nicx.cerebro.agentes.gestao.executor import AgentExecutor
+from nicx.cerebro.agentes.gestao.manager import AgentManager
 from nicx.cerebro.agentes.tool_resolver import ResolvedAgentTools
 from nicx.conectores.store import KnowledgeStore
 from nicx.ferramentas._stubs import BaseTool, ToolSpec
@@ -106,7 +106,7 @@ class _PrivilegedExecutorProbeTool(BaseTool):
 
 def _register_agent():
     """Re-register MonitorOperativeAgent (cleared by autouse fixture)."""
-    from nicx.cerebro.agentes.monitor_operative import MonitorOperativeAgent
+    from nicx.cerebro.agentes.autonomos.monitor_operative import MonitorOperativeAgent
     from nicx.nucleo.registry import AgentRegistry
 
     if not AgentRegistry.contains("monitor_operative"):
@@ -384,7 +384,7 @@ def test_executor_enforces_managed_agent_capability_denial(tmp_path):
 def test_simple_agent_uses_global_mcp_tools_without_native_tool_config(tmp_path):
     """Fallback-compatible simple agents preserve SSE/global-MCP parity."""
 
-    from nicx.cerebro.agentes.simple import SimpleAgent
+    from nicx.cerebro.agentes.conversa.simple import SimpleAgent
 
     AgentRegistry.register_value("simple", SimpleAgent)
     _ExecutorProbeTool.calls = 0
@@ -439,7 +439,7 @@ def test_simple_agent_uses_global_mcp_tools_without_native_tool_config(tmp_path)
 def test_simple_agent_without_tools_keeps_its_custom_system_prompt(tmp_path):
     """Signature filtering must not discard prompt-builder state on retry."""
 
-    from nicx.cerebro.agentes.simple import SimpleAgent
+    from nicx.cerebro.agentes.conversa.simple import SimpleAgent
 
     AgentRegistry.register_value("simple", SimpleAgent)
     engine = FakeEngine([{"content": "custom prompt response"}])
@@ -676,7 +676,9 @@ def test_executor_closes_resolver_resources_when_pre_run_setup_fails(
     def _resolve(*args, **kwargs):
         return ResolvedAgentTools(owned_resources=[resource])
 
-    monkeypatch.setattr("nicx.cerebro.agentes.executor.resolve_agent_tools", _resolve)
+    monkeypatch.setattr(
+        "nicx.cerebro.agentes.gestao.executor.resolve_agent_tools", _resolve
+    )
     system = SimpleNamespace(
         engine=FakeEngine([{"content": "unused"}]),
         model="test-model",

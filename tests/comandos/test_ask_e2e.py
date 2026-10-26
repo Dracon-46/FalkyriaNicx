@@ -35,7 +35,7 @@ def _patch_ask(monkeypatch, tmp_path, *, engine_result=None, no_engine=False):
     # Re-register SimpleAgent after the autouse `_clean_registries` conftest
     # fixture clears it. ``NicxConfig().agent.default_agent`` defaults to
     # ``"simple"``, so ``nicx ask "..."`` (no --agent) routes through it.
-    from nicx.cerebro.agentes.simple import SimpleAgent
+    from nicx.cerebro.agentes.conversa.simple import SimpleAgent
     from nicx.nucleo.registry import AgentRegistry
 
     if not AgentRegistry.contains("simple"):

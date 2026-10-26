@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 
-from nicx.cerebro.agentes.digest_store import DigestArtifact, DigestStore
+from nicx.cerebro.agentes.autonomos.digest_store import DigestArtifact, DigestStore
 
 
 def test_store_and_retrieve(tmp_path):

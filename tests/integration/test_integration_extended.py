@@ -22,8 +22,8 @@ from nicx.nucleo.types import (
 
 def _register_all():
     """Ensure agents and tools are registered."""
-    from nicx.cerebro.agentes.codeact import CodeActAgent
-    from nicx.cerebro.agentes.native_react import NativeReActAgent
+    from nicx.cerebro.agentes.conversa.codeact import CodeActAgent
+    from nicx.cerebro.agentes.conversa.native_react import NativeReActAgent
     from nicx.ferramentas.agentes.calculator import CalculatorTool
     from nicx.ferramentas.agentes.think import ThinkTool
 
@@ -78,7 +78,7 @@ class TestReActPipeline:
 
     def test_react_with_calculator_e2e(self):
         _register_all()
-        from nicx.cerebro.agentes.native_react import NativeReActAgent
+        from nicx.cerebro.agentes.conversa.native_react import NativeReActAgent
         from nicx.ferramentas.agentes.calculator import CalculatorTool
 
         responses = [
@@ -107,7 +107,7 @@ class TestReActPipeline:
 
     def test_react_with_think_tool(self):
         _register_all()
-        from nicx.cerebro.agentes.native_react import NativeReActAgent
+        from nicx.cerebro.agentes.conversa.native_react import NativeReActAgent
         from nicx.ferramentas.agentes.think import ThinkTool
 
         responses = [
@@ -133,7 +133,7 @@ class TestReActPipeline:
     def test_react_direct_answer(self):
         """ReAct returns immediately when no tool use is needed."""
         _register_all()
-        from nicx.cerebro.agentes.native_react import NativeReActAgent
+        from nicx.cerebro.agentes.conversa.native_react import NativeReActAgent
 
         engine = _make_engine(
             _simple_response("Thought: This is simple.\nFinal Answer: Hello!")
@@ -150,7 +150,7 @@ class TestReActPipeline:
         not by agents directly.
         """
         _register_all()
-        from nicx.cerebro.agentes.native_react import NativeReActAgent
+        from nicx.cerebro.agentes.conversa.native_react import NativeReActAgent
 
         engine = _make_engine(_simple_response("Thought: done.\nFinal Answer: ok"))
         bus = EventBus(record_history=True)
@@ -176,7 +176,7 @@ class TestCodeActPipeline:
 
     def test_codeact_code_execution_e2e(self):
         _register_all()
-        from nicx.cerebro.agentes.codeact import CodeActAgent
+        from nicx.cerebro.agentes.conversa.codeact import CodeActAgent
         from nicx.ferramentas.codigo.code_interpreter import (
             CodeInterpreterTool,
         )
@@ -208,7 +208,7 @@ class TestCodeActPipeline:
     def test_codeact_direct_answer(self):
         """CodeAct returns directly when no code is needed."""
         _register_all()
-        from nicx.cerebro.agentes.codeact import CodeActAgent
+        from nicx.cerebro.agentes.conversa.codeact import CodeActAgent
 
         engine = _make_engine(_simple_response("Hello! How can I help?"))
         agent = CodeActAgent(engine, "test-model")
@@ -219,7 +219,7 @@ class TestCodeActPipeline:
     def test_codeact_event_chain(self):
         """Verify event chain through a CodeAct run."""
         _register_all()
-        from nicx.cerebro.agentes.codeact import CodeActAgent
+        from nicx.cerebro.agentes.conversa.codeact import CodeActAgent
 
         engine = _make_engine(_simple_response("Direct answer."))
         bus = EventBus(record_history=True)
@@ -339,7 +339,7 @@ class TestCrossEngineConsistency:
     def test_same_query_same_format(self):
         """All engines return the same result dict shape."""
         _register_all()
-        from nicx.cerebro.agentes.native_react import NativeReActAgent
+        from nicx.cerebro.agentes.conversa.native_react import NativeReActAgent
 
         for engine_name in ["vllm", "ollama", "mock"]:
             engine = _make_engine(
@@ -357,7 +357,7 @@ class TestCrossEngineConsistency:
     def test_tool_calls_across_engines(self):
         """Tool calling works regardless of engine mock."""
         _register_all()
-        from nicx.cerebro.agentes.native_react import NativeReActAgent
+        from nicx.cerebro.agentes.conversa.native_react import NativeReActAgent
         from nicx.ferramentas.agentes.calculator import CalculatorTool
 
         for engine_name in ["vllm", "ollama"]:
@@ -528,7 +528,7 @@ class TestAgentRoutingMatrix:
     def test_context_passing(self):
         """Agents accept and use AgentContext."""
         _register_all()
-        from nicx.cerebro.agentes.native_react import NativeReActAgent
+        from nicx.cerebro.agentes.conversa.native_react import NativeReActAgent
 
         engine = _make_engine(
             _simple_response(

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from nicx.cerebro.agentes.rlm_repl import RLMRepl
+from nicx.cerebro.agentes.conversa.rlm_repl import RLMRepl
 
 
 class TestRLMReplBasics:

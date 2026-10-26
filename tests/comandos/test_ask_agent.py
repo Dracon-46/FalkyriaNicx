@@ -34,8 +34,8 @@ def _mock_engine(content="Hello from engine"):
 
 def _register_agents():
     """Re-register agents after registry clear."""
-    from nicx.cerebro.agentes.orchestrator import OrchestratorAgent
-    from nicx.cerebro.agentes.simple import SimpleAgent
+    from nicx.cerebro.agentes.conversa.orchestrator import OrchestratorAgent
+    from nicx.cerebro.agentes.conversa.simple import SimpleAgent
     from nicx.nucleo.registry import AgentRegistry
 
     for name, cls in [

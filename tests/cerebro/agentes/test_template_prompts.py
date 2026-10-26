@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from nicx.cerebro.agentes.manager import AgentManager
+from nicx.cerebro.agentes.gestao.manager import AgentManager
 
 
 def test_create_from_template_expands_system_prompt(tmp_path):

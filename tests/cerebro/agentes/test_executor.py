@@ -16,7 +16,7 @@ from nicx.nucleo.types import ToolResult
 
 @pytest.fixture
 def manager():
-    from nicx.cerebro.agentes.manager import AgentManager
+    from nicx.cerebro.agentes.gestao.manager import AgentManager
 
     with tempfile.TemporaryDirectory() as tmpdir:
         mgr = AgentManager(db_path=str(Path(tmpdir) / "agents.db"))
@@ -31,7 +31,7 @@ def event_bus():
 
 @pytest.fixture
 def executor(manager, event_bus):
-    from nicx.cerebro.agentes.executor import AgentExecutor
+    from nicx.cerebro.agentes.gestao.executor import AgentExecutor
 
     mock_system = MagicMock()
     ex = AgentExecutor(manager=manager, event_bus=event_bus)
@@ -111,7 +111,9 @@ class TestExecutorBasic:
             return AgentResult(content="success")
 
         with patch.object(executor, "_invoke_agent", side_effect=flaky_invoke):
-            with patch("nicx.cerebro.agentes.executor.retry_delay", return_value=0):
+            with patch(
+                "nicx.cerebro.agentes.gestao.executor.retry_delay", return_value=0
+            ):
                 executor.execute_tick(agent["id"])
 
         assert call_count == 3
@@ -123,7 +125,9 @@ class TestExecutorBasic:
         with patch.object(
             executor, "_invoke_agent", side_effect=RetryableError("always fails")
         ):
-            with patch("nicx.cerebro.agentes.executor.retry_delay", return_value=0):
+            with patch(
+                "nicx.cerebro.agentes.gestao.executor.retry_delay", return_value=0
+            ):
                 executor.execute_tick(agent["id"])
 
         assert manager.get_agent(agent["id"])["status"] == "error"
@@ -142,7 +146,7 @@ class TestExecutorBasic:
 
 
 def test_empty_turn_with_tool_result_is_not_retried() -> None:
-    from nicx.cerebro.agentes.executor import _should_retry_empty_result
+    from nicx.cerebro.agentes.gestao.executor import _should_retry_empty_result
 
     result = AgentResult(
         content="  ",
@@ -155,8 +159,8 @@ def test_empty_turn_with_tool_result_is_not_retried() -> None:
 
 def test_finalize_tick_reads_agent_result_metadata(tmp_path):
     """_finalize_tick() accumulates cost/tokens from AgentResult.metadata."""
-    from nicx.cerebro.agentes.executor import AgentExecutor
-    from nicx.cerebro.agentes.manager import AgentManager
+    from nicx.cerebro.agentes.gestao.executor import AgentExecutor
+    from nicx.cerebro.agentes.gestao.manager import AgentManager
 
     mgr = AgentManager(str(tmp_path / "test.db"))
     bus = EventBus()
@@ -179,7 +183,7 @@ def test_finalize_tick_reads_agent_result_metadata(tmp_path):
 
 
 def test_tick_model_prefers_system_default_before_legacy_fallback() -> None:
-    from nicx.cerebro.agentes.executor import _resolve_tick_model
+    from nicx.cerebro.agentes.gestao.executor import _resolve_tick_model
 
     system = MagicMock(model="qwen3:8b")
 
@@ -188,7 +192,7 @@ def test_tick_model_prefers_system_default_before_legacy_fallback() -> None:
 
 
 def test_managed_router_receives_every_actual_engine_model() -> None:
-    from nicx.cerebro.agentes.executor import _available_tick_models
+    from nicx.cerebro.agentes.gestao.executor import _available_tick_models
     from nicx.cerebro.roteamento.router import (
         HeuristicRouter,
         build_routing_context,
@@ -214,7 +218,7 @@ def test_managed_router_receives_every_actual_engine_model() -> None:
 
 
 def test_managed_router_excludes_unavailable_fallback_model() -> None:
-    from nicx.cerebro.agentes.executor import _available_tick_models
+    from nicx.cerebro.agentes.gestao.executor import _available_tick_models
 
     engine = MagicMock()
     engine.list_models.return_value = ["tiny:1b", "large:32b"]
@@ -226,7 +230,7 @@ def test_managed_router_excludes_unavailable_fallback_model() -> None:
 
 
 def test_managed_router_retains_resolved_model_when_discovery_fails() -> None:
-    from nicx.cerebro.agentes.executor import _available_tick_models
+    from nicx.cerebro.agentes.gestao.executor import _available_tick_models
 
     engine = MagicMock()
     engine.list_models.side_effect = RuntimeError("offline")
