@@ -13,7 +13,7 @@ uv run pre-commit install
 ```
 
 Detalhes de requisitos e uso no [README](README.md). Convenções de código e
-estrutura do projeto em [docs/development/contributing.md](docs/development/contributing.md).
+estrutura do projeto em [docs/desenvolvimento.md](docs/desenvolvimento.md).
 
 ## Antes de abrir um PR
 
