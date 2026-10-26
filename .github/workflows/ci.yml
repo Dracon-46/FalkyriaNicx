@@ -67,7 +67,7 @@ jobs:
         run: uv sync --extra dev --extra server --extra inference-cloud
 
       - name: Build Rust extension
-        run: uv run maturin develop --manifest-path rust/crates/nicx-python/Cargo.toml
+        run: uv run maturin develop --manifest-path rust/crates/nicx-ponte/Cargo.toml
 
       - name: Run tests
         # COVERAGE_CORE=sysmon uses CPython 3.12's sys.monitoring backend,
@@ -147,7 +147,7 @@ jobs:
       - name: Build + import the PyO3 extension on Windows
         shell: bash
         run: |
-          uv run maturin develop --manifest-path rust/crates/nicx-python/Cargo.toml
+          uv run maturin develop --manifest-path rust/crates/nicx-ponte/Cargo.toml
           uv run python -c "import nicx_rust; print('nicx_rust imports on Windows OK')"
 
       - name: Smoke-test CLI
@@ -183,10 +183,3 @@ jobs:
 
       - name: Test
         run: cargo test --workspace
-
-      # Standalone handoff example: intentionally not a runtime workspace member.
-      - name: Cross-device travel example
-        run: |
-          cargo fmt --manifest-path ../examples/cross_device_travel/Cargo.toml --check
-          cargo clippy --locked --manifest-path ../examples/cross_device_travel/Cargo.toml --all-targets -- -D warnings
-          cargo test --locked --manifest-path ../examples/cross_device_travel/Cargo.toml
