@@ -150,7 +150,7 @@ PY
 @test "invalid answer retries without silently consenting" {
     run python3 "$BATS_TEST_DIRNAME/run_installer_pty.py" "$SCRIPT" '["invalid\n", "n\n"]'
     [ "$status" -eq 0 ]
-    [[ "$output" == *"Please press Enter, type Y, or type N."* ]]
+    [[ "$output" == *"Aperte Enter, digite S ou digite N."* ]]
     ! grep -q '/rest/v1/nicx_events' "$CURL_STUB_LOG"
 }
 
