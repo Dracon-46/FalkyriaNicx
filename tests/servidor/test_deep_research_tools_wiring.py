@@ -114,7 +114,7 @@ def test_deep_research_agent_gets_tools(tmp_path: Path) -> None:
     store = KnowledgeStore(str(db_path))
     store.store("test content", source="test", doc_type="note")
 
-    from nicx.servidor.agent_manager_routes import _build_deep_research_tools
+    from nicx.servidor.rotas.agentes import _build_deep_research_tools
 
     tools = _build_deep_research_tools(
         engine=MagicMock(),
@@ -134,7 +134,7 @@ def test_deep_research_agent_gets_tools(tmp_path: Path) -> None:
 @pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
 def test_deep_research_tools_returns_empty_when_no_db() -> None:
     """When knowledge.db doesn't exist, returns empty list."""
-    from nicx.servidor.agent_manager_routes import _build_deep_research_tools
+    from nicx.servidor.rotas.agentes import _build_deep_research_tools
 
     tools = _build_deep_research_tools(
         engine=MagicMock(),
@@ -160,7 +160,7 @@ async def test_server_deep_research_merges_and_executes_all_tool_sources(
 ) -> None:
     """Configured and MCP tools reach Deep Research with or without its DB."""
 
-    from nicx.servidor import agent_manager_routes as routes
+    from nicx.servidor.rotas import agentes as routes
 
     start_worker = MagicMock(wraps=routes._start_managed_worker)
     monkeypatch.setattr(routes, "_start_managed_worker", start_worker)
@@ -291,7 +291,7 @@ async def test_disconnected_research_stream_keeps_tick_until_worker_finishes(
 
     from nicx.cerebro.agentes._stubs import AgentResult
     from nicx.cerebro.agentes.gestao.manager import AgentManager
-    from nicx.servidor import agent_manager_routes as routes
+    from nicx.servidor.rotas import agentes as routes
 
     started = threading.Event()
     release = threading.Event()

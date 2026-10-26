@@ -304,7 +304,7 @@ class TestModelsEndpointExtended:
         client = TestClient(app)
 
         with patch(
-            "nicx.servidor.routes.asyncio.to_thread",
+            "nicx.servidor.rotas.chat.asyncio.to_thread",
             new_callable=AsyncMock,
         ) as mock_to_thread:
             mock_to_thread.return_value = ["qwen3.5:4b"]

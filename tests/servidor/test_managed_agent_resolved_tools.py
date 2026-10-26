@@ -122,7 +122,7 @@ class _FinalOnlyEngine:
 async def test_sse_file_tools_keep_application_directory_policy(tmp_path, monkeypatch):
     from nicx.ferramentas.arquivos.file_read import FileReadTool
     from nicx.nucleo.config import NicxConfig
-    from nicx.servidor.agent_manager_routes import _stream_managed_agent
+    from nicx.servidor.rotas.agentes import _stream_managed_agent
 
     cfg = NicxConfig()
     cfg.security.allowed_dirs = [str(tmp_path / "allowed")]
@@ -183,7 +183,7 @@ class _SyntheticHttpSink(BaseTool):
 async def test_sse_advertises_and_executes_the_same_resolved_tool_instance() -> None:
     """The schema and dispatch map must come from one first-wins toolkit."""
 
-    from nicx.servidor.agent_manager_routes import _stream_managed_agent
+    from nicx.servidor.rotas.agentes import _stream_managed_agent
 
     _StatefulConfiguredTool.instances.clear()
     ToolRegistry.register_value("stateful_probe", _StatefulConfiguredTool)
@@ -262,7 +262,7 @@ async def test_sse_advertises_and_executes_the_same_resolved_tool_instance() -> 
 async def test_sse_mcp_opt_out_skips_discovery(monkeypatch) -> None:
     """Opting out skips request-local discovery and hides MCP specs."""
 
-    from nicx.servidor import agent_manager_routes as routes
+    from nicx.servidor.rotas import agentes as routes
 
     discovery = MagicMock(side_effect=AssertionError("MCP discovery must not run"))
     monkeypatch.setattr(routes, "_get_mcp_tools", discovery)
@@ -298,7 +298,7 @@ async def test_sse_mcp_opt_out_skips_discovery(monkeypatch) -> None:
 
 @pytest.mark.asyncio
 async def test_sse_rehydrates_taint_from_replayed_tool_history() -> None:
-    from nicx.servidor.agent_manager_routes import _stream_managed_agent
+    from nicx.servidor.rotas.agentes import _stream_managed_agent
 
     secret = "token=synthetic-secret-value"
     _SyntheticHttpSink.calls.clear()
@@ -371,7 +371,7 @@ async def test_sse_memory_tools_resolve_backend_when_context_injection_is_off(
     """Prompt context opt-out must not disable explicit memory tools."""
 
     from nicx.ferramentas.conhecimento.storage_tools import MemoryStoreTool
-    from nicx.servidor import agent_manager_routes as routes
+    from nicx.servidor.rotas import agentes as routes
 
     if not ToolRegistry.contains("memory_store"):
         ToolRegistry.register_value("memory_store", MemoryStoreTool)

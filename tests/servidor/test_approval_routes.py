@@ -31,7 +31,7 @@ except ImportError:
 @pytest.fixture
 def approval_store(tmp_path):
     """A fresh ApprovalStore backed by a temp DB, injected into the routes module."""
-    import nicx.servidor.approval_routes as ar
+    import nicx.servidor.rotas.aprovacoes as ar
 
     store = ApprovalStore(db_path=str(tmp_path / "approvals.db"))
     original = ar._store
@@ -44,7 +44,7 @@ def approval_store(tmp_path):
 @pytest.fixture
 def client(approval_store):  # noqa: ARG001 — triggers store injection as a side-effect
     """TestClient with the approval router mounted on a minimal FastAPI app."""
-    from nicx.servidor.approval_routes import router
+    from nicx.servidor.rotas.aprovacoes import router
 
     app = FastAPI()
     app.include_router(router)

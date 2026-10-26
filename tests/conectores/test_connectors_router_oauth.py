@@ -74,7 +74,7 @@ def hermetic_connectors(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path
 
     import nicx.conectores.oauth as oauth_mod
     import nicx.nucleo.config as config_mod
-    import nicx.servidor.connectors_router as router_mod
+    import nicx.servidor.rotas.conectores as router_mod
     from nicx.nucleo.registry import ConnectorRegistry
 
     conn_dir = tmp_path / "connectors"
@@ -124,7 +124,7 @@ def hermetic_connectors(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path
 
 @pytest.fixture()
 def client(hermetic_connectors: Path) -> Iterator[TestClient]:
-    from nicx.servidor.connectors_router import create_connectors_router
+    from nicx.servidor.rotas.conectores import create_connectors_router
 
     app = FastAPI()
     app.include_router(create_connectors_router())

@@ -55,7 +55,7 @@ def run_slack_daemon(
     from nicx.nucleo.config import load_config
     from nicx.nucleo.events import EventBus
     from nicx.seguranca import setup_security
-    from nicx.servidor.agent_manager_routes import (
+    from nicx.servidor.rotas.agentes import (
         _build_deep_research_tools,
     )
 

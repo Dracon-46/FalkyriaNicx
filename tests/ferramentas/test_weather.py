@@ -529,7 +529,7 @@ def test_weather_tool_handles_provider_error_after_connector_registry_repopulati
     monkeypatch,
 ):
     """Connector reloads must not stale the tool's exception identity."""
-    from nicx.servidor.connectors_router import _ensure_connectors_registered
+    from nicx.servidor.rotas.conectores import _ensure_connectors_registered
 
     secret = "reload-secret-weather-key"
     tool = WeatherTool(api_key=secret, config=_config())

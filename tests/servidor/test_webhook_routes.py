@@ -14,7 +14,7 @@ pytest.importorskip("fastapi", reason="nicx[server] not installed")
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from nicx.servidor.webhook_routes import create_webhook_router
+from nicx.servidor.rotas.webhooks import create_webhook_router
 
 
 @pytest.fixture
@@ -41,7 +41,7 @@ class TestTwilioWebhook:
 
     def test_valid_twilio_webhook(self, twilio_client, mock_bridge):
         with patch(
-            "nicx.servidor.webhook_routes._validate_twilio_signature",
+            "nicx.servidor.rotas.webhooks._validate_twilio_signature",
             return_value=True,
         ):
             resp = twilio_client.post(
@@ -57,7 +57,7 @@ class TestTwilioWebhook:
 
     def test_invalid_signature_rejected(self, twilio_client):
         with patch(
-            "nicx.servidor.webhook_routes._validate_twilio_signature",
+            "nicx.servidor.rotas.webhooks._validate_twilio_signature",
             return_value=False,
         ):
             resp = twilio_client.post(

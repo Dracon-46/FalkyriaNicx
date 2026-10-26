@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 from nicx.cerebro.agentes._stubs import AgentResult  # noqa: E402
 from nicx.servidor.app import create_app  # noqa: E402
-from nicx.servidor.routes import _VOICE_HINT, _VOICE_MAX_TOKENS  # noqa: E402
+from nicx.servidor.rotas.chat import _VOICE_HINT, _VOICE_MAX_TOKENS  # noqa: E402
 
 
 def _client():

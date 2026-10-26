@@ -179,7 +179,7 @@ def test_invalid_active_policy_cannot_fall_back_to_valid_ambient_config(
 
 
 def test_managed_route_constructor_uses_active_policy(tmp_path, monkeypatch):
-    from nicx.servidor.agent_manager_routes import _instantiate_managed_tool
+    from nicx.servidor.rotas.agentes import _instantiate_managed_tool
 
     cfg = NicxConfig()
     cfg.security.allowed_dirs = [str(tmp_path / "allowed")]

@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List
 
-from nicx.servidor.savings import CLOUD_PRICING
+from nicx.servidor.custos.economia import CLOUD_PRICING
 
 
 @dataclass(slots=True)

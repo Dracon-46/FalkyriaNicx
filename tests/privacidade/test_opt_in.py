@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 
 from nicx.nucleo.config import AnalyticsConfig, NicxConfig, load_config
 from nicx.privacidade.client import AnalyticsClient
-from nicx.servidor import analytics_routes
+from nicx.servidor.rotas import privacidade as analytics_routes
 
 
 def test_missing_analytics_section_defaults_off(tmp_path: Path) -> None:

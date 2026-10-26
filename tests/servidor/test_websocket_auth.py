@@ -19,9 +19,9 @@ from starlette.testclient import TestClient  # noqa: E402
 from starlette.websockets import WebSocketDisconnect  # noqa: E402
 
 from nicx.nucleo.events import EventBus, EventType  # noqa: E402
-from nicx.servidor.api_routes import include_all_routes  # noqa: E402
 from nicx.servidor.auth_middleware import websocket_authorized  # noqa: E402
-from nicx.servidor.ws_bridge import create_ws_router  # noqa: E402
+from nicx.servidor.pontes.websocket import create_ws_router  # noqa: E402
+from nicx.servidor.rotas.api import include_all_routes  # noqa: E402
 
 AUTH_PROTOCOL = "nicx.auth.v1"
 KEY_PROTOCOL_PREFIX = "nicx.key.b64url."

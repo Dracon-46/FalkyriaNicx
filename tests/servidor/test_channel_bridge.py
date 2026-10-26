@@ -17,8 +17,8 @@ from nicx.canais._stubs import (
     ChannelStatus,
 )
 from nicx.nucleo.events import EventBus
-from nicx.servidor.channel_bridge import ChannelBridge
-from nicx.servidor.session_store import SessionStore
+from nicx.servidor.pontes.canais import ChannelBridge
+from nicx.servidor.pontes.sessoes_canais import SessionStore
 
 
 class FakeChannel(BaseChannel):

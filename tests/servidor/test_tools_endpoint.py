@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 import pytest
 
 try:
-    from nicx.servidor.agent_manager_routes import build_tools_list
+    from nicx.servidor.rotas.agentes import build_tools_list
 except ImportError:
     build_tools_list = None
 
@@ -16,7 +16,7 @@ pytestmark = pytest.mark.skipif(
 
 
 def test_tools_endpoint_returns_list():
-    from nicx.servidor.agent_manager_routes import build_tools_list
+    from nicx.servidor.rotas.agentes import build_tools_list
 
     tools = build_tools_list()
     assert isinstance(tools, list)
@@ -32,7 +32,7 @@ def test_tools_endpoint_returns_list():
 
 
 def test_tools_includes_channels():
-    from nicx.servidor.agent_manager_routes import build_tools_list
+    from nicx.servidor.rotas.agentes import build_tools_list
 
     tools = build_tools_list()
     names = {t["name"] for t in tools}
@@ -41,7 +41,7 @@ def test_tools_includes_channels():
 
 
 def test_browser_meta_group():
-    from nicx.servidor.agent_manager_routes import build_tools_list
+    from nicx.servidor.rotas.agentes import build_tools_list
 
     tools = build_tools_list()
     names = {t["name"] for t in tools}
@@ -50,7 +50,7 @@ def test_browser_meta_group():
 
 
 def test_tools_endpoint_includes_knowledge_search_and_proactive_tools():
-    from nicx.servidor.agent_manager_routes import build_tools_list
+    from nicx.servidor.rotas.agentes import build_tools_list
 
     tools = build_tools_list()
     names = {t["name"] for t in tools}
@@ -60,7 +60,7 @@ def test_tools_endpoint_includes_knowledge_search_and_proactive_tools():
 
 def test_web_search_available_without_tavily_key(monkeypatch):
     """DuckDuckGo fallback keeps web search usable without Tavily."""
-    from nicx.servidor.agent_manager_routes import build_tools_list
+    from nicx.servidor.rotas.agentes import build_tools_list
 
     monkeypatch.delenv("TAVILY_API_KEY", raising=False)
     tools = build_tools_list()
@@ -72,7 +72,7 @@ def test_web_search_available_without_tavily_key(monkeypatch):
 
 def test_weather_tool_picker_recognizes_connector_credential(tmp_path, monkeypatch):
     """An existing Weather connector keeps the native tool configured."""
-    from nicx.servidor.agent_manager_routes import build_tools_list
+    from nicx.servidor.rotas.agentes import build_tools_list
 
     root = tmp_path / "nicx-home"
     connector_path = root / "connectors" / "weather.json"
@@ -101,7 +101,7 @@ def test_tool_credentials_browser_lifecycle(tmp_path, monkeypatch):
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
 
-    from nicx.servidor.agent_manager_routes import create_agent_manager_router
+    from nicx.servidor.rotas.agentes import create_agent_manager_router
 
     monkeypatch.setenv("NICX_HOME", str(tmp_path / "nicx-home"))
     monkeypatch.delenv("TAVILY_API_KEY", raising=False)
@@ -144,7 +144,7 @@ def test_weather_tool_credentials_browser_lifecycle(tmp_path, monkeypatch):
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
 
-    from nicx.servidor.agent_manager_routes import create_agent_manager_router
+    from nicx.servidor.rotas.agentes import create_agent_manager_router
 
     monkeypatch.setenv("NICX_HOME", str(tmp_path / "nicx-home"))
     monkeypatch.delenv("OPENWEATHERMAP_API_KEY", raising=False)

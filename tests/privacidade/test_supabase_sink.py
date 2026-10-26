@@ -13,7 +13,7 @@ from fastapi.testclient import TestClient
 from nicx.nucleo.config import NicxConfig
 from nicx.privacidade import POLICY_VERSION, supabase_sink
 from nicx.privacidade.supabase_sink import SupabaseSink, forget_installation
-from nicx.servidor import analytics_routes
+from nicx.servidor.rotas import privacidade as analytics_routes
 
 URL = "https://example.supabase.co"
 PUBLISHABLE = "sb_publishable_test"

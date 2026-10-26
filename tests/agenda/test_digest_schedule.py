@@ -135,7 +135,7 @@ class TestDigestScheduleEndpoints:
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
 
-        from nicx.servidor.digest_routes import create_digest_router
+        from nicx.servidor.rotas.briefing import create_digest_router
 
         app = FastAPI()
         app.include_router(create_digest_router())
@@ -148,7 +148,7 @@ class TestDigestScheduleEndpoints:
         mock_cfg.digest.schedule = "0 6 * * *"
 
         with patch(
-            "nicx.servidor.digest_routes.load_config",
+            "nicx.servidor.rotas.briefing.load_config",
             return_value=mock_cfg,
         ):
             resp = client.get("/api/digest/schedule")
@@ -167,12 +167,12 @@ class TestDigestScheduleEndpoints:
 
         with (
             patch(
-                "nicx.servidor.digest_routes.load_config",
+                "nicx.servidor.rotas.briefing.load_config",
                 return_value=mock_cfg,
             ),
-            patch("nicx.servidor.digest_routes._save_digest_schedule") as mock_save,
+            patch("nicx.servidor.rotas.briefing._save_digest_schedule") as mock_save,
             patch(
-                "nicx.servidor.digest_routes._create_scheduler_task",
+                "nicx.servidor.rotas.briefing._create_scheduler_task",
                 return_value="task123",
             ) as mock_create,
         ):
@@ -199,12 +199,12 @@ class TestDigestScheduleEndpoints:
 
         with (
             patch(
-                "nicx.servidor.digest_routes.load_config",
+                "nicx.servidor.rotas.briefing.load_config",
                 return_value=mock_cfg,
             ),
-            patch("nicx.servidor.digest_routes._save_digest_schedule") as mock_save,
+            patch("nicx.servidor.rotas.briefing._save_digest_schedule") as mock_save,
             patch(
-                "nicx.servidor.digest_routes._cancel_scheduler_tasks",
+                "nicx.servidor.rotas.briefing._cancel_scheduler_tasks",
                 return_value=1,
             ) as mock_cancel,
         ):

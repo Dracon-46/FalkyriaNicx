@@ -14,7 +14,7 @@ from nicx.cerebro.agentes._stubs import AgentResult  # noqa: E402
 from nicx.nucleo.events import EventBus  # noqa: E402
 from nicx.nucleo.types import ToolResult  # noqa: E402
 from nicx.servidor.models import ChatCompletionRequest  # noqa: E402
-from nicx.servidor.stream_bridge import AgentStreamBridge  # noqa: E402
+from nicx.servidor.pontes.stream import AgentStreamBridge  # noqa: E402
 
 
 def _streamed_content(events: list[str]) -> str:

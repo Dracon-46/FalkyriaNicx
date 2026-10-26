@@ -542,7 +542,7 @@ def _engine_key_for_model(engine: Any, model: str) -> str | None:
 
 def _uses_direct_cloud_router(engine: Any, model: str) -> bool:
     """Whether *model* should bypass the configured engine for direct cloud."""
-    from nicx.servidor.cloud_router import is_cloud_model
+    from nicx.servidor.rotas.nuvem import is_cloud_model
 
     return is_cloud_model(model) and _engine_key_for_model(engine, model) != "litellm"
 
@@ -1030,7 +1030,7 @@ async def _handle_stream(
     """
     import time
 
-    from nicx.servidor.cloud_router import stream_cloud, stream_local
+    from nicx.servidor.rotas.nuvem import stream_cloud, stream_local
 
     messages = _to_messages(req.messages)
     messages = _ensure_identity_prompt(messages, app_config)
@@ -1212,7 +1212,7 @@ async def list_models(request: Request) -> ModelListResponse:
     configured LiteLLM engine remain here because LiteLLM owns their routing
     and may use provider-qualified IDs that resemble OpenRouter IDs.
     """
-    from nicx.servidor.cloud_router import is_cloud_model, list_local_models
+    from nicx.servidor.rotas.nuvem import is_cloud_model, list_local_models
 
     # Prefer engine.list_models() so mock engines work in tests.
     # Filter out direct-cloud model IDs that may appear via MultiEngine, but
@@ -1422,7 +1422,7 @@ async def savings(request: Request):
     """
     from nicx.nucleo.config import DEFAULT_CONFIG_DIR
     from nicx.registros.telemetria.aggregator import TelemetryAggregator
-    from nicx.servidor.savings import compute_savings, savings_to_dict
+    from nicx.servidor.custos.economia import compute_savings, savings_to_dict
 
     db_path = DEFAULT_CONFIG_DIR / "telemetry.db"
     if not db_path.exists():

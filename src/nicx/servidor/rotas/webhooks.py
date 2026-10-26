@@ -194,7 +194,7 @@ def create_webhook_router(
                     from nicx.cerebro.agentes.pesquisa.deep_research import (
                         DeepResearchAgent,
                     )
-                    from nicx.servidor.agent_manager_routes import (
+                    from nicx.servidor.rotas.agentes import (
                         _build_deep_research_tools,
                     )
 

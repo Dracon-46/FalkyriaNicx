@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional
 
 from nicx.canais._stubs import BaseChannel, ChannelStatus
 from nicx.nucleo.events import EventBus, EventType
-from nicx.servidor.session_store import SessionStore
+from nicx.servidor.pontes.sessoes_canais import SessionStore
 
 logger = logging.getLogger(__name__)
 

@@ -1937,10 +1937,10 @@ def create_agent_manager_router(
                         bridge._channels["sendblue"] = sb_channel
                     else:
                         # Create a new ChannelBridge with DeepResearch
-                        from nicx.servidor.channel_bridge import (
+                        from nicx.servidor.pontes.canais import (
                             ChannelBridge,
                         )
-                        from nicx.servidor.session_store import (
+                        from nicx.servidor.pontes.sessoes_canais import (
                             SessionStore,
                         )
 

@@ -38,7 +38,7 @@ def app():
     except ImportError:
         pytest.skip("fastapi not installed")
 
-    from nicx.servidor.connectors_router import create_connectors_router
+    from nicx.servidor.rotas.conectores import create_connectors_router
 
     _app = FastAPI()
     router = create_connectors_router()
@@ -170,7 +170,7 @@ def test_disconnect_purges_previously_ingested_content(app) -> None:
 def test_disconnect_cancels_inflight_sync_before_purge(app) -> None:
     from nicx.conectores._stubs import Document, SyncStatus
     from nicx.conectores.store import KnowledgeStore
-    from nicx.servidor.connectors_router import _instances
+    from nicx.servidor.rotas.conectores import _instances
 
     started = threading.Event()
     released = threading.Event()
@@ -243,8 +243,8 @@ def test_disconnect_timeout_preserves_source_and_guards_reconnect(
     tmp_path,
 ) -> None:
     from nicx.conectores._stubs import SyncStatus
-    from nicx.servidor import connectors_router
-    from nicx.servidor.connectors_router import _instances
+    from nicx.servidor.rotas import conectores as connectors_router
+    from nicx.servidor.rotas.conectores import _instances
 
     started = threading.Event()
     released = threading.Event()
@@ -326,7 +326,7 @@ def test_disconnect_prevents_sync_start_racing_checkpoint_read(
     """Disconnect waits for an in-progress start decision, then purges it."""
     from nicx.conectores._stubs import Document, SyncStatus
     from nicx.conectores.sync_engine import SyncEngine
-    from nicx.servidor.connectors_router import _instances
+    from nicx.servidor.rotas.conectores import _instances
 
     baseline_started = threading.Event()
     release_baseline = threading.Event()
@@ -421,7 +421,7 @@ def test_disconnect_prevents_sync_start_racing_checkpoint_read(
 def test_disconnect_preserves_source_owned_by_connected_peer(app) -> None:
     from nicx.conectores._stubs import SyncStatus
     from nicx.conectores.store import KnowledgeStore
-    from nicx.servidor.connectors_router import _instances
+    from nicx.servidor.rotas.conectores import _instances
 
     class FakeConnector:
         def __init__(self, connector_id, indexed_sources=()):
@@ -467,7 +467,7 @@ def test_disconnect_restores_checkpoint_when_purge_fails(app, monkeypatch) -> No
     from nicx.conectores.pipeline import IngestionPipeline
     from nicx.conectores.store import KnowledgeStore
     from nicx.conectores.sync_engine import SyncEngine
-    from nicx.servidor.connectors_router import _instances
+    from nicx.servidor.rotas.conectores import _instances
 
     class FakeObsidian:
         indexed_sources = ("obsidian",)
@@ -538,7 +538,7 @@ def test_trigger_sync(app, tmp_path: Path) -> None:
 def test_connect_slack_bot_token_returns_400(app, tmp_path: Path) -> None:
     """POST connect with an xoxb- token is rejected 400 and writes nothing."""
     from nicx.conectores.slack_connector import SlackConnector
-    from nicx.servidor.connectors_router import _instances
+    from nicx.servidor.rotas.conectores import _instances
 
     creds = tmp_path / "slack.json"
     _instances["slack"] = SlackConnector(credentials_path=str(creds))
@@ -561,7 +561,7 @@ def test_connect_granola_invalid_key_returns_400_keeps_existing(
     from unittest.mock import patch
 
     from nicx.conectores.granola import GranolaConnector, GranolaKeyError
-    from nicx.servidor.connectors_router import _instances
+    from nicx.servidor.rotas.conectores import _instances
 
     creds = tmp_path / "granola.json"
     creds.write_text(json.dumps({"token": "grl_real_existing_key"}))
@@ -618,7 +618,7 @@ def test_connect_persists_generic_token_connector_credentials(
     from nicx.conectores.oura import OuraConnector
     from nicx.conectores.weather import WeatherConnector
     from nicx.nucleo.registry import ConnectorRegistry
-    from nicx.servidor.connectors_router import _instances
+    from nicx.servidor.rotas.conectores import _instances
 
     path = tmp_path / filename
     constructors = {
@@ -661,7 +661,7 @@ def test_invalid_token_is_not_persisted_or_synced(app, tmp_path, monkeypatch) ->
         GitHubNotificationsConnector,
     )
     from nicx.nucleo.registry import ConnectorRegistry
-    from nicx.servidor.connectors_router import _instances
+    from nicx.servidor.rotas.conectores import _instances
 
     path = tmp_path / "github.json"
     original = '{"token":"known-good"}'
@@ -696,7 +696,7 @@ def test_invalid_token_is_not_persisted_or_synced(app, tmp_path, monkeypatch) ->
 def test_connect_weather_requires_location(app, tmp_path: Path) -> None:
     """Weather must not report connected with an API key it cannot use."""
     from nicx.conectores.weather import WeatherConnector
-    from nicx.servidor.connectors_router import _instances
+    from nicx.servidor.rotas.conectores import _instances
 
     path = tmp_path / "weather.json"
     _instances["weather"] = WeatherConnector(token_path=str(path))
@@ -712,7 +712,7 @@ def test_connect_weather_requires_location(app, tmp_path: Path) -> None:
 def test_connect_news_rss_requires_and_persists_feeds(app, tmp_path: Path) -> None:
     """A local connector with required setup cannot claim success for ``{}``."""
     from nicx.conectores.news_rss import NewsRSSConnector
-    from nicx.servidor.connectors_router import _instances
+    from nicx.servidor.rotas.conectores import _instances
 
     path = tmp_path / "news_rss.json"
     instance = NewsRSSConnector(config_path=str(path))
@@ -740,7 +740,7 @@ def test_gmail_quota_exhaustion_is_reported_as_rate_limited(app, monkeypatch):
 
     from nicx.conectores._stubs import SyncStatus
     from nicx.conectores.sync_engine import SyncEngine
-    from nicx.servidor.connectors_router import _instances
+    from nicx.servidor.rotas.conectores import _instances
 
     class QuotaConnector:
         connector_id = "gmail"

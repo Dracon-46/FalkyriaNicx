@@ -52,7 +52,7 @@ def _make_adapter(name: str) -> MagicMock:
 @patch("nicx.nucleo.config.load_config")
 def test_returns_tools_from_mcp_server(mock_load_config: MagicMock):
     """With a mocked MCP server, discovered tools are returned."""
-    from nicx.servidor.agent_manager_routes import _get_mcp_tools
+    from nicx.servidor.rotas.agentes import _get_mcp_tools
 
     server_cfg = [{"name": "test-server", "url": "http://localhost:9999"}]
     mock_load_config.return_value = _make_config(
@@ -84,7 +84,7 @@ def test_returns_tools_from_external_mcp_file(
 ):
     """Managed-agent discovery uses the same file-backed config semantics."""
 
-    from nicx.servidor.agent_manager_routes import _get_mcp_tools
+    from nicx.servidor.rotas.agentes import _get_mcp_tools
 
     server_file = tmp_path / "mcp-servers.json"
     server_file.write_text(
@@ -111,7 +111,7 @@ def test_returns_tools_from_external_mcp_file(
 @patch("nicx.nucleo.config.load_config")
 def test_caches_successful_discovery(mock_load_config: MagicMock):
     """Second call returns cached result without re-discovering."""
-    from nicx.servidor.agent_manager_routes import _get_mcp_tools
+    from nicx.servidor.rotas.agentes import _get_mcp_tools
 
     server_cfg = [{"name": "test-server", "url": "http://localhost:9999"}]
     mock_load_config.return_value = _make_config(
@@ -145,7 +145,7 @@ def test_caches_successful_discovery(mock_load_config: MagicMock):
 @patch("nicx.nucleo.config.load_config")
 def test_does_not_cache_empty_results(mock_load_config: MagicMock):
     """Failed/empty discovery is not cached so it can be retried."""
-    from nicx.servidor.agent_manager_routes import _get_mcp_tools
+    from nicx.servidor.rotas.agentes import _get_mcp_tools
 
     server_cfg = [{"name": "failing-server", "url": "http://localhost:9999"}]
     mock_load_config.return_value = _make_config(
@@ -183,7 +183,7 @@ def test_does_not_cache_empty_results(mock_load_config: MagicMock):
 @patch("nicx.nucleo.config.load_config")
 def test_handles_config_load_failure(mock_load_config: MagicMock):
     """Config load failure returns empty, no crash."""
-    from nicx.servidor.agent_manager_routes import _get_mcp_tools
+    from nicx.servidor.rotas.agentes import _get_mcp_tools
 
     mock_load_config.side_effect = RuntimeError("config broken")
 
@@ -198,7 +198,7 @@ def test_handles_config_load_failure(mock_load_config: MagicMock):
 def test_uses_preloaded_full_system_pool(mock_load_config: MagicMock):
     """Server and scheduled paths reuse one unfiltered MCP discovery."""
 
-    from nicx.servidor.agent_manager_routes import _get_mcp_tools
+    from nicx.servidor.rotas.agentes import _get_mcp_tools
 
     adapter = _make_adapter("preloaded_tool")
     app_state = _FakeAppState()
@@ -215,7 +215,7 @@ def test_uses_preloaded_full_system_pool(mock_load_config: MagicMock):
 def test_preloaded_duplicate_names_are_first_wins(mock_load_config: MagicMock):
     """SSE and executor paths choose the same adapter on name collisions."""
 
-    from nicx.servidor.agent_manager_routes import _get_mcp_tools
+    from nicx.servidor.rotas.agentes import _get_mcp_tools
 
     first = _make_adapter("duplicate")
     second = _make_adapter("duplicate")
@@ -235,8 +235,8 @@ def test_app_shutdown_stops_scheduler_before_closing_shared_mcp_clients() -> Non
     from fastapi.testclient import TestClient
 
     from nicx.nucleo.config import NicxConfig
-    from nicx.servidor.agent_manager_routes import _start_managed_worker
     from nicx.servidor.app import create_app
+    from nicx.servidor.rotas.agentes import _start_managed_worker
 
     events: list[str] = []
     release_worker = threading.Event()
@@ -309,11 +309,11 @@ def test_shutdown_interrupts_mcp_client_during_lazy_initialization() -> None:
     from fastapi.testclient import TestClient
 
     from nicx.nucleo.config import NicxConfig
-    from nicx.servidor.agent_manager_routes import (
+    from nicx.servidor.app import create_app
+    from nicx.servidor.rotas.agentes import (
         _get_mcp_tools,
         _start_managed_worker,
     )
-    from nicx.servidor.app import create_app
 
     initialize_started = threading.Event()
     initialize_released = threading.Event()
@@ -379,8 +379,8 @@ def test_app_shutdown_closes_lazily_created_memory_backend(monkeypatch) -> None:
     from fastapi.testclient import TestClient
 
     from nicx.nucleo.config import NicxConfig
-    from nicx.servidor import agent_manager_routes as routes
     from nicx.servidor.app import create_app
+    from nicx.servidor.rotas import agentes as routes
 
     backend = MagicMock()
     monkeypatch.setattr(routes, "_resolve_memory_backend", lambda config: backend)
@@ -406,7 +406,7 @@ def test_app_shutdown_keeps_owned_memory_open_for_live_worker(monkeypatch) -> No
 
     from nicx.nucleo.config import NicxConfig
     from nicx.servidor import app as app_module
-    from nicx.servidor.agent_manager_routes import _start_managed_worker
+    from nicx.servidor.rotas.agentes import _start_managed_worker
 
     monkeypatch.setattr(app_module, "_MANAGED_SHUTDOWN_GRACE_SECONDS", 0.01)
     monkeypatch.setattr(app_module, "_MANAGED_SHUTDOWN_DRAIN_SECONDS", 0.01)

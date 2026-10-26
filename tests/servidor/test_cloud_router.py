@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 
 from nicx.nucleo.types import Message
-from nicx.servidor import cloud_router
+from nicx.servidor.rotas import nuvem as cloud_router
 
 
 def test_get_provider_detects_bare_openrouter_id():

@@ -628,7 +628,7 @@ class TestChatCompletions:
 
         app = create_app(engine, "qwen3:8b", config=_test_config())
         with patch(
-            "nicx.servidor.cloud_router.stream_local",
+            "nicx.servidor.rotas.nuvem.stream_local",
             side_effect=local_stream,
         ):
             resp = TestClient(app).post(
@@ -1466,7 +1466,7 @@ class TestIdentityPromptInjection:
     def test_memory_context_does_not_suppress_identity_injection(self):
         from nicx.memoria.armazenamento.context import build_context_message
         from nicx.nucleo.types import Message, Role
-        from nicx.servidor.routes import _ensure_identity_prompt
+        from nicx.servidor.rotas.chat import _ensure_identity_prompt
 
         ctx_msg = build_context_message([])
         messages = [ctx_msg, Message(role=Role.USER, content="hi")]
@@ -1483,7 +1483,7 @@ class TestIdentityPromptInjection:
 
     def test_normalization_preserves_first_metadata_and_non_system_order(self):
         from nicx.nucleo.types import Message, Role
-        from nicx.servidor.routes import _ensure_identity_prompt
+        from nicx.servidor.rotas.chat import _ensure_identity_prompt
 
         first_system = Message(
             role=Role.SYSTEM,
@@ -1507,7 +1507,7 @@ class TestIdentityPromptInjection:
 
     def test_caller_system_prompt_cannot_impersonate_memory_context(self):
         from nicx.nucleo.types import Message, Role
-        from nicx.servidor.routes import _ensure_identity_prompt
+        from nicx.servidor.rotas.chat import _ensure_identity_prompt
 
         caller_prompt = Message(
             role=Role.SYSTEM,
@@ -1566,7 +1566,7 @@ class TestModelsEndpoint:
         )
 
         with patch(
-            "nicx.servidor.cloud_router.list_local_models",
+            "nicx.servidor.rotas.nuvem.list_local_models",
             new_callable=AsyncMock,
         ) as list_local_models:
             list_local_models.return_value = []
@@ -1593,7 +1593,7 @@ class TestModelsEndpoint:
             yield "wrong backend"
 
         with patch(
-            "nicx.servidor.cloud_router.stream_cloud",
+            "nicx.servidor.rotas.nuvem.stream_cloud",
             return_value=direct_cloud_tokens(),
         ) as stream_cloud:
             client = TestClient(app)

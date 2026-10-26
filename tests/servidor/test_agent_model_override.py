@@ -22,7 +22,7 @@ fastapi = pytest.importorskip("fastapi")
 
 from nicx.cerebro.agentes._stubs import AgentResult  # noqa: E402
 from nicx.servidor.models import ChatCompletionRequest, ChatMessage  # noqa: E402
-from nicx.servidor.routes import (  # noqa: E402
+from nicx.servidor.rotas.chat import (  # noqa: E402
     _agent_model_locks,
     _get_agent_model_lock,
     _handle_agent,
