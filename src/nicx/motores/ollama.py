@@ -669,9 +669,10 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
         import sys
         import time
 
-        flags = 0
-        if sys.platform == "win32":
-            flags = subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS
+        # Console escondido, não DETACHED_PROCESS: o Ollama abre processos
+        # filhos (detecção da CPU, carga do modelo) e, sem console para
+        # herdar, cada um deles piscava uma janela de cmd na tela.
+        flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
         try:
             subprocess.Popen(
                 [exe, "serve"],
