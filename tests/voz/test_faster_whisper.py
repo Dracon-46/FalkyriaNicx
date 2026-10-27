@@ -165,14 +165,21 @@ def test_faster_whisper_health_no_model():
         assert "uv sync --extra desktop" in (backend.last_error() or "")
 
 
-def test_faster_whisper_health_captures_load_error():
-    with patch(
-        "nicx.voz.faster_whisper.WhisperModel",
-        side_effect=RuntimeError("missing cublas64_12.dll"),
-    ):
+def test_faster_whisper_health_does_not_load_model():
+    """health() só confere o pacote: o modelo (~470 MB) carrega no primeiro uso."""
+    with patch("nicx.voz.faster_whisper.WhisperModel") as model_cls:
         backend = FasterWhisperBackend()
-        assert backend.health() is False
-        assert "missing cublas64_12.dll" in (backend.last_error() or "")
+        assert backend.health() is True
+        model_cls.assert_not_called()
+
+
+def test_faster_whisper_unloads_when_idle():
+    with patch("nicx.voz.faster_whisper.WhisperModel"):
+        backend = FasterWhisperBackend()
+        backend._ensure_model()
+        assert backend._model is not None
+        backend.unload()
+        assert backend._model is None
 
 
 def test_faster_whisper_supported_formats():

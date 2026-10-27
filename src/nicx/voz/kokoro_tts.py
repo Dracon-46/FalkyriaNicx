@@ -23,6 +23,7 @@ from collections import OrderedDict
 from typing import Any, Dict, List
 
 from nicx.nucleo.registry import TTSRegistry
+from nicx.voz._ocioso import IdleRelease
 from nicx.voz.tts import TTSBackend, TTSResult
 
 logger = logging.getLogger(__name__)
@@ -131,6 +132,8 @@ class KokoroTTSBackend(TTSBackend):
         # documented as thread-safe, and an LRU entry must not be evicted and
         # closed while another thread is still synthesizing with it.
         self._pipeline_lock = threading.RLock()
+        # Kokoro + torch somam ~1 GB: sai da memória depois de um tempo parado.
+        self._idle = IdleRelease(self.close, "Kokoro")
 
     @staticmethod
     def _lang_for_voice(voice_id: str) -> str:
@@ -252,6 +255,9 @@ class KokoroTTSBackend(TTSBackend):
             for pipeline in pipelines:
                 self._cleanup_pipeline(pipeline)
             self._model = None
+        import gc
+
+        gc.collect()
 
     def synthesize(
         self,
@@ -273,6 +279,7 @@ class KokoroTTSBackend(TTSBackend):
             samples = []
             for _, _, audio in pipeline(text, voice=voice_id, speed=speed):
                 samples.append(audio)
+        self._idle.touch()
 
         if not samples:
             return TTSResult(
@@ -335,13 +342,14 @@ class KokoroTTSBackend(TTSBackend):
         ]
 
     def health(self) -> bool:
-        # Check the shared model, not the English pipeline: language-specific
-        # G2P problems surface at synthesis time for the voice actually used.
-        # Use the same lock as synthesis so concurrent health probes cannot
-        # allocate duplicate model weights or race with close().
-        with self._pipeline_lock:
-            try:
-                self._ensure_model()
-                return True
-            except RuntimeError:
-                return False
+        # Only check that Kokoro imports; the weights load on the first
+        # synthesis. Loading them here kept ~1 GB in RAM as soon as the app
+        # asked whether voice output exists. Language-specific G2P problems
+        # surface at synthesis time for the voice actually used.
+        if self._model is not None:
+            return True
+        try:
+            _import_kokoro()
+            return True
+        except ImportError:
+            return False

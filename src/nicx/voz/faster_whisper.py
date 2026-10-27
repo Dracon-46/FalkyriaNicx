@@ -9,6 +9,7 @@ import tempfile
 from typing import List, Optional
 
 from nicx.nucleo.registry import SpeechRegistry
+from nicx.voz._ocioso import IdleRelease
 from nicx.voz._stubs import Segment, SpeechBackend, TranscriptionResult
 
 try:
@@ -78,6 +79,7 @@ class FasterWhisperBackend(SpeechBackend):
         self._hotwords = hotwords.strip()
         self._model: Optional[WhisperModel] = None
         self._last_error: Optional[str] = None
+        self._idle = IdleRelease(self.unload, f"Whisper {model_size}")
 
     def _resolve_compute_type(self) -> str:
         """Pick a CTranslate2 compute type supported by the configured device."""
@@ -146,6 +148,7 @@ class FasterWhisperBackend(SpeechBackend):
         """Transcribe audio bytes using Faster-Whisper."""
         try:
             model = self._ensure_model()
+            self._idle.touch()
 
             # Write audio to a temp file (faster-whisper needs a file path).
             # delete=False + manual unlink: on Windows an open
@@ -204,14 +207,26 @@ class FasterWhisperBackend(SpeechBackend):
         )
 
     def health(self) -> bool:
-        """Check if model is loaded or loadable."""
-        try:
-            self._ensure_model()
+        """Check the package is installed, without loading the model.
+
+        Loading here kept ~470 MB in RAM from the moment the server started,
+        even when nobody used voice. The model loads on the first transcription.
+        """
+        if self._model is not None:
             return True
-        except Exception as exc:
-            self._last_error = str(exc)
-            logger.debug("Faster-Whisper health check failed: %s", exc)
+        if WhisperModel is None:
+            self._last_error = (
+                "faster-whisper is not installed. Install with: uv sync --extra desktop"
+            )
             return False
+        return True
+
+    def unload(self) -> None:
+        """Drop the model from memory; the next transcription loads it again."""
+        self._model = None
+        import gc
+
+        gc.collect()
 
     def last_error(self) -> Optional[str]:
         """Return the last model load or transcription error, if any."""
