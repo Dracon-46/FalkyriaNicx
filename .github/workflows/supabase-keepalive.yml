@@ -1,0 +1,29 @@
+name: Supabase acordado
+
+# O plano grátis do Supabase pausa o projeto depois de dias sem uso, e os
+# eventos enviados enquanto ele está pausado se perdem. Uma chamada leve a
+# cada 3 dias mantém o projeto ligado (alguns segundos de Actions).
+
+on:
+  schedule:
+    - cron: '0 12 */3 * *'  # a cada 3 dias, 9h em Brasília
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    env:
+      # Chave pública (publishable): é a mesma que vai no app.
+      SUPABASE_URL: https://xcazupxhoeoogcksymzg.supabase.co
+      SUPABASE_KEY: sb_publishable_udh4J44z3XxDaXlGTYbaIA_iT9NcTQD
+    steps:
+      - name: Chamar nicx_keepalive
+        run: |
+          curl --fail-with-body --silent --show-error --retry 3 --retry-delay 20 \
+            -X POST "$SUPABASE_URL/rest/v1/rpc/nicx_keepalive" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{}'

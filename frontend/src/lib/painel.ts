@@ -11,7 +11,6 @@
  */
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { fetchDashboardConfig } from './analytics';
 
 export const PERIODS = [7, 30, 90] as const;
 export type Period = (typeof PERIODS)[number];
@@ -25,11 +24,24 @@ export const EMPTY_DATA_MESSAGE =
 
 let clientPromise: Promise<SupabaseClient> | null = null;
 
-/** Create (once) the Supabase client from the server's public settings. */
+/**
+ * Public settings of the Supabase project. The standalone painel (published
+ * on the web, `npm run build:painel`) has them baked in at build time; inside
+ * the app they come from the local Nicx server.
+ */
+async function painelConfig(): Promise<{ supabase_url: string; supabase_key: string }> {
+  const url = import.meta.env.VITE_PAINEL_SUPABASE_URL;
+  const key = import.meta.env.VITE_PAINEL_SUPABASE_KEY;
+  if (url && key) return { supabase_url: url, supabase_key: key };
+  const { fetchDashboardConfig } = await import('./analytics');
+  return fetchDashboardConfig();
+}
+
+/** Create (once) the Supabase client from the project's public settings. */
 export function getPainelClient(): Promise<SupabaseClient> {
   if (!clientPromise) {
     const pending = (async () => {
-      const config = await fetchDashboardConfig();
+      const config = await painelConfig();
       if (!config.supabase_url || !config.supabase_key) {
         throw new Error('O painel não está configurado nesta instalação do Nicx.');
       }
