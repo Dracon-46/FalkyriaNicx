@@ -27,7 +27,9 @@ from nicx.nucleo.paths import get_config_dir
 
 logger = logging.getLogger(__name__)
 
-_DEFAULT_TOOLS = frozenset({"think", "calculator", "web_search", "controle_pc"})
+_DEFAULT_TOOLS = frozenset(
+    {"think", "calculator", "web_search", "controle_pc", "lembrete"}
+)
 
 
 def _resolve_server_cors_origins(configured: object) -> list[str]:
@@ -819,6 +821,10 @@ def serve(
             name="model-preload",
             daemon=True,
         ).start()
+    # Lembretes e timers marcados por voz ou texto ("me lembra em 10 minutos").
+    from nicx.acoes import lembretes
+
+    lembretes.start_alarm()
     try:
         run_server(app, host=bind_host, port=bind_port, log_level="info")
     finally:

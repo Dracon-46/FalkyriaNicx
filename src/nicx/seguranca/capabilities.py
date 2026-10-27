@@ -277,6 +277,8 @@ DEFAULT_TOOL_CAPABILITIES: Dict[str, List[str]] = {
     "web_search": [Capability.NETWORK_FETCH],
     # Volume, mídia, abrir apps/sites de uma lista fechada, bloquear a tela.
     "controle_pc": [Capability.TOOL_INVOKE],
+    # Lembretes e timers: só grava em ~/.nicx/lembretes.json.
+    "lembrete": [Capability.TOOL_INVOKE],
 }
 
 _SAFE_BUILTIN_PROVENANCE = {

@@ -2210,7 +2210,10 @@ default_model = "{model}"
 default_agent = "simple"
 
 [tools]
-enabled = ["controle_pc", "code_interpreter", "web_search", "file_read", "shell_exec"]
+enabled = [
+    "controle_pc", "lembrete", "code_interpreter",
+    "web_search", "file_read", "shell_exec",
+]
 """
 
 

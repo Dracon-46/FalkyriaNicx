@@ -177,7 +177,7 @@ def write_initial_config(
         f'default_agent = "simple"\n'
         f"\n"
         f"[tools]\n"
-        f'enabled = ["controle_pc", "code_interpreter", "web_search", '
+        f'enabled = ["controle_pc", "lembrete", "code_interpreter", "web_search", '
         f'"file_read", "shell_exec"]\n'
     )
 

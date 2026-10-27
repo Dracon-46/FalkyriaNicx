@@ -187,7 +187,7 @@ class TestCapabilityPolicy:
             *(root / "acoes").rglob("*.py"),
             root / "agenda" / "tools.py",
         ]:
-            tree = ast.parse(path.read_text(), filename=str(path))
+            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
             for node in ast.walk(tree):
                 if not isinstance(node, (ast.ClassDef, ast.FunctionDef)):
                     continue

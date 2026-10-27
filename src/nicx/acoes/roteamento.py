@@ -35,6 +35,9 @@ _PATTERNS = [
     r"codigo|script|funcao|algoritmo|regex)\b",
     r"\d+\s*(?:[x*/+^-]|mais|menos)\s*\d+",
     r"\bferramenta\w*\b",
+    # Rotinas: lembretes, anotações, print.
+    r"\b(?:lembr\w*|avis[ae]r?|alarme|timer|temporizador|anot\w*|notas?|print"
+    r"|captura)\b",
 ]
 _REGEX = re.compile("|".join(f"(?:{p})" for p in _PATTERNS))
 

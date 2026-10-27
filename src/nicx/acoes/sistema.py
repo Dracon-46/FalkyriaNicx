@@ -202,6 +202,11 @@ def run(action: Action) -> Outcome:
             return _battery()
         if action.kind == "lock":
             return _lock()
+        from nicx.acoes import executores
+
+        outcome = executores.run(action)
+        if outcome is not None:
+            return outcome
     except Exception as exc:  # noqa: BLE001 - a resposta explica a falha
         logger.warning("Ação %s falhou: %s", action, exc)
         return Outcome(False, "Não consegui fazer isso agora.")

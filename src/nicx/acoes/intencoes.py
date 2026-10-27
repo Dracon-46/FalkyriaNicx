@@ -10,6 +10,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Optional
 
 
@@ -17,11 +18,15 @@ from typing import Optional
 class Action:
     """Uma ação reconhecida. ``kind`` diz o que fazer; o resto são detalhes."""
 
-    kind: str  # volume, media, open, search, time, date, battery, lock
-    op: str = ""  # volume: up/down/set/mute; media: toggle/next/prev
+    # volume, media, open, search, time, date, battery, lock; e de rotinas.py:
+    # remind, remind_list, remind_clear, note_add, notes_list, notes_clear,
+    # status, folder, screenshot, close, power, confirm, deny
+    kind: str
+    op: str = ""  # volume: up/down/set/mute; media: toggle/next/prev; power
     value: Optional[int] = None  # volume: passos (up/down) ou nível 0-100 (set)
-    target: str = ""  # open: chave em APPS; search: o termo buscado
+    target: str = ""  # open/folder/close: chave; search: termo; remind/note: texto
     site: str = ""  # search: google ou youtube
+    when: Optional[datetime] = None  # remind: quando avisar
 
 
 @dataclass(frozen=True)
@@ -102,9 +107,50 @@ _SUFFIX = re.compile(
 
 
 def _clean(text: str) -> str:
-    t = normalize(text)
-    t = _PREFIX.sub("", t, count=1).strip()
-    return _SUFFIX.sub("", t).strip()
+    return clean_with_map(text)[0]
+
+
+def clean_with_map(text: str) -> tuple[str, list[int]]:
+    """Como ``_clean``, mais a posição no texto original de cada caractere.
+
+    Serve para devolver trechos com acento e maiúsculas ("ligar pra mãe"),
+    já que a comparação é feita sem eles.
+    """
+    chars: list[str] = []
+    where: list[int] = []
+    for i, ch in enumerate(text):
+        base = unicodedata.normalize("NFKD", ch.lower())
+        for c in base:
+            if unicodedata.combining(c):
+                continue
+            if re.match(r"[\w%-]", c):
+                chars.append(c)
+                where.append(i)
+            elif chars and chars[-1] != " ":
+                chars.append(" ")
+                where.append(i)
+    t = "".join(chars)
+    start, end = 0, len(t)
+    while start < end and t[start] == " ":
+        start += 1
+    while end > start and t[end - 1] == " ":
+        end -= 1
+    m = _PREFIX.match(t, start, end)
+    if m:
+        start = m.end()
+        while start < end and t[start] == " ":
+            start += 1
+    m = _SUFFIX.search(t, start, end)
+    if m and m.end() == end:
+        end = m.start()
+    return t[start:end], where[start:end]
+
+
+def original_text(text: str, where: list[int], start: int, end: int) -> str:
+    """O trecho ``[start:end]`` do texto limpo, tirado do texto original."""
+    if start >= end:
+        return ""
+    return text[where[start] : where[end - 1] + 1].strip(" ,.:;!?-")
 
 
 _NOUN = (
@@ -250,9 +296,14 @@ def _info(t: str) -> Optional[Action]:
 
 def parse(text: str) -> Optional[Action]:
     """A ação que a frase pede, ou None se não for um comando direto."""
-    t = _clean(text)
-    if not t or len(t) > 80:
+    from nicx.acoes import rotinas
+
+    t, where = clean_with_map(text)
+    if not t or len(t) > 200:
         return None
+    action = rotinas.parse(text, t, where)
+    if action is not None or len(t) > 80:
+        return action
     for matcher in (_volume, _media, _open, _search, _info):
         action = matcher(t)
         if action is not None:
