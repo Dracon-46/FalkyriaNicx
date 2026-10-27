@@ -16,7 +16,7 @@ import logging
 import os
 from typing import TYPE_CHECKING, List, Optional
 
-import requests
+import httpx
 
 # numpy is imported lazily inside the functions that use it (not at module
 # load). The CLI imports this module eagerly via the deep-research command
@@ -78,9 +78,9 @@ class OllamaEmbedder:
     def is_available(self) -> bool:
         """Return True iff the daemon answers and the model is installed."""
         try:
-            resp = requests.get(f"{self._host}/api/tags", timeout=2.0)
+            resp = httpx.get(f"{self._host}/api/tags", timeout=2.0)
             resp.raise_for_status()
-        except requests.RequestException:
+        except httpx.HTTPError:
             return False
 
         try:
@@ -100,14 +100,14 @@ class OllamaEmbedder:
         if not text or not text.strip():
             return None
         try:
-            resp = requests.post(
+            resp = httpx.post(
                 f"{self._host}/api/embeddings",
                 json={"model": self._model, "prompt": text},
                 timeout=self._timeout,
             )
             resp.raise_for_status()
             payload = resp.json()
-        except requests.RequestException as exc:
+        except httpx.HTTPError as exc:
             logger.warning("OllamaEmbedder.embed: request failed (%s)", exc)
             return None
         except ValueError as exc:

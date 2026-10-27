@@ -102,7 +102,7 @@ def test_sdist_omits_desktop_binaries_and_rebuilds_runtime_wheel(tmp_path) -> No
     project.mkdir()
     runtime_sources = (
         "src/nicx/__init__.py",
-        "src/nicx/templates/data/assistant.toml",
+        "src/nicx/privacidade/textos/politica-de-privacidade.md",
     )
     force_include = _pyproject()["tool"]["hatch"]["build"]["targets"]["wheel"][
         "force-include"
