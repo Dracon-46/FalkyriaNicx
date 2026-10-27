@@ -131,8 +131,9 @@ def get_engine(
     """Get a specific engine by key, or the default with a named fallback.
 
     An explicit ``engine_key`` is authoritative and is never silently
-    substituted. Default-engine fallback prefers the same local/cloud class
-    and logs the selected replacement.
+    substituted. A local default engine that is down is started when the
+    engine knows how (``start_server``, e.g. Ollama); otherwise the fallback
+    is another local engine, never a cloud one, and is logged.
 
     When *model* is given, an engine is selected only if it can actually
     serve that model (``engine.can_serve(model)``). This stops the cloud
@@ -156,6 +157,9 @@ def get_engine(
             engine = _make_engine(engine_key, config)
             if _usable(engine):
                 return (engine_key, engine)
+            start = getattr(engine, "start_server", None)
+            if callable(start) and start() and _usable(engine):
+                return (engine_key, engine)
         except Exception as exc:
             logger.debug("Engine %r health check failed: %s", engine_key, exc)
         logger.warning(
@@ -175,13 +179,20 @@ def get_engine(
             default_is_cloud = bool(getattr(engine, "is_cloud", default_is_cloud))
             if _usable(engine):
                 return (default_key, engine)
+            # Motor local desligado (ex.: Ollama fora da inicialização): liga.
+            start = getattr(engine, "start_server", None)
+            if callable(start) and start() and _usable(engine):
+                return (default_key, engine)
         except Exception as exc:
             logger.debug("Engine %r health check failed: %s", default_key, exc)
 
+    # O Nicx é só local: um motor padrão local nunca é trocado por um de nuvem.
     candidates = [
         (key, engine)
         for key, engine in discover_engines(config)
-        if key != default_key and (model is None or engine.can_serve(model))
+        if key != default_key
+        and (model is None or engine.can_serve(model))
+        and not (default_is_cloud is False and getattr(engine, "is_cloud", False))
     ]
     if not candidates:
         return None

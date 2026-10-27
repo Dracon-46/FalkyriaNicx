@@ -178,6 +178,22 @@ def _ollama_request_options(
     return options
 
 
+def _find_ollama() -> str | None:
+    """Caminho do executável do Ollama: PATH ou a instalação padrão do Windows."""
+    import shutil
+    from pathlib import Path
+
+    found = shutil.which("ollama")
+    if found:
+        return found
+    local = os.environ.get("LOCALAPPDATA")
+    if local:
+        exe = Path(local) / "Programs" / "Ollama" / "ollama.exe"
+        if exe.is_file():
+            return str(exe)
+    return None
+
+
 @EngineRegistry.register("ollama")
 class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
     """Ollama backend via its native HTTP API."""
@@ -633,6 +649,49 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
         except Exception as exc:
             logger.debug("Ollama health check failed at %s: %s", self._host, exc)
             return False
+
+    def start_server(self, wait: float = 20.0) -> bool:
+        """Liga o ``ollama serve`` em segundo plano quando ele está desligado.
+
+        Sem isso, com o Ollama fora da inicialização do Windows, o Nicx
+        abria sem modelo. Só vale para um Ollama nesta máquina;
+        ``NICX_NO_AUTOSTART=1`` desliga (os testes usam).
+        """
+        if os.environ.get("NICX_NO_AUTOSTART"):
+            return False
+        host = httpx.URL(self._host).host
+        if host not in ("localhost", "127.0.0.1", "::1"):
+            return False
+        exe = _find_ollama()
+        if exe is None:
+            return False
+        import subprocess
+        import sys
+        import time
+
+        flags = 0
+        if sys.platform == "win32":
+            flags = subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS
+        try:
+            subprocess.Popen(
+                [exe, "serve"],
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                creationflags=flags,
+                start_new_session=sys.platform != "win32",
+            )
+        except OSError as exc:
+            logger.warning("Não consegui ligar o Ollama (%s): %s", exe, exc)
+            return False
+        deadline = time.monotonic() + wait
+        while time.monotonic() < deadline:
+            time.sleep(0.5)
+            if self.health():
+                logger.info("Ollama ligado pelo Nicx (%s)", exe)
+                return True
+        logger.warning("Liguei o Ollama, mas ele não respondeu em %.0f s", wait)
+        return False
 
     def load(self, model: str) -> None:
         """Load the model's weights into RAM without reading any prompt.

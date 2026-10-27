@@ -100,6 +100,8 @@ def _no_update_check(monkeypatch: pytest.MonkeyPatch) -> None:
     version-check cache and network access) it fires for real.
     """
     monkeypatch.setenv("NICX_NO_UPDATE_CHECK", "1")
+    # Nem ligar o Ollama de verdade quando um teste não acha o servidor.
+    monkeypatch.setenv("NICX_NO_AUTOSTART", "1")
 
 
 @pytest.fixture(autouse=True)

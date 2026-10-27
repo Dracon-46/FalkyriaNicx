@@ -224,7 +224,8 @@ class TestGetEngine:
         assert result is not None
         assert result[0] == "z-local"
 
-    def test_cross_boundary_default_fallback_is_named(self, caplog) -> None:
+    def test_local_default_never_falls_back_to_cloud(self) -> None:
+        """O Nicx é só local: sem motor local, nada de nuvem."""
         _reg("bad-local", "bad-local")
         _reg("cloud-only", "cloud-only")
 
@@ -245,9 +246,32 @@ class TestGetEngine:
         ):
             result = get_engine(cfg)
 
-        assert result is not None
-        assert result[0] == "cloud-only"
-        assert "across the local/cloud boundary" in caplog.text
+        assert result is None
+
+    def test_down_local_default_is_started(self) -> None:
+        """Ollama desligado: o Nicx liga e usa, em vez de trocar de motor."""
+        _reg("sleepy", "sleepy")
+        _reg("other", "other")
+
+        class _Sleepy(_FakeEngine):
+            def start_server(self) -> bool:
+                self._healthy = True
+                return True
+
+        sleepy = _Sleepy(healthy=False)
+        cfg = NicxConfig()
+        cfg.engine.default = "sleepy"
+
+        def _make(k, c):  # noqa: ANN001
+            return sleepy if k == "sleepy" else _FakeEngine(healthy=True)
+
+        with mock.patch(
+            "nicx.motores._discovery._make_engine",
+            side_effect=_make,
+        ):
+            result = get_engine(cfg)
+
+        assert result == ("sleepy", sleepy)
 
     def test_skips_engine_that_cannot_serve_model(self) -> None:
         """A healthy engine that can't serve the requested model is

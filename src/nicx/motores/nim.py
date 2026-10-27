@@ -37,7 +37,11 @@ class NIMEngine(InferenceEngine):
 
     def __init__(self, host: str | None = None, *, timeout: float = 600.0) -> None:
         env_host = os.environ.get("NIM_HOST")
+        # Sem host configurado o NIM fica de fora: o padrão é o serviço da
+        # NVIDIA na internet, e o Nicx só usa modelos locais.
+        self._configured = bool(host or env_host)
         self._host = (host or env_host or self._default_host).rstrip("/")
+        self.is_cloud = "api.nvidia.com" in self._host
 
         api_key = os.environ.get("NIM_API_KEY", "")
         self._api_key = api_key if api_key else None
@@ -255,6 +259,8 @@ class NIMEngine(InferenceEngine):
         return [m["id"] for m in data.get("data", [])]
 
     def health(self) -> bool:
+        if not self._configured:
+            return False
         try:
             resp = self._client.get(
                 f"{self._api_prefix}/health/ready",

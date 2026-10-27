@@ -133,3 +133,11 @@ def test_health_falls_back_to_models(respx_mock) -> None:
     assert engine.health() is True
     assert models.called
     engine.close()
+
+
+def test_unconfigured_nim_stays_out(monkeypatch) -> None:
+    """Sem NIM_HOST, o padrão seria a NVIDIA na internet: fica de fora."""
+    monkeypatch.delenv("NIM_HOST", raising=False)
+    engine = NIMEngine()
+    assert engine.is_cloud
+    assert engine.health() is False
