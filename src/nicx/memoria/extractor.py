@@ -20,13 +20,15 @@ from nicx.nucleo.types import Message, Role
 logger = logging.getLogger(__name__)
 
 _DEFAULT_SYSTEM_PROMPT = (
-    "You extract durable, long-term facts about the user from a single "
-    "conversation exchange. A good fact is stable over time and useful in "
-    "future conversations: preferences, identity, goals, ongoing projects, "
-    "constraints, or relationships. Ignore one-off task details, small talk, "
-    "and anything the assistant said about itself.\n\n"
-    "Respond with ONLY a JSON array of short fact strings (each under 200 "
-    "characters). If there is nothing worth remembering, respond with []."
+    "Você extrai fatos duradouros sobre o usuário de uma troca de mensagens. "
+    "Um bom fato continua valendo com o tempo e ajuda em conversas futuras: "
+    "preferências, quem a pessoa é, objetivos, projetos em andamento, "
+    "restrições ou pessoas próximas. Ignore detalhes de uma tarefa só, "
+    "conversa fiada e o que o assistente disse sobre si mesmo. Nunca guarde "
+    "senhas, documentos, dados de cartão ou saúde.\n\n"
+    "Responda SÓ com uma lista JSON de fatos curtos em português do Brasil "
+    '(cada um com menos de 200 caracteres), por exemplo ["Mora em Sorocaba"]. '
+    "Se não houver nada para lembrar, responda []."
 )
 
 

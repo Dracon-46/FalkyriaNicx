@@ -498,3 +498,31 @@ def test_build_context_message_filters_untrusted_documents():
     # Defensive filtering protects direct callers that skip inject_context.
     msg = build_context_message([_doc("hostile", TRUST_UNTRUSTED)])
     assert "hostile" not in msg.content
+
+
+def test_facts_related_to_the_question_come_first():
+    messages = [Message(role=Role.USER, content="Qual é a minha cor favorita?")]
+    facts = [Fact(text="Gosta de café sem açúcar")] * 1 + [
+        Fact(text="A cor favorita do usuário é azul"),
+        Fact(text="Trabalha com vendas na Flexnyl"),
+    ]
+    augmented = inject_context(
+        "Qual é a minha cor favorita?",
+        messages,
+        None,
+        config=ContextConfig(facts_max_tokens=7),
+        facts=facts,
+    )
+    assert "A cor favorita do usuário é azul" in augmented[0].content
+    assert "café" not in augmented[0].content
+
+
+def test_facts_have_their_own_small_budget():
+    """Muitos fatos não podem inflar o prompt (modelo local relê tudo)."""
+    facts = [Fact(text=f"fato número {i} com seis palavras") for i in range(500)]
+    messages = [Message(role=Role.USER, content="oi")]
+    augmented = inject_context("oi", messages, None, facts=facts)
+    fact_lines = [
+        line for line in augmented[0].content.splitlines() if line.startswith("- ")
+    ]
+    assert 0 < len(fact_lines) * 6 <= ContextConfig().facts_max_tokens

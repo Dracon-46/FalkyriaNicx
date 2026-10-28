@@ -23,11 +23,35 @@ class ContextConfig:
     top_k: int = 5
     min_score: float = 0.0
     max_context_tokens: int = 2048
+    # Teto só para os fatos da memória automática. Modelos locais releem o
+    # prompt inteiro a cada pergunta: 2.048 tokens de fatos custariam 1-2 min
+    # por resposta numa CPU. Os relacionados à pergunta entram primeiro.
+    facts_max_tokens: int = 300
 
 
 def _count_tokens(text: str) -> int:
     """Approximate token count via whitespace split."""
     return len(text.split())
+
+
+def _words(text: str) -> set[str]:
+    """Palavras de 4+ letras, sem acento, para comparar fato e pergunta."""
+    import unicodedata
+
+    norm = unicodedata.normalize("NFKD", text.lower())
+    norm = "".join(
+        c if c.isalnum() else " " for c in norm if not unicodedata.combining(c)
+    )
+    return {w for w in norm.split() if len(w) >= 4}
+
+
+def _rank_facts(query: str, facts: Sequence[Fact]) -> List[Fact]:
+    """Mais novos primeiro; os que dividem palavras com a pergunta na frente."""
+    newest_first = list(reversed(facts))
+    asked = _words(query)
+    if not asked:
+        return newest_first
+    return sorted(newest_first, key=lambda f: -len(asked & _words(f.text)))
 
 
 def _trusted_facts(facts: Sequence[Fact]) -> List[Fact]:
@@ -186,12 +210,12 @@ def inject_context(
     # When both sources have data, cap facts at half the total budget so they
     # cannot starve query-specific document retrieval. Unused fact budget is
     # still available to documents. Newest facts win within the fact budget.
-    fact_budget = cfg.max_context_tokens
+    fact_budget = min(cfg.max_context_tokens, cfg.facts_max_tokens)
     if results:
-        fact_budget //= 2
+        fact_budget = min(fact_budget, cfg.max_context_tokens // 2)
     selected_facts: List[Fact] = []
     total_tokens = 0
-    for fact in reversed(_trusted_facts(facts)):
+    for fact in _rank_facts(query, _trusted_facts(facts)):
         tokens = _count_tokens(fact.text)
         if total_tokens + tokens > fact_budget:
             continue
