@@ -60,6 +60,15 @@ def _is_hash16(v: Any) -> bool:
     return all(c in "0123456789abcdef" for c in v)
 
 
+def _is_model_family(v: Any) -> bool:
+    """Família de modelo público ('qwen3.5', 'llama3.2'): minúsculas, sem espaços."""
+    if not isinstance(v, str) or not 0 < len(v) <= 32:
+        return False
+    return (
+        v[0].isalnum() and all(c.isalnum() or c in "._-" for c in v) and v == v.lower()
+    )
+
+
 def _is_one_of(*allowed: str) -> PropertyValidator:
     allowed_set = frozenset(allowed)
 
@@ -348,6 +357,40 @@ _SPECS: tuple[EventSpec, ...] = (
         properties={
             "granted": _is_bool,
             "policy_version": _is_short_str,
+        },
+    ),
+    # -- Saúde do servidor --------------------------------------------------
+    EventSpec(
+        name="server_started",
+        description=(
+            "The Nicx server started: engine, model family, whether Nicx had "
+            "to start Ollama, which voice features are on, startup time and "
+            "machine size (RAM, cores). No identifiers."
+        ),
+        properties={
+            "engine": _is_one_of(*_ENGINE_NAMES),
+            "model_family": _is_model_family,
+            "engine_autostarted": _is_bool,
+            "voice_input": _is_bool,
+            "voice_output": _is_bool,
+            "wake_word": _is_bool,
+            "quick_actions": _is_bool,
+            "startup_ms": _is_int_nonneg,
+            "ram_gb": _is_int_nonneg,
+            "cpu_cores": _is_int_nonneg,
+        },
+    ),
+    EventSpec(
+        name="server_health",
+        description=(
+            "Hourly while the server runs: memory used by Nicx, the machine's "
+            "RAM and CPU usage, and uptime."
+        ),
+        properties={
+            "rss_mb": _is_int_nonneg,
+            "ram_percent": _is_int_nonneg,
+            "cpu_percent": _is_int_nonneg,
+            "uptime_min": _is_int_nonneg,
         },
     ),
     # -- Daily rollup ------------------------------------------------------

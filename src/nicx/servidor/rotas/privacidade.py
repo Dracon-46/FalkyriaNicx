@@ -102,8 +102,21 @@ def stop_analytics(app: FastAPI, *, wait: bool = True) -> None:
     """Detach the event bridge and close the current analytics client."""
     bridge = getattr(app.state, "analytics_bridge", None)
     client = getattr(app.state, "analytics_client", None)
+    shipper = getattr(app.state, "log_shipper", None)
+    health = getattr(app.state, "health_reporter", None)
     app.state.analytics_bridge = None
     app.state.analytics_client = None
+    app.state.log_shipper = None
+    app.state.health_reporter = None
+    if health is not None:
+        health.stop()
+    if shipper is not None:
+        try:
+            from nicx.privacidade import logs
+
+            logs.uninstall(shipper)
+        except Exception:
+            logger.debug("Log shipper shutdown failed", exc_info=True)
     if client is not None and not wait:
         client.disable()
     if bridge is not None:
@@ -128,6 +141,31 @@ def configure_analytics(app: FastAPI, cfg: NicxConfig) -> None:
         bridge = EventBridge(bus, client)
         app.state.analytics_bridge = bridge
         bridge.start()
+    if client.enabled:
+        _start_logs_and_health(app, cfg, client)
+
+
+def _start_logs_and_health(
+    app: FastAPI, cfg: NicxConfig, client: AnalyticsClient
+) -> None:
+    """Avisos e erros (agrupados e limpos) e saúde do servidor, mesmo consentimento."""
+    try:
+        import nicx
+        from nicx.privacidade import logs
+        from nicx.privacidade.saude import HealthReporter
+        from nicx.privacidade.supabase_sink import install_context
+
+        shipper = logs.LogShipper(
+            cfg.analytics.host,
+            cfg.analytics.key,
+            client.anon_id,
+            context=install_context(nicx.__version__),
+        )
+        logs.install(shipper)
+        app.state.log_shipper = shipper
+        app.state.health_reporter = HealthReporter(client.capture)
+    except Exception:
+        logger.debug("Logs/saúde não iniciados", exc_info=True)
 
 
 @router.post("/preference", response_model=AnalyticsIdentity)

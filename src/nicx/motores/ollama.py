@@ -178,6 +178,40 @@ def _ollama_request_options(
     return options
 
 
+# O Ollama que o Nicx ligou neste processo: desliga junto quando o Nicx sai.
+_started: Any = None
+
+
+def started_by_nicx() -> bool:
+    """Se o Nicx precisou ligar o Ollama neste processo."""
+    return _started is not None
+
+
+def stop_started_server() -> None:
+    """Desliga o Ollama que o Nicx ligou (com os processos filhos dele, que
+    seguram o modelo na RAM). Um Ollama que a pessoa abriu nunca é tocado."""
+    global _started
+    process, _started = _started, None
+    if process is None or process.poll() is not None:
+        return
+    import subprocess
+    import sys
+
+    try:
+        if sys.platform == "win32":
+            subprocess.run(
+                ["taskkill", "/T", "/F", "/PID", str(process.pid)],
+                capture_output=True,
+                creationflags=subprocess.CREATE_NO_WINDOW,
+                check=False,
+            )
+        else:
+            process.terminate()
+        process.wait(timeout=5)
+    except Exception as exc:
+        logger.debug("Ollama ligado pelo Nicx não desligou: %s", exc)
+
+
 def _find_ollama() -> str | None:
     """Caminho do executável do Ollama: PATH ou a instalação padrão do Windows."""
     import shutil
@@ -673,8 +707,9 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
         # filhos (detecção da CPU, carga do modelo) e, sem console para
         # herdar, cada um deles piscava uma janela de cmd na tela.
         flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+        global _started
         try:
-            subprocess.Popen(
+            process = subprocess.Popen(
                 [exe, "serve"],
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.DEVNULL,
@@ -685,6 +720,10 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
         except OSError as exc:
             logger.warning("Não consegui ligar o Ollama (%s): %s", exe, exc)
             return False
+        _started = process
+        import atexit
+
+        atexit.register(stop_started_server)
         deadline = time.monotonic() + wait
         while time.monotonic() < deadline:
             time.sleep(0.5)

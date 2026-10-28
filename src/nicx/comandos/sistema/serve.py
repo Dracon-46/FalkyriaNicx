@@ -6,6 +6,7 @@ import logging
 import os
 import sys
 import threading
+import time
 
 import click
 from rich.console import Console
@@ -146,6 +147,7 @@ def serve(
     agent_name: str | None,
 ) -> None:
     """Start the OpenAI-compatible API server."""
+    started = time.monotonic()
     print_banner(quiet=(ctx.obj or {}).get("quiet", False))
     console = Console(stderr=True)
 
@@ -825,14 +827,52 @@ def serve(
     from nicx.acoes import lembretes
 
     lembretes.start_alarm()
+    _report_server_started(app, config, model_name, speech_backend, started)
     try:
         run_server(app, host=bind_host, port=bind_port, log_level="info")
     finally:
-        if ollama_host:
-            # Nicx closed: give the RAM back now, not after keep_alive.
-            from nicx.motores.ollama import OllamaEngine
+        from nicx.motores import ollama
 
-            OllamaEngine(host=ollama_host).unload(model_name)
+        if ollama.started_by_nicx():
+            # Foi o Nicx que ligou o Ollama: desliga tudo e a RAM volta inteira.
+            ollama.stop_started_server()
+        elif ollama_host:
+            # Nicx closed: give the RAM back now, not after keep_alive.
+            ollama.OllamaEngine(host=ollama_host).unload(model_name)
+
+
+def _report_server_started(
+    app, config, model_name, speech_backend, started: float
+) -> None:
+    """Com consentimento: com que motor, modelo e recursos o servidor abriu."""
+    client = getattr(app.state, "analytics_client", None)
+    if client is None or not client.enabled:
+        return
+    try:
+        from nicx.motores import ollama
+        from nicx.privacidade.events import KNOWN_ENGINES
+        from nicx.privacidade.saude import server_started_properties
+
+        engine = (
+            config.engine.default
+            if config.engine.default in KNOWN_ENGINES
+            else "unknown"
+        )
+        client.capture(
+            "server_started",
+            server_started_properties(
+                engine=engine,
+                model=model_name or "",
+                engine_autostarted=ollama.started_by_nicx(),
+                voice_input=speech_backend is not None,
+                voice_output=bool(getattr(config.speech, "tts_backend", "")),
+                wake_word=bool(getattr(config.speech, "wake_word", False)),
+                quick_actions=bool(getattr(config.agent, "quick_actions", False)),
+                startup_ms=int((time.monotonic() - started) * 1000),
+            ),
+        )
+    except Exception as exc:
+        logger.debug("server_started não enviado: %s", exc)
 
 
 def _local_ollama_host(engine: object) -> str | None:

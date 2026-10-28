@@ -1,6 +1,6 @@
 # Política de Privacidade do Nicx
 
-**Versão 2026-10-23**
+**Versão 2026-10-28**
 
 Esta política explica quais dados o **Nicx**, a inteligência artificial da
 **Falkyria**, trata, por quê, e como você controla isso. Ela vale para o
@@ -10,9 +10,10 @@ programa de linha de comando, o app desktop e a interface no navegador.
 
 - **Suas conversas, arquivos e memórias ficam no seu computador.** O Nicx roda
   com modelos de IA locais e não envia esse conteúdo para a Falkyria.
-- **Estatísticas de uso só com a sua permissão.** Se você aceitar, o Nicx envia
-  dados anônimos de uso (quais recursos você usa, tempos, erros), nunca o
-  conteúdo do que você escreve.
+- **Estatísticas e relatórios de erro só com a sua permissão.** Se você
+  aceitar, o Nicx envia dados anônimos de uso (quais recursos você usa, tempos,
+  erros e avisos técnicos, saúde do programa), nunca o conteúdo do que você
+  escreve.
 - **Você manda.** Pode recusar, mudar de ideia ou apagar o que já foi enviado a
   qualquer momento.
 
@@ -51,10 +52,12 @@ uso**:
 |---|---|
 | Eventos de uso | o app foi aberto; um recurso foi usado (voz, memória, ferramentas); uma sessão de conversa terminou |
 | Contagens e tempos | número de mensagens, tokens, tempo de resposta, duração da sessão |
-| Erros | apenas o tipo do erro (por exemplo, "modelo não encontrado") |
+| Erros mostrados | apenas o tipo do erro (por exemplo, "modelo não encontrado") |
+| Avisos e erros técnicos | a mensagem técnica do programa, limpa no seu computador antes do envio (sem textos entre aspas, caminhos, e-mails, links, IPs ou números longos), o tipo do erro, o ponto do código do Nicx onde ocorreu e quantas vezes aconteceu |
+| Saúde do Nicx | motor e família do modelo em uso (por exemplo, "qwen3.5"), se o Nicx precisou ligar o motor, recursos de voz ligados, tempo de abertura, memória usada pelo Nicx, uso de memória e processador do computador, total de memória e de núcleos |
 | Instalação | etapas concluídas ou que falharam |
 | Ambiente | versão do Nicx, sistema operacional, arquitetura do processador |
-| Modelo | identificador do modelo transformado em código irreversível (hash) |
+| Modelo | família pública do modelo (por exemplo, "qwen3.5") ou o identificador transformado em código irreversível (hash) |
 | Identificador | um código aleatório criado na instalação, que não revela quem você é |
 | Consentimento | quando você aceitou ou recusou, e a versão desta política |
 
@@ -86,11 +89,14 @@ As estatísticas são armazenadas no **Supabase**, em servidores localizados em
 **São Paulo, Brasil**. O Supabase atua como operador, tratando os dados apenas
 conforme as instruções da Falkyria.
 
-Os eventos são **apagados automaticamente após 24 meses**.
+Os eventos são **apagados automaticamente após 24 meses**; os avisos e erros
+técnicos, **após 90 dias**.
 
-O acesso é restrito a pessoas autorizadas da Falkyria. A comunicação é
-criptografada (HTTPS) e as regras do banco de dados só permitem que o Nicx
-**adicione** eventos: nenhuma instalação consegue ler os dados de outra.
+O acesso é restrito a administradores da Falkyria, que entram com senha **e**
+um código de verificação de um aplicativo autenticador; cada acesso fica
+registrado. A comunicação é criptografada (HTTPS) e as regras do banco de dados
+só permitem que o Nicx **adicione** dados: nenhuma instalação consegue ler os
+dados de outra.
 
 ## 7. Seus direitos
 

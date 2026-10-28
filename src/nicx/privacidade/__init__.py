@@ -23,7 +23,7 @@ from nicx.privacidade.redaction import hash_id, redact
 
 # Version of docs/legal/politica-de-privacidade.md shown when asking for
 # consent. Bump it whenever the policy changes so consent is asked again.
-POLICY_VERSION = "2026-10-23"
+POLICY_VERSION = "2026-10-28"
 
 __all__ = [
     "POLICY_VERSION",
