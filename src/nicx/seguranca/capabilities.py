@@ -280,6 +280,7 @@ DEFAULT_TOOL_CAPABILITIES: Dict[str, List[str]] = {
     # Lembretes e timers: só grava em ~/.nicx/lembretes.json.
     "lembrete": [Capability.TOOL_INVOKE],
     "agenda": [Capability.TOOL_INVOKE],
+    "arquivos": [Capability.TOOL_INVOKE, Capability.FILE_READ, Capability.FILE_WRITE],
 }
 
 _SAFE_BUILTIN_PROVENANCE = {

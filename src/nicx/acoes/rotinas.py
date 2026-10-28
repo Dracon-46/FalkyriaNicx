@@ -383,6 +383,171 @@ def _agenda_export(t: str) -> Optional[Action]:
 
 
 # ---------------------------------------------------------------------------
+# Arquivos, fotos e YouTube
+# ---------------------------------------------------------------------------
+
+_KIND_WORDS = {
+    "foto": "imagem",
+    "fotos": "imagem",
+    "imagem": "imagem",
+    "imagens": "imagem",
+    "print": "print",
+    "prints": "print",
+    "captura": "print",
+    "captura de tela": "print",
+    "video": "video",
+    "videos": "video",
+    "musica": "musica",
+    "musicas": "musica",
+    "pdf": "pdf",
+    "pdfs": "pdf",
+    "documento": "documento",
+    "documentos": "documento",
+    "planilha": "planilha",
+    "planilhas": "planilha",
+    "apresentacao": "apresentacao",
+    "arquivo": "",
+    "arquivos": "",
+    "download": "",
+}
+_KIND_RE = (
+    r"(?P<k>captura de tela|foto|imagem|print|captura|video|musica|pdf|documento"
+    r"|planilha|apresentacao|arquivo|download)s?"
+)
+_ART = r"(?: (?:a|o|as|os|um|uma|minha|meu|minhas|meus))?"
+
+
+def _folder_key(name: str) -> Optional[str]:
+    name = re.sub(
+        r"^(?:a pasta |pasta |os |as |meus |minhas |minha |meu |a |o )",
+        "",
+        name.strip(),
+    )
+    name = re.sub(r"^(?:de |dos |das |do |da )", "", name)
+    name = re.sub(r"^(?:meus |minhas )", "", name)
+    key = _FOLDER_ALIASES.get(name, name)
+    return key if key in FOLDERS else None
+
+
+def _youtube(text: str, t: str, where: list[int]) -> Optional[Action]:
+    """'toca Legião Urbana no YouTube', 'abre o vídeo X no youtube', 'toca X'."""
+    m = re.fullmatch(
+        r"(?:toca|toque|tocar|coloca|coloque|bota|poe|abre|abra|passa|reproduz|ve|ver)"
+        r"(?: (?:o|a|um|uma))?(?: (?:video|musica|clipe|som))?(?: (?:de|do|da))?"
+        r" (?P<q>.+?) no youtube",
+        t,
+    ) or re.fullmatch(
+        r"(?:toca|toque|tocar)(?: (?:a|o))?(?: (?:musica|clipe|video))?"
+        r"(?: (?:de|do|da))?"
+        r" (?P<q>.+)",
+        t,
+    )
+    if not m:
+        return None
+    q = m.group("q")
+    if q in ("", "musica", "a musica", "som", "o som", "video", "o video", "ai"):
+        return None  # "toca a música" é só continuar
+    query = original_text(text, where, m.start("q"), m.end("q"))
+    return Action("youtube", target=query) if query else None
+
+
+def _latest_file(t: str) -> Optional[Action]:
+    """'abre a última foto', 'mostra o último print', 'abre o último download'."""
+    m = re.fullmatch(
+        r"(?:abre|abra|mostra|mostre|ve|ver|exibe)"
+        + _ART
+        + r" (?:ultim[oa]|mais recente) "
+        + _KIND_RE
+        + r"(?: (?:que eu (?:tirei|baixei|salvei)|baixad[oa]))?",
+        t,
+    )
+    if not m:
+        return None
+    return Action("file_latest", target=_KIND_WORDS[m.group("k")] or "download")
+
+
+def _open_file(text: str, t: str, where: list[int]) -> Optional[Action]:
+    """'abre a foto da praia', 'abre o pdf do contrato', 'abre a planilha de gastos'."""
+    m = re.fullmatch(
+        r"(?:abre|abra|abrir|mostra|mostre)"
+        + _ART
+        + r" "
+        + _KIND_RE
+        + r" (?:de |da |do |das |dos |chamad[oa] |com o nome )?(?P<q>.+)",
+        t,
+    )
+    if not m or m.group("k") == "download":
+        return None
+    query = original_text(text, where, m.start("q"), m.end("q"))
+    return (
+        Action("file_open", target=query, op=_KIND_WORDS[m.group("k")])
+        if query
+        else None
+    )
+
+
+def _find_file(text: str, t: str, where: list[int]) -> Optional[Action]:
+    """'procura o arquivo do contrato', 'onde está a planilha de gastos'."""
+    m = re.fullmatch(
+        r"(?:procura|procure|acha|ache|encontra|encontre|busca|busque|localiza|localize)"
+        + _ART
+        + r" "
+        + _KIND_RE
+        + r" (?:de |da |do |das |dos |chamad[oa] |com o nome )?(?P<q>.+)",
+        t,
+    ) or re.fullmatch(
+        r"onde (?:esta|ta|fica|ficou|estao|foi parar)"
+        + _ART
+        + r" "
+        + _KIND_RE
+        + r" (?:de |da |do |das |dos |chamad[oa] )?(?P<q>.+)",
+        t,
+    )
+    if not m or m.group("k") == "download":
+        return None
+    query = original_text(text, where, m.start("q"), m.end("q"))
+    return (
+        Action("file_find", target=query, op=_KIND_WORDS[m.group("k")])
+        if query
+        else None
+    )
+
+
+def _list_folder(t: str) -> Optional[Action]:
+    """'o que tem na pasta downloads', 'lista os arquivos da área de trabalho'."""
+    m = re.fullmatch(
+        r"(?:o )?que (?:tem|ha) (?:na|no|em|nos|nas) (?P<f>.+)"
+        r"|(?:(?:lista|liste|listar|mostra|mostre) os arquivos d[aoe]s?"
+        r"|lista|liste|listar)"
+        r" (?P<f2>.+)",
+        t,
+    )
+    if not m:
+        return None
+    key = _folder_key(m.group("f") or m.group("f2"))
+    return Action("folder_list", target=key) if key else None
+
+
+def _organize(t: str) -> Optional[Action]:
+    """'organiza a pasta downloads', 'arruma a área de trabalho', 'desfaz'."""
+    if re.fullmatch(
+        r"(?:desfaz|desfaca|desfazer|volta|voltar)(?: a| o)?"
+        r" (?:organizacao|arrumacao|que voce organizou|como estava)",
+        t,
+    ):
+        return Action("organize_undo")
+    m = re.fullmatch(
+        r"(?:organiza|organize|organizar|arruma|arrume|arrumar|ajeita|ajeite)"
+        r"(?: a| o)? (?P<f>.+)",
+        t,
+    )
+    if not m:
+        return None
+    key = _folder_key(m.group("f"))
+    return Action("organize", target=key) if key else None
+
+
+# ---------------------------------------------------------------------------
 # PC: estado, pastas, print, fechar, energia
 # ---------------------------------------------------------------------------
 
@@ -479,11 +644,14 @@ def parse(text: str, t: str, where: list[int]) -> Optional[Action]:
         _agenda_export,
         _agenda_query,
         _agenda_cancel,
+        _organize,
+        _latest_file,
+        _list_folder,
     ):
         action = simple(t)
         if action is not None:
             return action
-    for with_text in (_agenda_add, _reminder, _note):
+    for with_text in (_youtube, _find_file, _open_file, _agenda_add, _reminder, _note):
         action = with_text(text, t, where)
         if action is not None:
             return action

@@ -31,6 +31,7 @@ _ACTIONS = {
     "estado_pc": ("status", ""),
     "print_tela": ("screenshot", ""),
     "bloquear_tela": ("lock", ""),
+    "tocar_youtube": ("youtube", ""),
 }
 
 
@@ -56,7 +57,10 @@ class ComputerControlTool(BaseTool):
                     "valor": {"type": "integer", "description": "volume 0-100"},
                     "alvo": {
                         "type": "string",
-                        "description": "app, site ou pasta; ou o texto a anotar",
+                        "description": (
+                            "app, site ou pasta; o texto a anotar; ou o que tocar"
+                            " no YouTube"
+                        ),
                     },
                 },
                 "required": ["acao"],
@@ -92,10 +96,11 @@ class ComputerControlTool(BaseTool):
                     self.tool_id, f"Não conheço '{target}'. Conheço: {known}.", False
                 )
             action = Action(kind, target=target)
-        elif kind == "note_add":
+        elif kind in ("note_add", "youtube"):
             text = str(params.get("alvo", "")).strip()
             if not text:
-                return ToolResult(self.tool_id, "Faltou o texto a anotar.", False)
+                missing = "o texto a anotar" if kind == "note_add" else "o que tocar"
+                return ToolResult(self.tool_id, f"Faltou {missing}.", False)
             action = Action(kind, target=text)
         elif kind == "volume" and op in ("up", "down"):
             action = Action(kind, op, STEP_NORMAL)
@@ -216,6 +221,88 @@ class AgendaTool(BaseTool):
             action = Action("agenda_cancel", target=normalize(f"{titulo} {quando}"))
         elif acao == "exportar":
             action = Action("agenda_export")
+        else:
+            return ToolResult(self.tool_id, f"Ação desconhecida: {acao}", False)
+        outcome = run(action)
+        return ToolResult(self.tool_id, outcome.message, success=outcome.ok)
+
+
+_FILE_KINDS = ["imagem", "print", "video", "musica", "pdf", "documento", "planilha"]
+
+
+@ToolRegistry.register("arquivos")
+class FilesTool(BaseTool):
+    """Arquivos do usuário: procurar, abrir, listar pasta e organizar."""
+
+    tool_id = "arquivos"
+    is_local = True
+
+    @property
+    def spec(self) -> ToolSpec:
+        return ToolSpec(
+            name="arquivos",
+            description=(
+                "Arquivos do usuário neste PC (Área de Trabalho, Documentos, Downloads,"
+                " Imagens, Vídeos, Músicas, OneDrive): procurar pelo nome, abrir com o"
+                " programa padrão, abrir o mais recente de um tipo, listar uma pasta,"
+                " organizar uma pasta em subpastas por tipo (pede confirmação) e"
+                " desfazer. Para ler o conteúdo de um arquivo achado, use file_read."
+            ),
+            parameters={
+                "type": "object",
+                "properties": {
+                    "acao": {
+                        "type": "string",
+                        "enum": [
+                            "procurar",
+                            "abrir",
+                            "abrir_mais_recente",
+                            "listar_pasta",
+                            "organizar_pasta",
+                            "desfazer_organizacao",
+                        ],
+                    },
+                    "busca": {"type": "string", "description": "parte do nome"},
+                    "tipo": {"type": "string", "enum": _FILE_KINDS},
+                    "pasta": {
+                        "type": "string",
+                        "description": "downloads, documentos, imagens, desktop...",
+                    },
+                },
+                "required": ["acao"],
+            },
+            category="system",
+        )
+
+    def execute(self, **params: Any) -> ToolResult:
+        from nicx.acoes.rotinas import _folder_key
+
+        acao = str(params.get("acao", ""))
+        busca = str(params.get("busca", "")).strip()
+        tipo = str(params.get("tipo", "") or "")
+        tipo = tipo if tipo in _FILE_KINDS else ""
+        if acao in ("procurar", "abrir"):
+            if not busca:
+                return ToolResult(
+                    self.tool_id, "Faltou a parte do nome a procurar.", False
+                )
+            kind = "file_find" if acao == "procurar" else "file_open"
+            action = Action(kind, target=busca, op="" if tipo == "print" else tipo)
+        elif acao == "abrir_mais_recente":
+            action = Action("file_latest", target=tipo or "download")
+        elif acao in ("listar_pasta", "organizar_pasta"):
+            key = _folder_key(normalize(str(params.get("pasta", ""))))
+            if key is None:
+                return ToolResult(
+                    self.tool_id,
+                    "Pasta desconhecida. Use downloads, documentos, imagens,"
+                    " musicas, videos ou area de trabalho.",
+                    False,
+                )
+            kind = "folder_list" if acao == "listar_pasta" else "organize"
+            action = Action(kind, target=key)
+        elif acao == "desfazer_organizacao":
+            action = Action("organize_undo")
         else:
             return ToolResult(self.tool_id, f"Ação desconhecida: {acao}", False)
         outcome = run(action)

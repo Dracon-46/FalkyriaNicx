@@ -11,7 +11,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Optional
 
-from nicx.acoes import agenda, confirmacao, lembretes, notas
+from nicx.acoes import agenda, arquivos, confirmacao, lembretes, notas, youtube
 from nicx.acoes.intencoes import Action
 from nicx.acoes.rotinas import CLOSABLE, FOLDERS
 from nicx.acoes.sistema import Outcome, _start, _windows_only
@@ -240,6 +240,8 @@ def confirm() -> Outcome:
     action = confirmacao.take()
     if action is None:
         return Outcome(False, "Não há nada esperando confirmação.")
+    if action.kind == "organize":
+        return _organize_now(action)
     if sys.platform != "win32":
         return _windows_only()
     if action.op == "shutdown":
@@ -384,6 +386,138 @@ def agenda_export() -> Outcome:
     return Outcome(True, f"Abri {n} no calendário do Windows: é só confirmar por lá.")
 
 
+# ---------------------------------------------------------------------------
+# Arquivos, fotos e YouTube
+# ---------------------------------------------------------------------------
+
+_KIND_LABEL = {
+    "imagem": ("foto", "fotos"),
+    "print": ("print", "prints"),
+    "video": ("vídeo", "vídeos"),
+    "musica": ("música", "músicas"),
+    "pdf": ("PDF", "PDFs"),
+    "documento": ("documento", "documentos"),
+    "planilha": ("planilha", "planilhas"),
+    "apresentacao": ("apresentação", "apresentações"),
+    "": ("arquivo", "arquivos"),
+    "download": ("download", "downloads"),
+}
+
+
+def _open_path(path: Path) -> Outcome:
+    _start(str(path))
+    return Outcome(True, f"Abrindo {arquivos.describe(path)}.")
+
+
+def file_latest(action: Action) -> Outcome:
+    kind = action.target
+    one, _many = _KIND_LABEL.get(kind, _KIND_LABEL[""])
+    if kind == "print":
+        path = arquivos.latest("imagem", arquivos.screenshots_folders() or None)
+    elif kind == "download":
+        downloads = folder_path("downloads")
+        newest = None
+        if downloads is not None:
+            files = [p for p in downloads.iterdir() if p.is_file()]
+            newest = max(files, key=lambda p: p.stat().st_mtime) if files else None
+        path = newest
+    else:
+        path = arquivos.latest(kind)
+    if path is None:
+        return Outcome(False, f"Não achei nenhum {one} nas suas pastas.")
+    return _open_path(path)
+
+
+def file_open(action: Action) -> Outcome:
+    one, _many = _KIND_LABEL.get(action.op, _KIND_LABEL[""])
+    found = arquivos.search(action.target, kind=action.op or None, limit=5)
+    if not found:
+        return Outcome(False, f'Não achei {one} com "{action.target}" no nome.')
+    outcome = _open_path(found[0])
+    if len(found) > 1:
+        outcome = Outcome(
+            True, f"{outcome.message} Achei outros {len(found) - 1} parecidos."
+        )
+    return outcome
+
+
+def file_find(action: Action) -> Outcome:
+    one, many = _KIND_LABEL.get(action.op, _KIND_LABEL[""])
+    found = arquivos.search(action.target, kind=action.op or None, limit=5)
+    if not found:
+        return Outcome(False, f'Não achei {one} com "{action.target}" no nome.')
+    names = "; ".join(arquivos.describe(p) for p in found)
+    head = f"Achei {_plural(len(found), one, many)}"
+    return Outcome(True, f"{head}: {names}.")
+
+
+def folder_list(action: Action) -> Outcome:
+    path = folder_path(action.target)
+    label = FOLDERS[action.target][0] if action.target in FOLDERS else action.target
+    if path is None:
+        return Outcome(False, f"Não achei a pasta {label}.")
+    names, total = arquivos.list_folder(path, limit=10)
+    if total == 0:
+        return Outcome(True, f"A pasta {label} está vazia.")
+    more = f" e mais {total - len(names)}" if total > len(names) else ""
+    return Outcome(
+        True, f"Em {label} (mais recentes): " + "; ".join(names) + more + "."
+    )
+
+
+def organize(action: Action) -> Outcome:
+    path = folder_path(action.target)
+    label = FOLDERS[action.target][0] if action.target in FOLDERS else action.target
+    if path is None:
+        return Outcome(False, f"Não achei a pasta {label}.")
+    groups = arquivos.plan(path)
+    total = sum(len(files) for files in groups.values())
+    if total == 0:
+        return Outcome(True, f"{label} já está organizada: nada solto para mover.")
+    resumo = ", ".join(f"{name} {len(files)}" for name, files in sorted(groups.items()))
+    confirmacao.ask(action)
+    return Outcome(
+        True,
+        f"Vou separar {_plural(total, 'arquivo', 'arquivos')} de {label} em pastas"
+        f" ({resumo}). Nada é apagado e dá para desfazer."
+        ' Diga "confirmo" em até 30 segundos.',
+    )
+
+
+def _organize_now(action: Action) -> Outcome:
+    path = folder_path(action.target)
+    if path is None:
+        return Outcome(False, "Não achei a pasta.")
+    moved, _log = arquivos.organize(path, arquivos.plan(path))
+    label = FOLDERS[action.target][0]
+    return Outcome(
+        True,
+        f"Pronto: {_plural(moved, 'arquivo organizado', 'arquivos organizados')} em"
+        f' {label}. Se não gostar, diga "desfaz a organização".',
+    )
+
+
+def organize_undo() -> Outcome:
+    result = arquivos.undo_last()
+    if result is None:
+        return Outcome(True, "Não há organização para desfazer.")
+    restored, folder_name = result
+    return Outcome(
+        True,
+        f"Desfeito: {_plural(restored, 'arquivo voltou', 'arquivos voltaram')}"
+        f" para {folder_name}.",
+    )
+
+
+def play_youtube(action: Action) -> Outcome:
+    url = youtube.first_video(action.target)
+    if url is None:
+        _start(youtube.search_url(action.target))
+        return Outcome(True, f"Abri a busca por {action.target} no YouTube.")
+    _start(url)
+    return Outcome(True, f"Tocando {action.target} no YouTube.")
+
+
 def run(action: Action) -> Optional[Outcome]:
     """Executa uma rotina; None se a ação não for uma rotina."""
     simple = {
@@ -393,6 +527,7 @@ def run(action: Action) -> Optional[Outcome]:
         "status": status,
         "screenshot": screenshot,
         "agenda_export": agenda_export,
+        "organize_undo": organize_undo,
         "confirm": confirm,
         "deny": deny,
     }
@@ -403,6 +538,12 @@ def run(action: Action) -> Optional[Outcome]:
         "agenda_add": agenda_add,
         "agenda_list": agenda_list,
         "agenda_cancel": agenda_cancel,
+        "file_latest": file_latest,
+        "file_open": file_open,
+        "file_find": file_find,
+        "folder_list": folder_list,
+        "organize": organize,
+        "youtube": play_youtube,
         "remind_clear": remind_clear,
         "remind_cancel": remind_cancel,
         "note_add": note_add,

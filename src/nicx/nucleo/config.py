@@ -2211,7 +2211,7 @@ default_agent = "simple"
 
 [tools]
 enabled = [
-    "controle_pc", "lembrete", "agenda", "code_interpreter",
+    "controle_pc", "lembrete", "agenda", "arquivos", "code_interpreter",
     "web_search", "file_read", "shell_exec",
 ]
 """

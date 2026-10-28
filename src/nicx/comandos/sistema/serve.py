@@ -29,7 +29,15 @@ from nicx.nucleo.paths import get_config_dir
 logger = logging.getLogger(__name__)
 
 _DEFAULT_TOOLS = frozenset(
-    {"think", "calculator", "web_search", "controle_pc", "lembrete", "agenda"}
+    {
+        "think",
+        "calculator",
+        "web_search",
+        "controle_pc",
+        "lembrete",
+        "agenda",
+        "arquivos",
+    }
 )
 
 

@@ -59,6 +59,7 @@ def test_serve_defaults_tools_when_no_selection_is_configured():
         "controle_pc",
         "lembrete",
         "agenda",
+        "arquivos",
     }
     assert explicit is False
 
