@@ -14,8 +14,6 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:tauri": "tsc -b && vite build --outDir dist",
-    "build:painel": "tsc -b && vite build -c vite.painel.config.ts",
-    "deploy:painel": "npm run build:painel && node scripts/deploy-painel.mjs",
     "preview": "vite preview",
     "tauri": "tauri",
     "test": "vitest run"

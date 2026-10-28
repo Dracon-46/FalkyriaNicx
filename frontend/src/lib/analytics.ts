@@ -71,12 +71,6 @@ export interface ForgetResult {
   anon_id: string;
 }
 
-export interface DashboardConfig {
-  supabase_url: string;
-  supabase_key: string;
-  policy_version: string;
-}
-
 interface AnalyticsState {
   identity: AnalyticsIdentity | null;
 }
@@ -215,25 +209,6 @@ export async function fetchLegalDocument(name: LegalDocument): Promise<string> {
   }
   legalCache.set(name, text);
   return text;
-}
-
-/** Public settings the Falkyria dashboard needs to sign administrators in. */
-export async function fetchDashboardConfig(): Promise<DashboardConfig> {
-  let response: Response;
-  try {
-    response = await apiFetch('/v1/analytics/dashboard-config');
-  } catch {
-    throw new Error('Não foi possível falar com o servidor do Nicx.');
-  }
-  if (!response.ok) {
-    throw new Error(await errorDetail(response, 'Não foi possível ler a configuração do painel.'));
-  }
-  const body = await response.json();
-  return {
-    supabase_url: String(body?.supabase_url ?? ''),
-    supabase_key: String(body?.supabase_key ?? ''),
-    policy_version: String(body?.policy_version ?? ''),
-  };
 }
 
 /**

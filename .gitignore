@@ -67,7 +67,6 @@ site/
 # Frontend
 frontend/node_modules/
 frontend/dist/
-frontend/dist-painel/
 
 # Desktop
 desktop/
