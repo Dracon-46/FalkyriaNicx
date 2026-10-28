@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, Optional
+from urllib.parse import quote, unquote
 
 from nicx.nucleo import config
 
@@ -30,6 +31,17 @@ class BgStatus:
         if any(s != "ready" for s in self.models.values()):
             return False
         return True
+
+
+def marker_name(model_id: str, state: str) -> str:
+    """Nome do arquivo marcador de um modelo: ``qwen3.5%3A4b.ready``.
+
+    ``:`` e ``/`` aparecem em nomes de modelo ("qwen3.5:4b", "hf.co/x/y"),
+    mas num arquivo do Windows o ``:`` abre um fluxo NTFS escondido e o ``/``
+    é pasta. O nome vai codificado; ``get_status`` decodifica (e ainda lê os
+    marcadores antigos, sem codificação, criados no Linux e no macOS).
+    """
+    return f"{quote(model_id, safe='')}.{state}"
 
 
 def _safe_read(path: Path) -> Optional[str]:
@@ -71,7 +83,7 @@ def get_status(home: Optional[Path] = None) -> BgStatus:
         for f in models_dir.iterdir():
             if f.suffix not in (".downloading", ".ready", ".failed"):
                 continue
-            model_id = f.name[: -len(f.suffix)]
+            model_id = unquote(f.name[: -len(f.suffix)])
             new_state = f.suffix.lstrip(".")
             current = seen.get(model_id, "")
             # Precedence: ready > failed > downloading

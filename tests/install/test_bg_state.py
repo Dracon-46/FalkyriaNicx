@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from nicx.comandos.instalacao import _bg_state
+from nicx.comandos.instalacao._bg_state import get_status, marker_name
 from nicx.nucleo import rust as _rust_bridge
 
 
@@ -51,19 +52,25 @@ def test_get_status_rust_failed(tmp_nicx_home: Path) -> None:
 
 
 def test_get_status_model_downloading(tmp_nicx_home: Path) -> None:
-    (tmp_nicx_home / ".state" / "models" / "qwen3.5:9b.downloading").write_text("")
+    (
+        tmp_nicx_home / ".state" / "models" / marker_name("qwen3.5:9b", "downloading")
+    ).write_text("")
     s = _bg_state.get_status()
     assert s.models == {"qwen3.5:9b": "downloading"}
 
 
 def test_get_status_model_ready(tmp_nicx_home: Path) -> None:
-    (tmp_nicx_home / ".state" / "models" / "qwen3.5:9b.ready").write_text("")
+    (
+        tmp_nicx_home / ".state" / "models" / marker_name("qwen3.5:9b", "ready")
+    ).write_text("")
     s = _bg_state.get_status()
     assert s.models == {"qwen3.5:9b": "ready"}
 
 
 def test_get_status_model_failed(tmp_nicx_home: Path) -> None:
-    (tmp_nicx_home / ".state" / "models" / "qwen3.5:9b.failed").write_text("net error")
+    (
+        tmp_nicx_home / ".state" / "models" / marker_name("qwen3.5:9b", "failed")
+    ).write_text("net error")
     s = _bg_state.get_status()
     assert s.models == {"qwen3.5:9b": "failed"}
 
@@ -71,22 +78,26 @@ def test_get_status_model_failed(tmp_nicx_home: Path) -> None:
 def test_get_status_ready_supersedes_downloading(tmp_nicx_home: Path) -> None:
     """If both .downloading and .ready exist (race window), .ready wins."""
     models_dir = tmp_nicx_home / ".state" / "models"
-    (models_dir / "qwen3.5:9b.downloading").write_text("")
-    (models_dir / "qwen3.5:9b.ready").write_text("")
+    (models_dir / marker_name("qwen3.5:9b", "downloading")).write_text("")
+    (models_dir / marker_name("qwen3.5:9b", "ready")).write_text("")
     s = _bg_state.get_status()
     assert s.models["qwen3.5:9b"] == "ready"
 
 
 def test_all_ready_true_when_all_ready(tmp_nicx_home: Path) -> None:
     (tmp_nicx_home / ".state" / "extension-built").write_text("")
-    (tmp_nicx_home / ".state" / "models" / "qwen3.5:9b.ready").write_text("")
+    (
+        tmp_nicx_home / ".state" / "models" / marker_name("qwen3.5:9b", "ready")
+    ).write_text("")
     s = _bg_state.get_status()
     assert s.all_ready() is True
 
 
 def test_all_ready_false_when_anything_pending(tmp_nicx_home: Path) -> None:
     (tmp_nicx_home / ".state" / "extension-built").write_text("")
-    (tmp_nicx_home / ".state" / "models" / "qwen3.5:9b.downloading").write_text("")
+    (
+        tmp_nicx_home / ".state" / "models" / marker_name("qwen3.5:9b", "downloading")
+    ).write_text("")
     s = _bg_state.get_status()
     assert s.all_ready() is False
 
@@ -99,3 +110,11 @@ def test_get_status_handles_deleted_file_race(tmp_nicx_home: Path) -> None:
     # No assertion error expected
     s = _bg_state.get_status()
     assert s.rust_extension == "pending"
+
+
+def test_marker_names_survive_windows_filenames(tmp_nicx_home: Path) -> None:
+    """':' e '/' no nome do modelo não podem virar fluxo NTFS nem pasta."""
+    name = marker_name("hf.co/usuario/modelo:4b", "ready")
+    assert ":" not in name and "/" not in name
+    (tmp_nicx_home / ".state" / "models" / name).write_text("")
+    assert get_status(tmp_nicx_home).models == {"hf.co/usuario/modelo:4b": "ready"}
