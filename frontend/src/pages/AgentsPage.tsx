@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { toast } from 'sonner';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { useAppStore } from '../lib/store';
 import {
@@ -1573,6 +1573,11 @@ type LiveItem =
   | { kind: 'note'; id: string; label: string }
   | { kind: 'tool'; id: string; tool: ToolCallInfo };
 
+/** Resultado de uma execução ('success' / 'error') no idioma da interface. */
+function outcomeLabel(outcome: string): string {
+  return i18n.t(`agents.outcome.${camelKey(outcome)}`, { defaultValue: outcome });
+}
+
 /** Convert a persisted trace step into a ToolCallInfo for ToolCallCard. */
 function stepToToolCall(
   step: AgentTraceDetail['steps'][number],
@@ -1804,7 +1809,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
       setRunning(true);
       onRunStateChange?.(); // flip the parent status badge to "running" now
     } catch {
-      setErrorMsg('Could not start the agent run.');
+      setErrorMsg(t('agents.interact.startFailed'));
       setLiveItems([]);
     } finally {
       setSending(false);
@@ -1824,7 +1829,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
           style={{ color: 'var(--color-text)' }}
         >
           <Activity size={14} style={{ color: 'var(--color-accent)' }} />
-          Activity trace
+          {t('agents.interact.activityTrace')}
         </div>
         <div
           className="flex items-center gap-2 text-xs"
@@ -1836,14 +1841,14 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
                 className="inline-block w-2 h-2 rounded-full animate-pulse"
                 style={{ background: 'var(--color-accent)' }}
               />
-              Running{elapsedMs > 0 ? ` · ${(elapsedMs / 1000).toFixed(1)}s` : ''}
+              {t('agents.interact.running')}{elapsedMs > 0 ? ` · ${(elapsedMs / 1000).toFixed(1)}s` : ''}
             </>
           ) : (
             <>
               {agent?.last_run_at
-                ? `Last run ${new Date(agent.last_run_at * 1000).toLocaleString()}`
-                : 'Idle'}
-              {lastTrace && ` · ${lastTrace.outcome}`}
+                ? t('agents.interact.lastRunAt', { time: new Date(agent.last_run_at * 1000).toLocaleString(i18n.language) })
+                : t('agents.interact.idle')}
+              {lastTrace && ` · ${outcomeLabel(lastTrace.outcome)}`}
             </>
           )}
         </div>
@@ -1861,7 +1866,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
       >
         {question && (
           <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-            <span style={{ color: 'var(--color-text-secondary)' }}>Question:</span> {question}
+            <span style={{ color: 'var(--color-text-secondary)' }}>{t('agents.interact.question')}</span> {question}
           </div>
         )}
 
@@ -1903,7 +1908,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
               style={{ color: 'var(--color-text-secondary)' }}
             >
               <Loader2 size={13} className="animate-spin" style={{ color: 'var(--color-accent)' }} />
-              {activity || 'Agent is working…'}
+              {activity || t('agents.interact.working')}
             </div>
           </>
         ) : (
@@ -1926,7 +1931,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
                 }}
               >
                 <div className="text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>
-                  Result
+                  {t('agents.interact.result')}
                 </div>
                 <div className="prose prose-sm prose-invert max-w-none">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{findings}</ReactMarkdown>
@@ -1938,7 +1943,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
                   className="text-sm text-center py-8"
                   style={{ color: 'var(--color-text-tertiary)' }}
                 >
-                  No runs yet. Ask a question below to run the agent.
+                  {t('agents.interact.empty')}
                 </div>
               )
             )}
@@ -1958,7 +1963,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
               handleAsk();
             }
           }}
-          placeholder={isBusy ? 'Agent is running…' : "Ask a follow-up about this agent's work…"}
+          placeholder={isBusy ? t('agents.interact.placeholderBusy') : t('agents.interact.placeholder')}
           disabled={isBusy}
           className="w-full px-3 py-2 rounded-lg text-sm bg-transparent outline-none resize-none"
           style={{
@@ -1970,7 +1975,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
         />
         <div className="flex items-center justify-between mt-2">
           <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-            Sends your question as an ad-hoc run — results appear in the trace above.
+            {t('agents.interact.hint')}
           </span>
           <button
             onClick={handleAsk}
@@ -1983,7 +1988,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
             }}
           >
             {isBusy ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
-            {isBusy ? 'Running' : 'Ask'}
+            {isBusy ? t('agents.interact.running') : t('agents.interact.ask')}
           </button>
         </div>
       </div>
@@ -1996,6 +2001,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
 // ---------------------------------------------------------------------------
 
 function ChannelsTab({ agentId }: { agentId: string }) {
+  const { t } = useTranslation();
   const [connectors, setConnectors] = useState<
     Array<{ connector_id: string; display_name: string; connected: boolean; chunks: number }>
   >([]);
@@ -2069,7 +2075,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
         color: 'var(--color-text-secondary)',
         fontSize: 12, marginBottom: 12,
       }}>
-        Data sources your agent can search across
+        {t('agents.dataSources.intro')}
       </div>
 
       {/* Connected sources grid */}
@@ -2081,7 +2087,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
         }}>
           {connected.map((c) => {
             const meta = SOURCE_CATALOG.find(s => s.connector_id === c.connector_id);
-            const unit = meta?.unitLabel || 'items';
+            const unit = meta?.unitLabel || t('agents.dataSources.items');
             const isReconnecting = expandedId === c.connector_id;
             return (
             <div
@@ -2105,8 +2111,8 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                   </div>
                   <div style={{ fontSize: 12, color: c.chunks > 0 ? 'var(--color-success)' : 'var(--color-warning)' }}>
                     {c.chunks > 0
-                      ? `${c.chunks.toLocaleString()} ${unit}`
-                      : 'Connected — no data synced yet'}
+                      ? `${c.chunks.toLocaleString(i18n.language)} ${unit}`
+                      : t('agents.dataSources.connectedNoData')}
                   </div>
                 </div>
                 <button
@@ -2119,7 +2125,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                     borderRadius: 4, cursor: 'pointer',
                   }}
                 >
-                  {isReconnecting ? 'Cancel' : 'Reconnect'}
+                  {isReconnecting ? t('agents.common.cancel') : t('agents.common.reconnect')}
                 </button>
               </div>
               {isReconnecting && meta?.steps && (
@@ -2131,7 +2137,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                     fontSize: 12, color: 'var(--color-warning)',
                     marginBottom: 8,
                   }}>
-                    Re-enter credentials to reconnect this source.
+                    {t('agents.dataSources.reenterCredentials')}
                   </div>
                   {meta.steps.map((step, i) => (
                     <div
@@ -2147,7 +2153,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                         color: 'var(--color-accent-purple)', fontSize: 10,
                         fontWeight: 600, marginBottom: 3,
                       }}>
-                        STEP {i + 1}
+                        {t('agents.dataSources.step', { n: i + 1 })}
                       </div>
                       <div style={{ fontSize: 12, marginBottom: step.url ? 4 : 0 }}>
                         {step.label}
@@ -2162,7 +2168,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                             textDecoration: 'underline',
                           }}
                         >
-                          {step.urlLabel || 'Open'} →
+                          {step.urlLabel || t('agents.common.open')} →
                         </a>
                       )}
                     </div>
@@ -2222,13 +2228,13 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                     </div>
                     <div style={{ fontSize: 12,
                       color: 'var(--color-text-secondary)' }}>
-                      Not connected
+                      {t('agents.dataSources.notConnected')}
                     </div>
                   </div>
                   <span style={{
                     color: 'var(--color-accent-purple)', fontSize: 11, fontWeight: 500,
                   }}>
-                    {isExpanded ? '\u2715 Close' : '+ Add'}
+                    {isExpanded ? `\u2715 ${t('agents.common.close')}` : `+ ${t('agents.common.add')}`}
                   </span>
                 </div>
 
@@ -2252,7 +2258,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                           color: 'var(--color-accent-purple)', fontSize: 10,
                           fontWeight: 600, marginBottom: 3,
                         }}>
-                          STEP {i + 1}
+                          {t('agents.dataSources.step', { n: i + 1 })}
                         </div>
                         <div style={{
                           fontSize: 12, marginBottom: step.url ? 4 : 0,
@@ -2269,7 +2275,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                               textDecoration: 'underline',
                             }}
                           >
-                            {step.urlLabel || 'Open'} {'\u2192'}
+                            {step.urlLabel || t('agents.common.open')} {'\u2192'}
                           </a>
                         )}
                       </div>
@@ -2287,7 +2293,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                       fontSize: 10, color: 'var(--color-text-secondary)',
                       textAlign: 'center', marginTop: 8,
                     }}>
-                      {'\uD83D\uDD12'} Read-only access {'\u00B7'} No data leaves your device
+                      {'\uD83D\uDD12'} {t('agents.dataSources.readOnly')} {'\u00B7'} {t('agents.dataSources.staysLocal')}
                     </div>
                   </div>
                 )}
@@ -2309,6 +2315,7 @@ function InlineConnectForm({
   loading: boolean;
   onSubmit: (req: ConnectRequest) => void;
 }) {
+  const { t } = useTranslation();
   const [inputs, setInputs] = useState<Record<string, string>>({});
 
   const update = (name: string, value: string) =>
@@ -2361,7 +2368,7 @@ function InlineConnectForm({
           borderRadius: 6, fontSize: 12, cursor: 'pointer',
         }}
       >
-        {loading ? 'Connecting...' : 'Connect'}
+        {loading ? t('agents.common.connecting') : t('agents.common.connect')}
       </button>
     </div>
   );
@@ -2390,32 +2397,38 @@ interface MessagingChannelConfig {
   howToUse: (cfg: Record<string, unknown>) => string;
 }
 
-const MESSAGING_CHANNELS: MessagingChannelConfig[] = [
-  // SendBlue (iMessage + SMS) is handled by the dedicated SendBlueWizard above.
-  // These are the other supported channels.
-  {
-    type: 'slack',
-    name: 'Slack',
-    icon: '#',
-    description: 'DM your agent in any Slack workspace',
-    setupSteps: [
-      '1. Go to api.slack.com/apps → click "Create New App" → choose "From an app manifest"',
-      '2. Select your workspace. When asked for the manifest format, choose JSON. Then paste the manifest below (click "Copy" to copy it):',
-      'COPYABLE:{"display_information":{"name":"Nicx"},"features":{"app_home":{"home_tab_enabled":true,"messages_tab_enabled":true,"messages_tab_read_only_enabled":false},"bot_user":{"display_name":"Nicx","always_online":true}},"oauth_config":{"scopes":{"bot":["chat:write","im:write","im:read","im:history","mpim:read","mpim:history","users:read","channels:read","channels:history","channels:join","groups:read","groups:history","app_mentions:read"]}},"settings":{"event_subscriptions":{"bot_events":["message.im"]},"socket_mode_enabled":true}}',
-      '3. Click "Next" → review the summary → click "Create". Then go to "Install App" in the left sidebar → click "Install to Workspace" → click "Allow"',
-      '4. In the left sidebar, click "OAuth & Permissions". Copy the "Bot User OAuth Token" (starts with xoxb-...)',
-      '5. In the left sidebar, click "Basic Information" → scroll to "App-Level Tokens" → click "Generate Token and Scopes" → name it "socket" → click "Add Scope" → select "connections:write" → click "Generate" → copy the token (starts with xapp-...)',
-      '6. (Optional) Still in "Basic Information", scroll to "Display Information" → upload the Nicx icon as the app icon',
-      '7. Paste both tokens below and click Connect',
-    ],
-    fields: [
-      { key: 'bot_token', label: 'Bot Token', placeholder: 'xoxb-...', type: 'password', required: true },
-      { key: 'app_token', label: 'App Token', placeholder: 'xapp-...', type: 'password', required: true },
-    ],
-    activeLabel: () => 'Connected to Slack',
-    howToUse: () => 'Open Slack and DM @Nicx to talk to your agent.',
-  },
-];
+const SLACK_MANIFEST = 'COPYABLE:{"display_information":{"name":"Nicx"},"features":{"app_home":{"home_tab_enabled":true,"messages_tab_enabled":true,"messages_tab_read_only_enabled":false},"bot_user":{"display_name":"Nicx","always_online":true}},"oauth_config":{"scopes":{"bot":["chat:write","im:write","im:read","im:history","mpim:read","mpim:history","users:read","channels:read","channels:history","channels:join","groups:read","groups:history","app_mentions:read"]}},"settings":{"event_subscriptions":{"bot_events":["message.im"]},"socket_mode_enabled":true}}';
+
+/** Canais de mensagem (textos no idioma atual da interface). */
+function messagingChannels(): MessagingChannelConfig[] {
+  const t = i18n.t.bind(i18n);
+  return [
+    // SendBlue (iMessage + SMS) is handled by the dedicated SendBlueWizard above.
+    // These are the other supported channels.
+    {
+      type: 'slack',
+      name: 'Slack',
+      icon: '#',
+      description: t('agents.slack.description'),
+      setupSteps: [
+        t('agents.slack.step1'),
+        t('agents.slack.step2'),
+        SLACK_MANIFEST,
+        t('agents.slack.step3'),
+        t('agents.slack.step4'),
+        t('agents.slack.step5'),
+        t('agents.slack.step6'),
+        t('agents.slack.step7'),
+      ],
+      fields: [
+        { key: 'bot_token', label: t('agents.slack.botToken'), placeholder: 'xoxb-...', type: 'password', required: true },
+        { key: 'app_token', label: t('agents.slack.appToken'), placeholder: 'xapp-...', type: 'password', required: true },
+      ],
+      activeLabel: () => t('agents.slack.active'),
+      howToUse: () => t('agents.slack.howToUse'),
+    },
+  ];
+}
 
 // ---------------------------------------------------------------------------
 // SendBlue webhook step — ngrok tunnel + registration
@@ -2426,6 +2439,7 @@ function SendBlueWebhookStep({
 }: {
   apiKey: string; apiSecret: string; selectedNumber: string;
 }) {
+  const { t } = useTranslation();
   const [webhookUrl, setWebhookUrl] = useState('');
   const [webhookStatus, setWebhookStatus] = useState<'idle' | 'registering' | 'done' | 'error'>('idle');
 
@@ -2448,7 +2462,7 @@ function SendBlueWebhookStep({
         borderRadius: 6, padding: 12, marginBottom: 12, textAlign: 'center',
       }}>
         <div style={{ fontSize: 11, color: 'var(--color-success)', fontWeight: 600, marginBottom: 4 }}>
-          {'\u2713'} Your agent is now reachable via iMessage / SMS
+          {'\u2713'} {t('agents.sendblue.reachable')}
         </div>
         <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-success)' }}>{selectedNumber}</div>
       </div>
@@ -2457,7 +2471,7 @@ function SendBlueWebhookStep({
       <div style={{ marginTop: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <span style={{ background: 'var(--color-accent-purple)', color: 'var(--color-on-accent)', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>4</span>
-          <span style={{ fontSize: 12, fontWeight: 600 }}>Set up webhook to receive texts</span>
+          <span style={{ fontSize: 12, fontWeight: 600 }}>{t('agents.sendblue.webhookTitle')}</span>
         </div>
         <div style={{
           fontSize: 11, lineHeight: 1.6,
@@ -2467,9 +2481,9 @@ function SendBlueWebhookStep({
           borderRadius: 6,
           borderLeft: '3px solid var(--color-accent, var(--color-accent-purple))',
         }}>
-          <div><strong>1.</strong> Open a terminal and run: <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }}>ngrok http 8000</code></div>
-          <div style={{ marginTop: 4 }}><strong>2.</strong> Copy the <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }}>https://</code> forwarding URL</div>
-          <div style={{ marginTop: 4 }}><strong>3.</strong> Paste it below and click "Register Webhook"</div>
+          <div><strong>1.</strong> <Trans i18nKey="agents.sendblue.webhookStep1" components={{ code: <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }} /> }} /></div>
+          <div style={{ marginTop: 4 }}><strong>2.</strong> <Trans i18nKey="agents.sendblue.webhookStep2" components={{ code: <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }} /> }} /></div>
+          <div style={{ marginTop: 4 }}><strong>3.</strong> {t('agents.sendblue.webhookStep3')}</div>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           <input
@@ -2493,24 +2507,24 @@ function SendBlueWebhookStep({
               opacity: !webhookUrl.trim() || webhookStatus === 'registering' ? 0.5 : 1,
             }}
           >
-            {webhookStatus === 'registering' ? 'Registering...'
-              : webhookStatus === 'done' ? 'Registered!'
-              : webhookStatus === 'error' ? 'Retry'
-              : 'Register Webhook'}
+            {webhookStatus === 'registering' ? t('agents.sendblue.registering')
+              : webhookStatus === 'done' ? t('agents.sendblue.registered')
+              : webhookStatus === 'error' ? t('agents.common.retry')
+              : t('agents.sendblue.registerWebhook')}
           </button>
         </div>
         {webhookStatus === 'done' && (
           <div style={{ fontSize: 11, color: 'var(--color-success)', marginTop: 6 }}>
-            Webhook registered! Incoming texts will be forwarded to your agent.
+            {t('agents.sendblue.webhookDone')}
           </div>
         )}
         {webhookStatus === 'error' && (
           <div style={{ fontSize: 11, color: 'var(--color-error)', marginTop: 6 }}>
-            Failed to register. Check your ngrok URL and try again.
+            {t('agents.sendblue.webhookFailed')}
           </div>
         )}
         <div style={{ fontSize: 10, color: 'var(--color-text-tertiary)', marginTop: 8 }}>
-          Don't have ngrok? <a href="https://ngrok.com/download" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>Download it free</a>
+          {t('agents.sendblue.noNgrok')} <a href="https://ngrok.com/download" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>{t('agents.sendblue.downloadNgrok')}</a>
         </div>
       </div>
     </div>
@@ -2532,6 +2546,7 @@ function SendBlueWizard({
   onDone: () => void;
   onRemove: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [step, setStep] = useState<'idle' | 'creds' | 'verifying' | 'verified' | 'connecting' | 'done' | 'test'>('idle');
   const [apiKey, setApiKey] = useState('');
@@ -2606,7 +2621,7 @@ function SendBlueWizard({
         setSelectedNumber('');
         setStep('verified');
       } else {
-        setError('Invalid credentials. Check your API key and secret.');
+        setError(t('agents.sendblue.invalidCredentials'));
         setStep('creds');
       }
     } catch (e) {
@@ -2666,7 +2681,7 @@ function SendBlueWizard({
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 600, fontSize: 13 }}>iMessage / SMS</div>
             <div style={{ fontSize: 11, color: healthy ? 'var(--color-success)' : 'var(--color-warning)' }}>
-              {healthy ? `Active on ${activeNumber}` : `Disconnected — ${activeNumber}`}
+              {healthy ? t('agents.sendblue.activeOn', { number: activeNumber }) : t('agents.sendblue.disconnectedNumber', { number: activeNumber })}
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -2676,16 +2691,16 @@ function SendBlueWizard({
                 disabled={reconnecting}
                 style={{ ...btnPrimary, fontSize: 10, padding: '3px 10px' }}
               >
-                {reconnecting ? '...' : 'Reconnect'}
+                {reconnecting ? '...' : t('agents.common.reconnect')}
               </button>
             )}
             <span style={{
               background: healthy ? 'color-mix(in srgb, var(--color-success) 22%, transparent)' : 'color-mix(in srgb, var(--color-warning) 18%, var(--color-bg))',
               color: healthy ? 'var(--color-success)' : 'var(--color-warning)',
               padding: '2px 8px', borderRadius: 10, fontSize: 10, fontWeight: 600,
-            }}>{healthy ? 'Active' : 'Disconnected'}</span>
+            }}>{healthy ? t('agents.common.active') : t('agents.common.disconnected')}</span>
             <button onClick={() => setExpanded(true)} style={btnSecondary}>
-              Details
+              {t('agents.common.details')}
             </button>
           </div>
         </div>
@@ -2701,27 +2716,26 @@ function SendBlueWizard({
           <span style={{ fontSize: 18, marginRight: 10 }}>{'\uD83D\uDCAC'}</span>
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 600, fontSize: 13 }}>iMessage / SMS</div>
-            <div style={{ fontSize: 11, color: 'var(--color-success)' }}>Active on {activeNumber}</div>
+            <div style={{ fontSize: 11, color: 'var(--color-success)' }}>{t('agents.sendblue.activeOn', { number: activeNumber })}</div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => setExpanded(false)} style={btnSecondary}>Collapse</button>
-            <button onClick={() => onRemove(binding!.id)} style={{ ...btnSecondary, color: 'var(--color-error)' }}>Remove</button>
+            <button onClick={() => setExpanded(false)} style={btnSecondary}>{t('agents.common.collapse')}</button>
+            <button onClick={() => onRemove(binding!.id)} style={{ ...btnSecondary, color: 'var(--color-error)' }}>{t('agents.common.remove')}</button>
           </div>
         </div>
         <div style={{ borderTop: '1px solid var(--color-border)', padding: 14, background: 'var(--color-bg)' }}>
           <div style={{ fontSize: 12, marginBottom: 10, lineHeight: 1.6 }}>
-            {'\u2192'} Text <strong>{activeNumber}</strong> from any phone to talk to your agent.
-            Responses arrive as iMessage (blue bubbles) when possible, SMS otherwise.
+            {'\u2192'} <Trans i18nKey="agents.sendblue.howToUse" values={{ number: activeNumber }} components={{ strong: <strong /> }} />
           </div>
 
           <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 8, fontWeight: 600 }}>
-            Send a test message
+            {t('agents.sendblue.testTitle')}
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
             <input
               value={testNumber}
               onChange={(e) => { setTestNumber(e.target.value); setTestSent(false); }}
-              placeholder="Your phone number (+1...)"
+              placeholder={t('agents.sendblue.testPlaceholder')}
               style={{ ...inputStyle, flex: 1 }}
             />
             <button
@@ -2729,7 +2743,7 @@ function SendBlueWizard({
               disabled={!testNumber.trim() || testSent}
               style={{ ...btnPrimary, opacity: !testNumber.trim() ? 0.5 : 1 }}
             >
-              {testSent ? 'Sent!' : 'Send Test'}
+              {testSent ? t('agents.sendblue.testSent') : t('agents.sendblue.sendTest')}
             </button>
           </div>
           {error && <div style={{ color: 'var(--color-error)', fontSize: 11, marginTop: 6 }}>{error}</div>}
@@ -2750,14 +2764,14 @@ function SendBlueWizard({
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 600, fontSize: 13 }}>iMessage / SMS</div>
           <div style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>
-            Your agent gets its own phone number — text it via iMessage or SMS
+            {t('agents.sendblue.description')}
           </div>
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); setStep(step === 'idle' ? 'creds' : 'idle'); }}
           style={{ fontSize: 10, padding: '3px 12px', background: 'var(--color-accent-purple)', color: 'var(--color-on-accent)', border: 'none', borderRadius: 5, cursor: 'pointer', fontWeight: 600 }}
         >
-          {step === 'idle' ? 'Set Up' : 'Cancel'}
+          {step === 'idle' ? t('agents.common.setUp') : t('agents.common.cancel')}
         </button>
       </div>
 
@@ -2766,38 +2780,39 @@ function SendBlueWizard({
         <div style={{ borderTop: '1px solid var(--color-border)', padding: 14, background: 'var(--color-bg)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <span style={{ background: 'var(--color-accent-purple)', color: 'var(--color-on-accent)', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>1</span>
-            <span style={{ fontSize: 12, fontWeight: 600 }}>Create a SendBlue account</span>
+            <span style={{ fontSize: 12, fontWeight: 600 }}>{t('agents.sendblue.createAccount')}</span>
           </div>
           <button
             onClick={() => window.open('https://dashboard.sendblue.com/company-signup', '_blank')}
             style={{ ...btnPrimary, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}
           >
-            Open SendBlue signup {'\u2192'}
+            {t('agents.sendblue.openSignup')} {'\u2192'}
           </button>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <span style={{ background: 'var(--color-accent-purple)', color: 'var(--color-on-accent)', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>2</span>
-            <span style={{ fontSize: 12, fontWeight: 600 }}>Paste your API credentials</span>
+            <span style={{ fontSize: 12, fontWeight: 600 }}>{t('agents.sendblue.pasteCredentials')}</span>
           </div>
           <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 8 }}>
-            Go to your{' '}
-            <a href="https://dashboard.sendblue.co/api-credentials" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>
-              SendBlue API Credentials page
-            </a>{' '}
-            and copy the API Key and API Secret.
+            <Trans
+              i18nKey="agents.sendblue.credentialsHelp"
+              components={{
+                link: <a href="https://dashboard.sendblue.co/api-credentials" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)', textDecoration: 'underline' }} />,
+              }}
+            />
           </div>
 
           <div style={{ marginBottom: 8 }}>
             <label style={{ display: 'block', fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 3, fontWeight: 500 }}>
-              API Key ID *
+              {t('agents.sendblue.apiKeyLabel')} *
             </label>
-            <input value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="Your API key ID" style={inputStyle} />
+            <input value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder={t('agents.sendblue.apiKeyPlaceholder')} style={inputStyle} />
           </div>
           <div style={{ marginBottom: 12 }}>
             <label style={{ display: 'block', fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 3, fontWeight: 500 }}>
-              API Secret Key *
+              {t('agents.sendblue.apiSecretLabel')} *
             </label>
-            <input value={apiSecret} onChange={(e) => setApiSecret(e.target.value)} placeholder="Your API secret key" type="password" style={inputStyle} />
+            <input value={apiSecret} onChange={(e) => setApiSecret(e.target.value)} placeholder={t('agents.sendblue.apiSecretPlaceholder')} type="password" style={inputStyle} />
           </div>
 
           {error && <div style={{ color: 'var(--color-error)', fontSize: 11, marginBottom: 8 }}>{error}</div>}
@@ -2807,7 +2822,7 @@ function SendBlueWizard({
             disabled={!apiKey.trim() || !apiSecret.trim() || step === 'verifying'}
             style={{ ...btnPrimary, opacity: !apiKey.trim() || !apiSecret.trim() ? 0.5 : 1 }}
           >
-            {step === 'verifying' ? 'Verifying...' : 'Verify & Find Number'}
+            {step === 'verifying' ? t('agents.sendblue.verifying') : t('agents.sendblue.verify')}
           </button>
         </div>
       )}
@@ -2817,18 +2832,18 @@ function SendBlueWizard({
         <div style={{ borderTop: '1px solid var(--color-border)', padding: 14, background: 'var(--color-bg)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <span style={{ background: 'var(--color-success)', color: 'var(--color-on-accent)', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{'\u2713'}</span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-success)' }}>Credentials verified</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-success)' }}>{t('agents.sendblue.verified')}</span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <span style={{ background: 'var(--color-accent-purple)', color: 'var(--color-on-accent)', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>3</span>
-            <span style={{ fontSize: 12, fontWeight: 600 }}>Your agent's phone number</span>
+            <span style={{ fontSize: 12, fontWeight: 600 }}>{t('agents.sendblue.numberTitle')}</span>
           </div>
 
           {numbers.length > 1 ? (
             <div style={{ marginBottom: 12 }}>
               <label style={{ display: 'block', fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 3, fontWeight: 500 }}>
-                Select a number for your agent
+                {t('agents.sendblue.selectNumber')}
               </label>
               <select
                 value={selectedNumber}
@@ -2847,7 +2862,7 @@ function SendBlueWizard({
               <span style={{ fontSize: 20 }}>{'\uD83D\uDCF1'}</span>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-success)' }}>{selectedNumber}</div>
-                <div style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>This will be your agent's phone number</div>
+                <div style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>{t('agents.sendblue.numberHint')}</div>
               </div>
             </div>
           ) : (
@@ -2858,11 +2873,10 @@ function SendBlueWizard({
                 padding: '8px 10px', background: 'var(--color-bg-secondary)',
                 borderRadius: 6, borderLeft: '3px solid var(--color-accent-purple)',
               }}>
-                Copy the phone number shown under <strong>"Send from"</strong> in your SendBlue dashboard
-                and paste it below. On the free tier this is a shared number.
+                <Trans i18nKey="agents.sendblue.manualNumberHelp" components={{ strong: <strong /> }} />
               </div>
               <label style={{ display: 'block', fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 3, fontWeight: 500 }}>
-                SendBlue phone number *
+                {t('agents.sendblue.manualNumberLabel')} *
               </label>
               <input
                 value={selectedNumber}
@@ -2880,7 +2894,7 @@ function SendBlueWizard({
             disabled={step === 'connecting' || !selectedNumber.trim()}
             style={{ ...btnPrimary, opacity: !selectedNumber.trim() ? 0.5 : 1 }}
           >
-            {step === 'connecting' ? 'Connecting...' : 'Activate Phone Number'}
+            {step === 'connecting' ? t('agents.common.connecting') : t('agents.sendblue.activate')}
           </button>
         </div>
       )}
@@ -2898,6 +2912,8 @@ function SendBlueWizard({
 }
 
 function MessagingTab({ agentId }: { agentId: string }) {
+  const { t } = useTranslation();
+  const channelConfigs = messagingChannels();
   const [bindings, setBindings] = useState<ChannelBinding[]>([]);
   const [setupType, setSetupType] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
@@ -2955,7 +2971,7 @@ function MessagingTab({ agentId }: { agentId: string }) {
         color: 'var(--color-text-secondary)',
         fontSize: 12, marginBottom: 14,
       }}>
-        Connect a messaging channel so you can talk to your agent from your phone or other devices.
+        {t('agents.messaging.intro')}
       </div>
 
       {/* SendBlue wizard — primary option */}
@@ -2972,10 +2988,10 @@ function MessagingTab({ agentId }: { agentId: string }) {
         textTransform: 'uppercase', letterSpacing: 1,
         margin: '14px 0 8px', fontWeight: 600,
       }}>
-        Other messaging channels
+        {t('agents.messaging.other')}
       </div>
 
-      {MESSAGING_CHANNELS.map((ch) => {
+      {channelConfigs.map((ch) => {
         const binding = bindings.find((b) => b.channel_type === ch.type);
         const cfg = (binding?.config || {}) as Record<string, unknown>;
         const isSetup = setupType === ch.type;
@@ -3018,7 +3034,7 @@ function MessagingTab({ agentId }: { agentId: string }) {
                     background: 'color-mix(in srgb, var(--color-success) 22%, transparent)', color: 'var(--color-success)',
                     padding: '2px 8px', borderRadius: 10,
                     fontSize: 10, fontWeight: 600,
-                  }}>Active</span>
+                  }}>{t('agents.common.active')}</span>
                   <button
                     onClick={() => handleRemove(binding.id)}
                     style={{
@@ -3028,7 +3044,7 @@ function MessagingTab({ agentId }: { agentId: string }) {
                       border: '1px solid var(--color-border)',
                       borderRadius: 4, cursor: 'pointer',
                     }}
-                  >Remove</button>
+                  >{t('agents.common.remove')}</button>
                 </div>
               ) : (
                 <button
@@ -3043,7 +3059,7 @@ function MessagingTab({ agentId }: { agentId: string }) {
                     cursor: 'pointer', fontWeight: 600,
                   }}
                 >
-                  {isSetup ? 'Cancel' : 'Set Up'}
+                  {isSetup ? t('agents.common.cancel') : t('agents.common.setUp')}
                 </button>
               )}
             </div>
@@ -3106,7 +3122,7 @@ function MessagingTab({ agentId }: { agentId: string }) {
                                 border: 'none', borderRadius: 3,
                                 cursor: 'pointer', fontWeight: 600,
                               }}
-                            >Copy</button>
+                            >{t('agents.common.copy')}</button>
                           </div>
                         </div>
                       );
@@ -3152,7 +3168,7 @@ function MessagingTab({ agentId }: { agentId: string }) {
                     marginTop: 4,
                   }}
                 >
-                  {loading ? 'Connecting...' : 'Connect'}
+                  {loading ? t('agents.common.connecting') : t('agents.common.connect')}
                 </button>
               </div>
             )}
@@ -3168,6 +3184,7 @@ function MessagingTab({ agentId }: { agentId: string }) {
 // ---------------------------------------------------------------------------
 
 function LearningTab({ agentId, learningEnabled }: { agentId: string; learningEnabled: boolean }) {
+  const { t } = useTranslation();
   const [logs, setLogs] = useState<LearningLogEntry[]>([]);
   const [triggering, setTriggering] = useState(false);
 
@@ -3192,7 +3209,7 @@ function LearningTab({ agentId, learningEnabled }: { agentId: string; learningEn
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>Learning</span>
+          <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>{t('agents.learning.title')}</span>
           <span
             className="text-xs px-2 py-0.5 rounded-full"
             style={{
@@ -3200,7 +3217,7 @@ function LearningTab({ agentId, learningEnabled }: { agentId: string; learningEn
               color: learningEnabled ? 'var(--color-success)' : 'var(--color-text-tertiary)',
             }}
           >
-            {learningEnabled ? 'Enabled' : 'Disabled'}
+            {learningEnabled ? t('agents.common.enabled') : t('agents.common.disabled')}
           </span>
         </div>
         <button
@@ -3214,12 +3231,12 @@ function LearningTab({ agentId, learningEnabled }: { agentId: string; learningEn
           }}
         >
           <RefreshCw size={12} className={triggering ? 'animate-spin' : ''} />
-          Run Learning
+          {t('agents.learning.run')}
         </button>
       </div>
       {logs.length === 0 ? (
         <div className="text-sm text-center py-8" style={{ color: 'var(--color-text-tertiary)' }}>
-          No learning events yet. Run the agent or trigger learning manually.
+          {t('agents.learning.empty')}
         </div>
       ) : (
         <div className="space-y-2">
@@ -3256,6 +3273,7 @@ function LearningTab({ agentId, learningEnabled }: { agentId: string; learningEn
 // ---------------------------------------------------------------------------
 
 function LogsTab({ agentId }: { agentId: string }) {
+  const { t: tr } = useTranslation();
   const [traces, setTraces] = useState<AgentTrace[]>([]);
   const [learningEntries, setLearningEntries] = useState<LearningLogEntry[]>([]);
   const [expandedTrace, setExpandedTrace] = useState<string | null>(null);
@@ -3309,11 +3327,11 @@ function LogsTab({ agentId }: { agentId: string }) {
   };
 
   const learningEventLabel = (eventType: string) => {
-    if (eventType === 'query_start') return 'Query';
-    if (eventType === 'query_complete') return 'Complete';
-    if (eventType === 'tool_call') return 'Tool Call';
-    if (eventType === 'tool_result') return 'Tool Result';
-    if (eventType === 'query_error') return 'Error';
+    if (eventType === 'query_start') return tr('agents.logs.event.query');
+    if (eventType === 'query_complete') return tr('agents.logs.event.complete');
+    if (eventType === 'tool_call') return tr('agents.logs.event.toolCall');
+    if (eventType === 'tool_result') return tr('agents.logs.event.toolResult');
+    if (eventType === 'query_error') return tr('agents.logs.event.error');
     return eventType;
   };
 
@@ -3321,15 +3339,15 @@ function LogsTab({ agentId }: { agentId: string }) {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-          Activity Log
+          {tr('agents.logs.title')}
         </span>
         <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-          {timeline.length} entr{timeline.length !== 1 ? 'ies' : 'y'} (auto-refreshing)
+          {tr('agents.logs.entries', { n: timeline.length })}
         </span>
       </div>
       {timeline.length === 0 ? (
         <div className="text-sm text-center py-8" style={{ color: 'var(--color-text-tertiary)' }}>
-          No activity yet. Send a message or run the agent to generate logs.
+          {tr('agents.logs.empty')}
         </div>
       ) : (
         <div className="space-y-2">
@@ -3390,12 +3408,12 @@ function LogsTab({ agentId }: { agentId: string }) {
                       className="w-2 h-2 rounded-full inline-block"
                       style={{ background: t.outcome === 'success' ? 'var(--color-success)' : 'var(--color-error)' }}
                     />
-                    <span style={{ color: 'var(--color-text)' }}>{t.outcome}</span>
+                    <span style={{ color: 'var(--color-text)' }}>{outcomeLabel(t.outcome)}</span>
                     <span
                       className="text-[10px] px-1.5 py-0.5 rounded font-medium"
                       style={{ background: 'var(--color-bg)', color: 'var(--color-text-secondary)' }}
                     >
-                      Trace
+                      {tr('agents.logs.trace')}
                     </span>
                     {errorDetail && (
                       <span
@@ -3417,16 +3435,16 @@ function LogsTab({ agentId }: { agentId: string }) {
                 </div>
                 <div className="flex items-center gap-3 mt-1 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
                   <span>{t.duration.toFixed(1)}s</span>
-                  <span>{t.steps} step{t.steps !== 1 ? 's' : ''}</span>
+                  <span>{tr('agents.logs.steps', { n: t.steps })}</span>
                 </div>
                 {isExpanded && errorDetail && (
                   <div className="mt-2 pt-2 space-y-1.5 text-xs" style={{ borderTop: '1px solid var(--color-border)' }}>
                     <div>
-                      <span className="font-medium" style={{ color: 'var(--color-text-secondary)' }}>Error: </span>
+                      <span className="font-medium" style={{ color: 'var(--color-text-secondary)' }}>{tr('agents.logs.errorLabel')} </span>
                       <span style={{ color: 'var(--color-text)' }}>{errorDetail.error_message}</span>
                     </div>
                     <div>
-                      <span className="font-medium" style={{ color: 'var(--color-text-secondary)' }}>Action: </span>
+                      <span className="font-medium" style={{ color: 'var(--color-text-secondary)' }}>{tr('agents.logs.actionLabel')} </span>
                       <span style={{ color: 'var(--color-text)' }}>{errorDetail.suggested_action}</span>
                     </div>
                   </div>
@@ -3445,6 +3463,7 @@ function LogsTab({ agentId }: { agentId: string }) {
 // ---------------------------------------------------------------------------
 
 export function AgentsPage() {
+  const { t } = useTranslation();
   const managedAgents = useAppStore((s) => s.managedAgents);
   const setManagedAgents = useAppStore((s) => s.setManagedAgents);
   const selectedAgentId = useAppStore((s) => s.selectedAgentId);
@@ -3507,8 +3526,8 @@ export function AgentsPage() {
     try {
       await runManagedAgent(id);
     } catch (err: any) {
-      toast.error('Failed to start agent', {
-        description: err.message || 'Unknown error',
+      toast.error(t('agents.toast.startFailed'), {
+        description: err.message || t('agents.toast.unknownError'),
       });
       await refresh();
       return;
@@ -3518,12 +3537,15 @@ export function AgentsPage() {
       try {
         const agent = await fetchManagedAgent(id);
         if (agent.status === 'error') {
-          toast.error(`Agent "${agent.name}" failed`, {
-            description: agent.summary_memory?.replace(/^ERROR: /, '') || 'Unknown error',
+          toast.error(i18n.t('agents.toast.agentFailed', { name: agent.name }), {
+            description: agent.summary_memory?.replace(/^ERROR: /, '') || i18n.t('agents.toast.unknownError'),
           });
           useAppStore.getState().addLogEntry({
             timestamp: Date.now(), level: 'error', category: 'model',
-            message: `Agent "${agent.name}" failed: ${agent.summary_memory || 'Unknown error'}`,
+            message: i18n.t('agents.toast.agentFailedLog', {
+              name: agent.name,
+              error: agent.summary_memory || i18n.t('agents.toast.unknownError'),
+            }),
           });
         }
       } catch {}
@@ -3535,14 +3557,14 @@ export function AgentsPage() {
     try {
       const result = await recoverManagedAgent(id);
       if (result.checkpoint) {
-        toast.success('Agent recovered from checkpoint');
+        toast.success(t('agents.toast.recovered'));
       } else {
-        toast.success('Agent reset to idle (no checkpoint available)');
+        toast.success(t('agents.toast.resetIdle'));
       }
       setDetailTab('overview');
     } catch (err: any) {
-      toast.error('Recovery failed', {
-        description: err.message || 'Unknown error',
+      toast.error(t('agents.toast.recoverFailed'), {
+        description: err.message || t('agents.toast.unknownError'),
       });
     }
     await refresh();
@@ -3556,8 +3578,8 @@ export function AgentsPage() {
         for (const agent of agents) {
           const prev = prevStatuses.current[agent.id];
           if (prev && prev !== 'error' && agent.status === 'error') {
-            toast.error(`Agent "${agent.name}" failed`, {
-              description: agent.summary_memory?.replace(/^ERROR: /, '') || 'Unknown error',
+            toast.error(i18n.t('agents.toast.agentFailed', { name: agent.name }), {
+              description: agent.summary_memory?.replace(/^ERROR: /, '') || i18n.t('agents.toast.unknownError'),
             });
           }
           prevStatuses.current[agent.id] = agent.status;
@@ -3575,7 +3597,7 @@ export function AgentsPage() {
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center" style={{ color: 'var(--color-text-tertiary)' }}>
-        Loading agents...
+        {t('agents.list.loading')}
       </div>
     );
   }
@@ -3589,14 +3611,14 @@ export function AgentsPage() {
         : null;
 
     const DETAIL_TABS = [
-      { id: 'interact', label: 'Interact', icon: MessageSquare },
-      { id: 'overview', label: 'Overview', icon: Activity },
-      { id: 'channels', label: 'Data Sources', icon: Database },
-      { id: 'messaging', label: 'Messaging Channels', icon: Wifi },
-      { id: 'tasks', label: 'Tasks', icon: ListTodo },
-      { id: 'memory', label: 'Memory', icon: Brain },
-      { id: 'learning', label: 'Learning', icon: Settings },
-      { id: 'logs', label: 'Logs', icon: FileText },
+      { id: 'interact', label: t('agents.tabs.interact'), icon: MessageSquare },
+      { id: 'overview', label: t('agents.tabs.overview'), icon: Activity },
+      { id: 'channels', label: t('agents.tabs.dataSources'), icon: Database },
+      { id: 'messaging', label: t('agents.tabs.messaging'), icon: Wifi },
+      { id: 'tasks', label: t('agents.tabs.tasks'), icon: ListTodo },
+      { id: 'memory', label: t('agents.tabs.memory'), icon: Brain },
+      { id: 'learning', label: t('agents.tabs.learning'), icon: Settings },
+      { id: 'logs', label: t('agents.tabs.logs'), icon: FileText },
     ] as const;
 
     return (

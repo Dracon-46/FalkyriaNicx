@@ -2,5 +2,171 @@
   "language": {
     "label": "语言",
     "description": "界面、Nicx 回答和语音所使用的语言。"
+  },
+  "page": {
+    "title": "设置",
+    "saved": "已保存",
+    "description": "应用偏好：外观、模型、语音、记忆和你的数据。"
+  },
+  "sections": {
+    "appearance": "外观",
+    "connection": "连接",
+    "inference": "模型来源",
+    "models": "模型",
+    "apiKeys": "API 密钥",
+    "tools": "工具",
+    "memory": "记忆",
+    "modelDefaults": "模型默认值",
+    "voice": "语音",
+    "data": "数据",
+    "about": "关于"
+  },
+  "theme": {
+    "label": "主题",
+    "description": "选择 Nicx 的外观",
+    "light": "浅色",
+    "dark": "深色",
+    "system": "跟随系统"
+  },
+  "fontSize": {
+    "label": "字号",
+    "small": "小",
+    "default": "默认",
+    "large": "大"
+  },
+  "connection": {
+    "serverStatus": "服务器状态",
+    "notConnected": "未连接",
+    "connected": "已连接",
+    "disconnected": "已断开",
+    "checking": "检查中...",
+    "serverAddress": "服务器地址",
+    "invalidAddress": "这不是有效地址（必须以 http:// 开头）。留空即使用默认地址。",
+    "addressHint": "请留空。只有当 Nicx 服务器运行在其他端口或其他机器上时才需要修改。",
+    "addressPlaceholder": "留空 = 默认",
+    "apiKey": "API 密钥",
+    "apiKeyDescription": "仅当服务器启动时设置了 API 密钥才需要"
+  },
+  "inference": {
+    "source": "来源",
+    "sourceDescription": "应用在哪里运行模型。重启后生效。",
+    "ollama": "应用内置的 Ollama（默认）",
+    "custom": "自己的 OpenAI 兼容服务器",
+    "serverUrl": "服务器地址",
+    "serverUrlDescription": "例如 LM Studio：http://localhost:1234/v1",
+    "model": "模型",
+    "modelDescription": "你的服务器提供的模型 ID",
+    "serverType": "服务器类型",
+    "serverTypeDescription": "OpenAI 兼容引擎",
+    "apiKey": "API 密钥（可选）",
+    "apiKeyDescription": "仅当你的服务器要求时填写",
+    "apiKeyPlaceholder": "没有就留空",
+    "save": "保存模型来源",
+    "saved": "已保存。重启应用后生效。",
+    "saveFailed": "无法保存。"
+  },
+  "models": {
+    "none": "没有已加载的模型",
+    "local": "本地模型（Ollama）",
+    "localDescription": "在这台电脑上运行的模型",
+    "pullBefore": "在终端运行",
+    "pullModelName": "模型名称",
+    "pullAfter": "即可下载更多模型",
+    "cloud": "云服务提供商",
+    "cloudDescription": "绿点：已配置 API 密钥"
+  },
+  "apiKeys": {
+    "openaiDescription": "GPT 模型",
+    "anthropicDescription": "Claude 模型",
+    "googleDescription": "Gemini 模型",
+    "openrouterDescription": "多个提供商集中在一处",
+    "atlasDescription": "通过 Atlas Cloud 使用的模型",
+    "atlasPlaceholder": "Atlas Cloud API 密钥",
+    "savedSecure": "已保存在安全存储中",
+    "savedServer": "已由本地服务器保存",
+    "remove": "移除",
+    "saved": "已保存",
+    "saveFailed": "无法保存 API 密钥",
+    "removeFailed": "无法移除 API 密钥"
+  },
+  "tools": {
+    "webSearch": "网页搜索",
+    "webSearchDescription": "网页搜索工具使用的 Tavily 密钥"
+  },
+  "memory": {
+    "status": "记忆状态",
+    "checkingBackend": "正在检查记忆...",
+    "notConfiguredLong": "记忆尚未配置",
+    "backendEntries": "{{backend}} — 已保存条目：{{entries}}",
+    "checking": "检查中...",
+    "notConfigured": "未配置",
+    "entries": "条目：{{entries}}",
+    "unavailable": "不可用",
+    "retry": "重试",
+    "useContext": "在对话中使用记忆",
+    "useContextDescription": "自动把相关记忆加入对话",
+    "backend": "记忆引擎",
+    "backendDescription": "使用哪种检索引擎",
+    "topK": "包含的结果数",
+    "minScore": "最低相关度",
+    "maxTokens": "最大上下文 token 数"
+  },
+  "modelDefaults": {
+    "temperature": "温度",
+    "maxTokens": "最大 token 数"
+  },
+  "voice": {
+    "input": "语音输入",
+    "inputDescription": "使用麦克风听写和进行语音对话（本地识别）",
+    "output": "语音输出",
+    "outputDescription": "显示收听 Nicx 回答的按钮",
+    "autoplay": "自动朗读回答",
+    "autoplayDescription": "每条回答结束后立即朗读",
+    "tts": "Nicx 的声音",
+    "ttsDescription": "朗读回答所用的引擎和声音",
+    "recognition": "语音识别",
+    "recognitionDescription": "在你的电脑上运行的 Whisper",
+    "checking": "检查中...",
+    "available": "可用",
+    "notConfigured": "未配置",
+    "setupHint": "配置语音识别后即可使用语音输入。",
+    "docsBefore": "请参阅",
+    "docsLink": "文档",
+    "docsAfter": "了解详情。"
+  },
+  "wake": {
+    "enableLabel": "开启 “Nicx, ligar”（后台聆听）",
+    "enableDescription": "说出 “Nicx, ligar”（或 “Ei Nicx”），吉祥物就会出现，随时可以语音对话。麦克风只在这台电脑上开启：不会录音，也不会发送任何内容。",
+    "enableToggle": "开启 “Nicx, ligar”",
+    "listening": "聆听",
+    "noWindow": "这台电脑上没有悬浮窗口：界面会在浏览器中打开。",
+    "howToStop": "说 “tchau” 或 “desligar” 让吉祥物离开；安静 1 分钟后它也会自动消失。",
+    "autostart": "随 Windows 启动",
+    "autostartDescription": "登录 Windows 时开始聆听（仅当上方选项已开启）",
+    "serverUnavailable": "Nicx 服务器不可用",
+    "saveFailed": "无法保存",
+    "restartServer": "请重启 Nicx 服务器",
+    "checking": "检查中...",
+    "starting": "启动中...",
+    "states": {
+      "listening": "正在后台聆听",
+      "paused": "已暂停（托盘图标）",
+      "mascotOpen": "吉祥物已打开",
+      "stopped": "已停止"
+    }
+  },
+  "data": {
+    "conversations": "对话",
+    "storedLocally": "保存在这台电脑上：{{total}}",
+    "export": "导出",
+    "import": "导入",
+    "clearAll": "清除所有数据",
+    "clearAllDescription": "永久删除所有对话",
+    "confirm": "再点一次以确认",
+    "clear": "清除"
+  },
+  "about": {
+    "tagline": "Falkyria 的人工智能。",
+    "repository": "代码仓库"
   }
 }

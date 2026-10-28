@@ -1,5 +1,6 @@
 import { useReducer, useState, type FormEvent } from 'react';
 import { ArrowLeft, Cpu, Download, Loader2, Server, ShieldCheck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   resetInferenceSource,
   stageInferenceSource,
@@ -52,6 +53,7 @@ export async function persistAndStartInferenceSource(
 }
 
 function SetupFrame({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   return (
     <div className="fixed inset-0 flex items-center justify-center" style={{ background: 'var(--color-bg)' }}>
       <div className="w-full max-w-lg px-6">
@@ -63,10 +65,10 @@ function SetupFrame({ children }: { children: React.ReactNode }) {
             <Cpu size={32} />
           </div>
           <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--color-text)' }}>
-            Choose your inference source
+            {t('setup.source.title')}
           </h1>
           <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-            Nothing is installed, started, or downloaded until you confirm a choice.
+            {t('setup.source.subtitle')}
           </p>
         </div>
         <div
@@ -85,6 +87,7 @@ export function InferenceSourceChooser({
 }: {
   onChoose: (source: 'ollama' | 'custom') => void;
 }) {
+  const { t } = useTranslation();
   return (
     <SetupFrame>
       <div className="flex flex-col gap-3">
@@ -97,10 +100,10 @@ export function InferenceSourceChooser({
           <Cpu size={22} className="shrink-0 mt-0.5" style={{ color: 'var(--color-accent)' }} />
           <span>
             <span className="block text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
-              Local Ollama
+              {t('setup.source.ollamaTitle')}
             </span>
             <span className="block text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-              Run models on this computer. Requires a separate confirmation before Ollama starts or a model downloads.
+              {t('setup.source.ollamaDesc')}
             </span>
           </span>
         </button>
@@ -113,10 +116,10 @@ export function InferenceSourceChooser({
           <Server size={22} className="shrink-0 mt-0.5" style={{ color: 'var(--color-accent)' }} />
           <span>
             <span className="block text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
-              OpenAI-compatible server
+              {t('setup.source.customTitle')}
             </span>
             <span className="block text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-              Connect to LM Studio, vLLM, SGLang, llama.cpp, MLX, or another compatible endpoint. Ollama stays off.
+              {t('setup.source.customDesc')}
             </span>
           </span>
         </button>
@@ -125,7 +128,8 @@ export function InferenceSourceChooser({
   );
 }
 
-function BackButton({ onClick, label = 'Back', disabled = false }: { onClick: () => void; label?: string; disabled?: boolean }) {
+function BackButton({ onClick, label, disabled = false }: { onClick: () => void; label?: string; disabled?: boolean }) {
+  const { t } = useTranslation();
   return (
     <button
       type="button"
@@ -135,7 +139,7 @@ function BackButton({ onClick, label = 'Back', disabled = false }: { onClick: ()
       style={{ color: 'var(--color-text-secondary)' }}
     >
       <ArrowLeft size={15} />
-      {label}
+      {label ?? t('setup.source.back')}
     </button>
   );
 }
@@ -147,6 +151,7 @@ export function InferenceRecoveryButton({
   recovering: boolean;
   onChange: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <button
       type="button"
@@ -159,7 +164,7 @@ export function InferenceRecoveryButton({
         background: 'var(--color-surface)',
       }}
     >
-      {recovering ? 'Stopping setup...' : 'Change inference source'}
+      {recovering ? t('setup.source.stopping') : t('setup.source.change')}
     </button>
   );
 }
@@ -175,6 +180,7 @@ export function OllamaConsent({
   busy?: boolean;
   error?: string;
 }) {
+  const { t } = useTranslation();
   return (
     <SetupFrame>
       <BackButton onClick={onBack} disabled={busy} />
@@ -182,10 +188,10 @@ export function OllamaConsent({
         <Download size={22} className="shrink-0 mt-0.5" style={{ color: 'var(--color-accent)' }} />
         <div>
           <h2 className="text-base font-semibold mb-1" style={{ color: 'var(--color-text)' }}>
-            Allow local model setup?
+            {t('setup.source.consentTitle')}
           </h2>
           <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
-            Nicx will start Ollama and may download one model selected for this computer. Model downloads can use several gigabytes of disk space and network data.
+            {t('setup.source.consentBody')}
           </p>
         </div>
       </div>
@@ -194,7 +200,7 @@ export function OllamaConsent({
         style={{ background: 'var(--color-accent-subtle)', color: 'var(--color-text-secondary)' }}
       >
         <ShieldCheck size={16} className="shrink-0" style={{ color: 'var(--color-accent)' }} />
-        Going back leaves Ollama stopped and does not save this choice.
+        {t('setup.source.consentBackNote')}
       </div>
       {error && <SetupError message={error} />}
       <button
@@ -205,7 +211,7 @@ export function OllamaConsent({
         style={{ background: 'var(--color-accent)', color: 'white' }}
       >
         {busy && <Loader2 size={16} className="animate-spin" />}
-        {busy ? 'Starting local setup...' : 'Use Ollama and continue'}
+        {busy ? t('setup.source.consentStarting') : t('setup.source.consentConfirm')}
       </button>
     </SetupFrame>
   );
@@ -238,6 +244,7 @@ export function CustomEndpointSetup({
   busy?: boolean;
   error?: string;
 }) {
+  const { t } = useTranslation();
   const [host, setHost] = useState('http://localhost:1234/v1');
   const [model, setModel] = useState('');
   const [engine, setEngine] = useState('lmstudio');
@@ -262,20 +269,20 @@ export function CustomEndpointSetup({
 
   return (
     <SetupFrame>
-      <BackButton onClick={onCancel} label="Cancel" disabled={busy} />
+      <BackButton onClick={onCancel} label={t('setup.source.cancel')} disabled={busy} />
       <form onSubmit={submit} className="flex flex-col gap-4">
         <div>
           <h2 className="text-base font-semibold mb-1" style={{ color: 'var(--color-text)' }}>
-            Connect your server
+            {t('setup.source.customHeading')}
           </h2>
           <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-            Nicx will connect only after you submit this form. Ollama will not start or download models.
+            {t('setup.source.customNote')}
           </p>
         </div>
         <label className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-          Server URL
+          {t('setup.source.serverUrl')}
           <input
-            aria-label="Server URL"
+            aria-label={t('setup.source.serverUrl')}
             type="url"
             required
             value={host}
@@ -285,9 +292,9 @@ export function CustomEndpointSetup({
           />
         </label>
         <label className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-          Model ID
+          {t('setup.source.modelId')}
           <input
-            aria-label="Model ID"
+            aria-label={t('setup.source.modelId')}
             type="text"
             required
             value={model}
@@ -298,9 +305,9 @@ export function CustomEndpointSetup({
           />
         </label>
         <label className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-          Server type
+          {t('setup.source.serverType')}
           <select
-            aria-label="Server type"
+            aria-label={t('setup.source.serverType')}
             value={engine}
             onChange={(event) => setEngine(event.target.value)}
             className="block w-full mt-1.5 px-3 py-2 rounded-lg text-sm outline-none"
@@ -314,9 +321,9 @@ export function CustomEndpointSetup({
           </select>
         </label>
         <label className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-          API key (optional)
+          {t('setup.source.apiKeyOptional')}
           <input
-            aria-label="API key"
+            aria-label={t('setup.source.apiKey')}
             type="password"
             value={apiKey}
             onChange={(event) => setApiKey(event.target.value)}
@@ -333,7 +340,7 @@ export function CustomEndpointSetup({
           style={{ background: 'var(--color-accent)', color: 'white' }}
         >
           {busy && <Loader2 size={16} className="animate-spin" />}
-          {busy ? 'Connecting...' : 'Save and connect'}
+          {busy ? t('setup.source.connecting') : t('setup.source.saveConnect')}
         </button>
       </form>
     </SetupFrame>

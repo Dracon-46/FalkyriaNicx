@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion } from 'motion/react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 import { useAppStore } from '../lib/store';
 import {
   fetchManagedAgents,
@@ -41,6 +43,7 @@ function InlineConnectForm({
   disabled?: boolean;
   onSubmit: (req: ConnectRequest) => void;
 }) {
+  const { t } = useTranslation();
   const [inputs, setInputs] = useState<Record<string, string>>(() =>
     Object.fromEntries(fields.map((field) => [field.name, field.defaultValue || ''])),
   );
@@ -127,7 +130,7 @@ function InlineConnectForm({
           cursor: submitDisabled ? 'default' : 'pointer',
         }}
       >
-        Connect
+        {t('dataSources.common.connect')}
       </button>
     </div>
   );
@@ -160,6 +163,7 @@ function GenericConnectPanel({
   onConnect: (req: ConnectRequest) => void;
   onOAuthStart: () => void;
 }) {
+  const { t } = useTranslation();
   const [oauthSetup, setOauthSetup] = useState<OAuthSetupInfo | null>(null);
   const [feedUrls, setFeedUrls] = useState('');
 
@@ -186,7 +190,7 @@ function GenericConnectPanel({
       return (
         <div>
           <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 10 }}>
-            Add one RSS or Atom feed URL per line.
+            {t('dataSources.connect.rssHint')}
           </div>
           <textarea
             value={feedUrls}
@@ -200,7 +204,7 @@ function GenericConnectPanel({
             disabled={loading || disabled || feeds.length === 0}
             style={{ width: '100%', padding: 8, background: loading || disabled || feeds.length === 0 ? 'var(--color-disabled-bg)' : 'var(--color-accent-purple)', color: 'var(--color-on-accent)', border: 'none', borderRadius: 6, fontSize: 12, cursor: loading || disabled || feeds.length === 0 ? 'default' : 'pointer' }}
           >
-            {loading ? 'Connecting...' : 'Save feeds'}
+            {loading ? t('dataSources.common.connecting') : t('dataSources.connect.saveFeeds')}
           </button>
         </div>
       );
@@ -208,8 +212,7 @@ function GenericConnectPanel({
     return (
       <div>
         <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 10 }}>
-          {displayName} reads data directly from this device. Grant access if
-          prompted, then connect.
+          {t('dataSources.connect.localHint', { name: displayName })}
         </div>
         <button
           onClick={() => onConnect({})}
@@ -222,7 +225,7 @@ function GenericConnectPanel({
             cursor: loading || disabled ? 'default' : 'pointer',
           }}
         >
-          {loading ? 'Connecting...' : `Connect ${displayName}`}
+          {loading ? t('dataSources.common.connecting') : t('dataSources.connect.connectNamed', { name: displayName })}
         </button>
       </div>
     );
@@ -232,15 +235,15 @@ function GenericConnectPanel({
     return (
       <div>
         <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 10 }}>
-          Enter your {displayName} API token.
+          {t('dataSources.connect.tokenHint', { name: displayName })}
         </div>
         <InlineConnectForm
           fields={connectorId === 'weather'
             ? [
-                { name: 'token', placeholder: 'OpenWeather API key', type: 'password' },
-                { name: 'location', placeholder: 'City, country (for example: Boston,US)', type: 'text' },
+                { name: 'token', placeholder: t('dataSources.connect.weatherKey'), type: 'password' },
+                { name: 'location', placeholder: t('dataSources.connect.weatherLocation'), type: 'text' },
               ]
-            : [{ name: 'token', placeholder: `${displayName} API token`, type: 'password' }]}
+            : [{ name: 'token', placeholder: t('dataSources.connect.tokenPlaceholder', { name: displayName }), type: 'password' }]}
           loading={loading}
           disabled={disabled}
           onSubmit={onConnect}
@@ -254,8 +257,9 @@ function GenericConnectPanel({
     return (
       <div>
         <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 10 }}>
-          OAuth app credentials are already configured. Continue directly to
-          {oauthSetup.provider ? ` ${oauthSetup.provider}` : ' the provider'} sign-in.
+          {oauthSetup.provider
+            ? t('dataSources.connect.oauthReady', { provider: oauthSetup.provider })
+            : t('dataSources.connect.oauthReadyGeneric')}
         </div>
         <button
           onClick={onOAuthStart}
@@ -268,7 +272,7 @@ function GenericConnectPanel({
             cursor: loading || disabled ? 'default' : 'pointer',
           }}
         >
-          {loading ? 'Connecting...' : `Continue with ${oauthSetup.provider || displayName}`}
+          {loading ? t('dataSources.common.connecting') : t('dataSources.connect.continueWith', { name: oauthSetup.provider || displayName })}
         </button>
       </div>
     );
@@ -283,7 +287,7 @@ function GenericConnectPanel({
           borderRadius: 6, padding: 10, marginBottom: 10,
         }}>
           <div style={{ color: 'var(--color-accent-purple)', fontSize: 10, fontWeight: 600, marginBottom: 3 }}>
-            SETUP REQUIRED
+            {t('dataSources.connect.setupRequired')}
           </div>
           <div style={{ fontSize: 12, marginBottom: 6 }}>{oauthSetup.setup_hint}</div>
           <a
@@ -292,17 +296,17 @@ function GenericConnectPanel({
             rel="noopener noreferrer"
             style={{ color: 'var(--color-accent)', fontSize: 11, textDecoration: 'underline' }}
           >
-            Open developer dashboard &rarr;
+            {t('dataSources.connect.openDashboard')} &rarr;
           </a>
         </div>
       )}
       <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 10 }}>
-        Paste the Client ID and Client Secret from the app you created above.
+        {t('dataSources.connect.pasteCredentials')}
       </div>
       <InlineConnectForm
         fields={[
-          { name: 'email', placeholder: 'Client ID', type: 'text' },
-          { name: 'password', placeholder: 'Client Secret', type: 'password' },
+          { name: 'email', placeholder: t('dataSources.common.clientId'), type: 'text' },
+          { name: 'password', placeholder: t('dataSources.common.clientSecret'), type: 'password' },
         ]}
         loading={loading}
         disabled={disabled}
@@ -319,6 +323,7 @@ function GenericConnectPanel({
 const ACCEPTED_EXTENSIONS = '.txt,.md,.pdf,.docx,.csv';
 
 function UploadForm({ onDone }: { onDone?: () => void }) {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<'paste' | 'upload'>('paste');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -340,15 +345,15 @@ function UploadForm({ onDone }: { onDone?: () => void }) {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ detail: res.statusText }));
-        throw new Error(err.detail || `Upload failed: ${res.status}`);
+        throw new Error(err.detail || t('dataSources.upload.failedStatus', { status: res.status }));
       }
       const data = await res.json();
-      setResult(`Added ${data.chunks_added} chunk${data.chunks_added !== 1 ? 's' : ''} to knowledge base`);
+      setResult(t('dataSources.upload.addedText', { chunks: data.chunks_added }));
       setTitle('');
       setContent('');
       onDone?.();
     } catch (err: any) {
-      setError(err.message || 'Upload failed');
+      setError(err.message || t('dataSources.upload.failed'));
     } finally {
       setBusy(false);
     }
@@ -370,15 +375,15 @@ function UploadForm({ onDone }: { onDone?: () => void }) {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ detail: res.statusText }));
-        throw new Error(err.detail || `Upload failed: ${res.status}`);
+        throw new Error(err.detail || t('dataSources.upload.failedStatus', { status: res.status }));
       }
       const data = await res.json();
-      setResult(`Added ${data.chunks_added} chunk${data.chunks_added !== 1 ? 's' : ''} from ${files.length} file${files.length !== 1 ? 's' : ''}`);
+      setResult(t('dataSources.upload.addedFiles', { chunks: data.chunks_added, files: files.length }));
       setFiles([]);
       setTitle('');
       onDone?.();
     } catch (err: any) {
-      setError(err.message || 'Upload failed');
+      setError(err.message || t('dataSources.upload.failed'));
     } finally {
       setBusy(false);
     }
@@ -407,10 +412,10 @@ function UploadForm({ onDone }: { onDone?: () => void }) {
       <div style={{ display: 'flex', gap: 4, marginBottom: 10,
         background: 'var(--color-bg)', borderRadius: 6, padding: 2 }}>
         <button style={tabStyle(tab === 'paste')} onClick={() => setTab('paste')}>
-          Paste Text
+          {t('dataSources.upload.pasteTab')}
         </button>
         <button style={tabStyle(tab === 'upload')} onClick={() => setTab('upload')}>
-          Upload Files
+          {t('dataSources.upload.uploadTab')}
         </button>
       </div>
 
@@ -418,7 +423,7 @@ function UploadForm({ onDone }: { onDone?: () => void }) {
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="Title (optional)"
+        placeholder={t('dataSources.upload.titlePlaceholder')}
         style={inputStyle}
       />
 
@@ -427,7 +432,7 @@ function UploadForm({ onDone }: { onDone?: () => void }) {
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Paste your text here..."
+            placeholder={t('dataSources.upload.contentPlaceholder')}
             rows={6}
             style={{
               ...inputStyle,
@@ -446,7 +451,7 @@ function UploadForm({ onDone }: { onDone?: () => void }) {
               borderRadius: 6, fontSize: 12, cursor: 'pointer',
             }}
           >
-            {busy ? 'Adding...' : 'Add to Knowledge Base'}
+            {busy ? t('dataSources.upload.adding') : t('dataSources.upload.add')}
           </button>
         </>
       )}
@@ -478,7 +483,7 @@ function UploadForm({ onDone }: { onDone?: () => void }) {
               borderRadius: 6, fontSize: 12, cursor: 'pointer',
             }}
           >
-            {busy ? 'Uploading...' : 'Upload & Index'}
+            {busy ? t('dataSources.upload.uploading') : t('dataSources.upload.uploadAndIndex')}
           </button>
         </>
       )}
@@ -548,6 +553,7 @@ function GmailOAuthAdvanced({
   disabled?: boolean;
   onConnect: (req: ConnectRequest) => void;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   return (
     <div style={{ marginTop: 12 }}>
@@ -566,7 +572,7 @@ function GmailOAuthAdvanced({
           textDecoration: 'underline',
         }}
       >
-        {open ? 'Hide advanced' : 'Advanced: Connect with Google OAuth'}
+        {open ? t('dataSources.gmailOAuth.hide') : t('dataSources.gmailOAuth.show')}
       </button>
       {open && (
         <div
@@ -579,22 +585,21 @@ function GmailOAuthAdvanced({
           }}
         >
           <div style={{ fontSize: 11, color: 'var(--color-text-tertiary)', marginBottom: 8 }}>
-            For developers with an existing Google Cloud project. Enable the
-            Gmail API and create a Desktop OAuth client at{' '}
+            {t('dataSources.gmailOAuth.before')}{' '}
             <a
               href="https://console.cloud.google.com/apis/credentials"
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}
             >
-              Google Cloud Credentials →
+              {t('dataSources.gmailOAuth.link')} →
             </a>{' '}
-            then paste the Client ID and Client Secret below.
+            {t('dataSources.gmailOAuth.after')}
           </div>
           <InlineConnectForm
             fields={[
-              { name: 'email', placeholder: 'Client ID', type: 'text' },
-              { name: 'password', placeholder: 'Client Secret', type: 'password' },
+              { name: 'email', placeholder: t('dataSources.common.clientId'), type: 'text' },
+              { name: 'password', placeholder: t('dataSources.common.clientSecret'), type: 'password' },
             ]}
             loading={loading}
             disabled={disabled}
@@ -616,18 +621,13 @@ function formatTimeAgo(iso: string | null | undefined): string | null {
   const t = new Date(iso).getTime();
   if (Number.isNaN(t)) return null;
   const diffSec = (Date.now() - t) / 1000;
-  if (diffSec < 30) return 'just now';
-  if (diffSec < 60) return 'less than a min ago';
-  if (diffSec < 3600) {
-    const m = Math.round(diffSec / 60);
-    return `${m} min${m === 1 ? '' : 's'} ago`;
-  }
-  if (diffSec < 86400) {
-    const h = Math.round(diffSec / 3600);
-    return `${h} hr${h === 1 ? '' : 's'} ago`;
-  }
-  const d = Math.round(diffSec / 86400);
-  return `${d} day${d === 1 ? '' : 's'} ago`;
+  if (diffSec < 30) return i18n.t('dataSources.sync.justNow');
+  if (diffSec < 60) return i18n.t('dataSources.sync.underMinute');
+  // Intl cuida do plural e da ordem das palavras em cada idioma.
+  const rtf = new Intl.RelativeTimeFormat(i18n.language, { numeric: 'auto' });
+  if (diffSec < 3600) return rtf.format(-Math.round(diffSec / 60), 'minute');
+  if (diffSec < 86400) return rtf.format(-Math.round(diffSec / 3600), 'hour');
+  return rtf.format(-Math.round(diffSec / 86400), 'day');
 }
 
 /** Render how far back the corpus extends, given the oldest indexed
@@ -637,12 +637,32 @@ function formatBacklogRange(iso: string | null | undefined): string | null {
   const t = new Date(iso).getTime();
   if (Number.isNaN(t)) return null;
   const days = (Date.now() - t) / 86400_000;
-  if (days < 7) return 'past few days';
-  if (days < 30) return 'past month';
-  if (days < 90) return 'past 3 months';
-  if (days < 365) return 'past year';
+  if (days < 7) return i18n.t('dataSources.sync.range.days');
+  if (days < 30) return i18n.t('dataSources.sync.range.month');
+  if (days < 90) return i18n.t('dataSources.sync.range.months3');
+  if (days < 365) return i18n.t('dataSources.sync.range.year');
   const years = Math.round(days / 365);
-  return `past ${years} year${years === 1 ? '' : 's'}`;
+  if (years <= 1) return i18n.t('dataSources.sync.range.year');
+  return i18n.t('dataSources.sync.range.years', { n: years });
+}
+
+/** Unidades do catálogo de fontes (em inglês) -> chave em dataSources.units. */
+const UNIT_KEYS: Record<string, string> = {
+  items: 'items',
+  documents: 'documents',
+  emails: 'emails',
+  messages: 'messages',
+  pages: 'pages',
+  'meeting notes': 'meetingNotes',
+  notes: 'notes',
+  files: 'files',
+  events: 'events',
+  contacts: 'contacts',
+};
+
+function unitText(unit: string): string {
+  const key = UNIT_KEYS[unit];
+  return key ? i18n.t(`dataSources.units.${key}`) : unit;
 }
 
 export function SyncStatusDisplay({
@@ -660,8 +680,10 @@ export function SyncStatusDisplay({
   disabled?: boolean;
   onSyncTriggered: () => void;
 }) {
+  const { t } = useTranslation();
   const [syncing, setSyncing] = useState(false);
   const [syncError, setSyncError] = useState('');
+  const unit = unitText(unitLabel);
 
   const handleSync = async () => {
     if (disabled || sync?.state === 'stopping') return;
@@ -671,7 +693,7 @@ export function SyncStatusDisplay({
       await triggerSync(connectorId);
       onSyncTriggered();
     } catch (err: any) {
-      setSyncError(err.message || 'Sync failed');
+      setSyncError(err.message || t('dataSources.sync.failed'));
     } finally {
       setSyncing(false);
     }
@@ -684,10 +706,10 @@ export function SyncStatusDisplay({
     return (
       <div>
         <div style={{ fontSize: 12, color: 'var(--color-warning)', marginBottom: 4 }}>
-          Disconnect pending — waiting for the active sync to stop.
+          {t('dataSources.sync.stoppingTitle')}
         </div>
         <div style={{ fontSize: 10.5, color: 'var(--color-text-tertiary)' }}>
-          Indexed data will be cleaned up before this source disconnects.
+          {t('dataSources.sync.stoppingHint')}
         </div>
       </div>
     );
@@ -698,7 +720,7 @@ export function SyncStatusDisplay({
     return (
       <div>
         <div style={{ fontSize: 12, color: 'var(--color-error)', marginBottom: 4 }}>
-          Error: {sync.error}
+          {t('dataSources.sync.error', { error: sync.error })}
         </div>
         <button
           onClick={handleSync}
@@ -710,7 +732,7 @@ export function SyncStatusDisplay({
             cursor: syncing || disabled ? 'default' : 'pointer', fontWeight: 600,
             opacity: syncing || disabled ? 0.5 : 1,
           }}
-        >{syncing ? 'Retrying...' : 'Retry Sync'}</button>
+        >{syncing ? t('dataSources.sync.retrying') : t('dataSources.sync.retrySync')}</button>
       </div>
     );
   }
@@ -730,23 +752,23 @@ export function SyncStatusDisplay({
 
   // Actively syncing — single status line + reassurance line.
   if (sync?.state === 'syncing' || syncing) {
-    const rangeLabel = backlogRange ?? 'building corpus';
+    const rangeLabel = backlogRange ?? t('dataSources.sync.buildingCorpus');
     return (
       <div>
         <div style={{ fontSize: 11, color: 'var(--color-warning)', marginBottom: 4 }}>
-          Indexed{' '}
+          {t('dataSources.sync.indexed')}{' '}
           <span key={totalIndexed} className="sync-bump">
-            {totalIndexed.toLocaleString()} {unitLabel}
+            {totalIndexed.toLocaleString(i18n.language)} {unit}
           </span>{' '}
           <span style={{ color: 'var(--color-text-tertiary)' }}>
             ({rangeLabel})
           </span>{' '}
           <span style={{ color: 'var(--color-text-tertiary)' }}>
-            · Still indexing…
+            · {t('dataSources.sync.stillIndexing')}
           </span>
         </div>
         <div style={{ fontSize: 10.5, color: 'var(--color-text-tertiary)' }}>
-          Deep Research available now · results improve as more {unitLabel} are indexed
+          {t('dataSources.sync.researchReady', { unit })}
         </div>
       </div>
     );
@@ -757,13 +779,13 @@ export function SyncStatusDisplay({
   if (totalIndexed > 0) {
     const lastSyncLabel = formatTimeAgo(sync?.last_sync);
     const rangeLabel = isComplete
-      ? 'complete inbox'
+      ? t('dataSources.sync.complete')
       : backlogRange;
     return (
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 12, color: 'var(--color-success)' }}>
-            Indexed {totalIndexed.toLocaleString()} {unitLabel}
+            {t('dataSources.sync.indexed')} {totalIndexed.toLocaleString(i18n.language)} {unit}
             {rangeLabel && (
               <span style={{ color: 'var(--color-text-tertiary)' }}>
                 {' '}({rangeLabel})
@@ -771,7 +793,7 @@ export function SyncStatusDisplay({
             )}
             {lastSyncLabel && (
               <span style={{ color: 'var(--color-text-tertiary)' }}>
-                {' · '}Last synced {lastSyncLabel}
+                {' · '}{t('dataSources.sync.lastSynced', { when: lastSyncLabel })}
               </span>
             )}
           </span>
@@ -787,7 +809,7 @@ export function SyncStatusDisplay({
               cursor: syncing || disabled ? 'default' : 'pointer',
               opacity: syncing || disabled ? 0.5 : 1,
             }}
-          >{syncing ? '...' : 'Re-sync'}</button>
+          >{syncing ? '...' : t('dataSources.sync.resync')}</button>
         </div>
         {syncError && (
           <div style={{ fontSize: 11, color: 'var(--color-error)', marginTop: 4 }}>
@@ -805,8 +827,8 @@ export function SyncStatusDisplay({
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 12, color: 'var(--color-text-tertiary)' }}>
           {hasSynced
-            ? `Synced — 0 ${unitLabel} found`
-            : 'Connected — not synced yet'}
+            ? t('dataSources.sync.syncedEmpty', { unit })
+            : t('dataSources.sync.notSynced')}
         </span>
         <button
           onClick={handleSync}
@@ -818,11 +840,11 @@ export function SyncStatusDisplay({
             cursor: syncing || disabled ? 'default' : 'pointer', fontWeight: 600,
             opacity: syncing || disabled ? 0.5 : 1,
           }}
-        >{syncing ? 'Syncing...' : hasSynced ? 'Re-sync' : 'Sync Now'}</button>
+        >{syncing ? t('dataSources.sync.syncing') : hasSynced ? t('dataSources.sync.resync') : t('dataSources.sync.syncNow')}</button>
       </div>
       {hasSynced && connectorId === 'slack' && (
         <div style={{ fontSize: 10, color: 'var(--color-text-tertiary)', marginTop: 4 }}>
-          Tip: invite the bot to channels with /invite @Nicx, then re-sync
+          {t('dataSources.sync.slackTip')}
         </div>
       )}
       {syncError && (
@@ -834,7 +856,12 @@ export function SyncStatusDisplay({
   );
 }
 
+/** Etapas da conexão (chaves em dataSources.connect.stages) e a barra de progresso de cada uma. */
+type ConnectStage = '' | 'connecting' | 'openingSignIn' | 'connected' | 'authenticating' | 'waiting' | 'syncing';
+const STAGE_PROGRESS: Record<string, string> = { syncing: '75%', connected: '50%' };
+
 function DataSourcesSection() {
+  const { t } = useTranslation();
   const cachedConnectors = useAppStore((s) => s.cachedConnectors);
   const setCachedConnectors = useAppStore((s) => s.setCachedConnectors);
   const connectors = cachedConnectors ?? [];
@@ -894,7 +921,7 @@ function DataSourcesSection() {
   }, [connectors, loadSyncStatuses]);
 
   const [connectingId, setConnectingId] = useState<string | null>(null);
-  const [connectStage, setConnectStage] = useState<string>('');
+  const [connectStage, setConnectStage] = useState<ConnectStage>('');
   const [connectError, setConnectError] = useState<string>('');
 
   useEffect(() => () => disconnectAbortRef.current?.abort(), []);
@@ -936,7 +963,7 @@ function DataSourcesSection() {
       if (!(err instanceof DOMException && err.name === 'AbortError')) {
         setDisconnectError({
           id,
-          message: err instanceof Error ? err.message : 'Disconnect failed',
+          message: err instanceof Error ? err.message : t('dataSources.sources.disconnectFailedGeneric'),
         });
       }
     } finally {
@@ -951,7 +978,7 @@ function DataSourcesSection() {
     if (loading || disconnectAbortRef.current) return;
     setLoading(true);
     setConnectingId(id);
-    setConnectStage('Connecting...');
+    setConnectStage('connecting');
     setConnectError('');
     try {
       const resp = req === null ? null : await connectSource(id, req);
@@ -963,11 +990,11 @@ function DataSourcesSection() {
       // and wait for the callback to flip the connector to connected. Without
       // this the connector would stay "pending" forever.
       if (req === null || resp?.status === 'oauth_required') {
-        setConnectStage('Opening provider sign-in...');
+        setConnectStage('openingSignIn');
         await startServerOAuth(id, resp?.oauth_start);
       }
 
-      setConnectStage('Connected! Starting sync...');
+      setConnectStage('connected');
 
       // Wait for connector to show as connected
       for (let i = 0; i < 20; i++) {
@@ -984,11 +1011,11 @@ function DataSourcesSection() {
           })));
           break;
         }
-        setConnectStage(i < 5 ? 'Authenticating...' : 'Waiting for connection...');
+        setConnectStage(i < 5 ? 'authenticating' : 'waiting');
       }
 
       // Trigger sync
-      setConnectStage('Syncing data...');
+      setConnectStage('syncing');
       try {
         await triggerSync(id);
       } catch { /* sync may already be running */ }
@@ -999,9 +1026,9 @@ function DataSourcesSection() {
       loadConnectors();
       loadSyncStatuses();
     } catch (err: any) {
-      let errorMsg = err.message || 'Connection failed';
+      let errorMsg = err.message || t('dataSources.connect.failed');
       if (id === 'gmail_imap' && (errorMsg.includes('auth') || errorMsg.includes('credentials') || errorMsg.includes('LOGIN'))) {
-        errorMsg = 'Invalid credentials — make sure you\'re using an App Password (16 characters), not your regular Gmail password.';
+        errorMsg = t('dataSources.connect.gmailInvalid');
       }
       setConnectError(errorMsg);
       setConnectStage('');
@@ -1039,7 +1066,7 @@ function DataSourcesSection() {
   const connected = unifiedConnectors.filter((c) => c.connected);
   const notConnectedBase = unifiedConnectors.filter((c) => !c.connected);
   // Always show the upload card in the not-connected list (it has no backend connector)
-  const uploadEntry = { connector_id: 'upload', display_name: 'Upload / Paste', connected: false, chunks: 0, auth_type: 'local' };
+  const uploadEntry = { connector_id: 'upload', display_name: t('dataSources.upload.entryName'), connected: false, chunks: 0, auth_type: 'local' };
   const notConnected = notConnectedBase.some((c) => c.connector_id === 'upload')
     ? notConnectedBase
     : [...notConnectedBase, uploadEntry];
@@ -1050,7 +1077,7 @@ function DataSourcesSection() {
       <div className="flex flex-col gap-5">
         <section>
           <div className="hud-label mb-2" style={{ color: 'var(--color-text-tertiary)' }}>
-            Loading sources…
+            {t('dataSources.sources.loading')}
           </div>
           <div className="flex flex-col gap-2">
             {[0, 1, 2, 3].map((i) => (
@@ -1077,7 +1104,7 @@ function DataSourcesSection() {
         <section>
           <div className="hud-label mb-2 flex items-center gap-2">
             <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: 999, background: 'var(--color-success)' }} />
-            Connected · {connected.length}
+            {t('dataSources.sources.connected', { n: connected.length })}
           </div>
           <div className="flex flex-col gap-2">
           {connected.map((c) => {
@@ -1113,7 +1140,7 @@ function DataSourcesSection() {
                     />
                     {disconnectError?.id === c.connector_id && (
                       <div style={{ fontSize: 11, color: 'var(--color-error)', marginTop: 4 }}>
-                        Disconnect failed: {disconnectError.message}
+                        {t('dataSources.sources.disconnectFailed', { error: disconnectError.message })}
                       </div>
                     )}
                   </div>
@@ -1133,8 +1160,8 @@ function DataSourcesSection() {
                     }}
                   >
                     {disconnectingId === c.connector_id
-                      ? sync?.state === 'stopping' ? 'Cleaning up…' : 'Disconnecting…'
-                      : sync?.state === 'stopping' ? 'Finish disconnect' : 'Disconnect'}
+                      ? sync?.state === 'stopping' ? t('dataSources.sources.cleaningUp') : t('dataSources.sources.disconnecting')
+                      : sync?.state === 'stopping' ? t('dataSources.sources.finishDisconnect') : t('dataSources.sources.disconnect')}
                   </button>
                 </div>
               </div>
@@ -1149,7 +1176,7 @@ function DataSourcesSection() {
         <section>
           <div className="hud-label mb-2 flex items-center gap-2">
             <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: 999, background: 'var(--color-text-tertiary)' }} />
-            Available · {notConnected.length}
+            {t('dataSources.sources.available', { n: notConnected.length })}
           </div>
           <div className="grid grid-cols-2 gap-2">
           {notConnected.map((c) => {
@@ -1179,18 +1206,18 @@ function DataSourcesSection() {
                       {meta?.display_name ?? c.display_name}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--color-text-tertiary)', marginTop: 2 }}>
-                      {meta?.description ?? 'Not connected'}
+                      {meta?.description ?? t('dataSources.sources.notConnected')}
                     </div>
                   </div>
                   <span style={{ color: 'var(--color-text-secondary)', fontSize: 12, fontWeight: 500 }}>
-                    {isExpanded ? '× Close' : '+ Add'}
+                    {isExpanded ? t('dataSources.common.close') : t('dataSources.common.add')}
                   </span>
                 </div>
 
                 {isExpanded && c.connector_id === 'upload' && (
                   <div style={{ borderTop: '1px solid var(--color-border)', padding: 12 }}>
                     <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 10 }}>
-                      Paste text or upload files (.txt, .md, .pdf, .docx, .csv) to add them to your knowledge base.
+                      {t('dataSources.upload.hint')}
                     </div>
                     <UploadForm onDone={loadConnectors} />
                   </div>
@@ -1209,7 +1236,7 @@ function DataSourcesSection() {
                         }}
                       >
                         <div style={{ color: 'var(--color-accent-purple)', fontSize: 10, fontWeight: 600, marginBottom: 3 }}>
-                          STEP {i + 1}
+                          {t('dataSources.connect.step', { n: i + 1 })}
                         </div>
                         <div style={{ fontSize: 12, marginBottom: step.url ? 4 : 0 }}>{step.label}</div>
                         {step.url && (
@@ -1219,7 +1246,7 @@ function DataSourcesSection() {
                             rel="noopener noreferrer"
                             style={{ color: 'var(--color-accent)', fontSize: 11, textDecoration: 'underline' }}
                           >
-                            {step.urlLabel || 'Open'} &rarr;
+                            {step.urlLabel || t('dataSources.common.open')} &rarr;
                           </a>
                         )}
                       </div>
@@ -1242,7 +1269,7 @@ function DataSourcesSection() {
                     {meta?.troubleshooting && (
                       <details className="mt-2">
                         <summary className="text-[11px] cursor-pointer" style={{ color: 'var(--color-text-tertiary)' }}>
-                          Having trouble?
+                          {t('dataSources.connect.trouble')}
                         </summary>
                         <ul className="mt-1 space-y-1">
                           {meta.troubleshooting.map((tip: string, i: number) => (
@@ -1265,7 +1292,7 @@ function DataSourcesSection() {
                             border: '2px solid var(--color-warning)',
                             borderTopColor: 'transparent',
                           }} />
-                          {connectStage}
+                          {t(`dataSources.connect.stages.${connectStage}`)}
                         </div>
                         <div style={{
                           height: 3, borderRadius: 2, marginTop: 6,
@@ -1274,7 +1301,7 @@ function DataSourcesSection() {
                         }}>
                           <div style={{
                             height: '100%', borderRadius: 2, background: 'var(--color-warning)',
-                            width: connectStage.includes('Sync') ? '75%' : connectStage.includes('Connected') ? '50%' : '25%',
+                            width: STAGE_PROGRESS[connectStage] ?? '25%',
                             transition: 'width 0.5s ease',
                           }} />
                         </div>
@@ -1302,7 +1329,7 @@ function DataSourcesSection() {
                     />
                     {connectingId === c.connector_id && connectStage && (
                       <div style={{ marginTop: 8, fontSize: 12, color: 'var(--color-warning)' }}>
-                        {connectStage}
+                        {t(`dataSources.connect.stages.${connectStage}`)}
                       </div>
                     )}
                     {connectError && connectingId === null && expandedId === c.connector_id && (
@@ -1345,28 +1372,31 @@ interface MessagingChannelConfig {
   howToUse: (cfg: Record<string, unknown>) => string;
 }
 
+// Os textos (description, setupSteps, label dos campos, activeLabel e
+// howToUse) s\u00e3o chaves do i18n, traduzidas na hora de mostrar. Passos que
+// come\u00e7am com COPYABLE: s\u00e3o conte\u00fado para copiar e n\u00e3o passam pelo i18n.
 const MESSAGING_CHANNELS: MessagingChannelConfig[] = [
   {
     type: 'slack',
     name: 'Slack',
     icon: '#',
-    description: 'DM your agent in any Slack workspace',
+    description: 'dataSources.slack.description',
     setupSteps: [
-      '1. Go to api.slack.com/apps \u2192 click "Create New App" \u2192 choose "From an app manifest"',
-      '2. Select your workspace. When asked for the manifest format, choose JSON. Then paste the manifest below (click "Copy" to copy it):',
+      'dataSources.slack.steps.s1',
+      'dataSources.slack.steps.s2',
       'COPYABLE:{"display_information":{"name":"Nicx"},"features":{"app_home":{"home_tab_enabled":true,"messages_tab_enabled":true,"messages_tab_read_only_enabled":false},"bot_user":{"display_name":"Nicx","always_online":true}},"oauth_config":{"scopes":{"bot":["chat:write","im:write","im:read","im:history","mpim:read","mpim:history","users:read","channels:read","channels:history","channels:join","groups:read","groups:history","app_mentions:read"]}},"settings":{"event_subscriptions":{"bot_events":["message.im"]},"socket_mode_enabled":true}}',
-      '3. Click "Next" \u2192 review the summary \u2192 click "Create". Then go to "Install App" in the left sidebar \u2192 click "Install to Workspace" \u2192 click "Allow"',
-      '4. In the left sidebar, click "OAuth & Permissions". Copy the "Bot User OAuth Token" (starts with xoxb-...)',
-      '5. In the left sidebar, click "Basic Information" \u2192 scroll to "App-Level Tokens" \u2192 click "Generate Token and Scopes" \u2192 name it "socket" \u2192 click "Add Scope" \u2192 select "connections:write" \u2192 click "Generate" \u2192 copy the token (starts with xapp-...)',
-      '6. (Optional) Still in "Basic Information", scroll to "Display Information" \u2192 upload the Nicx icon as the app icon',
-      '7. Paste both tokens below and click Connect',
+      'dataSources.slack.steps.s3',
+      'dataSources.slack.steps.s4',
+      'dataSources.slack.steps.s5',
+      'dataSources.slack.steps.s6',
+      'dataSources.slack.steps.s7',
     ],
     fields: [
-      { key: 'bot_token', label: 'Bot Token', placeholder: 'xoxb-...', type: 'password', required: true },
-      { key: 'app_token', label: 'App Token', placeholder: 'xapp-...', type: 'password', required: true },
+      { key: 'bot_token', label: 'dataSources.slack.botToken', placeholder: 'xoxb-...', type: 'password', required: true },
+      { key: 'app_token', label: 'dataSources.slack.appToken', placeholder: 'xapp-...', type: 'password', required: true },
     ],
-    activeLabel: () => 'Connected to Slack',
-    howToUse: () => 'Open Slack and DM @Nicx to talk to your agent.',
+    activeLabel: () => 'dataSources.slack.active',
+    howToUse: () => 'dataSources.slack.howToUse',
   },
 ];
 
@@ -1382,6 +1412,7 @@ function SendBlueSection({
   onDone: () => void;
   onRemove: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [apiKey, setApiKey] = useState('');
   const [apiSecret, setApiSecret] = useState('');
@@ -1424,7 +1455,7 @@ function SendBlueSection({
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 600, fontSize: 13 }}>iMessage + SMS</div>
             <div style={{ fontSize: 11, color: 'var(--color-success)' }}>
-              Active &mdash; text {(cfg.phone_number as string) || 'your number'} to chat
+              {t('dataSources.sendblue.active', { phone: (cfg.phone_number as string) || t('dataSources.sendblue.yourNumber') })}
             </div>
           </div>
           <button
@@ -1436,7 +1467,7 @@ function SendBlueSection({
               border: '1px solid var(--color-border)',
               borderRadius: 4, cursor: 'pointer',
             }}
-          >Remove</button>
+          >{t('dataSources.common.remove')}</button>
         </div>
         {health && (
           <div style={{
@@ -1444,7 +1475,7 @@ function SendBlueSection({
             padding: '8px 14px', fontSize: 11,
             color: 'var(--color-text-secondary)',
           }}>
-            Webhook: {health.webhook_registered ? 'registered' : 'not registered'}
+            {health.webhook_registered ? t('dataSources.sendblue.webhookRegistered') : t('dataSources.sendblue.webhookNotRegistered')}
             {health.phone_number && ` \u2022 ${health.phone_number}`}
           </div>
         )}
@@ -1462,11 +1493,11 @@ function SendBlueSection({
   // Not active — setup wizard
   const steps = [
     {
-      title: 'Get SendBlue API keys',
+      title: t('dataSources.sendblue.step1Title'),
       content: (
         <div>
           <div style={{ fontSize: 12, marginBottom: 8 }}>
-            SendBlue lets your agent send and receive iMessages and SMS. You need an account and API credentials.
+            {t('dataSources.sendblue.step1Intro')}
           </div>
           <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
             <a
@@ -1475,7 +1506,7 @@ function SendBlueSection({
               rel="noopener noreferrer"
               style={{ color: 'var(--color-accent)', fontSize: 12, textDecoration: 'underline' }}
             >
-              1. Sign up at sendblue.co &rarr;
+              {t('dataSources.sendblue.signUp')} &rarr;
             </a>
           </div>
           <div style={{ marginBottom: 8 }}>

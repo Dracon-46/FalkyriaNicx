@@ -2,5 +2,171 @@
   "language": {
     "label": "भाषा",
     "description": "इंटरफ़ेस, Nicx के जवाबों और आवाज़ की भाषा।"
+  },
+  "page": {
+    "title": "सेटिंग्स",
+    "saved": "सहेजा गया",
+    "description": "ऐप की पसंद: रूप, मॉडल, आवाज़, मेमोरी और आपका डेटा।"
+  },
+  "sections": {
+    "appearance": "रूप",
+    "connection": "कनेक्शन",
+    "inference": "मॉडल का स्रोत",
+    "models": "मॉडल",
+    "apiKeys": "API कुंजियाँ",
+    "tools": "टूल",
+    "memory": "मेमोरी",
+    "modelDefaults": "मॉडल की डिफ़ॉल्ट सेटिंग",
+    "voice": "आवाज़",
+    "data": "डेटा",
+    "about": "परिचय"
+  },
+  "theme": {
+    "label": "थीम",
+    "description": "चुनें कि Nicx कैसा दिखे",
+    "light": "हल्की",
+    "dark": "गहरी",
+    "system": "सिस्टम"
+  },
+  "fontSize": {
+    "label": "अक्षरों का आकार",
+    "small": "छोटा",
+    "default": "डिफ़ॉल्ट",
+    "large": "बड़ा"
+  },
+  "connection": {
+    "serverStatus": "सर्वर की स्थिति",
+    "notConnected": "कनेक्ट नहीं है",
+    "connected": "कनेक्टेड",
+    "disconnected": "डिस्कनेक्टेड",
+    "checking": "जाँच हो रही है...",
+    "serverAddress": "सर्वर का पता",
+    "invalidAddress": "यह पता नहीं है (इसे http:// से शुरू होना चाहिए)। डिफ़ॉल्ट इस्तेमाल करने के लिए खाली छोड़ें।",
+    "addressHint": "खाली छोड़ें। सिर्फ़ तब बदलें जब Nicx सर्वर किसी दूसरे पोर्ट या मशीन पर चलता हो।",
+    "addressPlaceholder": "खाली = डिफ़ॉल्ट",
+    "apiKey": "API कुंजी",
+    "apiKeyDescription": "सिर्फ़ तब ज़रूरी है जब सर्वर API कुंजी के साथ शुरू किया गया हो"
+  },
+  "inference": {
+    "source": "स्रोत",
+    "sourceDescription": "ऐप मॉडल कहाँ चलाता है। रीस्टार्ट के बाद लागू होता है।",
+    "ollama": "ऐप का Ollama (डिफ़ॉल्ट)",
+    "custom": "अपना OpenAI-संगत सर्वर",
+    "serverUrl": "सर्वर का पता",
+    "serverUrlDescription": "जैसे LM Studio: http://localhost:1234/v1",
+    "model": "मॉडल",
+    "modelDescription": "आपके सर्वर द्वारा दिए गए मॉडल की ID",
+    "serverType": "सर्वर का प्रकार",
+    "serverTypeDescription": "OpenAI-संगत इंजन",
+    "apiKey": "API कुंजी (वैकल्पिक)",
+    "apiKeyDescription": "सिर्फ़ तब, जब आपका सर्वर माँगे",
+    "apiKeyPlaceholder": "न हो तो खाली छोड़ें",
+    "save": "मॉडल का स्रोत सहेजें",
+    "saved": "सहेजा गया। लागू करने के लिए ऐप रीस्टार्ट करें।",
+    "saveFailed": "सहेजा नहीं जा सका।"
+  },
+  "models": {
+    "none": "कोई मॉडल लोड नहीं है",
+    "local": "लोकल मॉडल (Ollama)",
+    "localDescription": "इस कंप्यूटर पर चलने वाले मॉडल",
+    "pullBefore": "और मॉडल डाउनलोड करने के लिए टर्मिनल में",
+    "pullModelName": "मॉडल-का-नाम",
+    "pullAfter": "चलाएँ",
+    "cloud": "क्लाउड प्रदाता",
+    "cloudDescription": "हरा बिंदु: API कुंजी सेट है"
+  },
+  "apiKeys": {
+    "openaiDescription": "GPT मॉडल",
+    "anthropicDescription": "Claude मॉडल",
+    "googleDescription": "Gemini मॉडल",
+    "openrouterDescription": "कई प्रदाता एक ही जगह",
+    "atlasDescription": "Atlas Cloud के ज़रिए मॉडल",
+    "atlasPlaceholder": "Atlas Cloud API कुंजी",
+    "savedSecure": "सुरक्षित स्टोरेज में सहेजी गई",
+    "savedServer": "लोकल सर्वर ने सहेजी",
+    "remove": "हटाएँ",
+    "saved": "सहेजी गई",
+    "saveFailed": "API कुंजी सहेजी नहीं जा सकी",
+    "removeFailed": "API कुंजी हटाई नहीं जा सकी"
+  },
+  "tools": {
+    "webSearch": "वेब खोज",
+    "webSearchDescription": "वेब खोज टूल के लिए Tavily कुंजी"
+  },
+  "memory": {
+    "status": "मेमोरी की स्थिति",
+    "checkingBackend": "मेमोरी की जाँच हो रही है...",
+    "notConfiguredLong": "मेमोरी सेट नहीं है",
+    "backendEntries": "{{backend}} — सहेजी गई चीज़ें: {{entries}}",
+    "checking": "जाँच हो रही है...",
+    "notConfigured": "सेट नहीं है",
+    "entries": "चीज़ें: {{entries}}",
+    "unavailable": "उपलब्ध नहीं",
+    "retry": "फिर कोशिश करें",
+    "useContext": "बातचीत में मेमोरी इस्तेमाल करें",
+    "useContextDescription": "बातचीत में ज़रूरी यादें अपने-आप जोड़ता है",
+    "backend": "मेमोरी इंजन",
+    "backendDescription": "कौन-सा खोज इंजन इस्तेमाल करें",
+    "topK": "शामिल नतीजे",
+    "minScore": "न्यूनतम प्रासंगिकता",
+    "maxTokens": "अधिकतम संदर्भ टोकन"
+  },
+  "modelDefaults": {
+    "temperature": "टेम्परेचर",
+    "maxTokens": "अधिकतम टोकन"
+  },
+  "voice": {
+    "input": "आवाज़ से इनपुट",
+    "inputDescription": "बोलकर लिखने और आवाज़ से बातचीत के लिए माइक्रोफ़ोन इस्तेमाल करें (लोकल पहचान)",
+    "output": "आवाज़ में आउटपुट",
+    "outputDescription": "Nicx के जवाब सुनने का बटन दिखाएँ",
+    "autoplay": "जवाब अपने-आप बोलें",
+    "autoplayDescription": "हर जवाब पूरा होते ही उसे ज़ोर से पढ़ें",
+    "tts": "Nicx की आवाज़",
+    "ttsDescription": "बोले गए जवाबों के लिए इंजन और आवाज़",
+    "recognition": "आवाज़ की पहचान",
+    "recognitionDescription": "आपके कंप्यूटर पर चल रहा Whisper",
+    "checking": "जाँच हो रही है...",
+    "available": "उपलब्ध",
+    "notConfigured": "सेट नहीं है",
+    "setupHint": "आवाज़ से इनपुट के लिए आवाज़ की पहचान सेट करें।",
+    "docsBefore": "ज़्यादा जानकारी के लिए",
+    "docsLink": "दस्तावेज़",
+    "docsAfter": "देखें।"
+  },
+  "wake": {
+    "enableLabel": "“Nicx, ligar” चालू करें (बैकग्राउंड में सुनना)",
+    "enableDescription": "“Nicx, ligar” (या “Ei Nicx”) बोलें और मैस्कॉट आवाज़ से बात करने के लिए तैयार दिखेगा। माइक्रोफ़ोन सिर्फ़ इसी कंप्यूटर पर खुला रहता है: कुछ भी रिकॉर्ड या भेजा नहीं जाता।",
+    "enableToggle": "“Nicx, ligar” चालू करें",
+    "listening": "सुनना",
+    "noWindow": "इस कंप्यूटर पर फ़्लोटिंग विंडो नहीं है: इंटरफ़ेस ब्राउज़र में खुलता है।",
+    "howToStop": "मैस्कॉट को हटाने के लिए “tchau” या “desligar” बोलें; 1 मिनट की चुप्पी के बाद भी वह चला जाता है।",
+    "autostart": "Windows के साथ शुरू करें",
+    "autostartDescription": "Windows में लॉग इन करते ही सुनना शुरू करता है (सिर्फ़ तब जब ऊपर वाला विकल्प चालू हो)",
+    "serverUnavailable": "Nicx सर्वर उपलब्ध नहीं है",
+    "saveFailed": "सहेजा नहीं जा सका",
+    "restartServer": "Nicx सर्वर रीस्टार्ट करें",
+    "checking": "जाँच हो रही है...",
+    "starting": "शुरू हो रहा है...",
+    "states": {
+      "listening": "बैकग्राउंड में सुन रहा है",
+      "paused": "रुका हुआ (ट्रे आइकन)",
+      "mascotOpen": "मैस्कॉट खुला है",
+      "stopped": "बंद"
+    }
+  },
+  "data": {
+    "conversations": "बातचीत",
+    "storedLocally": "इस कंप्यूटर पर सहेजी गईं: {{total}}",
+    "export": "एक्सपोर्ट",
+    "import": "इंपोर्ट",
+    "clearAll": "सारा डेटा मिटाएँ",
+    "clearAllDescription": "सारी बातचीत हमेशा के लिए मिटा देता है",
+    "confirm": "पक्का करने के लिए फिर क्लिक करें",
+    "clear": "मिटाएँ"
+  },
+  "about": {
+    "tagline": "Falkyria की आर्टिफ़िशियल इंटेलिजेंस।",
+    "repository": "रिपॉज़िटरी"
   }
 }

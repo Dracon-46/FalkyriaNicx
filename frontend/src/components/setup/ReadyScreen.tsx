@@ -1,8 +1,9 @@
 import { Sparkles, MessageSquare, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { SOURCE_CATALOG } from '../../types/connectors';
 
 // ---------------------------------------------------------------------------
-// Starter queries
+// Starter queries (keys under setup.ready.starters)
 // ---------------------------------------------------------------------------
 
 function getStarterQueries(connectedSources: string[]): string[] {
@@ -10,34 +11,30 @@ function getStarterQueries(connectedSources: string[]): string[] {
   const has = (id: string) => connectedSources.includes(id);
 
   if (has('gmail') || has('gmail_imap')) {
-    queries.push('What emails need my attention today?');
+    queries.push('email');
   }
   if (has('gcalendar')) {
-    queries.push("What's on my calendar this week?");
+    queries.push('calendar');
   }
   if (has('slack')) {
-    queries.push('Summarize important Slack messages from yesterday');
+    queries.push('slack');
   }
   if (has('gdrive') || has('notion') || has('obsidian')) {
-    queries.push('Find my notes about project planning');
+    queries.push('notes');
   }
   if (has('imessage')) {
-    queries.push('What have I been texting about lately?');
+    queries.push('imessage');
   }
   if (has('gcontacts')) {
-    queries.push('Who are my most frequent collaborators?');
+    queries.push('contacts');
   }
   if (has('granola')) {
-    queries.push('Summarize my recent meeting notes');
+    queries.push('meetings');
   }
 
   // Fallback defaults
   if (queries.length === 0) {
-    return [
-      'What should I focus on today?',
-      'Summarize my recent activity',
-      'Help me draft a quick update',
-    ];
+    return ['focus', 'activity', 'update'];
   }
 
   return queries.slice(0, 3);
@@ -89,7 +86,10 @@ export function ReadyScreen({
   connectedSources: string[];
   onStart: (query?: string) => void;
 }) {
-  const starters = getStarterQueries(connectedSources);
+  const { t } = useTranslation();
+  const starters = getStarterQueries(connectedSources).map((key) =>
+    t(`setup.ready.starters.${key}`),
+  );
 
   const connectedCards = connectedSources
     .map((id) => SOURCE_CATALOG.find((c) => c.connector_id === id))
@@ -108,13 +108,16 @@ export function ReadyScreen({
       {/* Headline */}
       <div>
         <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
-          You're all set!
+          {t('setup.ready.title')}
         </h2>
         <p className="text-sm max-w-sm" style={{ color: 'var(--color-text-secondary)' }}>
           {connectedCards.length > 0
-            ? `Connected ${connectedCards.length} source${connectedCards.length !== 1 ? 's' : ''}: ${connectedCards.map((c) => c!.display_name).join(', ')}.`
-            : 'Your personal AI is ready to help.'}
-          {' '}Ask anything about your work and life.
+            ? t('setup.ready.connected', {
+                n: connectedCards.length,
+                names: connectedCards.map((c) => c!.display_name).join(', '),
+              })
+            : t('setup.ready.noSources')}
+          {' '}{t('setup.ready.askAnything')}
         </p>
       </div>
 
@@ -122,7 +125,7 @@ export function ReadyScreen({
       <div className="w-full max-w-sm flex flex-col gap-2">
         <p className="text-xs font-semibold uppercase tracking-wider mb-1 text-left"
           style={{ color: 'var(--color-text-tertiary)' }}>
-          Try asking
+          {t('setup.ready.tryAsking')}
         </p>
         {starters.map((q) => (
           <StarterCard key={q} query={q} onSelect={onStart} />
@@ -135,7 +138,7 @@ export function ReadyScreen({
         className="px-8 py-3 rounded-xl font-semibold text-sm transition-all"
         style={{ background: 'var(--color-accent)', color: 'var(--color-on-accent)' }}
       >
-        Open Chat
+        {t('setup.ready.openChat')}
       </button>
     </div>
   );

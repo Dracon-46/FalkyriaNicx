@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { getSyncStatus } from '../../lib/connectors-api';
 import { SOURCE_CATALOG } from '../../types/connectors';
 import type { SyncStatus } from '../../types/connectors';
@@ -15,6 +16,7 @@ function ProgressRow({
   displayName: string;
   status: SyncStatus | null;
 }) {
+  const { t } = useTranslation();
   const isDone = status?.state === 'idle' && (status?.items_synced ?? 0) > 0;
   const pct =
     status && status.items_total > 0
@@ -51,12 +53,12 @@ function ProgressRow({
             {status?.state === 'syncing'
               ? `${status.items_synced} / ${status.items_total}`
               : isDone
-                ? `${status!.items_synced} items`
+                ? t('setup.ingest.items', { n: status!.items_synced })
                 : status?.state === 'paused'
-                  ? 'Paused'
+                  ? t('setup.ingest.paused')
                   : status?.state === 'error'
-                    ? 'Error'
-                    : 'Starting...'}
+                    ? t('setup.ingest.error')
+                    : t('setup.ingest.starting')}
           </span>
         </div>
       </div>
@@ -93,6 +95,7 @@ export function IngestDashboard({
   connectedIds: string[];
   onReady: () => void;
 }) {
+  const { t } = useTranslation();
   const [statuses, setStatuses] = useState<Record<string, SyncStatus | null>>(() =>
     Object.fromEntries(connectedIds.map((id) => [id, null])),
   );
@@ -132,12 +135,12 @@ export function IngestDashboard({
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--color-text)' }}>
-          {allDone ? 'Sync complete' : 'Syncing your data...'}
+          {allDone ? t('setup.ingest.done') : t('setup.ingest.syncing')}
         </h2>
         <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
           {allDone
-            ? `Indexed ${totalSynced} items across ${connectedIds.length} source${connectedIds.length !== 1 ? 's' : ''}.`
-            : 'This may take a few minutes depending on your data volume.'}
+            ? t('setup.ingest.summary', { items: totalSynced, sources: connectedIds.length })
+            : t('setup.ingest.mayTake')}
         </p>
       </div>
 
@@ -166,11 +169,11 @@ export function IngestDashboard({
           }}
         >
           {!allDone && <Loader2 size={16} className="animate-spin" />}
-          Start Researching →
+          {t('setup.ingest.startResearching')}
         </button>
         {!allDone && (
           <p className="text-center text-xs mt-2" style={{ color: 'var(--color-text-tertiary)' }}>
-            Sync will continue in the background
+            {t('setup.ingest.background')}
           </p>
         )}
       </div>

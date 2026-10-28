@@ -7,6 +7,7 @@ import {
   FolderOpen,
   Loader2,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { SOURCE_CATALOG } from '../../types/connectors';
 import { connectSource, getConnector } from '../../lib/connectors-api';
 import { getBase } from '../../lib/api';
@@ -92,18 +93,19 @@ function FilesystemPanel({
   onSkip: () => void;
   isConnecting: boolean;
 }) {
+  const { t } = useTranslation();
   const [path, setPath] = useState('');
   return (
     <div className="flex flex-col gap-4">
       <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-        Enter the path to your local {displayName} folder.
+        {t('setup.connect.folderPrompt', { name: displayName })}
       </p>
       <div className="flex gap-2">
         <input
           type="text"
           value={path}
           onChange={(e) => setPath(e.target.value)}
-          placeholder="/Users/you/Documents/..."
+          placeholder={t('setup.connect.pathPlaceholder')}
           className="flex-1 px-3 py-2 rounded-lg text-sm outline-none"
           style={{
             background: 'var(--color-surface)',
@@ -122,7 +124,7 @@ function FilesystemPanel({
           }}
         >
           {isConnecting ? <Loader2 size={14} className="animate-spin" /> : <FolderOpen size={14} />}
-          Connect
+          {t('setup.connect.connect')}
         </button>
       </div>
       <button
@@ -130,7 +132,7 @@ function FilesystemPanel({
         className="text-xs self-start"
         style={{ color: 'var(--color-text-tertiary)' }}
       >
-        Skip for now
+        {t('setup.connect.skipForNow')}
       </button>
     </div>
   );
@@ -151,6 +153,7 @@ function OAuthPanel({
   onSkip: () => void;
   isConnecting: boolean;
 }) {
+  const { t } = useTranslation();
   const [waiting, setWaiting] = useState(false);
 
   const startOAuth = () => {
@@ -184,13 +187,13 @@ function OAuthPanel({
     <div className="flex flex-col gap-4">
       <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
         {waiting
-          ? `Waiting for ${displayName} authorization... Complete it in the browser window.`
-          : `Connect your ${displayName} account with one click.`}
+          ? t('setup.connect.oauthWaiting', { name: displayName })
+          : t('setup.connect.oauthPrompt', { name: displayName })}
       </p>
       {waiting ? (
         <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-accent)' }}>
           <Loader2 size={16} className="animate-spin" />
-          Waiting for authorization...
+          {t('setup.connect.waitingAuth')}
         </div>
       ) : (
         <button
@@ -202,7 +205,7 @@ function OAuthPanel({
           }}
         >
           <ExternalLink size={14} />
-          Connect {displayName}
+          {t('setup.connect.connectName', { name: displayName })}
         </button>
       )}
       <button
@@ -210,7 +213,7 @@ function OAuthPanel({
         className="text-xs self-start"
         style={{ color: 'var(--color-text-tertiary)' }}
       >
-        Skip for now
+        {t('setup.connect.skipForNow')}
       </button>
     </div>
   );
@@ -227,11 +230,11 @@ function LocalPanel({
   onSkip: () => void;
   isConnecting: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-4">
       <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-        {displayName} reads data directly from your Mac. Make sure the app is installed and
-        Full Disk Access is granted to Nicx in System Settings.
+        {t('setup.connect.localIntro', { name: displayName })}
       </p>
       <div
         className="px-4 py-3 rounded-lg text-sm"
@@ -240,8 +243,7 @@ function LocalPanel({
           color: 'var(--color-text-secondary)',
         }}
       >
-        <strong>System Settings</strong> → Privacy &amp; Security → Full Disk Access →
-        enable Nicx
+        <strong>{t('setup.connect.localSettings')}</strong> {t('setup.connect.localPath')}
       </div>
       <button
         onClick={() => onConnect({})}
@@ -255,14 +257,14 @@ function LocalPanel({
         }}
       >
         {isConnecting && <Loader2 size={14} className="animate-spin" />}
-        Check Access
+        {t('setup.connect.checkAccess')}
       </button>
       <button
         onClick={onSkip}
         className="text-xs self-start"
         style={{ color: 'var(--color-text-tertiary)' }}
       >
-        Skip for now
+        {t('setup.connect.skipForNow')}
       </button>
     </div>
   );
@@ -283,6 +285,7 @@ function StepByStepPanel({
   onSkip: () => void;
   isConnecting: boolean;
 }) {
+  const { t } = useTranslation();
   const steps = connector.steps || [];
   const fields = connector.inputFields || [];
   const [inputs, setInputs] = useState<Record<string, string>>(() =>
@@ -354,7 +357,7 @@ function StepByStepPanel({
             color: 'var(--color-accent-purple)', fontSize: 11,
             fontWeight: 600, marginBottom: 4,
           }}>
-            STEP {i + 1}
+            {t('setup.connect.step', { n: i + 1 })}
           </div>
           <div style={{
             color: 'var(--color-text)',
@@ -372,7 +375,7 @@ function StepByStepPanel({
                 textDecoration: 'underline',
               }}
             >
-              {step.urlLabel || 'Open'} &rarr;
+              {step.urlLabel || t('setup.connect.open')} &rarr;
             </a>
           )}
         </div>
@@ -438,7 +441,7 @@ function StepByStepPanel({
         fontSize: 11, color: 'var(--color-text-secondary)',
         marginBottom: 12, textAlign: 'center',
       }}>
-        Read-only access &middot; No data leaves your device
+        {t('setup.connect.readOnly')}
       </div>
 
       <div style={{ display: 'flex', gap: 8 }}>
@@ -454,7 +457,9 @@ function StepByStepPanel({
             cursor: 'pointer',
           }}
         >
-          {isConnecting ? 'Connecting...' : `Connect ${connector.display_name}`}
+          {isConnecting
+            ? t('setup.connect.connecting')
+            : t('setup.connect.connectName', { name: connector.display_name })}
         </button>
         <button
           onClick={onSkip}

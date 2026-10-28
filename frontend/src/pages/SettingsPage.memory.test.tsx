@@ -5,6 +5,7 @@ vi.mock('../lib/store', () => ({ useAppStore: vi.fn() }));
 
 import { MemoryStatusRow } from './SettingsPage';
 
+// Os testes rodam com os textos em português (src/i18n/test-setup.ts).
 describe('Settings memory status', () => {
   it('shows the failure detail and a Retry action, then the recovered count', () => {
     const onRetry = vi.fn();
@@ -22,11 +23,11 @@ describe('Settings memory status', () => {
     );
 
     expect(failed).toContain('Missing Authorization header (HTTP 401)');
-    expect(failed).toContain('Retry');
-    expect(failed).toContain('Unavailable');
+    expect(failed).toContain('Tentar de novo');
+    expect(failed).toContain('Indisponível');
     expect(failed).not.toContain('Unable to reach memory service');
-    expect(recovered).toContain('sqlite backend — 3 entries');
-    expect(recovered).not.toContain('Retry');
+    expect(recovered).toContain('sqlite — itens guardados: 3');
+    expect(recovered).not.toContain('Tentar de novo');
     expect(recovered).not.toContain('Missing Authorization header');
   });
 
@@ -38,8 +39,8 @@ describe('Settings memory status', () => {
       />,
     );
 
-    expect(html).toContain('Memory is not configured');
-    expect(html).toContain('Not configured');
-    expect(html).not.toContain('0 entries');
+    expect(html).toContain('A memória não está configurada');
+    expect(html).toContain('Não configurada');
+    expect(html).not.toContain('Itens: 0');
   });
 });

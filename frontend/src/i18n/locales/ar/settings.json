@@ -2,5 +2,171 @@
   "language": {
     "label": "اللغة",
     "description": "لغة الواجهة وردود Nicx والصوت."
+  },
+  "page": {
+    "title": "الإعدادات",
+    "saved": "تم الحفظ",
+    "description": "تفضيلات التطبيق: المظهر والنماذج والصوت والذاكرة وبياناتك."
+  },
+  "sections": {
+    "appearance": "المظهر",
+    "connection": "الاتصال",
+    "inference": "مصدر النماذج",
+    "models": "النماذج",
+    "apiKeys": "مفاتيح API",
+    "tools": "الأدوات",
+    "memory": "الذاكرة",
+    "modelDefaults": "إعدادات النموذج الافتراضية",
+    "voice": "الصوت",
+    "data": "البيانات",
+    "about": "حول"
+  },
+  "theme": {
+    "label": "السمة",
+    "description": "اختر مظهر Nicx",
+    "light": "فاتح",
+    "dark": "داكن",
+    "system": "النظام"
+  },
+  "fontSize": {
+    "label": "حجم الخط",
+    "small": "صغير",
+    "default": "افتراضي",
+    "large": "كبير"
+  },
+  "connection": {
+    "serverStatus": "حالة الخادم",
+    "notConnected": "غير متصل",
+    "connected": "متصل",
+    "disconnected": "انقطع الاتصال",
+    "checking": "جارٍ التحقق...",
+    "serverAddress": "عنوان الخادم",
+    "invalidAddress": "هذا ليس عنوانًا (يجب أن يبدأ بـ http://). اتركه فارغًا لاستخدام الافتراضي.",
+    "addressHint": "اتركه فارغًا. غيّره فقط إذا كان خادم Nicx يعمل على منفذ أو جهاز آخر.",
+    "addressPlaceholder": "فارغ = الافتراضي",
+    "apiKey": "مفتاح API",
+    "apiKeyDescription": "مطلوب فقط إذا بدأ الخادم بمفتاح API"
+  },
+  "inference": {
+    "source": "المصدر",
+    "sourceDescription": "أين يشغّل التطبيق النماذج. يُطبَّق بعد إعادة التشغيل.",
+    "ollama": "Ollama المدمج في التطبيق (افتراضي)",
+    "custom": "خادمك المتوافق مع OpenAI",
+    "serverUrl": "عنوان الخادم",
+    "serverUrlDescription": "مثال LM Studio: http://localhost:1234/v1",
+    "model": "النموذج",
+    "modelDescription": "معرّف النموذج الذي يقدّمه خادمك",
+    "serverType": "نوع الخادم",
+    "serverTypeDescription": "محرك متوافق مع OpenAI",
+    "apiKey": "مفتاح API (اختياري)",
+    "apiKeyDescription": "فقط إذا طلبه خادمك",
+    "apiKeyPlaceholder": "اتركه فارغًا إن لم يكن لديك",
+    "save": "حفظ مصدر النماذج",
+    "saved": "تم الحفظ. أعد تشغيل التطبيق للتطبيق.",
+    "saveFailed": "تعذّر الحفظ."
+  },
+  "models": {
+    "none": "لا توجد نماذج محمّلة",
+    "local": "النماذج المحلية (Ollama)",
+    "localDescription": "نماذج تعمل على هذا الكمبيوتر",
+    "pullBefore": "شغّل",
+    "pullModelName": "اسم-النموذج",
+    "pullAfter": "في الطرفية لتنزيل نماذج أخرى",
+    "cloud": "مزوّدو السحابة",
+    "cloudDescription": "النقطة الخضراء: مفتاح API مُعدّ"
+  },
+  "apiKeys": {
+    "openaiDescription": "نماذج GPT",
+    "anthropicDescription": "نماذج Claude",
+    "googleDescription": "نماذج Gemini",
+    "openrouterDescription": "عدة مزوّدين في مكان واحد",
+    "atlasDescription": "نماذج عبر Atlas Cloud",
+    "atlasPlaceholder": "مفتاح API لـ Atlas Cloud",
+    "savedSecure": "محفوظ في التخزين الآمن",
+    "savedServer": "محفوظ عبر الخادم المحلي",
+    "remove": "إزالة",
+    "saved": "تم الحفظ",
+    "saveFailed": "تعذّر حفظ مفتاح API",
+    "removeFailed": "تعذّرت إزالة مفتاح API"
+  },
+  "tools": {
+    "webSearch": "البحث في الويب",
+    "webSearchDescription": "مفتاح Tavily لأداة البحث في الويب"
+  },
+  "memory": {
+    "status": "حالة الذاكرة",
+    "checkingBackend": "جارٍ التحقق من الذاكرة...",
+    "notConfiguredLong": "الذاكرة غير مُعدّة",
+    "backendEntries": "{{backend}} — العناصر المحفوظة: {{entries}}",
+    "checking": "جارٍ التحقق...",
+    "notConfigured": "غير مُعدّة",
+    "entries": "العناصر: {{entries}}",
+    "unavailable": "غير متاحة",
+    "retry": "إعادة المحاولة",
+    "useContext": "استخدام الذاكرة في المحادثات",
+    "useContextDescription": "يضيف الذكريات ذات الصلة إلى المحادثات تلقائيًا",
+    "backend": "محرك الذاكرة",
+    "backendDescription": "أي محرك بحث يُستخدم",
+    "topK": "النتائج المضمّنة",
+    "minScore": "أدنى صلة",
+    "maxTokens": "أقصى عدد من رموز السياق"
+  },
+  "modelDefaults": {
+    "temperature": "درجة الحرارة",
+    "maxTokens": "أقصى عدد من الرموز"
+  },
+  "voice": {
+    "input": "الإدخال الصوتي",
+    "inputDescription": "استخدام الميكروفون للإملاء والمحادثة الصوتية (تعرّف محلي)",
+    "output": "الإخراج الصوتي",
+    "outputDescription": "إظهار زر الاستماع إلى ردود Nicx",
+    "autoplay": "نطق الردود تلقائيًا",
+    "autoplayDescription": "قراءة كل رد بصوت عالٍ فور انتهائه",
+    "tts": "صوت Nicx",
+    "ttsDescription": "المحرك والصوت المستخدمان في الردود المنطوقة",
+    "recognition": "التعرّف على الكلام",
+    "recognitionDescription": "Whisper يعمل على جهازك",
+    "checking": "جارٍ التحقق...",
+    "available": "متاح",
+    "notConfigured": "غير مُعدّ",
+    "setupHint": "أعدّ التعرّف على الكلام لاستخدام الإدخال الصوتي.",
+    "docsBefore": "راجع",
+    "docsLink": "الوثائق",
+    "docsAfter": "لمزيد من التفاصيل."
+  },
+  "wake": {
+    "enableLabel": "تفعيل “Nicx, ligar” (الاستماع في الخلفية)",
+    "enableDescription": "قل “Nicx, ligar” (أو “Ei Nicx”) وستظهر التميمة جاهزة للمحادثة الصوتية. يبقى الميكروفون مفتوحًا على هذا الكمبيوتر فقط: لا يُسجَّل ولا يُرسَل أي شيء.",
+    "enableToggle": "تفعيل “Nicx, ligar”",
+    "listening": "الاستماع",
+    "noWindow": "لا توجد نافذة عائمة على هذا الكمبيوتر: تُفتح الواجهة في المتصفح.",
+    "howToStop": "قل “tchau” أو “desligar” لتغادر التميمة؛ وتختفي أيضًا بعد دقيقة واحدة من الصمت.",
+    "autostart": "التشغيل مع Windows",
+    "autostartDescription": "يبدأ الاستماع عند تسجيل دخولك إلى Windows (فقط إذا كان الخيار أعلاه مفعّلًا)",
+    "serverUnavailable": "خادم Nicx غير متاح",
+    "saveFailed": "تعذّر الحفظ",
+    "restartServer": "أعد تشغيل خادم Nicx",
+    "checking": "جارٍ التحقق...",
+    "starting": "جارٍ البدء...",
+    "states": {
+      "listening": "يستمع في الخلفية",
+      "paused": "متوقف مؤقتًا (أيقونة شريط المهام)",
+      "mascotOpen": "التميمة مفتوحة",
+      "stopped": "متوقف"
+    }
+  },
+  "data": {
+    "conversations": "المحادثات",
+    "storedLocally": "محفوظة على هذا الكمبيوتر: {{total}}",
+    "export": "تصدير",
+    "import": "استيراد",
+    "clearAll": "مسح كل البيانات",
+    "clearAllDescription": "يحذف كل المحادثات نهائيًا",
+    "confirm": "انقر مرة أخرى للتأكيد",
+    "clear": "مسح"
+  },
+  "about": {
+    "tagline": "الذكاء الاصطناعي من Falkyria.",
+    "repository": "المستودع"
   }
 }

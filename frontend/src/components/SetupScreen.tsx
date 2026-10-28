@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Loader2, CheckCircle2, XCircle, Cpu, Server, Database } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   getSetupStatus,
   fetchModels,
@@ -11,10 +12,17 @@ import { useAppStore } from '../lib/store';
 import { isEmbedOnlyModel } from '../lib/model-capabilities';
 import { InferenceRecoveryButton, InferenceSourceSetup } from './InferenceSourceSetup';
 
+// Labels and details are i18n keys under setup.boot.
 const STEPS = [
-  { key: 'ollama_ready', label: 'Inference Engine', icon: Cpu, detail: 'Starting Ollama...' },
-  { key: 'model_ready', label: 'AI Model', icon: Database, detail: 'Loading model...' },
-  { key: 'server_ready', label: 'API Server', icon: Server, detail: 'Starting server...' },
+  { key: 'ollama_ready', label: 'engine', icon: Cpu, detail: 'engineDetail' },
+  { key: 'model_ready', label: 'model', icon: Database, detail: 'modelDetail' },
+  { key: 'server_ready', label: 'server', icon: Server, detail: 'serverDetail' },
+] as const;
+
+const CUSTOM_STEPS = [
+  { key: 'ollama_ready', label: 'engine', icon: Cpu, detail: 'engineConnecting' },
+  { key: 'model_ready', label: 'endpoint', icon: Database, detail: 'endpointDetail' },
+  { key: 'server_ready', label: 'server', icon: Server, detail: 'serverDetail' },
 ] as const;
 
 type StepKey = (typeof STEPS)[number]['key'];
@@ -32,6 +40,7 @@ function StepRow({
   active: boolean;
   detail: string;
 }) {
+  const { t } = useTranslation();
   return (
     <div
       className="flex items-center gap-4 px-5 py-4 rounded-xl transition-all"
@@ -58,7 +67,7 @@ function StepRow({
           {label}
         </div>
         <div className="text-xs truncate" style={{ color: 'var(--color-text-tertiary)', maxWidth: '280px' }}>
-          {done ? 'Ready' : active ? detail : 'Waiting...'}
+          {done ? t('setup.boot.ready') : active ? detail : t('setup.boot.waiting')}
         </div>
       </div>
       <div className="shrink-0">
@@ -78,6 +87,7 @@ function StepRow({
 }
 
 export function SetupScreen({ onReady }: { onReady: () => void }) {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<SetupStatus | null>(null);
   const [statusChecked, setStatusChecked] = useState(false);
   const [setupInitiated, setSetupInitiated] = useState(false);
@@ -178,33 +188,26 @@ export function SetupScreen({ onReady }: { onReady: () => void }) {
           </h1>
           <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
             {!statusChecked
-              ? 'Checking your saved setup...'
+              ? t('setup.boot.checking')
               : status?.source === 'custom'
-                ? 'Connecting to your AI server...'
-                : 'Setting up your local AI...'}
+                ? t('setup.boot.connecting')
+                : t('setup.boot.settingUp')}
           </p>
         </div>
 
         {/* Steps */}
         <div className="flex flex-col gap-2 mb-8">
-          {(status?.source === 'custom'
-            ? [
-                { key: 'ollama_ready' as const, label: 'Inference Engine', icon: Cpu, detail: 'Connecting to your server...' },
-                { key: 'model_ready' as const, label: 'Endpoint', icon: Database, detail: 'Checking endpoint...' },
-                { key: 'server_ready' as const, label: 'API Server', icon: Server, detail: 'Starting server...' },
-              ]
-            : STEPS
-          ).map((step) => (
+          {(status?.source === 'custom' ? CUSTOM_STEPS : STEPS).map((step) => (
             <StepRow
               key={step.key}
               icon={step.icon}
-              label={step.label}
+              label={t(`setup.boot.${step.label}`)}
               done={status?.[step.key] ?? false}
               active={activeStep === step.key}
               detail={
                 activeStep === step.key && status?.detail
                   ? status.detail
-                  : step.detail
+                  : t(`setup.boot.${step.detail}`)
               }
             />
           ))}

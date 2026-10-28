@@ -9,7 +9,8 @@ describe('desktop cloud provider settings', () => {
     const html = renderToStaticMarkup(<SettingsPage />);
 
     expect(html).toContain('Atlas Cloud');
-    const atlasKeyInput = html.match(/<input[^>]*placeholder="Atlas Cloud API key"[^>]*>/)?.[0];
+    // Placeholder em português (os testes carregam o pt-BR).
+    const atlasKeyInput = html.match(/<input[^>]*placeholder="Chave de API do Atlas Cloud"[^>]*>/)?.[0];
     expect(atlasKeyInput).toBeDefined();
     expect(atlasKeyInput).not.toContain('disabled');
     vi.unstubAllGlobals();

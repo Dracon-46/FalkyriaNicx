@@ -11,6 +11,7 @@ import {
   Users,
   CheckCircle2,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { SOURCE_CATALOG, type ConnectorMeta, type SourceCard } from '../../types/connectors';
 
 // ---------------------------------------------------------------------------
@@ -109,13 +110,15 @@ function CategorySection({
 // SourcePicker
 // ---------------------------------------------------------------------------
 
-const CATEGORIES: { key: 'communication' | 'documents' | 'pim'; label: string }[] = [
-  { key: 'communication', label: 'Communication' },
-  { key: 'documents', label: 'Documents' },
-  { key: 'pim', label: 'Personal Info' },
+// Each key doubles as its label key under setup.picker.
+const CATEGORIES: { key: 'communication' | 'documents' | 'pim' }[] = [
+  { key: 'communication' },
+  { key: 'documents' },
+  { key: 'pim' },
 ];
 
 export function SourcePicker({ onContinue }: { onContinue: (selectedIds: string[]) => void }) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const toggle = (id: string) => {
@@ -135,20 +138,20 @@ export function SourcePicker({ onContinue }: { onContinue: (selectedIds: string[
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--color-text)' }}>
-          Connect your sources
+          {t('setup.picker.title')}
         </h2>
         <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-          Choose which data sources to include in your personal knowledge base.
+          {t('setup.picker.subtitle')}
         </p>
       </div>
 
       {/* Cards by category */}
       <div className="flex-1 overflow-y-auto">
-        {CATEGORIES.map(({ key, label }) => (
+        {CATEGORIES.map(({ key }) => (
           <CategorySection
             key={key}
             category={key}
-            label={label}
+            label={t(`setup.picker.${key}`)}
             cards={SOURCE_CATALOG.filter((s) => s.category === key)}
             selected={selected}
             onToggle={toggle}
@@ -169,8 +172,8 @@ export function SourcePicker({ onContinue }: { onContinue: (selectedIds: string[
           }}
         >
           {selected.size === 0
-            ? 'Select sources to continue'
-            : `Connect ${selected.size} source${selected.size !== 1 ? 's' : ''}`}
+            ? t('setup.picker.selectToContinue')
+            : t('setup.picker.connectSelected', { n: selected.size })}
         </button>
       </div>
     </div>

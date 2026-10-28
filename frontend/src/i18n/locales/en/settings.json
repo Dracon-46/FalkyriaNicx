@@ -2,5 +2,171 @@
   "language": {
     "label": "Language",
     "description": "Language of the interface, of Nicx's answers and of the voice."
+  },
+  "page": {
+    "title": "Settings",
+    "saved": "Saved",
+    "description": "App preferences: appearance, models, voice, memory and your data."
+  },
+  "sections": {
+    "appearance": "Appearance",
+    "connection": "Connection",
+    "inference": "Model source",
+    "models": "Models",
+    "apiKeys": "API keys",
+    "tools": "Tools",
+    "memory": "Memory",
+    "modelDefaults": "Model defaults",
+    "voice": "Voice",
+    "data": "Data",
+    "about": "About"
+  },
+  "theme": {
+    "label": "Theme",
+    "description": "Choose how Nicx looks",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "fontSize": {
+    "label": "Font size",
+    "small": "Small",
+    "default": "Default",
+    "large": "Large"
+  },
+  "connection": {
+    "serverStatus": "Server status",
+    "notConnected": "Not connected",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "checking": "Checking...",
+    "serverAddress": "Server address",
+    "invalidAddress": "That is not an address (it must start with http://). Leave it blank to use the default.",
+    "addressHint": "Leave it blank. Only change it if the Nicx server runs on another port or machine.",
+    "addressPlaceholder": "blank = default",
+    "apiKey": "API key",
+    "apiKeyDescription": "Only needed if the server was started with an API key"
+  },
+  "inference": {
+    "source": "Source",
+    "sourceDescription": "Where the app runs models. Applies after a restart.",
+    "ollama": "Bundled Ollama (default)",
+    "custom": "Your own OpenAI-compatible server",
+    "serverUrl": "Server address",
+    "serverUrlDescription": "e.g. LM Studio: http://localhost:1234/v1",
+    "model": "Model",
+    "modelDescription": "ID of the model served by your server",
+    "serverType": "Server type",
+    "serverTypeDescription": "OpenAI-compatible engine",
+    "apiKey": "API key (optional)",
+    "apiKeyDescription": "Only if your server asks for one",
+    "apiKeyPlaceholder": "leave blank if you have none",
+    "save": "Save model source",
+    "saved": "Saved. Restart the app to apply.",
+    "saveFailed": "Could not save."
+  },
+  "models": {
+    "none": "No models loaded",
+    "local": "Local models (Ollama)",
+    "localDescription": "Models that run on this computer",
+    "pullBefore": "Run",
+    "pullModelName": "model-name",
+    "pullAfter": "in your terminal to download more models",
+    "cloud": "Cloud providers",
+    "cloudDescription": "Green dot: API key configured"
+  },
+  "apiKeys": {
+    "openaiDescription": "GPT models",
+    "anthropicDescription": "Claude models",
+    "googleDescription": "Gemini models",
+    "openrouterDescription": "Many providers in one place",
+    "atlasDescription": "Models through Atlas Cloud",
+    "atlasPlaceholder": "Atlas Cloud API key",
+    "savedSecure": "Saved in secure storage",
+    "savedServer": "Saved by the local server",
+    "remove": "Remove",
+    "saved": "Saved",
+    "saveFailed": "Could not save the API key",
+    "removeFailed": "Could not remove the API key"
+  },
+  "tools": {
+    "webSearch": "Web search",
+    "webSearchDescription": "Tavily key for the web search tool"
+  },
+  "memory": {
+    "status": "Memory status",
+    "checkingBackend": "Checking memory...",
+    "notConfiguredLong": "Memory is not configured",
+    "backendEntries": "{{backend}} — stored items: {{entries}}",
+    "checking": "Checking...",
+    "notConfigured": "Not configured",
+    "entries": "Items: {{entries}}",
+    "unavailable": "Unavailable",
+    "retry": "Try again",
+    "useContext": "Use memory in conversations",
+    "useContextDescription": "Automatically adds relevant memories to conversations",
+    "backend": "Memory engine",
+    "backendDescription": "Which retrieval engine to use",
+    "topK": "Results included",
+    "minScore": "Minimum relevance",
+    "maxTokens": "Max context tokens"
+  },
+  "modelDefaults": {
+    "temperature": "Temperature",
+    "maxTokens": "Max tokens"
+  },
+  "voice": {
+    "input": "Voice input",
+    "inputDescription": "Use the microphone for dictation and voice conversation (local recognition)",
+    "output": "Voice output",
+    "outputDescription": "Show the button to listen to Nicx's answers",
+    "autoplay": "Speak answers automatically",
+    "autoplayDescription": "Read each answer aloud as soon as it ends",
+    "tts": "Nicx's voice",
+    "ttsDescription": "Engine and voice used for spoken answers",
+    "recognition": "Speech recognition",
+    "recognitionDescription": "Whisper running on your computer",
+    "checking": "Checking...",
+    "available": "Available",
+    "notConfigured": "Not configured",
+    "setupHint": "Set up speech recognition to use voice input.",
+    "docsBefore": "See the",
+    "docsLink": "documentation",
+    "docsAfter": "for details."
+  },
+  "wake": {
+    "enableLabel": "Turn on “Nicx, ligar” (background listening)",
+    "enableDescription": "Say “Nicx, ligar” (or “Ei Nicx”) and the mascot shows up ready for a voice conversation. The microphone stays open only on this computer: nothing is recorded or sent.",
+    "enableToggle": "Turn on “Nicx, ligar”",
+    "listening": "Listening",
+    "noWindow": "No floating window on this computer: the interface opens in the browser.",
+    "howToStop": "Say “tchau” or “desligar” to make the mascot leave; it also goes away after 1 minute of silence.",
+    "autostart": "Start with Windows",
+    "autostartDescription": "Starts listening when you sign in to Windows (only if the option above is on)",
+    "serverUnavailable": "Nicx server unavailable",
+    "saveFailed": "Could not save",
+    "restartServer": "Restart the Nicx server",
+    "checking": "Checking...",
+    "starting": "Starting...",
+    "states": {
+      "listening": "Listening in the background",
+      "paused": "Paused (tray icon)",
+      "mascotOpen": "Mascot open",
+      "stopped": "Stopped"
+    }
+  },
+  "data": {
+    "conversations": "Conversations",
+    "storedLocally": "Stored on this computer: {{total}}",
+    "export": "Export",
+    "import": "Import",
+    "clearAll": "Clear all data",
+    "clearAllDescription": "Permanently deletes all conversations",
+    "confirm": "Click again to confirm",
+    "clear": "Clear"
+  },
+  "about": {
+    "tagline": "the artificial intelligence of Falkyria.",
+    "repository": "Repository"
   }
 }

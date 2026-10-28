@@ -24,10 +24,10 @@ describe('first-run inference source navigation', () => {
   it('renders both sources without claiming either has started', () => {
     const html = renderToStaticMarkup(<InferenceSourceChooser onChoose={vi.fn()} />);
 
-    expect(html).toContain('Local Ollama');
-    expect(html).toContain('OpenAI-compatible server');
-    expect(html).toContain('Nothing is installed, started, or downloaded until you confirm');
-    expect(html).not.toContain('Starting local setup');
+    expect(html).toContain('Ollama local');
+    expect(html).toContain('Servidor compatível com OpenAI');
+    expect(html).toContain('Nada é instalado, iniciado ou baixado até você confirmar');
+    expect(html).not.toContain('Iniciando a configuração local');
   });
 
   it('discloses the model download and offers a no-op back path', () => {
@@ -35,11 +35,11 @@ describe('first-run inference source navigation', () => {
       <OllamaConsent onBack={vi.fn()} onConfirm={vi.fn()} />,
     );
 
-    expect(html).toContain('may download one model');
-    expect(html).toContain('several gigabytes');
-    expect(html).toContain('Going back leaves Ollama stopped');
-    expect(html).toContain('Use Ollama and continue');
-    expect(html).toContain('Back');
+    expect(html).toContain('pode baixar um modelo');
+    expect(html).toContain('vários gigabytes');
+    expect(html).toContain('Se você voltar, o Ollama continua parado');
+    expect(html).toContain('Usar o Ollama e continuar');
+    expect(html).toContain('Voltar');
   });
 
   it('requires endpoint coordinates and keeps an explicit cancel control', () => {
@@ -47,12 +47,12 @@ describe('first-run inference source navigation', () => {
       <CustomEndpointSetup onCancel={vi.fn()} onConfirm={vi.fn()} />,
     );
 
-    expect(html).toContain('Server URL');
-    expect(html).toContain('Model ID');
-    expect(html).toMatch(/aria-label="Server URL"[^>]*required/);
-    expect(html).toMatch(/aria-label="Model ID"[^>]*required/);
-    expect(html).toContain('Ollama will not start or download models');
-    expect(html).toContain('Cancel');
+    expect(html).toContain('URL do servidor');
+    expect(html).toContain('ID do modelo');
+    expect(html).toMatch(/aria-label="URL do servidor"[^>]*required/);
+    expect(html).toMatch(/aria-label="ID do modelo"[^>]*required/);
+    expect(html).toContain('O Ollama não vai iniciar nem baixar modelos');
+    expect(html).toContain('Cancelar');
   });
 
   it('renders a source-change recovery action with a guarded busy state', () => {
@@ -63,9 +63,9 @@ describe('first-run inference source navigation', () => {
       <InferenceRecoveryButton recovering onChange={vi.fn()} />,
     );
 
-    expect(ready).toContain('Change inference source');
+    expect(ready).toContain('Trocar a fonte da IA');
     expect(ready).not.toMatch(/ disabled(?:=""|>)/);
-    expect(stopping).toContain('Stopping setup...');
+    expect(stopping).toContain('Parando a configuração...');
     expect(stopping).toMatch(/ disabled(?:=""|>)/);
   });
 });
