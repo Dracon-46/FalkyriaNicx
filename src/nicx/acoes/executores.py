@@ -7,15 +7,15 @@ from __future__ import annotations
 import subprocess
 import sys
 import threading
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Optional
 
-from nicx.acoes import confirmacao, lembretes, notas
+from nicx.acoes import agenda, confirmacao, lembretes, notas
 from nicx.acoes.intencoes import Action
 from nicx.acoes.rotinas import CLOSABLE, FOLDERS
 from nicx.acoes.sistema import Outcome, _start, _windows_only
-from nicx.acoes.tempo import say_when
+from nicx.acoes.tempo import parse_day, say_day, say_when
 
 _NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
@@ -286,6 +286,104 @@ def deny() -> Outcome:
     return Outcome(True, "Tudo bem, não vou fazer nada.")
 
 
+# ---------------------------------------------------------------------------
+# Agenda
+# ---------------------------------------------------------------------------
+
+
+def _hhmm(when: datetime) -> str:
+    return f"{when.hour}h" if when.minute == 0 else f"{when.hour}h{when.minute:02d}"
+
+
+def _event_line(event: "agenda.Event", now: datetime) -> str:
+    if event.all_day:
+        day = say_day(event.start_at, now, with_time=False)
+        return f"{event.title} {day}, o dia todo"
+    return f"{event.title} {say_day(event.start_at, now)}"
+
+
+def agenda_add(action: Action) -> Outcome:
+    now = datetime.now()
+    when = action.when or now
+    all_day = action.op == "dia"
+    if (when.date() < now.date()) if all_day else (when < now):
+        return Outcome(
+            False, f"Esse horário já passou ({say_day(when, now)}). Me diz outro."
+        )
+    event = agenda.add(action.target, when, all_day=all_day, now=now)
+    if all_day:
+        day = say_day(event.start_at, now, with_time=False)
+        aviso = " Te aviso às 8h do dia." if event.reminder_id else ""
+        return Outcome(True, f"Marquei {event.title} {day}, o dia todo.{aviso}")
+    aviso = " Te aviso 15 minutos antes." if event.reminder_id else ""
+    return Outcome(
+        True, f"Marquei {event.title} {say_day(event.start_at, now)}.{aviso}"
+    )
+
+
+def agenda_list(action: Action) -> Outcome:
+    now = datetime.now()
+    if action.op == "dia" and action.when is not None:
+        events = agenda.on_day(action.when.date())
+        label = say_day(action.when, now, with_time=False)
+        if not events:
+            return Outcome(True, f"Nada marcado para {label}.")
+        parts = [
+            f"{e.title} o dia todo"
+            if e.all_day
+            else f"{e.title} às {_hhmm(e.start_at)}"
+            for e in events
+        ]
+        return Outcome(
+            True, f"{label.capitalize()} você tem: " + "; ".join(parts) + "."
+        )
+    events = agenda.upcoming(now, days=7)
+    if not events:
+        return Outcome(True, "Nada marcado nos próximos 7 dias.")
+    shown = [_event_line(e, now) for e in events[:6]]
+    more = f" e mais {len(events) - 6}" if len(events) > 6 else ""
+    head = (
+        "Nos próximos 7 dias" if action.op == "semana" else "Seus próximos compromissos"
+    )
+    return Outcome(True, f"{head}: " + "; ".join(shown) + more + ".")
+
+
+def _split_day(query: str) -> tuple[str, Optional[date]]:
+    """'reuniao sexta' -> ('reuniao', data da sexta)."""
+    words = query.split()
+    for i in range(len(words)):
+        day = parse_day(" ".join(words[i:]))
+        if day is not None:
+            return " ".join(words[:i]), day
+    return query, None
+
+
+def agenda_cancel(action: Action) -> Outcome:
+    now = datetime.now()
+    query, day = _split_day(action.target)
+    if query or day:
+        event = agenda.find(query, now, day)
+    else:
+        upcoming = agenda.upcoming(now, days=366)
+        event = upcoming[0] if upcoming else None
+    if event is None:
+        return Outcome(False, "Não achei esse compromisso na agenda.")
+    agenda.cancel(event)
+    return Outcome(True, f"Desmarquei {_event_line(event, now)}.")
+
+
+def agenda_export() -> Outcome:
+    events = agenda.upcoming(days=366)
+    if not events:
+        return Outcome(True, "Não há compromissos marcados para mandar.")
+    path = agenda.export_ics(events)
+    n = _plural(len(events), "compromisso", "compromissos")
+    if sys.platform != "win32":
+        return Outcome(True, f"Salvei {n} em {path}. Abra no seu calendário.")
+    _start(str(path))
+    return Outcome(True, f"Abri {n} no calendário do Windows: é só confirmar por lá.")
+
+
 def run(action: Action) -> Optional[Outcome]:
     """Executa uma rotina; None se a ação não for uma rotina."""
     simple = {
@@ -294,6 +392,7 @@ def run(action: Action) -> Optional[Outcome]:
         "notes_clear": notes_clear,
         "status": status,
         "screenshot": screenshot,
+        "agenda_export": agenda_export,
         "confirm": confirm,
         "deny": deny,
     }
@@ -301,6 +400,9 @@ def run(action: Action) -> Optional[Outcome]:
         return simple[action.kind]()
     with_action = {
         "remind": remind,
+        "agenda_add": agenda_add,
+        "agenda_list": agenda_list,
+        "agenda_cancel": agenda_cancel,
         "remind_clear": remind_clear,
         "remind_cancel": remind_cancel,
         "note_add": note_add,

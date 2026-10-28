@@ -12,7 +12,13 @@ from typing import Optional
 
 from nicx.acoes import confirmacao
 from nicx.acoes.intencoes import Action, original_text
-from nicx.acoes.tempo import parse_clock, parse_duration, parse_when
+from nicx.acoes.tempo import (
+    parse_clock,
+    parse_day,
+    parse_duration,
+    parse_moment,
+    parse_when,
+)
 
 # ---------------------------------------------------------------------------
 # Pastas e apps que dá para fechar
@@ -240,6 +246,143 @@ def _notes_admin(t: str) -> Optional[Action]:
 
 
 # ---------------------------------------------------------------------------
+# Agenda
+# ---------------------------------------------------------------------------
+
+_AGENDA_VERB = (
+    r"(?P<verb>marca|marque|marcar|agenda|agende|agendar|coloca|coloque|colocar|poe"
+    r"|bota|adiciona|adicione|adicionar|cria|crie|criar)"
+)
+_IN_AGENDA = r" (?:na|no) (?:minha |meu )?(?:agenda|calendario)"
+_AGENDA_NOUN = r"(?:um |uma |o |a )?(?:compromisso|reuniao|evento|consulta)\b"
+_WEEK = r"(?:(?:essa|esta|nessa|nesta|da|a|na) )?semana|semana que vem|proxima semana"
+
+
+def _agenda_add(text: str, t: str, where: list[int]) -> Optional[Action]:
+    """'marca reunião com o João sexta às 15h', 'agenda dentista dia 30'."""
+    m = re.match(_AGENDA_VERB + r"(?P<inag>" + _IN_AGENDA + r")? (?P<rest>.+)", t)
+    if not m:
+        return None
+    start, end = m.start("rest"), len(t)
+    in_agenda = bool(m.group("inag"))
+    tail = re.search(_IN_AGENDA + r"$", t[start:])
+    if tail:
+        in_agenda = True
+        end = start + tail.start()
+    # "coloca", "cria"... só valem falando de agenda ("coloca música" não é).
+    if m.group("verb").startswith(("marc", "agend")) is False and not (
+        in_agenda or re.match(_AGENDA_NOUN, t[start:end])
+    ):
+        return None
+    rest = t[start:end]
+    words = rest.split()
+    starts = [start + o for o in _offsets(rest)]
+    found = None
+    for i in range(1, len(words)):  # quando no fim: "... sexta às 15h"
+        moment = parse_moment(" ".join(words[i:]))
+        if moment is not None:
+            found = (start, starts[i] - 1, moment)
+            break
+    if found is None:
+        for j in range(len(words) - 1, 0, -1):  # quando no começo
+            moment = parse_moment(" ".join(words[:j]))
+            if moment is not None:
+                found = (starts[j], end, moment)
+                break
+    if found is None:
+        return None
+    title_start, title_end, (when, has_time) = found
+    lead = re.match(
+        r"(?:(?:um|uma|o|a) )?(?:(?:de|pra|para) )?", t[title_start:title_end]
+    )
+    title_start += lead.end() if lead else 0
+    trail = re.search(r" (?:para|pra|no|na|em|de|do|da)$", t[title_start:title_end])
+    if trail:
+        title_end = title_start + trail.start()
+    if _VAGUE.match(t[title_start:title_end]):
+        return None
+    title = original_text(text, where, title_start, title_end)
+    if not title:
+        return None
+    return Action("agenda_add", target=title, when=when, op="" if has_time else "dia")
+
+
+def _agenda_day(d: str) -> Optional[Action]:
+    d = d.strip().rstrip("?").strip()
+    if not d:
+        return Action("agenda_list", op="proximos")
+    if re.fullmatch(_WEEK, d):
+        return Action("agenda_list", op="semana")
+    day = parse_day(d)
+    if day is None:
+        return None
+    from datetime import datetime
+
+    return Action(
+        "agenda_list", op="dia", when=datetime.combine(day, datetime.min.time())
+    )
+
+
+def _agenda_query(t: str) -> Optional[Action]:
+    """'o que eu tenho amanhã', 'minha agenda da semana', 'meus compromissos'."""
+    prep = r"(?: (?:de|da|do|pra|para|na|no))?"
+    m = re.fullmatch(
+        r"(?:o )?que (?:eu )?tenho(?: (?:marcado|agendado|na agenda|pra fazer))?"
+        r" (?P<d>.+)",
+        t,
+    )
+    if m and (re.fullmatch(_WEEK, m.group("d")) or parse_day(m.group("d"))):
+        return _agenda_day(m.group("d"))
+    m = re.fullmatch(
+        r"(?:(?:como (?:esta|ta)|mostra|le|leia|fala|abre)(?: a)? )?minha agenda"
+        + prep
+        + r"(?: (?P<d>.+))?"
+        + r"|(?:quais )?(?:sao )?(?:os )?meus compromissos"
+        + prep
+        + r"(?: (?P<d2>.+))?"
+        + r"|tenho (?:algum )?compromisso(?: (?P<d3>.+))?",
+        t,
+    )
+    if m:
+        return _agenda_day(m.group("d") or m.group("d2") or m.group("d3") or "")
+    return None
+
+
+def _agenda_cancel(t: str) -> Optional[Action]:
+    """'desmarca a reunião com o João', 'cancela o próximo compromisso'."""
+    m = re.fullmatch(
+        r"(?P<verb>desmarca|desmarque|desmarcar|cancela|cancele|remove|tira|apaga)"
+        r"(?: (?:o|a|meu|minha))?(?: (?P<noun>compromisso|reuniao|evento|consulta))?"
+        r"(?: (?:de|da|do|com|na|no))?(?: (?P<q>.+))?",
+        t,
+    )
+    agenda_word = re.search(r"\b(?:compromisso|reuniao|evento|consulta)\b", t)
+    if not m or not (m.group("verb").startswith("desmarc") or agenda_word):
+        return None
+    query = (m.group("q") or "").strip()
+    if re.fullmatch(r"(?:o |a )?proxim[oa](?: compromisso)?", query):
+        query = ""
+    noun = m.group("noun") or ""
+    target = f"{noun} {query}".strip() if noun in ("reuniao", "consulta") else query
+    return Action("agenda_cancel", target=target)
+
+
+def _agenda_export(t: str) -> Optional[Action]:
+    """'manda pro calendário do Windows', 'coloca meus compromissos no Outlook'."""
+    if re.fullmatch(
+        r"(?:manda|mande|envia|envie|coloca|coloque|passa|passe|adiciona|adicione"
+        r"|exporta|exporte|salva|salve|joga)"
+        r"(?: (?:a agenda|minha agenda|os compromissos|meus compromissos|isso|tudo"
+        r"|eles|o compromisso))?"
+        r" (?:pro|para o|no|ao|pra o)"
+        r" (?:calendario(?: do (?:windows|outlook|computador|pc|google))?|outlook)",
+        t,
+    ):
+        return Action("agenda_export")
+    return None
+
+
+# ---------------------------------------------------------------------------
 # PC: estado, pastas, print, fechar, energia
 # ---------------------------------------------------------------------------
 
@@ -333,11 +476,14 @@ def parse(text: str, t: str, where: list[int]) -> Optional[Action]:
         _screenshot,
         _close,
         _power,
+        _agenda_export,
+        _agenda_query,
+        _agenda_cancel,
     ):
         action = simple(t)
         if action is not None:
             return action
-    for with_text in (_reminder, _note):
+    for with_text in (_agenda_add, _reminder, _note):
         action = with_text(text, t, where)
         if action is not None:
             return action

@@ -7,7 +7,7 @@ e devolve um ``datetime`` no fuso local. Nada aqui toca no sistema.
 from __future__ import annotations
 
 import re
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Optional
 
 _UNITS = {
@@ -112,7 +112,7 @@ _PERIODS = {
 }
 _CLOCK = re.compile(
     r"(?:(?P<day>hoje|amanha|depois de amanha) )?"
-    r"(?:as |a |para as |pras |pra )?"
+    r"(?:as |a |ao |para as |pras |pra )?"
     r"(?:(?P<noon>meio dia|meio-dia|meia noite|meia-noite)"
     r"|(?P<h>" + NUMBER + r")(?:(?::| e |h ?)(?P<m>\d{1,2}|" + NUMBER + r"|meia))?"
     r"(?: ?(?:horas?|h))?(?P<per> da manha| da tarde| da noite| da madrugada)?)"
@@ -204,3 +204,154 @@ def say_when(when: datetime, now: Optional[datetime] = None) -> str:
     if days == 1:
         return f"amanhã às {hhmm}"
     return f"dia {when.day:02d}/{when.month:02d} às {hhmm}"
+
+
+# ---------------------------------------------------------------------------
+# Dias: "sexta", "amanhã", "dia 30", "30/10", "5 de novembro" (para a agenda)
+# ---------------------------------------------------------------------------
+
+_WEEKDAYS = {
+    "segunda": 0,
+    "terca": 1,
+    "quarta": 2,
+    "quinta": 3,
+    "sexta": 4,
+    "sabado": 5,
+    "domingo": 6,
+}
+WEEKDAY_NAMES = ("segunda", "terça", "quarta", "quinta", "sexta", "sábado", "domingo")
+_MONTHS = {
+    name: i + 1
+    for i, name in enumerate(
+        (
+            "janeiro",
+            "fevereiro",
+            "marco",
+            "abril",
+            "maio",
+            "junho",
+            "julho",
+            "agosto",
+            "setembro",
+            "outubro",
+            "novembro",
+            "dezembro",
+        )
+    )
+}
+_DAY = re.compile(
+    r"(?:(?:para|pra|no|na|em) )?"
+    r"(?:(?P<rel>hoje|amanha|depois de amanha)"
+    r"|(?:(?:nesta|neste|nessa|nesse|esta|este|essa|esse|na|no) )?"
+    r"(?P<next>(?:proxima|proximo) )?(?P<wd>" + "|".join(_WEEKDAYS) + r")"
+    r"(?:[ -]feira)?(?P<later> que vem)?"
+    r"|(?:dia )?(?P<d>\d{1,2})-(?P<m>\d{1,2})(?:-(?P<y>\d{2,4}))?"
+    r"|(?:(?:no )?dia )?(?P<dn>"
+    + NUMBER
+    + r")(?: de (?P<mon>"
+    + "|".join(_MONTHS)
+    + r"))"
+    r"|(?:no )?dia (?P<dd>" + NUMBER + r"))"
+)
+
+
+def parse_day(text: str, now: Optional[datetime] = None) -> Optional[date]:
+    """'amanha', 'sexta', 'dia 30', '30-10' (já normalizado), '5 de novembro'.
+
+    Sem ano, uma data que já passou é a do ano (ou mês) seguinte.
+    """
+    now = now or datetime.now()
+    today = now.date()
+    m = _DAY.fullmatch(text.strip())
+    if not m:
+        return None
+    if m.group("rel"):
+        offset = {"hoje": 0, "amanha": 1, "depois de amanha": 2}[m.group("rel")]
+        return today + timedelta(days=offset)
+    if m.group("wd"):
+        delta = (_WEEKDAYS[m.group("wd")] - today.weekday()) % 7
+        if delta == 0 and (m.group("next") or m.group("later")):
+            delta = 7
+        return today + timedelta(days=delta)
+    try:
+        if m.group("d"):
+            day, month = int(m.group("d")), int(m.group("m"))
+            year = int(m.group("y")) if m.group("y") else today.year
+            year += 2000 if year < 100 else 0
+            found = date(year, month, day)
+            if not m.group("y") and found < today:
+                found = date(year + 1, month, day)
+            return found
+        if m.group("dn"):
+            day = to_number(m.group("dn"))
+            month = _MONTHS[m.group("mon")]
+            if day is None:
+                return None
+            found = date(today.year, month, day)
+            return found if found >= today else date(today.year + 1, month, day)
+        day = to_number(m.group("dd") or "")
+        if day is None:
+            return None
+        found = date(today.year, today.month, day)
+        if found < today:
+            month = today.month % 12 + 1
+            found = date(today.year + (month == 1), month, day)
+        return found
+    except ValueError:
+        return None  # 31/02 e afins
+
+
+def _clock_on(text: str, day: date) -> Optional[datetime]:
+    """Horário ('às 15h', '3 da tarde') naquele dia."""
+    start = datetime.combine(day, datetime.min.time())
+    when = parse_clock(text, start)
+    if when is None or when.date() != day:
+        return None
+    return when
+
+
+def parse_moment(
+    text: str, now: Optional[datetime] = None
+) -> Optional[tuple[datetime, bool]]:
+    """Dia e hora para a agenda: 'sexta às 15h', 'amanhã', 'às 10 do dia 30'.
+
+    Devolve ``(início, tem_hora)``; sem hora, é um compromisso do dia todo.
+    """
+    now = now or datetime.now()
+    text = re.sub(r"^(?:para|pra|marcado para) ", "", text.strip())
+    day = parse_day(text, now)
+    if day is not None:
+        return datetime.combine(day, datetime.min.time()), False
+    words = text.split()
+    for i in range(1, len(words)):
+        left, right = " ".join(words[:i]), " ".join(words[i:])
+        right = re.sub(r"^(?:do|no|de) (?=dia )", "", right)
+        for day_text, clock_text in ((left, right), (right, left)):
+            day = parse_day(day_text, now)
+            if day is None:
+                continue
+            when = _clock_on(clock_text, day)
+            if when is not None:
+                return when, True
+    when = parse_clock(text, now)
+    return (when, True) if when is not None else None
+
+
+def say_day(
+    when: datetime, now: Optional[datetime] = None, *, with_time: bool = True
+) -> str:
+    """'hoje às 15h', 'amanhã', 'sexta (31/10) às 9h30'."""
+    now = now or datetime.now()
+    days = (when.date() - now.date()).days
+    if days == 0:
+        label = "hoje"
+    elif days == 1:
+        label = "amanhã"
+    elif 1 < days < 7:
+        label = f"{WEEKDAY_NAMES[when.weekday()]} ({when.day:02d}/{when.month:02d})"
+    else:
+        label = f"dia {when.day:02d}/{when.month:02d}"
+    if not with_time:
+        return label
+    hhmm = f"{when.hour}h" if when.minute == 0 else f"{when.hour}h{when.minute:02d}"
+    return f"{label} às {hhmm}"

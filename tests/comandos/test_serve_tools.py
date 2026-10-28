@@ -52,7 +52,14 @@ def test_agent_tools_remains_a_backward_compatible_fallback():
 def test_serve_defaults_tools_when_no_selection_is_configured():
     allowed, explicit = _resolve_allowed_tools(NicxConfig())
 
-    assert allowed == {"think", "calculator", "web_search", "controle_pc", "lembrete"}
+    assert allowed == {
+        "think",
+        "calculator",
+        "web_search",
+        "controle_pc",
+        "lembrete",
+        "agenda",
+    }
     assert explicit is False
 
 

@@ -133,6 +133,16 @@ def cancel_next(kind: str = "") -> Optional[Reminder]:
     return target
 
 
+def cancel_id(reminder_id: str) -> bool:
+    """Cancela um lembrete pelo id (o aviso de um compromisso desmarcado)."""
+    with _LOCK:
+        items = _load()
+        keep = [r for r in items if r.id != reminder_id]
+        if len(keep) != len(items):
+            _save(keep)
+    return len(keep) != len(items)
+
+
 def pop_due(now: Optional[datetime] = None) -> List[Reminder]:
     """Tira da lista e devolve os lembretes vencidos."""
     now = now or datetime.now()

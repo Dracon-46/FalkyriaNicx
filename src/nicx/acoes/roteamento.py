@@ -38,6 +38,9 @@ _PATTERNS = [
     # Rotinas: lembretes, anotações, print.
     r"\b(?:lembr\w*|avis[ae]r?|alarme|timer|temporizador|anot\w*|notas?|print"
     r"|captura)\b",
+    # Agenda, arquivos, fotos e vídeos.
+    r"\b(?:agenda\w*|compromisso\w*|reuniao|reunioes|calendario|marca\w*|desmarc\w*"
+    r"|consulta|organiz\w*|arruma\w*|fotos?|imagens?|video\w*|youtube|toca\w*)\b",
 ]
 _REGEX = re.compile("|".join(f"(?:{p})" for p in _PATTERNS))
 

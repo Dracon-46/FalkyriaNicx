@@ -147,3 +147,76 @@ class ReminderTool(BaseTool):
             return ToolResult(self.tool_id, "Faltou dizer do que lembrar.", False)
         outcome = run(Action("remind", target=message, when=when))
         return ToolResult(self.tool_id, outcome.message, success=outcome.ok)
+
+
+@ToolRegistry.register("agenda")
+class AgendaTool(BaseTool):
+    """Agenda local do Nicx: marcar, ver, desmarcar e mandar para o calendário."""
+
+    tool_id = "agenda"
+    is_local = True
+
+    @property
+    def spec(self) -> ToolSpec:
+        return ToolSpec(
+            name="agenda",
+            description=(
+                "Agenda do usuário neste PC: marcar compromisso (avisa 15 min antes),"
+                " ver o que tem num dia, desmarcar, mandar para o calendário."
+            ),
+            parameters={
+                "type": "object",
+                "properties": {
+                    "acao": {
+                        "type": "string",
+                        "enum": ["marcar", "ver", "desmarcar", "exportar"],
+                    },
+                    "titulo": {
+                        "type": "string",
+                        "description": "marcar: o compromisso; desmarcar: como achar",
+                    },
+                    "quando": {
+                        "type": "string",
+                        "description": "'sexta às 15h', 'amanhã', 'dia 30 às 9h'",
+                    },
+                },
+                "required": ["acao"],
+            },
+            category="system",
+        )
+
+    def execute(self, **params: Any) -> ToolResult:
+        from nicx.acoes.tempo import parse_day, parse_moment
+
+        acao = str(params.get("acao", ""))
+        titulo = str(params.get("titulo", "")).strip()
+        quando = normalize(str(params.get("quando", "")))
+        if acao == "marcar":
+            moment = parse_moment(quando) if quando else None
+            if moment is None or not titulo:
+                return ToolResult(
+                    self.tool_id,
+                    "Preciso do título e de quando ('sexta às 15h', 'dia 30').",
+                    False,
+                )
+            when, has_time = moment
+            action = Action(
+                "agenda_add", target=titulo, when=when, op="" if has_time else "dia"
+            )
+        elif acao == "ver":
+            day = parse_day(quando) if quando else None
+            if day is not None:
+                from datetime import datetime
+
+                when = datetime.combine(day, datetime.min.time())
+                action = Action("agenda_list", op="dia", when=when)
+            else:
+                action = Action("agenda_list", op="proximos")
+        elif acao == "desmarcar":
+            action = Action("agenda_cancel", target=normalize(f"{titulo} {quando}"))
+        elif acao == "exportar":
+            action = Action("agenda_export")
+        else:
+            return ToolResult(self.tool_id, f"Ação desconhecida: {acao}", False)
+        outcome = run(action)
+        return ToolResult(self.tool_id, outcome.message, success=outcome.ok)

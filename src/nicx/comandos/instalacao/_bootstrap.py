@@ -177,8 +177,8 @@ def write_initial_config(
         f'default_agent = "simple"\n'
         f"\n"
         f"[tools]\n"
-        f'enabled = ["controle_pc", "lembrete", "code_interpreter", "web_search", '
-        f'"file_read", "shell_exec"]\n'
+        f'enabled = ["controle_pc", "lembrete", "agenda", "code_interpreter", '
+        f'"web_search", "file_read", "shell_exec"]\n'
     )
 
     _cfg.DEFAULT_CONFIG_PATH.write_text(base_toml)

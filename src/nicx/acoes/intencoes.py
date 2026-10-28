@@ -88,6 +88,8 @@ STEP_BIG = 10
 
 # Horário com dois-pontos ("às 15:30"): os dois-pontos sairiam com a pontuação.
 _CLOCK_COLON = re.compile(r"(\d{1,2}):(\d{2})\b")
+# Data com barra ("30/10"): a barra também sairia; vira "30-10".
+_DATE_SLASH = re.compile(r"(?<=\d)/(?=\d)")
 
 
 def normalize(text: str) -> str:
@@ -95,6 +97,7 @@ def normalize(text: str) -> str:
     text = unicodedata.normalize("NFKD", text.lower())
     text = "".join(c for c in text if not unicodedata.combining(c))
     text = _CLOCK_COLON.sub(r"\1h\2", text)  # "15:30" -> "15h30"
+    text = _DATE_SLASH.sub("-", text)  # "30/10" -> "30-10"
     text = re.sub(r"[^\w\s%-]", " ", text)
     return re.sub(r"\s+", " ", text).strip()
 
@@ -124,9 +127,10 @@ def clean_with_map(text: str) -> tuple[str, list[int]]:
     chars: list[str] = []
     where: list[int] = []
     colons = {m.start() + len(m.group(1)) for m in _CLOCK_COLON.finditer(text)}
+    slashes = {m.start() for m in _DATE_SLASH.finditer(text)}
     for i, ch in enumerate(text):
-        if i in colons:
-            chars.append("h")
+        if i in colons or i in slashes:
+            chars.append("h" if i in colons else "-")
             where.append(i)
             continue
         base = unicodedata.normalize("NFKD", ch.lower())
