@@ -59,3 +59,18 @@ def test_typed_question_is_unchanged():
     _ask(client)
     assert seen["input"] == "me conta algo"
     assert seen["max_tokens"] == 1024
+
+
+def test_reply_language_follows_the_interface():
+    from nicx.nucleo.idiomas import instrucao_resposta
+
+    client, _, seen = _client()
+    _ask(client, language="en", voice=True)
+    assert seen["input"] == "me conta algo" + instrucao_resposta("en") + _VOICE_HINT
+    assert "inglês" in instrucao_resposta("en")
+
+
+def test_portuguese_interface_adds_nothing():
+    client, _, seen = _client()
+    _ask(client, language="pt-BR")
+    assert seen["input"] == "me conta algo"

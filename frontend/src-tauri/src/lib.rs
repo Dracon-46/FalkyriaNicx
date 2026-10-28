@@ -2093,6 +2093,7 @@ async fn transcribe_audio(
     api_url: String,
     audio_data: Vec<u8>,
     filename: String,
+    language: Option<String>,
 ) -> Result<serde_json::Value, String> {
     let url = format!("{}/v1/speech/transcribe", api_url);
     let client = reqwest::Client::new();
@@ -2102,7 +2103,11 @@ async fn transcribe_audio(
         .mime_str("audio/webm")
         .map_err(|e| format!("Failed to create multipart: {}", e))?;
 
-    let form = reqwest::multipart::Form::new().part("file", part);
+    let mut form = reqwest::multipart::Form::new().part("file", part);
+    // Idioma da interface: o servidor converte para o código do Whisper.
+    if let Some(language) = language.filter(|l| !l.is_empty()) {
+        form = form.text("language", language);
+    }
 
     let resp = client
         .post(&url)

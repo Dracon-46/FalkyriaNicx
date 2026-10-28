@@ -31,6 +31,9 @@ class ChatCompletionRequest(BaseModel):
     # Nicx extension: the reply will be read aloud (voice conversation), so
     # the agent is asked for a short answer without markdown.
     voice: bool = False
+    # Nicx extension: interface language ("pt-BR", "en", "es"...). Replies
+    # come in this language; empty or "pt-BR" keeps the default Portuguese.
+    language: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------

@@ -13,6 +13,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
+from nicx.nucleo.idiomas import instrucao_resposta
 from nicx.nucleo.paths import get_config_dir
 from nicx.nucleo.types import Message, Role, ToolCall
 from nicx.servidor.model_capabilities import is_embed_only_model
@@ -358,6 +359,14 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
                 "Complexity analysis failed",
                 exc_info=True,
             )
+
+    # Idioma escolhido na interface: pedido no fim da mensagem (e não no
+    # prompt de sistema) para o começo do prompt continuar igual.
+    language_hint = instrucao_resposta(request_body.language)
+    if language_hint and request_body.messages:
+        last = request_body.messages[-1]
+        if last.role == "user" and isinstance(last.content, str):
+            last.content = f"{last.content}{language_hint}"
 
     # Spoken reply on the direct path (the agent path does this itself).
     if request_body.voice and not use_server_agent and not request_body.tools:

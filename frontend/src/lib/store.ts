@@ -17,6 +17,7 @@ import type {
 import type { ManagedAgent } from './api';
 import { isEmbedOnlyModel } from './model-capabilities';
 import { serializeToolCallArguments } from './tool-call';
+import { detectLanguage } from '../i18n';
 
 export interface CachedConnector {
   connector_id: string;
@@ -103,6 +104,8 @@ interface Settings {
   speechEnabled: boolean;
   voiceOutputEnabled: boolean;
   voiceAutoplay: boolean;
+  /** Idioma da interface, das respostas e da voz (ex.: 'pt-BR', 'en'). */
+  language: string;
 }
 
 function loadSettings(): Settings {
@@ -118,6 +121,7 @@ function loadSettings(): Settings {
     speechEnabled: true,
     voiceOutputEnabled: true,
     voiceAutoplay: false,
+    language: detectLanguage(),
   };
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);

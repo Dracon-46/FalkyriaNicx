@@ -1,5 +1,6 @@
 import type { ModelInfo, SavingsData, ServerInfo } from '../types';
 import { serializeToolCallArguments } from './tool-call';
+import i18n from '../i18n';
 
 declare global {
   interface Window {
@@ -377,6 +378,7 @@ export async function transcribeAudio(audioBlob: Blob, filename = 'recording.web
       return await tauriInvoke<TranscriptionResult>('transcribe_audio', {
         audioData: Array.from(new Uint8Array(buffer)),
         filename,
+        language: i18n.language,
       });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -385,6 +387,7 @@ export async function transcribeAudio(audioBlob: Blob, filename = 'recording.web
   }
   const formData = new FormData();
   formData.append('file', audioBlob, filename);
+  formData.append('language', i18n.language);
   const res = await apiFetch(`/v1/speech/transcribe`, {
     method: 'POST',
     body: formData,
@@ -417,7 +420,12 @@ export async function synthesizeSpeech(
   const res = await apiFetch(`/v1/speech/synthesize`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, voice_id: opts.voiceId, speed: opts.speed }),
+    body: JSON.stringify({
+      text,
+      voice_id: opts.voiceId,
+      speed: opts.speed,
+      language: i18n.language,
+    }),
     signal: opts.signal,
   });
   if (!res.ok) {

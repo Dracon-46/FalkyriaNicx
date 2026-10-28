@@ -7,6 +7,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { initApiBase } from './lib/api';
 import { initAnalytics } from './lib/analytics';
 import './index.css';
+import { DEFAULT_LANGUAGE, setLanguage } from './i18n';
 
 // "localhost" and "127.0.0.1" are different origins with separate storage, so
 // settings and conversations would seem to vanish when switching between them.
@@ -45,7 +46,17 @@ if (FLOATING) {
 // Fetch the API base URL from the Tauri backend before rendering.
 // This ensures NICX_PORT is defined in one place (the Rust backend).
 // In non-Tauri environments this is a no-op.
-initApiBase().finally(async () => {
+/** Idioma salvo nas configurações (o mesmo que applyTheme lê). */
+function savedLanguage(): string {
+  try {
+    const raw = localStorage.getItem('nicx-settings');
+    return (raw && JSON.parse(raw).language) || DEFAULT_LANGUAGE;
+  } catch {
+    return DEFAULT_LANGUAGE;
+  }
+}
+
+Promise.all([initApiBase(), setLanguage(savedLanguage()).catch(() => undefined)]).finally(async () => {
   const root = createRoot(document.getElementById('root')!);
   if (FLOATING) {
     const { default: FloatingPage } = await import('./pages/FloatingPage');

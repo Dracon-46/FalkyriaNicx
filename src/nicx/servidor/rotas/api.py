@@ -39,6 +39,8 @@ class SpeechSynthesizeRequest(BaseModel):
     text: str
     voice_id: Optional[str] = None
     speed: Optional[float] = None
+    # Idioma da interface: escolhe a voz do Kokoro quando não vier voice_id.
+    language: Optional[str] = None
 
 
 class MemoryStoreRequest(BaseModel):
@@ -1008,7 +1010,12 @@ async def transcribe_speech(request: Request):
 
     audio_bytes = await audio_file.read()
     language = form.get("language")
-    if not language:
+    if language:
+        # A interface manda o código dela ("pt-BR", "zh"); o Whisper quer "pt".
+        from nicx.nucleo.idiomas import idioma
+
+        language = idioma(str(language)).whisper
+    else:
         # The desktop app and the web UI upload audio without a language, so
         # use the configured one (Nicx defaults to "pt"); empty = auto-detect.
         config = getattr(request.app.state, "config", None)
@@ -1159,6 +1166,13 @@ async def synthesize_speech(request: Request, body: SpeechSynthesizeRequest):
     voice_id, speed = _tts_voice_and_speed(request, backend)
     if body.voice_id:
         voice_id = body.voice_id
+    elif body.language and getattr(backend, "backend_id", "") == "kokoro":
+        from nicx.nucleo.idiomas import PADRAO, idioma
+
+        alvo = idioma(body.language)
+        # Em português fica a voz configurada pelo usuário.
+        if alvo.codigo != PADRAO and alvo.voz_kokoro:
+            voice_id = alvo.voz_kokoro
     if body.speed is not None:
         speed = body.speed
 

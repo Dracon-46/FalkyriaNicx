@@ -17,6 +17,8 @@ import {
   Search,
   Brain,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { LANGUAGES, setLanguage } from '../i18n';
 import { useAppStore, type ThemeMode } from '../lib/store';
 import { NicxMascot } from '../components/Mascot/NicxMascot';
 import { PrivacySection } from '../components/Privacy/PrivacySection';
@@ -448,6 +450,7 @@ const themeOptions: { value: ThemeMode; label: string; icon: typeof Sun }[] = [
 export function SettingsPage() {
   const settings = useAppStore((s) => s.settings);
   const updateSettings = useAppStore((s) => s.updateSettings);
+  const { t } = useTranslation();
   const conversations = useAppStore((s) => s.conversations);
   const serverInfo = useAppStore((s) => s.serverInfo);
   const [healthy, setHealthy] = useState<boolean | null>(null);
@@ -617,6 +620,29 @@ export function SettingsPage() {
         <div className="flex flex-col gap-4">
           {/* Appearance */}
           <Section title="Appearance">
+            <SettingRow label={t('settings.language.label')} description={t('settings.language.description')}>
+              <select
+                value={settings.language}
+                onChange={(e) => {
+                  updateSettings({ language: e.target.value });
+                  void setLanguage(e.target.value);
+                  showSaved();
+                }}
+                aria-label={t('settings.language.label')}
+                className="text-sm px-3 py-1.5 rounded-lg outline-none cursor-pointer"
+                style={{
+                  background: 'var(--color-bg-secondary)',
+                  color: 'var(--color-text)',
+                  border: '1px solid var(--color-border)',
+                }}
+              >
+                {LANGUAGES.map((lang) => (
+                  <option key={lang.code} value={lang.code} lang={lang.code}>
+                    {lang.name}
+                  </option>
+                ))}
+              </select>
+            </SettingRow>
             <SettingRow label="Theme" description="Choose how Nicx looks">
               <div className="flex gap-1 p-0.5 rounded-lg" style={{ background: 'var(--color-bg-secondary)' }}>
                 {themeOptions.map((opt) => {

@@ -1,5 +1,6 @@
 import type { ResearchEvent, SSEEvent } from '../types';
 import { getBase, authHeaders } from './api';
+import i18n from '../i18n';
 
 export interface ChatRequest {
   model: string;
@@ -9,6 +10,8 @@ export interface ChatRequest {
   max_tokens?: number;
   /** Nicx: the reply will be spoken, so ask for a short answer. */
   voice?: boolean;
+  /** Nicx: reply language; defaults to the interface language. */
+  language?: string;
 }
 
 export async function* streamChat(
@@ -19,7 +22,7 @@ export async function* streamChat(
   const response = await fetch(`${base}/v1/chat/completions`, {
     method: 'POST',
     headers: authHeaders({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify(request),
+    body: JSON.stringify({ language: i18n.language, ...request }),
     signal,
   });
 
