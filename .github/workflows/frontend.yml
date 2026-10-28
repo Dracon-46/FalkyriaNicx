@@ -37,7 +37,13 @@ jobs:
 
       - run: npm ci
       - name: Audit dependencies
-        run: npm audit
+        # O que vai para o app: qualquer severidade barra. Ferramentas de build
+        # (só rodam aqui, com configuração nossa): a partir de moderada. O
+        # deepmerge do workbox (via vite-plugin-pwa) tem um aviso baixo sem
+        # versão corrigida.
+        run: |
+          npm audit --omit=dev
+          npm audit --audit-level=moderate
       - run: npm test
       - run: npx tsc --noEmit
       - run: npm run build
