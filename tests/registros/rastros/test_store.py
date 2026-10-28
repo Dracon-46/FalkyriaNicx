@@ -64,6 +64,8 @@ class TestTraceStore:
         cwd = tmp_path / "cwd"
         cwd.mkdir()
         monkeypatch.setenv("HOME", str(home))
+        # No Windows, expanduser usa USERPROFILE (HOME é ignorado).
+        monkeypatch.setenv("USERPROFILE", str(home))
         monkeypatch.chdir(cwd)
 
         store = TraceStore("~/.nicx/traces.db")

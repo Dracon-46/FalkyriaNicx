@@ -189,7 +189,10 @@ assert not result.success
             env=env,
             capture_output=True,
             text=True,
-            timeout=3,
+            # Só abrir o Python e importar o nicx leva ~1,2 s no Windows, e
+            # mais com o PC ocupado; com 3 s o teste oscilava. Se o processo
+            # esperasse a ferramenta travada, não sairia nunca: 30 s bastam.
+            timeout=30,
             check=False,
         )
         assert completed.returncode == 0, completed.stderr

@@ -121,23 +121,37 @@ class WhatsAppBaileysChannel(BaseChannel):
                 shutil.rmtree(dist_dst)
             shutil.copytree(dist_src, dist_dst)
 
-        # Run npm install if node_modules is missing.
-        node_modules = runtime / "node_modules"
-        if not node_modules.exists():
-            logger.info("Running npm install in %s", runtime)
-            subprocess.run(
-                ["npm", "install", "--production"],
-                cwd=str(runtime),
-                check=True,
-                capture_output=True,
-            )
-
+        # Without the compiled bridge there is nothing to run: fail before
+        # spending time (and network) on npm install.
         bridge_js = runtime / "dist" / "bridge.js"
         if not bridge_js.exists():
             raise RuntimeError(
                 f"Bridge entry point not found at {bridge_js}.  "
                 "Ensure the bridge TypeScript has been compiled."
             )
+
+        # Run npm install if node_modules is missing.
+        node_modules = runtime / "node_modules"
+        if not node_modules.exists():
+            # On Windows npm is "npm.cmd", which a shell-less subprocess cannot
+            # find by the bare name: use the full path resolved by which().
+            npm = shutil.which("npm")
+            if npm is None:
+                raise RuntimeError(
+                    "npm is required to install the WhatsApp bridge but was "
+                    "not found on PATH."
+                )
+            logger.info("Running npm install in %s", runtime)
+            try:
+                subprocess.run(
+                    [npm, "install", "--production"],
+                    cwd=str(runtime),
+                    check=True,
+                    capture_output=True,
+                )
+            except (OSError, subprocess.CalledProcessError) as exc:
+                raise RuntimeError(f"npm install failed: {exc}") from exc
+
         return bridge_js
 
     # -- BaseChannel interface ---------------------------------------------------

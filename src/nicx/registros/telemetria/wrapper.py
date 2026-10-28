@@ -28,10 +28,13 @@ def instrumented_generate(
     bus.publish(EventType.INFERENCE_START, {"model": model, "engine": engine.engine_id})
 
     t0 = time.time()
+    # Duração pelo perf_counter: no Windows o time.time() anda de ~16 ms em
+    # ~16 ms e chamadas rápidas saíam com latência zero.
+    start = time.perf_counter()
     result = engine.generate(
         messages, model=model, temperature=temperature, max_tokens=max_tokens, **kwargs
     )
-    latency = time.time() - t0
+    latency = time.perf_counter() - start
 
     usage = result.get("usage", {})
     rec = TelemetryRecord(

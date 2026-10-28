@@ -56,8 +56,12 @@ class TestCodeInterpreterValidation:
         )
         monkeypatch.setitem(sys.modules, "resource", fake_resource)
         setsid = MagicMock()
+        # os.setsid não existe no Windows (o produto só usa _child_limits no
+        # POSIX); raising=False cria o atributo só durante o teste.
         monkeypatch.setattr(
-            "nicx.ferramentas.codigo.code_interpreter.os.setsid", setsid
+            "nicx.ferramentas.codigo.code_interpreter.os.setsid",
+            setsid,
+            raising=False,
         )
 
         _child_limits()

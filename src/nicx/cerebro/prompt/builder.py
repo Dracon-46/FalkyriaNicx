@@ -287,10 +287,11 @@ class SystemPromptBuilder:
                 nudge_interval=mf.nudge_interval,
             )
         name = mf.persona_name
-        if ".." in name or "/" in name or "\\" in name or name.startswith("/"):
+        # ":" também é recusado: no Windows, "D:" apontaria para outra unidade.
+        if any(sep in name for sep in ("..", "/", "\\", ":")):
             raise ValueError(
                 f"Invalid persona name {name!r}: must be a simple "
-                "identifier (no path separators or '..')."
+                "identifier (no path separators, ':' or '..')."
             )
         base = get_config_dir() / "personas" / name
         return MemoryFilesConfig(

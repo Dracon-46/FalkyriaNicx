@@ -1,5 +1,7 @@
 """Tests for per-invocation persona scope (_resolve_persona)."""
 
+from pathlib import Path
+
 import pytest
 
 from nicx.cerebro.prompt.builder import SystemPromptBuilder
@@ -20,13 +22,16 @@ def test_none_persona_disables_all_files():
 
 def test_named_persona_resolves_to_personas_dir():
     out = SystemPromptBuilder._resolve_persona(MemoryFilesConfig(persona_name="coder"))
-    base = str(get_config_dir() / "personas" / "coder")
-    assert out.soul_path == f"{base}/SOUL.md"
-    assert out.memory_path == f"{base}/MEMORY.md"
-    assert out.user_path == f"{base}/USER.md"
+    # Compara como Path: no Windows o separador é a barra invertida.
+    base = get_config_dir() / "personas" / "coder"
+    assert Path(out.soul_path) == base / "SOUL.md"
+    assert Path(out.memory_path) == base / "MEMORY.md"
+    assert Path(out.user_path) == base / "USER.md"
 
 
-@pytest.mark.parametrize("bad", ["../etc", "a/b", "..\\win", "/abs", "x/../y"])
+@pytest.mark.parametrize(
+    "bad", ["../etc", "a/b", "..\\win", "/abs", "x/../y", "D:", "C:evil"]
+)
 def test_path_traversal_rejected(bad):
     with pytest.raises(ValueError):
         SystemPromptBuilder._resolve_persona(MemoryFilesConfig(persona_name=bad))

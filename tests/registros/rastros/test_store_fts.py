@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import sqlite3
-import tempfile
 from pathlib import Path
 
 import pytest
@@ -12,12 +11,13 @@ from nicx.nucleo.types import Trace
 
 
 @pytest.fixture
-def store():
+def store(tmp_path: Path):
     from nicx.registros.rastros.store import TraceStore
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        s = TraceStore(Path(tmpdir) / "traces.db")
-        yield s
+    s = TraceStore(tmp_path / "traces.db")
+    yield s
+    # No Windows o SQLite segura o arquivo aberto: feche antes de apagar a pasta.
+    s.close()
 
 
 def _make_trace(trace_id: str, query: str, result: str, agent: str = "test") -> Trace:

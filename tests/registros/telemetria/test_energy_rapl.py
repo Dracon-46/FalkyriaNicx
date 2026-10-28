@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from unittest.mock import patch
 
@@ -18,6 +19,13 @@ from tests.registros.telemetria.energy_test_helpers import (
 
 _PLAT = "nicx.registros.telemetria.energy_rapl.platform.system"
 _BASE = "nicx.registros.telemetria.energy_rapl._RAPL_BASE"
+
+# O RAPL só existe no Linux, e o sysfs falso precisa de pastas "intel-rapl:0":
+# o NTFS não aceita ":" em nome de pasta (vira fluxo alternativo).
+_PRECISA_SYSFS = pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="sysfs falso do RAPL usa ':' no nome da pasta, que o NTFS não aceita",
+)
 
 
 # ---------------------------------------------------------------------------
@@ -103,6 +111,7 @@ class TestEnergyMethod:
 
 
 class TestDomainDiscovery:
+    @_PRECISA_SYSFS
     def test_discovers_domains_from_sysfs(self, tmp_path):
         rapl_base = _build_fake_sysfs(tmp_path)
         domains = _discover_domains(rapl_base)
@@ -129,6 +138,7 @@ class TestDomainDiscovery:
 
 
 class TestSampleNormalDelta:
+    @_PRECISA_SYSFS
     def test_normal_counter_delta(self, tmp_path):
         """Start reading, then update energy files, verify delta."""
         rapl_base = _build_fake_sysfs(tmp_path)
@@ -167,6 +177,7 @@ class TestSampleNormalDelta:
 
 
 class TestSampleWrapAround:
+    @_PRECISA_SYSFS
     def test_counter_wrap_around(self, tmp_path):
         """When end < start, uses max_energy_range_uj."""
         rapl_base = tmp_path / "intel-rapl"
@@ -209,6 +220,7 @@ class TestSampleWrapAround:
 
 
 class TestSampleDomainCategorization:
+    @_PRECISA_SYSFS
     def test_package_domains_categorized_as_cpu(self, tmp_path):
         rapl_base = _build_fake_sysfs(tmp_path)
 
@@ -240,6 +252,7 @@ class TestSampleDomainCategorization:
 
 
 class TestClose:
+    @_PRECISA_SYSFS
     def test_close_clears_domains(self, tmp_path):
         rapl_base = _build_fake_sysfs(tmp_path)
 
