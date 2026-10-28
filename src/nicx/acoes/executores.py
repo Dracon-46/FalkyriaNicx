@@ -51,11 +51,29 @@ def remind_list() -> Outcome:
     return Outcome(True, f"Você tem {head}: " + "; ".join(parts) + more + ".")
 
 
-def remind_clear() -> Outcome:
-    n = lembretes.cancel_all()
+_KIND_NAMES = {
+    "": ("lembrete", "lembretes"),
+    "timer": ("timer", "timers"),
+    "alarme": ("alarme", "alarmes"),
+}
+
+
+def remind_clear(action: Action) -> Outcome:
+    one, many = _KIND_NAMES.get(action.target, _KIND_NAMES[""])
+    n = lembretes.cancel_all(action.target)
     if n == 0:
-        return Outcome(True, "Não havia lembretes para cancelar.")
-    return Outcome(True, f"Cancelei {_plural(n, 'lembrete', 'lembretes')}.")
+        return Outcome(True, f"Não havia {many} para cancelar.")
+    return Outcome(True, f"Cancelei {_plural(n, one, many)}.")
+
+
+def remind_cancel(action: Action) -> Outcome:
+    one, _many = _KIND_NAMES.get(action.target, _KIND_NAMES[""])
+    reminder = lembretes.cancel_next(action.target)
+    if reminder is None:
+        return Outcome(True, f"Não havia {one} para cancelar.")
+    if lembretes.kind_of(reminder) == "lembrete":
+        return Outcome(True, f"Cancelei o lembrete de {reminder.text}.")
+    return Outcome(True, f"Cancelei o {one} de {say_when(reminder.due_at)}.")
 
 
 def note_add(action: Action) -> Outcome:
@@ -265,7 +283,6 @@ def run(action: Action) -> Optional[Outcome]:
     """Executa uma rotina; None se a ação não for uma rotina."""
     simple = {
         "remind_list": remind_list,
-        "remind_clear": remind_clear,
         "notes_list": notes_list,
         "notes_clear": notes_clear,
         "status": status,
@@ -277,6 +294,8 @@ def run(action: Action) -> Optional[Outcome]:
         return simple[action.kind]()
     with_action = {
         "remind": remind,
+        "remind_clear": remind_clear,
+        "remind_cancel": remind_cancel,
         "note_add": note_add,
         "folder": folder,
         "close": close,

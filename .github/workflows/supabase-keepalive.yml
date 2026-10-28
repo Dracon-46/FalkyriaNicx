@@ -3,13 +3,17 @@ name: Supabase acordado
 # O plano grátis do Supabase pausa o projeto depois de dias sem uso, e os
 # eventos enviados enquanto ele está pausado se perdem. Uma chamada leve a
 # cada 3 dias mantém o projeto ligado (alguns segundos de Actions).
+#
+# O GitHub desliga agendamentos de repositório público após 60 dias sem
+# atividade; reativar o próprio workflow a cada execução zera essa contagem.
 
 on:
   schedule:
-    - cron: '0 12 */3 * *'  # a cada 3 dias, 9h em Brasília
+    - cron: '17 12 */3 * *'  # a cada 3 dias, 9h17 em Brasília (fora da hora cheia)
   workflow_dispatch:
 
-permissions: {}
+permissions:
+  actions: write  # só para reativar o próprio agendamento
 
 jobs:
   ping:
@@ -27,3 +31,7 @@ jobs:
             -H "apikey: $SUPABASE_KEY" \
             -H "Content-Type: application/json" \
             -d '{}'
+      - name: Manter o agendamento ativo
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/supabase-keepalive.yml/enable"

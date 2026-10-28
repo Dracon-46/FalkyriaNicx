@@ -667,7 +667,7 @@ def test_kokoro_unloadable_spacy_stub_is_removed_if_kokoro_still_fails(
     monkeypatch,
 ):
     """When something besides spaCy breaks the import, the stub must not
-    linger in ``sys.modules`` and the backend stays unhealthy."""
+    linger in ``sys.modules`` and loading the model fails."""
     import sys
 
     from nicx.voz.kokoro_tts import KokoroTTSBackend
@@ -675,7 +675,8 @@ def test_kokoro_unloadable_spacy_stub_is_removed_if_kokoro_still_fails(
     _serve_kokoro_importing_spacy(monkeypatch, object, missing_dep="torch")
     monkeypatch.setitem(sys.modules, "spacy", None)
 
-    assert KokoroTTSBackend(device="cpu").health() is False
+    with pytest.raises(RuntimeError, match="kokoro package not installed"):
+        KokoroTTSBackend(device="cpu")._ensure_model()
     assert sys.modules.get("spacy") is None
 
 

@@ -108,6 +108,18 @@ def _import_kokoro() -> Any:
         return kokoro
 
 
+def _kokoro_installed() -> bool:
+    """Whether the kokoro package exists, without importing it."""
+    import importlib.util
+
+    if "kokoro" in sys.modules:
+        return sys.modules["kokoro"] is not None
+    try:
+        return importlib.util.find_spec("kokoro") is not None
+    except (ImportError, ValueError):
+        return False
+
+
 @TTSRegistry.register("kokoro")
 class KokoroTTSBackend(TTSBackend):
     """Kokoro TTS — local open-source voice synthesis, multilingual."""
@@ -342,14 +354,10 @@ class KokoroTTSBackend(TTSBackend):
         ]
 
     def health(self) -> bool:
-        # Only check that Kokoro imports; the weights load on the first
-        # synthesis. Loading them here kept ~1 GB in RAM as soon as the app
-        # asked whether voice output exists. Language-specific G2P problems
-        # surface at synthesis time for the voice actually used.
+        # Only check that the package is installed: importing kokoro pulls in
+        # torch, transformers and spaCy, which never leave the process again.
+        # Weights load on the first synthesis; import and G2P problems surface
+        # there, for the voice actually used.
         if self._model is not None:
             return True
-        try:
-            _import_kokoro()
-            return True
-        except ImportError:
-            return False
+        return _kokoro_installed()

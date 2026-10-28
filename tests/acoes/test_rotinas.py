@@ -42,6 +42,9 @@ def nicx_home(tmp_path, monkeypatch):
         ("as 7 da manha", datetime(2026, 10, 28, 7, 0)),
         ("as 22:45", datetime(2026, 10, 27, 22, 45)),
         ("as 9 e meia", datetime(2026, 10, 27, 21, 30)),
+        ("as 12 da noite", datetime(2026, 10, 28, 0, 0)),
+        ("amanha as 3", datetime(2026, 10, 28, 15, 0)),
+        ("as 3", datetime(2026, 10, 27, 15, 0)),
         ("as 25h", None),
         ("em banana", None),
     ],
@@ -104,6 +107,11 @@ def test_parse_routines(text, kind, target):
         "fecha a porta",
         "quero que você anote isso em algum lugar",
         "sim",  # sem nada pendente, é conversa
+        "Você pode anotar o que eu falar daqui pra frente?",
+        "Consegue anotar uma coisa pra mim?",
+        "Anotar à mão ajuda a memorizar?",
+        "Me lembra as 3 leis de Newton",
+        "Me lembra disso amanhã às 9",
     ],
 )
 def test_parse_leaves_conversation_alone(text):
@@ -321,3 +329,40 @@ def test_computer_tool_new_actions(nicx_home):
     assert not unknown.success and "downloads" in unknown.content
     # Desligar não está ao alcance do modelo.
     assert not tool.execute(acao="desligar").success
+
+
+# ---------------------------------------------------------------------------
+# Correções da revisão
+# ---------------------------------------------------------------------------
+
+
+def test_clock_with_colon_is_understood():
+    action = parse("Me lembra às 15:30 de ligar pro banco")
+    assert action is not None and action.kind == "remind"
+    assert action.target == "ligar pro banco"
+    assert (action.when.hour, action.when.minute) == (15, 30)
+
+
+def test_three_oclock_after_three_is_tomorrow_afternoon():
+    late = datetime(2026, 10, 27, 16, 0)
+    assert parse_when("as 3", late) == datetime(2026, 10, 28, 15, 0)
+
+
+def test_alarm_early_hours_stay_in_the_morning():
+    action = parse("coloca um alarme para as 6")
+    assert action is not None and action.when.hour == 6
+
+
+def test_timer_near_midnight_is_said_in_minutes():
+    now = datetime(2026, 10, 27, 23, 57)
+    assert say_when(now + timedelta(minutes=5), now) == "em 5 minutos"
+
+
+def test_cancel_the_timer_keeps_other_reminders():
+    lembretes.add("pagar a conta", datetime.now() + timedelta(days=1))
+    lembretes.add("o tempo acabou", datetime.now() + timedelta(minutes=10))
+    message = handle("cancela o timer").message
+    assert message.startswith("Cancelei o timer de")
+    assert [r.text for r in lembretes.pending()] == ["pagar a conta"]
+    assert handle("cancela os alarmes").message == "Não havia alarmes para cancelar."
+    assert handle("cancela os lembretes").message == "Cancelei 1 lembrete."

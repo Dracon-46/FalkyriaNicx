@@ -71,6 +71,11 @@ CLOSABLE: dict[str, tuple[str, tuple[str, ...]]] = {
 
 _REMIND = r"(?:me )?(?:lembra|lembre|lembrar|lembrete|avisa|avise|avisar)(?: me)?"
 _CONNECTOR = r"(?:de |que |para |pra |do |da )"
+# "me lembra disso", "anota uma coisa": falam de algo de antes ou vago, é com o modelo.
+_VAGUE = re.compile(
+    r"(?:isso|isto|disso|disto|aquilo|daquilo|essa|esse|uma coisa|alguma coisa|algo"
+    r"|o que)\b"
+)
 _WHEN_START = (
     r"(?:em|daqui|dentro de|hoje|amanha|depois de amanha|as|a|para as|pras"
     r"|meio dia|meia noite)\b"
@@ -129,12 +134,18 @@ def _reminder(text: str, t: str, where: list[int]) -> Optional[Action]:
             if found is None or found[0] >= len(words):
                 return None
             i, when = found
+            # Horário na frente precisa de conector: "às 3 de ligar" sim,
+            # "as 3 leis de Newton" não (é uma pergunta para o modelo).
+            if not re.match(_CONNECTOR, t[starts[i] :]):
+                return None
             what_start, what_end = starts[i], len(t)
 
     what_clean = t[what_start:what_end]
     cm = re.match(_CONNECTOR, what_clean)
     if cm:
         what_start += cm.end()
+    if _VAGUE.match(t[what_start:what_end]):
+        return None
     what = original_text(text, where, what_start, what_end)
     if not what:
         return None
@@ -160,7 +171,7 @@ def _timer(t: str) -> Optional[Action]:
         t,
     )
     if m:
-        when = parse_clock(m.group("w")) or parse_when(m.group("w"))
+        when = parse_clock(m.group("w"), morning=True) or parse_when(m.group("w"))
         if when is None:
             return None
         return Action("remind", target="alarme", when=when)
@@ -175,12 +186,18 @@ def _reminder_admin(t: str) -> Optional[Action]:
         t,
     ):
         return Action("remind_list")
-    if re.fullmatch(
-        r"(?:cancela|cancele|apaga|apague|remove|limpa|tira)(?: todos)?"
-        r" (?:os |meus |o |meu )?(?:lembretes?|alarmes?|timers?)",
+    m = re.fullmatch(
+        r"(?:cancela|cancele|apaga|apague|remove|limpa|tira)(?P<all> todos)?"
+        r" (?:os |meus |o |meu )?(?P<noun>lembretes?|alarmes?|timers?)",
         t,
-    ):
-        return Action("remind_clear")
+    )
+    if m:
+        noun = m.group("noun")
+        kind = {"lembrete": "", "alarme": "alarme", "timer": "timer"}[noun.rstrip("s")]
+        if m.group("all") or noun.endswith("s"):
+            return Action("remind_clear", target=kind)
+        # "cancela o timer": só o próximo timer, não a lista inteira.
+        return Action("remind_cancel", target=kind)
     return None
 
 
@@ -190,14 +207,18 @@ def _reminder_admin(t: str) -> Optional[Action]:
 
 
 def _note(text: str, t: str, where: list[int]) -> Optional[Action]:
+    # Só a forma de comando: "você pode anotar ...?" e "anotar à mão ajuda?"
+    # são conversa e vão para o modelo.
+    if text.rstrip().endswith("?"):
+        return None
     m = re.match(
-        r"(?:anota|anote|anotar|toma nota|tome nota|registra|registre|"
+        r"(?:anota|anote|toma nota|tome nota|registra|registre|"
         r"salva uma nota|cria uma nota|faz uma nota)"
         r"(?: (?:ai|pra mim|para mim))?(?: (?:que|de que|uma nota))?\s",
         t,
     )
-    # "anota isso ..." fala de algo dito antes: isso é com o modelo.
-    if not m or re.match(r"(?:isso|isto|aquilo|essa|esse)\b", t[m.end() :]):
+    # "anota isso ...", "anota uma coisa": vago ou de antes, é com o modelo.
+    if not m or _VAGUE.match(t[m.end() :]):
         return None
     what = original_text(text, where, m.end(), len(t))
     return Action("note_add", target=what) if what else None

@@ -19,8 +19,8 @@ class Action:
     """Uma ação reconhecida. ``kind`` diz o que fazer; o resto são detalhes."""
 
     # volume, media, open, search, time, date, battery, lock; e de rotinas.py:
-    # remind, remind_list, remind_clear, note_add, notes_list, notes_clear,
-    # status, folder, screenshot, close, power, confirm, deny
+    # remind, remind_list, remind_clear, remind_cancel, note_add, notes_list,
+    # notes_clear, status, folder, screenshot, close, power, confirm, deny
     kind: str
     op: str = ""  # volume: up/down/set/mute; media: toggle/next/prev; power
     value: Optional[int] = None  # volume: passos (up/down) ou nível 0-100 (set)
@@ -86,10 +86,15 @@ STEP_SMALL = 3
 STEP_BIG = 10
 
 
+# Horário com dois-pontos ("às 15:30"): os dois-pontos sairiam com a pontuação.
+_CLOCK_COLON = re.compile(r"(\d{1,2}):(\d{2})\b")
+
+
 def normalize(text: str) -> str:
     """Minúsculas, sem acento, sem pontuação e com espaços simples."""
     text = unicodedata.normalize("NFKD", text.lower())
     text = "".join(c for c in text if not unicodedata.combining(c))
+    text = _CLOCK_COLON.sub(r"\1h\2", text)  # "15:30" -> "15h30"
     text = re.sub(r"[^\w\s%-]", " ", text)
     return re.sub(r"\s+", " ", text).strip()
 
@@ -118,7 +123,12 @@ def clean_with_map(text: str) -> tuple[str, list[int]]:
     """
     chars: list[str] = []
     where: list[int] = []
+    colons = {m.start() + len(m.group(1)) for m in _CLOCK_COLON.finditer(text)}
     for i, ch in enumerate(text):
+        if i in colons:
+            chars.append("h")
+            where.append(i)
+            continue
         base = unicodedata.normalize("NFKD", ch.lower())
         for c in base:
             if unicodedata.combining(c):

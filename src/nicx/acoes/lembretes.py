@@ -89,11 +89,34 @@ def pending() -> List[Reminder]:
         return sorted(_load(), key=lambda r: r.due)
 
 
-def cancel_all() -> int:
+_KIND_TEXT = {"timer": "o tempo acabou", "alarme": "alarme"}
+
+
+def kind_of(reminder: Reminder) -> str:
+    """'timer', 'alarme' ou 'lembrete'."""
+    for kind, text in _KIND_TEXT.items():
+        if reminder.text == text:
+            return kind
+    return "lembrete"
+
+
+def cancel_all(kind: str = "") -> int:
+    """Cancela todos os lembretes, ou só os de um tipo ('timer', 'alarme')."""
     with _LOCK:
-        count = len(_load())
-        _save([])
-    return count
+        items = _load()
+        keep = [r for r in items if kind and kind_of(r) != kind]
+        _save(keep)
+    return len(items) - len(keep)
+
+
+def cancel_next(kind: str = "") -> Optional[Reminder]:
+    """Cancela só o próximo lembrete (de um tipo, se dado)."""
+    with _LOCK:
+        items = sorted(_load(), key=lambda r: r.due)
+        target = next((r for r in items if not kind or kind_of(r) == kind), None)
+        if target is not None:
+            _save([r for r in items if r.id != target.id])
+    return target
 
 
 def pop_due(now: Optional[datetime] = None) -> List[Reminder]:
@@ -172,6 +195,22 @@ def show_notification(message: str) -> None:
         logger.info("Notificação não exibida: %s", exc)
 
 
+# Uma voz só para os avisos: cada get_tts_backend cria um modelo novo, e
+# vários lembretes vencidos juntos carregariam vários Kokoros na RAM.
+_VOICE: object = None
+_VOICE_LOCK = threading.Lock()
+
+
+def _voice(preferred: str):
+    global _VOICE
+    with _VOICE_LOCK:
+        if _VOICE is None:
+            from nicx.voz._tts_discovery import get_tts_backend
+
+            _VOICE = get_tts_backend(preferred)
+        return _VOICE
+
+
 def speak(message: str) -> None:
     """Fala o aviso com a voz local, se instalada. Silencioso se não houver."""
     try:
@@ -181,10 +220,9 @@ def speak(message: str) -> None:
         import soundfile as sf
 
         from nicx.nucleo.config import load_config
-        from nicx.voz._tts_discovery import get_tts_backend
 
         speech = load_config().speech
-        backend = get_tts_backend(getattr(speech, "tts_backend", "kokoro"))
+        backend = _voice(getattr(speech, "tts_backend", "kokoro"))
         if backend is None:
             return
         result = backend.synthesize(

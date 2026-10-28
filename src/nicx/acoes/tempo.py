@@ -120,8 +120,14 @@ _CLOCK = re.compile(
 )
 
 
-def parse_clock(text: str, now: Optional[datetime] = None) -> Optional[datetime]:
-    """'às 15h30', 'às 3 da tarde', 'amanhã às 8', 'meio-dia'. Próxima ocorrência."""
+def parse_clock(
+    text: str, now: Optional[datetime] = None, *, morning: bool = False
+) -> Optional[datetime]:
+    """'às 15h30', 'às 3 da tarde', 'amanhã às 8', 'meio-dia'. Próxima ocorrência.
+
+    Sem "da manhã/tarde/noite", de 1 a 6 horas é à tarde ("às 3" = 15h), como
+    se fala no dia a dia; ``morning=True`` (alarmes) mantém de madrugada.
+    """
     now = now or datetime.now()
     m = _CLOCK.fullmatch(text.strip())
     if not m:
@@ -142,8 +148,10 @@ def parse_clock(text: str, now: Optional[datetime] = None) -> Optional[datetime]
         period = (m.group("per") or "").strip()
         if period in ("da tarde", "da noite") and hour < 12:
             hour += 12
-        elif period in ("da manha", "da madrugada") and hour == 12:
-            hour = 0
+        elif period in ("da noite", "da manha", "da madrugada") and hour == 12:
+            hour = 0  # "12 da noite" é meia-noite
+        elif not period and not morning and 1 <= hour <= 6 and minute <= 59:
+            hour += 12
     if not (0 <= hour <= 23 and 0 <= minute <= 59):
         return None
     day = m.group("day") or (m.group("day2") or "").replace("de ", "")
@@ -153,9 +161,10 @@ def parse_clock(text: str, now: Optional[datetime] = None) -> Optional[datetime]
     elif day == "depois de amanha":
         target += timedelta(days=2)
     elif target <= now:
-        # "às 8" depois das 8 é amanhã; sem período, "às 3" às 14h vira 15h.
+        # "às 8" depois das 8 vira 20h; alarme "às 6" depois das 6 é amanhã cedo.
         if (
-            not m.group("per")
+            not morning
+            and not m.group("per")
             and not m.group("noon")
             and hour < 12
             and target + timedelta(hours=12) > now
@@ -181,15 +190,16 @@ def say_when(when: datetime, now: Optional[datetime] = None) -> str:
     """Hora do lembrete do jeito que se fala: 'às 15h30', 'amanhã às 8h'."""
     now = now or datetime.now()
     hhmm = f"{when.hour}h" if when.minute == 0 else f"{when.hour}h{when.minute:02d}"
+    # Perto: em minutos, mesmo virando o dia (timer às 23h57 = "em 5 minutos").
+    delta = when - now
+    if delta < timedelta(minutes=1):
+        secs = max(1, round(delta.total_seconds()))
+        return f"em {secs} segundo{'s' if secs > 1 else ''}"
+    if delta < timedelta(hours=1):
+        mins = max(1, round(delta.total_seconds() / 60))
+        return f"em {mins} minuto{'s' if mins > 1 else ''}"
     days = (when.date() - now.date()).days
     if days == 0:
-        delta = when - now
-        if delta < timedelta(minutes=1):
-            secs = max(1, round(delta.total_seconds()))
-            return f"em {secs} segundo{'s' if secs > 1 else ''}"
-        if delta < timedelta(hours=1):
-            mins = max(1, round(delta.total_seconds() / 60))
-            return f"em {mins} minuto{'s' if mins > 1 else ''}"
         return f"às {hhmm}"
     if days == 1:
         return f"amanhã às {hhmm}"
