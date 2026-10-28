@@ -2,6 +2,12 @@
 
 All Nicx data files under ``~/.nicx/`` should be created
 through these helpers to ensure consistent, restrictive permissions.
+
+On Windows there are no POSIX mode bits: ``os.chmod`` only toggles the
+read-only attribute, so ``0o600``/``0o700`` leave files writable and change
+nothing else. Privacy there comes from the ACL that ``~/.nicx`` inherits from
+the user profile (only the user, SYSTEM and Administrators). A ``NICX_HOME``
+outside the profile gets that folder's ACL instead.
 """
 
 from __future__ import annotations

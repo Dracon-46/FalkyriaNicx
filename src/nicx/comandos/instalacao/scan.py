@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 import json
 import os
 import subprocess
@@ -58,7 +59,7 @@ class ScanResult:
     name: str
     status: str  # "ok" | "warn" | "fail" | "skip"
     message: str
-    platform: str  # "darwin" | "linux" | "all"
+    platform: str  # "darwin" | "linux" | "win32" | "all"
 
 
 # ---------------------------------------------------------------------------
@@ -229,20 +230,57 @@ class PrivacyScanner:
         warn_msg: str,
         platform: str,
     ) -> ScanResult:
-        """Shared helper: pgrep for any of the given process names."""
+        """Shared helper: look for any of the given process names.
+
+        POSIX uses ``pgrep``; Windows has no pgrep, so it reads ``tasklist``.
+        When neither tool runs the check is skipped instead of reporting a
+        false "nothing detected".
+        """
         try:
-            for name in names:
-                try:
-                    proc = self._run(["pgrep", "-x", name])
-                    if proc.returncode == 0:
+            if sys.platform == "win32":
+                running = self._windows_process_names()
+                if running is None:
+                    return ScanResult(
+                        name=check_name,
+                        status="skip",
+                        message="tasklist not available.",
+                        platform=platform,
+                    )
+                for name in names:
+                    if name.lower() in running:
                         return ScanResult(
                             name=check_name,
                             status="warn",
                             message=warn_msg.format(name=name),
                             platform=platform,
                         )
+                return ScanResult(
+                    name=check_name,
+                    status="ok",
+                    message=f"No {check_name.lower()} processes detected.",
+                    platform=platform,
+                )
+            checked = False
+            for name in names:
+                try:
+                    proc = self._run(["pgrep", "-x", name])
                 except Exception:
                     continue
+                checked = True
+                if proc.returncode == 0:
+                    return ScanResult(
+                        name=check_name,
+                        status="warn",
+                        message=warn_msg.format(name=name),
+                        platform=platform,
+                    )
+            if not checked:
+                return ScanResult(
+                    name=check_name,
+                    status="skip",
+                    message="pgrep not available.",
+                    platform=platform,
+                )
             return ScanResult(
                 name=check_name,
                 status="ok",
@@ -256,6 +294,21 @@ class PrivacyScanner:
                 message="pgrep not available.",
                 platform=platform,
             )
+
+    def _windows_process_names(self) -> set[str] | None:
+        """Return lower-case image names (without .exe) of running processes."""
+        try:
+            proc = self._run(["tasklist", "/FO", "CSV", "/NH"])
+        except Exception:
+            return None
+        if proc.returncode != 0:
+            return None
+        names: set[str] = set()
+        for row in csv.reader(proc.stdout.splitlines()):
+            if row and row[0]:
+                image = row[0].strip().lower()
+                names.add(image.removesuffix(".exe"))
+        return names
 
     def check_cloud_sync_agents(self) -> ScanResult:
         """Check for running cloud-sync agent processes."""
@@ -271,14 +324,17 @@ class PrivacyScanner:
         try:
             if sys.platform == "darwin":
                 proc = self._run(["lsof", "-iTCP", "-sTCP:LISTEN", "-n", "-P"])
+            elif sys.platform == "win32":
+                proc = self._run(["netstat", "-an"])
             else:
                 proc = self._run(["ss", "-tlnp"])
             output = proc.stdout
 
             exposed: list[int] = []
             for port in _ENGINE_PORTS:
-                # Look for patterns like *:PORT or 0.0.0.0:PORT
-                for token in (f"*:{port}", f"0.0.0.0:{port}", f":::{port}"):
+                # Look for patterns like *:PORT, 0.0.0.0:PORT or [::]:PORT
+                tokens = (f"*:{port}", f"0.0.0.0:{port}", f":::{port}", f"[::]:{port}")
+                for token in tokens:
                     if token.replace(" ", "") in output.replace(" ", ""):
                         exposed.append(port)
                         break
@@ -301,7 +357,10 @@ class PrivacyScanner:
             return ScanResult(
                 name="Network Exposure",
                 status="skip",
-                message="Could not determine network exposure (lsof/ss unavailable).",
+                message=(
+                    "Could not determine network exposure "
+                    "(lsof/ss/netstat unavailable)."
+                ),
                 platform="all",
             )
 
@@ -409,9 +468,16 @@ class PrivacyScanner:
             self.check_dns,
         ]
 
+    @staticmethod
+    def _current_platform() -> str:
+        """Map ``sys.platform`` onto the ``ScanResult.platform`` values."""
+        if sys.platform in ("darwin", "win32"):
+            return sys.platform
+        return "linux"
+
     def run_all(self) -> list[ScanResult]:
         """Run all checks, filter to the current platform, hide 'skip' results."""
-        current_plat = "darwin" if sys.platform == "darwin" else "linux"
+        current_plat = self._current_platform()
         results: list[ScanResult] = []
         for check_fn in self._get_all_checks():
             result = check_fn()
@@ -424,10 +490,14 @@ class PrivacyScanner:
 
     def run_quick(self) -> list[ScanResult]:
         """Run only critical checks: disk encryption + cloud sync agents."""
-        current_plat = "darwin" if sys.platform == "darwin" else "linux"
+        current_plat = self._current_platform()
         quick_checks: list[Callable[[], ScanResult]]
         if current_plat == "darwin":
             quick_checks = [self.check_filevault, self.check_cloud_sync_agents]
+        elif current_plat == "win32":
+            # There is no Windows disk-encryption (BitLocker) check yet; never
+            # run the Linux LUKS probe here.
+            quick_checks = [self.check_cloud_sync_agents]
         else:
             quick_checks = [self.check_luks, self.check_cloud_sync_agents]
         results = []

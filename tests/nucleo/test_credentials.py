@@ -1,6 +1,7 @@
 """Tests for credential persistence module."""
 
 import os
+import sys
 
 import pytest
 
@@ -143,6 +144,13 @@ def test_get_status_missing():
     assert status["TAVILY_API_KEY"] is False
 
 
+@pytest.mark.skipif(
+    sys.platform == "win32",
+    reason=(
+        "Windows não tem bits de permissão POSIX (o chmod só liga o somente "
+        "leitura); a proteção vem da ACL herdada do perfil do usuário"
+    ),
+)
 def test_file_permissions(cred_path):
     save_credential("web_search", "TAVILY_API_KEY", "tvly-x", path=cred_path)
     mode = oct(cred_path.stat().st_mode & 0o777)

@@ -504,9 +504,29 @@ def _locate_quantize_script(
     return None
 
 
+# Junction reparse tag (stat.IO_REPARSE_TAG_MOUNT_POINT on Windows).
+_IO_REPARSE_TAG_MOUNT_POINT = 0xA0000003
+
+
+def _is_link(path: Path) -> bool:
+    """Return whether *path* is a symlink or a Windows directory junction.
+
+    Windows users without the symlink privilege link folders with junctions
+    (``mklink /J``). ``Path.is_symlink`` does not see them, and following one
+    would treat the target's contents as the output itself.
+    """
+    if path.is_symlink():
+        return True
+    try:
+        st = os.lstat(path)
+    except OSError:
+        return False
+    return getattr(st, "st_reparse_tag", 0) == _IO_REPARSE_TAG_MOUNT_POINT
+
+
 def _remove_path(path: Path) -> None:
-    """Remove one file, symlink, or directory without following symlinks."""
-    if path.is_symlink() or path.is_file():
+    """Remove one file, link, or directory without following links."""
+    if _is_link(path) or path.is_file():
         path.unlink()
     elif path.is_dir():
         shutil.rmtree(path)
@@ -636,13 +656,15 @@ def convert(
         # A symlink is always an existing output object, even when it points to
         # an empty directory. Never follow it to decide whether overwriting is
         # safe; --force replaces the link itself after conversion succeeds.
-        if output_path.is_symlink() and not force:
+        is_link = _is_link(output_path)
+        if is_link and not force:
             console.print(
-                f"[red]Output path exists as a symlink:[/red] {output_path}\n"
+                "[red]Output path exists as a symlink or junction:[/red] "
+                f"{output_path}\n"
                 "Use [cyan]--force[/cyan] to overwrite."
             )
             sys.exit(1)
-        if output_path.is_dir() and not output_path.is_symlink():
+        if output_path.is_dir() and not is_link:
             contents = os.listdir(output_path)
             if contents and not force:
                 console.print(

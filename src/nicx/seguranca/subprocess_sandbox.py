@@ -6,6 +6,7 @@ import logging
 import os
 import signal
 import subprocess
+import sys
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
@@ -26,6 +27,33 @@ _SAFE_ENV_VARS = frozenset(
         "TZ",
     }
 )
+
+# Windows system locations, none of them secret. Without SYSTEMROOT/WINDIR
+# many programs (Python included) fail to start; without PATHEXT cmd.exe
+# cannot resolve "python" to "python.exe"; TEMP/TMP are the temp folder.
+_WINDOWS_SAFE_ENV_VARS = frozenset(
+    {
+        "SYSTEMROOT",
+        "WINDIR",
+        "SYSTEMDRIVE",
+        "COMSPEC",
+        "PATHEXT",
+        "TEMP",
+        "TMP",
+        "USERPROFILE",
+        "USERNAME",
+        "APPDATA",
+        "LOCALAPPDATA",
+        "NUMBER_OF_PROCESSORS",
+        "PROCESSOR_ARCHITECTURE",
+    }
+)
+
+
+def _safe_env_vars() -> frozenset[str]:
+    if sys.platform == "win32":
+        return _SAFE_ENV_VARS | _WINDOWS_SAFE_ENV_VARS
+    return _SAFE_ENV_VARS
 
 
 @dataclass(slots=True)
@@ -49,7 +77,7 @@ def build_safe_env(
     Extra vars are added directly.
     """
     env: Dict[str, str] = {}
-    allowed = _SAFE_ENV_VARS | frozenset(passthrough or [])
+    allowed = _safe_env_vars() | frozenset(passthrough or [])
     for key in allowed:
         val = os.environ.get(key)
         if val is not None:
@@ -61,6 +89,19 @@ def build_safe_env(
 
 def kill_process_tree(pid: int) -> None:
     """Kill a process and all its children (best effort)."""
+    if sys.platform == "win32":
+        # No process groups or signals here: taskkill /T walks the child tree
+        # (shell=True runs the command under cmd.exe, so the tree matters).
+        try:
+            subprocess.run(
+                ["taskkill", "/F", "/T", "/PID", str(pid)],
+                capture_output=True,
+                check=False,
+                timeout=10,
+            )
+        except (OSError, subprocess.SubprocessError) as exc:
+            logger.debug("Failed to kill process tree %d: %s", pid, exc)
+        return
     try:
         os.killpg(os.getpgid(pid), signal.SIGTERM)
     except (OSError, ProcessLookupError) as exc:
@@ -91,6 +132,16 @@ def run_sandboxed(
     env = build_safe_env(passthrough=env_passthrough, extra=env_extra)
     cwd = working_dir if working_dir and os.path.isdir(working_dir) else None
 
+    # New process group for clean cleanup. os.setsid does not exist on Windows;
+    # there the child gets its own group and a hidden console instead.
+    group_kwargs: dict = {}
+    if sys.platform == "win32":
+        group_kwargs["creationflags"] = (
+            subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW
+        )
+    else:
+        group_kwargs["start_new_session"] = True
+
     result = SandboxResult()
     try:
         proc = subprocess.Popen(
@@ -100,9 +151,11 @@ def run_sandboxed(
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
+            # Console programs may print in another code page; never crash on it.
+            errors="replace",
             env=env,
             cwd=cwd,
-            preexec_fn=os.setsid,  # New process group
+            **group_kwargs,
         )
         try:
             stdout, stderr = proc.communicate(timeout=timeout)

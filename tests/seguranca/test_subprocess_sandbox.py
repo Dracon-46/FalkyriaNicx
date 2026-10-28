@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import os
 import shlex
+import subprocess
+import sys
 import tempfile
 
 from nicx.nucleo import get_python_executable
@@ -12,6 +14,15 @@ from nicx.seguranca.subprocess_sandbox import (
     kill_process_tree,
     run_sandboxed,
 )
+
+WINDOWS = sys.platform == "win32"
+
+
+def _python_command(code: str) -> str:
+    """Quote a Python one-liner for the platform shell (cmd.exe or sh)."""
+    argv = [get_python_executable(), "-c", code]
+    return subprocess.list2cmdline(argv) if WINDOWS else shlex.join(argv)
+
 
 # ---------------------------------------------------------------------------
 # build_safe_env tests
@@ -34,6 +45,23 @@ class TestBuildSafeEnv:
             "TMPDIR",
             "TZ",
         }
+        if WINDOWS:
+            # System locations cmd.exe and Python need; none of them is secret.
+            safe_keys |= {
+                "SYSTEMROOT",
+                "WINDIR",
+                "SYSTEMDRIVE",
+                "COMSPEC",
+                "PATHEXT",
+                "TEMP",
+                "TMP",
+                "USERPROFILE",
+                "USERNAME",
+                "APPDATA",
+                "LOCALAPPDATA",
+                "NUMBER_OF_PROCESSORS",
+                "PROCESSOR_ARCHITECTURE",
+            }
         for key in env:
             assert key in safe_keys
 
@@ -73,22 +101,26 @@ class TestRunSandboxed:
         assert not result.killed
 
     def test_timeout_kills_process(self) -> None:
-        result = run_sandboxed("sleep 60", timeout=1.0)
+        result = run_sandboxed(
+            _python_command("import time; time.sleep(60)"), timeout=1.0
+        )
         assert result.timed_out
         assert result.killed
         assert result.returncode == -1
 
     def test_working_dir(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
-            result = run_sandboxed("pwd", working_dir=tmpdir, timeout=10.0)
+            result = run_sandboxed(
+                "cd" if WINDOWS else "pwd", working_dir=tmpdir, timeout=10.0
+            )
             assert result.returncode == 0
-            assert tmpdir in result.stdout.strip()
+            assert os.path.samefile(result.stdout.strip(), tmpdir)
 
     def test_env_isolation(self) -> None:
         os.environ["TEST_SECRET"] = "super_secret_value"
         try:
             result = run_sandboxed(
-                'echo "val=$TEST_SECRET"',
+                "echo val=%TEST_SECRET%" if WINDOWS else 'echo "val=$TEST_SECRET"',
                 timeout=10.0,
             )
             assert result.returncode == 0
@@ -99,7 +131,7 @@ class TestRunSandboxed:
     def test_output_truncation(self) -> None:
         # Generate output larger than max_output_bytes
         result = run_sandboxed(
-            f"{shlex.quote(get_python_executable())} -c \"print('A' * 200)\"",
+            _python_command("print('A' * 200)"),
             timeout=10.0,
             max_output_bytes=50,
         )

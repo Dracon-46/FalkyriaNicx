@@ -7,6 +7,8 @@ import sys
 from subprocess import CompletedProcess
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from nicx.comandos.instalacao.scan import PrivacyScanner, ScanResult
 
 # ---------------------------------------------------------------------------
@@ -22,6 +24,13 @@ def _make_proc(
     return CompletedProcess(
         args=[], returncode=returncode, stdout=stdout, stderr=stderr
     )
+
+
+@pytest.fixture
+def posix_platform():
+    """Process checks use pgrep on POSIX; Windows reads tasklist instead."""
+    with patch("sys.platform", "linux"):
+        yield
 
 
 # ---------------------------------------------------------------------------
@@ -107,6 +116,7 @@ class TestMDM:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.usefixtures("posix_platform")
 class TestCloudSync:
     def test_no_agents(self) -> None:
         """pgrep returns non-zero → no sync agents running."""
@@ -206,6 +216,7 @@ class TestLUKS:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.usefixtures("posix_platform")
 class TestScreenRecording:
     def test_none_running(self) -> None:
         """No screen-recording processes -> ok."""
@@ -240,8 +251,7 @@ class TestPlatformFiltering:
     def test_run_all_filters_to_current_platform(self) -> None:
         """run_all() returns only current-platform + 'all' checks."""
         scanner = PrivacyScanner()
-        current_plat = "darwin" if sys.platform == "darwin" else "linux"
-        other_plat = "linux" if current_plat == "darwin" else "darwin"
+        current_plat = PrivacyScanner._current_platform()
 
         with patch.object(scanner, "_get_all_checks") as mock_get:
             darwin_ck = MagicMock(return_value=ScanResult("d", "ok", "msg", "darwin"))
@@ -252,7 +262,7 @@ class TestPlatformFiltering:
             results = scanner.run_all()
 
         result_platforms = {r.platform for r in results}
-        assert other_plat not in result_platforms
+        assert result_platforms <= {current_plat, "all"}
         assert "all" in result_platforms or current_plat in result_platforms
 
 
@@ -261,6 +271,7 @@ class TestPlatformFiltering:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.usefixtures("posix_platform")
 class TestRemoteAccess:
     """Tests for check_remote_access (Linux)."""
 
@@ -337,6 +348,90 @@ class TestRunQuick:
         assert "Network Exposure" not in names
         assert "Screen Recording" not in names
 
+    def test_windows_never_runs_linux_or_macos_disk_checks(self) -> None:
+        scanner = PrivacyScanner()
+        with (
+            patch("sys.platform", "win32"),
+            patch.object(scanner, "check_filevault") as fv,
+            patch.object(scanner, "check_luks") as luks,
+            patch.object(scanner, "check_cloud_sync_agents") as cs,
+        ):
+            cs.return_value = ScanResult("Cloud", "ok", "ok", "all")
+            results = scanner.run_quick()
+        fv.assert_not_called()
+        luks.assert_not_called()
+        assert [r.name for r in results] == ["Cloud"]
+
+
+# ---------------------------------------------------------------------------
+# TestWindowsProcesses
+# ---------------------------------------------------------------------------
+
+_TASKLIST = (
+    '"System Idle Process","0","Services","0","8 K"\n'
+    '"OneDrive.exe","4321","Console","1","90.000 K"\n'
+    '"AnyDesk.exe","5555","Console","1","20.000 K"\n'
+)
+
+
+class TestWindowsProcesses:
+    """Windows has no pgrep; the process checks read tasklist."""
+
+    def test_running_agent_is_reported(self) -> None:
+        scanner = PrivacyScanner()
+        with (
+            patch("sys.platform", "win32"),
+            patch.object(scanner, "_run", return_value=_make_proc(stdout=_TASKLIST)),
+        ):
+            cloud = scanner.check_cloud_sync_agents()
+            remote = scanner.check_remote_access()
+        assert cloud.status == "warn"
+        assert "OneDrive" in cloud.message
+        assert remote.status == "warn"
+        assert "AnyDesk" in remote.message
+
+    def test_no_agent_running(self) -> None:
+        scanner = PrivacyScanner()
+        idle = '"System Idle Process","0","Services","0","8 K"\n'
+        with (
+            patch("sys.platform", "win32"),
+            patch.object(scanner, "_run", return_value=_make_proc(stdout=idle)),
+        ):
+            result = scanner.check_cloud_sync_agents()
+        assert result.status == "ok"
+
+    def test_missing_tasklist_is_skipped_not_ok(self) -> None:
+        scanner = PrivacyScanner()
+        with (
+            patch("sys.platform", "win32"),
+            patch.object(scanner, "_run", side_effect=FileNotFoundError),
+        ):
+            result = scanner.check_cloud_sync_agents()
+        assert result.status == "skip"
+
+    def test_missing_pgrep_is_skipped_not_ok(self) -> None:
+        scanner = PrivacyScanner()
+        with (
+            patch("sys.platform", "linux"),
+            patch.object(scanner, "_run", side_effect=FileNotFoundError),
+        ):
+            result = scanner.check_remote_access()
+        assert result.status == "skip"
+
+    def test_network_exposure_reads_netstat(self) -> None:
+        scanner = PrivacyScanner()
+        netstat = "  TCP    0.0.0.0:11434          0.0.0.0:0              LISTENING\n"
+        with (
+            patch("sys.platform", "win32"),
+            patch.object(
+                scanner, "_run", return_value=_make_proc(stdout=netstat)
+            ) as run,
+        ):
+            result = scanner.check_network_exposure()
+        assert run.call_args.args[0][0] == "netstat"
+        assert result.status == "warn"
+        assert "11434" in result.message
+
 
 # ---------------------------------------------------------------------------
 # TestDNS
@@ -404,6 +499,7 @@ class TestDNS:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.usefixtures("posix_platform")
 class TestExpandedRemoteAccess:
     """Verify expanded remote-access process list."""
 

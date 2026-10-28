@@ -18,6 +18,18 @@ from nicx.comandos.recursos.model import model
 model_module = importlib.import_module("nicx.comandos.recursos.model")
 
 
+def _link_dir(link: Path, target: Path) -> None:
+    """Link a folder: symlink, or a junction when Windows lacks the privilege."""
+    try:
+        link.symlink_to(target, target_is_directory=True)
+    except OSError:
+        if sys.platform != "win32":
+            raise
+        import _winapi
+
+        _winapi.CreateJunction(str(target), str(link))
+
+
 class TestModelConvert:
     """Tests for the convert command."""
 
@@ -478,7 +490,7 @@ class TestModelConvert:
         sentinel = target / "keep.txt"
         sentinel.write_text("keep", encoding="utf-8")
         output_dir = tmp_path / "model-link"
-        output_dir.symlink_to(target, target_is_directory=True)
+        _link_dir(output_dir, target)
 
         class FakeMLXLM:
             @staticmethod
@@ -514,7 +526,7 @@ class TestModelConvert:
         )
 
         assert result.exit_code == 0
-        assert not output_dir.is_symlink()
+        assert not model_module._is_link(output_dir)
         assert (output_dir / "config.json").is_file()
         assert sentinel.read_text(encoding="utf-8") == "keep"
 
@@ -524,7 +536,7 @@ class TestModelConvert:
         target = tmp_path / "empty-target"
         target.mkdir()
         output_dir = tmp_path / "model-link"
-        output_dir.symlink_to(target, target_is_directory=True)
+        _link_dir(output_dir, target)
 
         class FakeConfig:
             class Engine:
@@ -542,7 +554,7 @@ class TestModelConvert:
         assert result.exit_code == 1
         assert "symlink" in result.output
         assert "--force" in result.output
-        assert output_dir.is_symlink()
+        assert model_module._is_link(output_dir)
         assert list(target.iterdir()) == []
 
     def test_convert_ollama_creates_model_from_gguf(

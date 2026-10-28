@@ -57,23 +57,57 @@ def _linux_process_identity(pid: int) -> dict | None:
         return None
 
 
-def _read_pid_identity() -> dict:
-    """Read the optional Linux identity sidecar, preserving legacy PID files."""
+def _windows_process_identity(pid: int) -> dict | None:
+    """Read a Windows process identity that survives clock changes.
+
+    Windows reuses PIDs quickly, so a PID alone does not identify the daemon
+    after a crash or reboot. The kernel keeps the creation time fixed for the
+    whole life of the process; setting the clock does not rewrite it.
+    """
+    if sys.platform != "win32":
+        return None
     try:
-        identity = json.loads(_PID_FILE.with_suffix(".identity.json").read_text())
+        import psutil
+
+        created_at = psutil.Process(pid).create_time()
+    except Exception:
+        return None
+    if not isinstance(created_at, float) or created_at <= 0:
+        return None
+    return {"pid": pid, "created_at": created_at}
+
+
+def _process_identity(pid: int) -> dict | None:
+    """Return the platform's recycled-PID-proof identity, or None if unknown."""
+    if sys.platform == "linux":
+        return _linux_process_identity(pid)
+    if sys.platform == "win32":
+        return _windows_process_identity(pid)
+    return None
+
+
+def _read_pid_identity() -> dict:
+    """Read the optional identity sidecar, preserving legacy PID files."""
+    try:
+        identity = json.loads(
+            _PID_FILE.with_suffix(".identity.json").read_text(encoding="utf-8")
+        )
     except (OSError, ValueError):
         return {}
     if (
         not isinstance(identity, dict)
         or type(identity.get("pid")) is not int
         or identity["pid"] <= 0
-        or type(identity.get("start_ticks")) is not int
-        or identity["start_ticks"] < 0
-        or not isinstance(identity.get("boot_id"), str)
-        or not identity["boot_id"]
     ):
         return {}
-    return identity
+    linux = (
+        type(identity.get("start_ticks")) is int
+        and identity["start_ticks"] >= 0
+        and isinstance(identity.get("boot_id"), str)
+        and bool(identity["boot_id"])
+    )
+    windows = type(identity.get("created_at")) is float and identity["created_at"] > 0
+    return identity if linux or windows else {}
 
 
 def _legacy_cli_args(argv: list[str]) -> list[str] | None:
@@ -129,8 +163,16 @@ def _legacy_cli_args(argv: list[str]) -> list[str] | None:
     return None
 
 
-def _legacy_linux_daemon(pid: int) -> bool | None:
-    """Recognize an old registration before it has a saved process identity."""
+def _process_argv(pid: int) -> list[str] | None:
+    """Read a process's command line, or None when the OS does not allow it."""
+    if sys.platform == "win32":
+        try:
+            import psutil
+
+            argv = psutil.Process(pid).cmdline()
+        except Exception:
+            return None
+        return [str(arg) for arg in argv]
     try:
         arguments = Path(f"/proc/{pid}/cmdline").read_bytes().split(b"\0")
     except OSError:
@@ -139,7 +181,14 @@ def _legacy_linux_daemon(pid: int) -> bool | None:
         arguments.pop()
     # Empty option values still occupy an argument; dropping them shifts the
     # execution boundary and can make a script's own -m look like Python's.
-    argv = [os.fsdecode(arg) for arg in arguments]
+    return [os.fsdecode(arg) for arg in arguments]
+
+
+def _legacy_daemon(pid: int) -> bool | None:
+    """Recognize an old registration before it has a saved process identity."""
+    argv = _process_argv(pid)
+    if argv is None:
+        return None
     command = _legacy_cli_args(argv)
     if command is None:
         return False
@@ -153,14 +202,15 @@ def _legacy_linux_daemon(pid: int) -> bool | None:
 
 
 def _registered_pid_alive(pid: int) -> bool:
-    """Reject reused Linux PIDs without comparing mutable wall-clock times."""
+    """Reject reused PIDs without comparing mutable wall-clock times."""
     if not _pid_alive(pid):
         return False
-    if sys.platform != "linux":
+    if sys.platform not in {"linux", "win32"}:
         return True
-    current = _linux_process_identity(pid)
+    current = _process_identity(pid)
     if current is None:
-        # Restricted or unmounted procfs must not orphan a live daemon.
+        # Restricted or unmounted procfs (or a process Windows will not let us
+        # inspect) must not orphan a live daemon.
         return True
     recorded = _read_pid_identity()
     if recorded.get("pid") == pid:
@@ -168,12 +218,12 @@ def _registered_pid_alive(pid: int) -> bool:
     # A legacy file has no historical identity to compare. Do not adopt an
     # arbitrary live process just because its PID was recycled. Once verified,
     # migrate the registration while the caller holds the state lock.
-    is_daemon = _legacy_linux_daemon(pid)
+    is_daemon = _legacy_daemon(pid)
     if is_daemon is False:
         return False
     if is_daemon:
         # Do not pair an old start tick with a replacement process's command.
-        confirmed = _linux_process_identity(pid)
+        confirmed = _process_identity(pid)
         if confirmed is not None and confirmed != current:
             return False
         if confirmed is not None:
@@ -291,7 +341,7 @@ def _write_pid_unlocked(
     if existing is not None and existing != pid and _registered_pid_alive(existing):
         if not (ready and same_launch and current.get("ready") is False):
             raise RuntimeError(f"Another server is already registered (PID {existing})")
-    identity = _linux_process_identity(pid)
+    identity = _process_identity(pid)
     if identity is not None:
         secure_write_json(_PID_FILE.with_suffix(".identity.json"), identity)
     else:
