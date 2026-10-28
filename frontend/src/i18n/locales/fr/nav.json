@@ -1,0 +1,25 @@
+{
+  "chat": "Discussion",
+  "dashboard": "Tableau de bord",
+  "painel": "Panneau Falkyria",
+  "dataSources": "Sources de données",
+  "agents": "Agents",
+  "logs": "Journaux",
+  "settings": "Paramètres",
+  "getStarted": "Premiers pas",
+  "openSidebar": "Ouvrir la barre latérale",
+  "closeSidebar": "Fermer la barre latérale",
+  "themeToggle": "Thème : {{theme}} (cliquez pour {{next}})",
+  "newChat": "Nouvelle discussion",
+  "selectModel": "Choisir un modèle",
+  "loadingModel": "Chargement du modèle...",
+  "searchChats": "Rechercher des discussions...",
+  "chats": {
+    "justNow": "À l'instant",
+    "noMatches": "Aucune discussion trouvée",
+    "empty": "Aucune discussion pour l'instant",
+    "stopBeforeDelete": "Arrêtez la génération avant de supprimer cette discussion",
+    "delete": "Supprimer la discussion",
+    "overlay": "Discussion rapide"
+  }
+}

@@ -2,6 +2,7 @@ import { useAppStore } from './store';
 import { useTtsStore } from './tts';
 import { stripThinkTags } from './message-text';
 import type { SilenceOptions } from './audio-level';
+import i18n from '../i18n';
 
 /** Where the hands-free loop is: listen → transcribe → think → speak → listen. */
 export type ConversationPhase = 'off' | 'listening' | 'transcribing' | 'thinking' | 'speaking';
@@ -9,13 +10,10 @@ export type ConversationPhase = 'off' | 'listening' | 'transcribing' | 'thinking
 /** What sending one transcribed message led to. */
 export type SendOutcome = 'done' | 'stopped' | 'not-sent';
 
-export const CONVERSATION_PHASE_LABEL: Record<ConversationPhase, string> = {
-  off: 'Conversa por voz',
-  listening: 'Ouvindo…',
-  transcribing: 'Transcrevendo…',
-  thinking: 'Pensando…',
-  speaking: 'Falando…',
-};
+/** What the voice-conversation button says in each phase, in the UI language. */
+export function conversationPhaseLabel(phase: ConversationPhase): string {
+  return i18n.t(`chat.voice.phase.${phase}`);
+}
 
 /** The microphone side, as `useSpeech` provides it. */
 export interface SpeechControls {
@@ -133,7 +131,7 @@ export class VoiceConversation {
     if (!heard) {
       speech.cancelRecording();
       if (idleRounds + 1 >= MAX_IDLE_ROUNDS) {
-        this.stop('Conversa por voz encerrada: ninguém falou por um minuto.');
+        this.stop(i18n.t('chat.voice.endedIdle'));
         return;
       }
       await this.listen(session, idleRounds + 1);

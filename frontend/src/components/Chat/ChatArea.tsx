@@ -9,12 +9,14 @@ import { stripThinkTags } from '../../lib/message-text';
 import { PanelRightOpen, PanelRightClose, Database, MessageSquare, X } from 'lucide-react';
 import { listConnectors } from '../../lib/connectors-api';
 import { NicxMascot } from '../Mascot/NicxMascot';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n';
 
 function getGreeting(): string {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Bom dia';
-  if (hour < 18) return 'Boa tarde';
-  return 'Boa noite';
+  if (hour < 12) return i18n.t('chat.greeting.morning');
+  if (hour < 18) return i18n.t('chat.greeting.afternoon');
+  return i18n.t('chat.greeting.evening');
 }
 
 export function ChatArea() {
@@ -24,6 +26,7 @@ export function ChatArea() {
   const systemPanelOpen = useAppStore((s) => s.systemPanelOpen);
   const toggleSystemPanel = useAppStore((s) => s.toggleSystemPanel);
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const listRef = useRef<HTMLDivElement>(null);
   const shouldAutoScroll = useRef(true);
   const wasStreaming = useRef(false);
@@ -141,7 +144,7 @@ export function ChatArea() {
           onClick={toggleSystemPanel}
           className="p-1.5 rounded-md transition-colors cursor-pointer"
           style={{ color: 'var(--color-text-tertiary)' }}
-          title={`${systemPanelOpen ? 'Hide' : 'Show'} system panel (${navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}+I)`}
+          title={t(systemPanelOpen ? 'chat.systemPanel.hide' : 'chat.systemPanel.show', { shortcut: `${navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}+I` })}
         >
           <PanelIcon size={16} />
         </button>
@@ -158,17 +161,19 @@ export function ChatArea() {
         >
           <Database size={16} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
           <span style={{ color: 'var(--color-text-secondary)', flex: 1 }}>
-            Connect your data sources (Gmail, iMessage, Slack, etc.) to get personalized answers.
+            {t('chat.sourcesBanner.text')}
           </span>
           <button
             onClick={() => navigate('/data-sources')}
             className="px-3 py-1 rounded text-xs font-medium cursor-pointer"
             style={{ background: 'var(--color-accent)', color: 'var(--color-on-accent)', border: 'none' }}
           >
-            Connect
+            {t('chat.sourcesBanner.connect')}
           </button>
           <button
             onClick={() => setBannerDismissed(true)}
+            aria-label={t('chat.sourcesBanner.dismiss')}
+            title={t('chat.sourcesBanner.dismiss')}
             className="p-1 rounded cursor-pointer"
             style={{ color: 'var(--color-text-tertiary)', background: 'transparent', border: 'none' }}
           >
@@ -185,10 +190,10 @@ export function ChatArea() {
           <div className="flex flex-col items-center justify-center h-full px-4">
             <NicxMascot size="lg" interactive className="mb-1" />
             <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
-              Oi! Eu sou o Nicx.
+              {t('chat.empty.title')}
             </h2>
             <p className="text-sm text-center max-w-sm mb-6" style={{ color: 'var(--color-text-secondary)' }}>
-              {getGreeting()}! Pergunte o que quiser: eu rodo aqui no seu computador, com privacidade.
+              {t('chat.empty.subtitle', { greeting: getGreeting() })}
             </p>
 
             {/* Quick action hints */}
@@ -205,7 +210,7 @@ export function ChatArea() {
                 onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--color-border)')}
               >
                 <Database size={14} style={{ color: 'var(--color-accent)' }} />
-                Connect Data Sources
+                {t('chat.empty.connectSources')}
               </button>
               <button
                 onClick={() => { navigate('/data-sources'); setTimeout(() => window.dispatchEvent(new CustomEvent('switch-tab', { detail: 'messaging' })), 100); }}
@@ -219,7 +224,7 @@ export function ChatArea() {
                 onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--color-border)')}
               >
                 <MessageSquare size={14} style={{ color: 'var(--color-accent)' }} />
-                Set Up Messaging Channels
+                {t('chat.empty.setupChannels')}
               </button>
             </div>
           </div>

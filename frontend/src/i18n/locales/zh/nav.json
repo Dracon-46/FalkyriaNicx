@@ -1,0 +1,25 @@
+{
+  "chat": "聊天",
+  "dashboard": "仪表板",
+  "painel": "Falkyria 面板",
+  "dataSources": "数据源",
+  "agents": "智能体",
+  "logs": "日志",
+  "settings": "设置",
+  "getStarted": "快速开始",
+  "openSidebar": "打开侧边栏",
+  "closeSidebar": "关闭侧边栏",
+  "themeToggle": "主题：{{theme}}（点击切换为{{next}}）",
+  "newChat": "新对话",
+  "selectModel": "选择模型",
+  "loadingModel": "正在加载模型...",
+  "searchChats": "搜索对话...",
+  "chats": {
+    "justNow": "刚刚",
+    "noMatches": "没有匹配的对话",
+    "empty": "还没有对话",
+    "stopBeforeDelete": "请先停止生成再删除此对话",
+    "delete": "删除对话",
+    "overlay": "悬浮窗对话"
+  }
+}

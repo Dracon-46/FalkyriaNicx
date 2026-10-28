@@ -1,0 +1,157 @@
+{
+  "greeting": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "systemPanel": {
+    "show": "Show system panel ({{shortcut}})",
+    "hide": "Hide system panel ({{shortcut}})",
+    "title": "System",
+    "close": "Close panel",
+    "session": "Session",
+    "requests": "Requests",
+    "outputTokens": "Output tokens",
+    "device": "Device",
+    "cpuTemp": "CPU temp",
+    "gpuTemp": "GPU temp",
+    "power": "Power",
+    "energy": "Energy",
+    "costComparison": "Cost comparison",
+    "local": "Local"
+  },
+  "sourcesBanner": {
+    "text": "Connect your data sources (Gmail, iMessage, Slack, etc.) to get personalized answers.",
+    "connect": "Connect",
+    "dismiss": "Dismiss"
+  },
+  "empty": {
+    "title": "Hi! I'm Nicx.",
+    "subtitle": "{{greeting}}! Ask me anything: I run right here on your computer, privately.",
+    "connectSources": "Connect data sources",
+    "setupChannels": "Set up messaging channels"
+  },
+  "audio": {
+    "title": "Morning digest",
+    "play": "Play",
+    "pause": "Pause"
+  },
+  "input": {
+    "placeholder": "Message Nicx...",
+    "pickModel": "Pick a model first (⌘K)",
+    "send": "Send message",
+    "stop": "Stop generating",
+    "deepResearch": "Deep Research",
+    "deepResearchOn": "Deep Research: on",
+    "deepResearchOff": "Deep Research: off",
+    "enterToSend": "to send",
+    "shiftEnterNewLine": "for new line"
+  },
+  "phase": {
+    "generating": "Generating...",
+    "researching": "Researching...",
+    "thinking": "Thinking...",
+    "searching": "Searching: {{query}}",
+    "callingTool": "Calling {{tool}}..."
+  },
+  "reply": {
+    "stopped": "(Generation stopped)",
+    "error": "Error: {{message}}",
+    "empty": "No response was generated. Please try again.",
+    "failed": "I couldn't answer. Please try again."
+  },
+  "research": {
+    "failedNoDetail": "Research failed (no detail provided)",
+    "stopped": "Research stopped:",
+    "failed": "Research failed:",
+    "syncBefore": "Searching over",
+    "syncAfter": "items — sync in progress, results will improve as more data is indexed.",
+    "after": "after {{date}}",
+    "before": "before {{date}}",
+    "searchCount": "Searches: {{n}}",
+    "resultCount": "Results: {{n}}",
+    "person": "person: {{person}}",
+    "time": "time: {{time}}",
+    "step": "Search {{n}}",
+    "analyzing": "Analyzing query",
+    "synthesizing": "Synthesizing findings",
+    "collapse": "Collapse search trace",
+    "expand": "Expand search trace",
+    "source": "Source {{n}}"
+  },
+  "voice": {
+    "stopHint": "Click to end the voice conversation",
+    "enableHint": "Turn on voice input in Settings",
+    "unavailable": "Speech recognition is unavailable on the server",
+    "startHint": "Talk and Nicx answers out loud, hands-free",
+    "phase": {
+      "off": "Voice conversation",
+      "listening": "Listening…",
+      "transcribing": "Transcribing…",
+      "thinking": "Thinking…",
+      "speaking": "Speaking…"
+    },
+    "endedIdle": "Voice conversation ended: nobody spoke for a minute."
+  },
+  "log": {
+    "research": "Research: \"{{text}}\"",
+    "request": "Request: \"{{text}}\" → {{model}}",
+    "search": "Search: \"{{query}}\"",
+    "searchPerson": "Search: \"{{query}}\" (person: {{person}})",
+    "researchError": "Deep Research error: {{message}}",
+    "generatingWith": "Generating with {{model}}...",
+    "callingTool": "Calling {{call}}",
+    "streamError": "Stream error: {{message}}",
+    "response": "Response: {{chars}} chars"
+  },
+  "message": {
+    "code": "code",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyMessage": "Copy message"
+  },
+  "mic": {
+    "notEnabled": "Turn it on in Settings",
+    "noBackend": "Speech recognition is not set up",
+    "waitReply": "Wait for the reply",
+    "stopRecording": "Stop recording",
+    "transcribing": "Transcribing...",
+    "speak": "Speak"
+  },
+  "speak": {
+    "loading": "Generating voice...",
+    "stop": "Stop",
+    "readAloud": "Read aloud",
+    "stopReading": "Stop reading",
+    "readMessageAloud": "Read the message aloud"
+  },
+  "tool": {
+    "args": "args",
+    "result": "result"
+  },
+  "xray": {
+    "inputTokens": "{{n}} input tokens",
+    "outputTokens": "{{n}} output tokens",
+    "tokens": "{{n}} tokens",
+    "mode": "Mode",
+    "engine": "Engine",
+    "generated": "{{n}} generated",
+    "prompt": "{{n}} prompt",
+    "thinking": "~{{n}} thinking",
+    "tokensLabel": "Tokens",
+    "complexity": "Complexity",
+    "tokenBudget": "Token budget",
+    "speed": "Speed",
+    "total": "Total {{time}}",
+    "latency": "Latency"
+  },
+  "floating": {
+    "goodbye": "See you soon!",
+    "ended": "Conversation ended",
+    "preparing": "Getting ready…",
+    "you": "You:",
+    "hint": "Go ahead and talk. Say “tchau” to close me.",
+    "listenAgain": "Listen again",
+    "end": "End"
+  }
+}

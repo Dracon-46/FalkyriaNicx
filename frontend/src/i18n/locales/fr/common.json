@@ -1,0 +1,98 @@
+{
+  "theme": {
+    "light": "clair",
+    "dark": "sombre",
+    "system": "système"
+  },
+  "backendUnreachable": "Impossible de joindre le serveur de Nicx",
+  "changeUrl": "Changer l'adresse",
+  "close": "Fermer",
+  "modelPicker": {
+    "note": {
+      "fastLight": "rapide et léger",
+      "recommended": "choix recommandé",
+      "largest": "le plus grand",
+      "fastMultimodal": "rapide, multimodal",
+      "cheapFast": "économique et rapide",
+      "reasoning": "raisonnement",
+      "balanced": "équilibré",
+      "mostCapable": "le plus performant",
+      "fastest": "le plus rapide",
+      "flagship": "phare",
+      "fast": "rapide",
+      "latest": "le plus récent",
+      "auto": "le meilleur modèle pour la tâche"
+    },
+    "keyStatusFailed": "Impossible de lire l'état des clés cloud",
+    "keySaveFailed": "Impossible d'enregistrer la clé API {{provider}}",
+    "downloadFailed": "Échec du téléchargement",
+    "log": {
+      "switching": "Passage à {{model}}...",
+      "loaded": "{{model}} chargé",
+      "loadFailed": "Échec du chargement de {{model}} : {{message}}",
+      "downloaded": "{{model}} téléchargé",
+      "downloadFailed": "Échec du téléchargement de {{model}} : {{message}}",
+      "deleted": "{{model}} supprimé",
+      "keySaved": "Clé API {{provider}} enregistrée. Actualisation de la liste des modèles...",
+      "keyRemoved": "Clé API {{provider}} supprimée. Actualisation de la liste des modèles..."
+    },
+    "tabInstalled": "Modèles installés ({{n}})",
+    "tabDownload": "Télécharger",
+    "tabCloud": "Modèles cloud",
+    "searchInstalled": "Rechercher dans les modèles installés...",
+    "searchDownload": "Rechercher des modèles à télécharger...",
+    "downloadedOk": "{{model}} téléchargé avec succès",
+    "noModels": "Aucun modèle disponible : passez à « Télécharger » pour commencer",
+    "noMatches": "Aucun modèle trouvé",
+    "active": "Actif",
+    "deleteModel": "Supprimer le modèle",
+    "downloading": "Téléchargement...",
+    "installed": "Installé",
+    "download": "Télécharger",
+    "customLabel": "Ou saisissez le nom de n'importe quel modèle Ollama :",
+    "customPlaceholder": "ex. : codellama:7b",
+    "pull": "Télécharger",
+    "cloudDesktopHint": "Ajoutez vos clés API pour utiliser les modèles cloud. Les clés sont conservées dans le stockage sécurisé de l'ordinateur.",
+    "cloudServerHint": "Configurez les clés des fournisseurs cloud dans l'environnement du serveur pour utiliser les modèles cloud.",
+    "connected": "Connecté",
+    "keySaved": "Enregistrée dans le stockage sécurisé",
+    "showKey": "Afficher la clé",
+    "hideKey": "Masquer la clé",
+    "saving": "Enregistrement",
+    "remove": "Retirer",
+    "navigate": "Naviguer",
+    "select": "Choisir",
+    "catalogueFooter": "Les modèles sont téléchargés depuis le registre Ollama",
+    "cloudFooter": "Les clés API restent sur votre ordinateur et ne sont jamais envoyées aux serveurs de Nicx"
+  },
+  "approvals": {
+    "title": "Approbations des agents",
+    "pending": "En attente : {{n}}",
+    "empty": "Aucune approbation en attente",
+    "tier": {
+      "trivial": "Anodin",
+      "low": "Faible",
+      "medium": "Moyen",
+      "high": "Élevé"
+    },
+    "viewDetails": "Voir les détails",
+    "hideDetails": "Masquer les détails",
+    "approve": "Approuver",
+    "deny": "Refuser"
+  },
+  "errorBoundary": {
+    "title": "Un problème est survenu",
+    "unexpected": "Une erreur inattendue s'est produite.",
+    "retry": "Réessayer"
+  },
+  "mascot": {
+    "mood": {
+      "idle": "calme",
+      "listening": "à l'écoute",
+      "thinking": "réfléchit",
+      "speaking": "parle",
+      "happy": "content",
+      "error": "un problème est survenu"
+    }
+  }
+}

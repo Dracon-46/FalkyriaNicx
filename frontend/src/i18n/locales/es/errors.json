@@ -1,0 +1,67 @@
+{
+  "serverUnreachable": "No se puede conectar con el servidor",
+  "mic": {
+    "notFound": "No se encontró ningún micrófono",
+    "inUse": "Otro programa está usando el micrófono",
+    "denied": "Acceso al micrófono denegado",
+    "unsupported": "Este navegador no admite el micrófono",
+    "notRecording": "No se está grabando nada"
+  },
+  "transcriptionFailed": "Error en la transcripción",
+  "transcriptionFailedStatus": "Error en la transcripción: {{status}}",
+  "playbackFailed": "No se pudo reproducir el audio",
+  "synthesisFailed": "No se pudo sintetizar la voz",
+  "synthesisFailedStatus": "No se pudo sintetizar la voz: {{status}}",
+  "wakeUnsupported": "Este servidor de Nicx aún no tiene la escucha: reinícialo para usarla.",
+  "wakeFailed": "Error en la escucha: {{status}}",
+  "noModel": "No hay ningún modelo disponible",
+  "chatRequestFailed": "La solicitud de chat falló: {{status}}",
+  "researchRequestFailed": "La solicitud de investigación falló: {{status}}",
+  "requestFailed": "La solicitud falló: {{status}}",
+  "fetchFailed": "No se pudo obtener",
+  "desktopOnly": {
+    "cloudKeys": "Las claves de API de la nube solo se pueden guardar en la app de escritorio.",
+    "backend": "El servidor local solo está disponible en la app de escritorio.",
+    "setupReset": "Reiniciar la configuración del motor solo es posible en la app de escritorio.",
+    "inferenceSource": "El motor de respuestas solo se puede configurar en la app de escritorio."
+  },
+  "cloudKeySaveFailed": "No se pudo guardar la clave de la nube",
+  "serverHtml": "Servidor de Nicx no disponible (la API respondió con HTML)",
+  "backendStartFailed": "No se pudo iniciar el servidor local",
+  "setupResetFailed": "No se pudo reiniciar la configuración del motor",
+  "modelsFetchFailed": "No se pudieron obtener los modelos: {{status}}",
+  "modelPullFailed": "No se pudo descargar el modelo: {{detail}}",
+  "deleteFailed": "No se pudo borrar",
+  "modelDeleteFailed": "No se pudo borrar el modelo: {{detail}}",
+  "preloadFailed": "No se pudo cargar el modelo: {{status}}",
+  "modelLoadTimeout": "El modelo tardó demasiado en cargar (120 s)",
+  "verificationFailed": "La verificación falló: {{status}}",
+  "webhookFailed": "El registro del webhook falló: {{status}}",
+  "testMessageFailed": "El mensaje de prueba falló: {{status}}",
+  "apiUnreachable": "No se pudo conectar con la API de Nicx. Revisa el estado del servidor y la dirección de la API, y vuelve a intentarlo.",
+  "memory": {
+    "statusFailed": "No se pudo leer el estado de la memoria",
+    "searchFailed": "No se pudo buscar en la memoria",
+    "storeFailed": "No se pudo guardar en la memoria",
+    "indexFailed": "No se pudo indexar la ruta",
+    "configFailed": "No se pudo leer la configuración de la memoria"
+  },
+  "inferenceSourceReadFailed": "No se pudo leer el motor de respuestas",
+  "inferenceSourceSaveFailed": "No se pudo guardar el motor de respuestas",
+  "connectors": {
+    "listFailed": "No se pudieron listar las fuentes de datos: {{status}}",
+    "getFailed": "No se pudo leer la fuente {{id}}: {{status}}",
+    "connectFailed": "No se pudo conectar {{id}}: {{status}}",
+    "authTimeout": "La autorización tardó demasiado. Inténtalo de nuevo.",
+    "disconnectFailed": "No se pudo desconectar {{id}}: {{status}}",
+    "syncStatusFailed": "No se pudo leer la sincronización de {{id}}: {{status}}",
+    "syncFailed": "La sincronización falló: {{status}}"
+  },
+  "privacy": {
+    "serverUnreachable": "No se pudo conectar con el servidor de Nicx. Inténtalo de nuevo.",
+    "saveChoiceFailed": "No se pudo guardar tu elección. Inténtalo de nuevo.",
+    "forgetFailed": "No se pudieron borrar tus datos ahora. Inténtalo de nuevo.",
+    "documentUnreachable": "No se pudo cargar el documento. Comprueba que Nicx esté en marcha.",
+    "documentFailed": "No se pudo cargar el documento."
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "greeting": {
+    "morning": "Buenos días",
+    "afternoon": "Buenas tardes",
+    "evening": "Buenas noches"
+  },
+  "systemPanel": {
+    "show": "Mostrar panel del sistema ({{shortcut}})",
+    "hide": "Ocultar panel del sistema ({{shortcut}})",
+    "title": "Sistema",
+    "close": "Cerrar panel",
+    "session": "Sesión",
+    "requests": "Solicitudes",
+    "outputTokens": "Tokens de salida",
+    "device": "Dispositivo",
+    "cpuTemp": "Temp. de la CPU",
+    "gpuTemp": "Temp. de la GPU",
+    "power": "Potencia",
+    "energy": "Energía",
+    "costComparison": "Comparación de costos",
+    "local": "Local"
+  },
+  "sourcesBanner": {
+    "text": "Conecta tus fuentes de datos (Gmail, iMessage, Slack, etc.) para obtener respuestas personalizadas.",
+    "connect": "Conectar",
+    "dismiss": "Cerrar aviso"
+  },
+  "empty": {
+    "title": "¡Hola! Soy Nicx.",
+    "subtitle": "¡{{greeting}}! Pregúntame lo que quieras: funciono aquí en tu computadora, con privacidad.",
+    "connectSources": "Conectar fuentes de datos",
+    "setupChannels": "Configurar canales de mensajería"
+  },
+  "audio": {
+    "title": "Resumen de la mañana",
+    "play": "Reproducir",
+    "pause": "Pausar"
+  },
+  "input": {
+    "placeholder": "Escribe a Nicx...",
+    "pickModel": "Elige un modelo primero (⌘K)",
+    "send": "Enviar mensaje",
+    "stop": "Dejar de generar",
+    "deepResearch": "Investigación profunda",
+    "deepResearchOn": "Investigación profunda: activada",
+    "deepResearchOff": "Investigación profunda: desactivada",
+    "enterToSend": "para enviar",
+    "shiftEnterNewLine": "para nueva línea"
+  },
+  "phase": {
+    "generating": "Generando...",
+    "researching": "Investigando...",
+    "thinking": "Pensando...",
+    "searching": "Buscando: {{query}}",
+    "callingTool": "Usando {{tool}}..."
+  },
+  "reply": {
+    "stopped": "(Respuesta interrumpida)",
+    "error": "Error: {{message}}",
+    "empty": "No se generó ninguna respuesta. Inténtalo de nuevo.",
+    "failed": "No pude responder. Inténtalo de nuevo."
+  },
+  "research": {
+    "failedNoDetail": "La investigación falló (sin detalles)",
+    "stopped": "Investigación interrumpida:",
+    "failed": "La investigación falló:",
+    "syncBefore": "Buscando en",
+    "syncAfter": "elementos. La sincronización sigue y los resultados mejorarán a medida que se indexen más datos.",
+    "after": "después del {{date}}",
+    "before": "antes del {{date}}",
+    "searchCount": "Búsquedas: {{n}}",
+    "resultCount": "Resultados: {{n}}",
+    "person": "persona: {{person}}",
+    "time": "periodo: {{time}}",
+    "step": "Búsqueda {{n}}",
+    "analyzing": "Analizando la pregunta",
+    "synthesizing": "Reuniendo los hallazgos",
+    "collapse": "Contraer las búsquedas",
+    "expand": "Mostrar las búsquedas",
+    "source": "Fuente {{n}}"
+  },
+  "voice": {
+    "stopHint": "Haz clic para terminar la conversación por voz",
+    "enableHint": "Activa la entrada de voz en Configuración",
+    "unavailable": "Reconocimiento de voz no disponible en el servidor",
+    "startHint": "Habla y Nicx responde en voz alta, sin tocar el teclado",
+    "phase": {
+      "off": "Conversación por voz",
+      "listening": "Escuchando…",
+      "transcribing": "Transcribiendo…",
+      "thinking": "Pensando…",
+      "speaking": "Hablando…"
+    },
+    "endedIdle": "Conversación por voz terminada: nadie habló durante un minuto."
+  },
+  "log": {
+    "research": "Investigación: \"{{text}}\"",
+    "request": "Solicitud: \"{{text}}\" → {{model}}",
+    "search": "Búsqueda: \"{{query}}\"",
+    "searchPerson": "Búsqueda: \"{{query}}\" (persona: {{person}})",
+    "researchError": "Error en la investigación profunda: {{message}}",
+    "generatingWith": "Generando con {{model}}...",
+    "callingTool": "Llamando a {{call}}",
+    "streamError": "Error en la transmisión: {{message}}",
+    "response": "Respuesta: {{chars}} caracteres"
+  },
+  "message": {
+    "code": "código",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "copyMessage": "Copiar mensaje"
+  },
+  "mic": {
+    "notEnabled": "Actívalo en Configuración",
+    "noBackend": "Reconocimiento de voz no configurado",
+    "waitReply": "Espera la respuesta",
+    "stopRecording": "Detener grabación",
+    "transcribing": "Transcribiendo...",
+    "speak": "Hablar"
+  },
+  "speak": {
+    "loading": "Generando la voz...",
+    "stop": "Detener",
+    "readAloud": "Leer en voz alta",
+    "stopReading": "Detener la lectura",
+    "readMessageAloud": "Leer el mensaje en voz alta"
+  },
+  "tool": {
+    "args": "argumentos",
+    "result": "resultado"
+  },
+  "xray": {
+    "inputTokens": "{{n}} tokens de entrada",
+    "outputTokens": "{{n}} tokens de salida",
+    "tokens": "{{n}} tokens",
+    "mode": "Modo",
+    "engine": "Motor",
+    "generated": "{{n}} generados",
+    "prompt": "{{n}} en el prompt",
+    "thinking": "~{{n}} de razonamiento",
+    "tokensLabel": "Tokens",
+    "complexity": "Complejidad",
+    "tokenBudget": "Límite de tokens",
+    "speed": "Velocidad",
+    "total": "Total {{time}}",
+    "latency": "Latencia"
+  },
+  "floating": {
+    "goodbye": "¡Hasta luego!",
+    "ended": "Conversación terminada",
+    "preparing": "Preparando…",
+    "you": "Tú:",
+    "hint": "Puedes hablar. Di “tchau” para que me vaya.",
+    "listenAgain": "Escuchar de nuevo",
+    "end": "Terminar"
+  }
+}

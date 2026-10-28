@@ -1,0 +1,157 @@
+{
+  "greeting": {
+    "morning": "Bom dia",
+    "afternoon": "Boa tarde",
+    "evening": "Boa noite"
+  },
+  "systemPanel": {
+    "show": "Mostrar painel do sistema ({{shortcut}})",
+    "hide": "Ocultar painel do sistema ({{shortcut}})",
+    "title": "Sistema",
+    "close": "Fechar painel",
+    "session": "Sessão",
+    "requests": "Pedidos",
+    "outputTokens": "Tokens de saída",
+    "device": "Dispositivo",
+    "cpuTemp": "Temp. da CPU",
+    "gpuTemp": "Temp. da GPU",
+    "power": "Potência",
+    "energy": "Energia",
+    "costComparison": "Comparação de custo",
+    "local": "Local"
+  },
+  "sourcesBanner": {
+    "text": "Conecte suas fontes de dados (Gmail, iMessage, Slack etc.) para ter respostas sob medida.",
+    "connect": "Conectar",
+    "dismiss": "Fechar aviso"
+  },
+  "empty": {
+    "title": "Oi! Eu sou o Nicx.",
+    "subtitle": "{{greeting}}! Pergunte o que quiser: eu rodo aqui no seu computador, com privacidade.",
+    "connectSources": "Conectar fontes de dados",
+    "setupChannels": "Configurar canais de mensagem"
+  },
+  "audio": {
+    "title": "Resumo da manhã",
+    "play": "Tocar",
+    "pause": "Pausar"
+  },
+  "input": {
+    "placeholder": "Pergunte ao Nicx...",
+    "pickModel": "Escolha um modelo primeiro (⌘K)",
+    "send": "Enviar mensagem",
+    "stop": "Parar de gerar",
+    "deepResearch": "Pesquisa profunda",
+    "deepResearchOn": "Pesquisa profunda: ligada",
+    "deepResearchOff": "Pesquisa profunda: desligada",
+    "enterToSend": "para enviar",
+    "shiftEnterNewLine": "para nova linha"
+  },
+  "phase": {
+    "generating": "Gerando...",
+    "researching": "Pesquisando...",
+    "thinking": "Pensando...",
+    "searching": "Buscando: {{query}}",
+    "callingTool": "Usando {{tool}}..."
+  },
+  "reply": {
+    "stopped": "(Resposta interrompida)",
+    "error": "Erro: {{message}}",
+    "empty": "Nenhuma resposta foi gerada. Tente de novo.",
+    "failed": "Não consegui responder. Tente de novo."
+  },
+  "research": {
+    "failedNoDetail": "A pesquisa falhou (sem detalhes)",
+    "stopped": "Pesquisa interrompida:",
+    "failed": "A pesquisa falhou:",
+    "syncBefore": "Buscando em",
+    "syncAfter": "itens. A sincronização continua e os resultados melhoram conforme mais dados são indexados.",
+    "after": "depois de {{date}}",
+    "before": "antes de {{date}}",
+    "searchCount": "Buscas: {{n}}",
+    "resultCount": "Resultados: {{n}}",
+    "person": "pessoa: {{person}}",
+    "time": "período: {{time}}",
+    "step": "Busca {{n}}",
+    "analyzing": "Analisando a pergunta",
+    "synthesizing": "Juntando o que encontrei",
+    "collapse": "Recolher as buscas",
+    "expand": "Mostrar as buscas",
+    "source": "Fonte {{n}}"
+  },
+  "voice": {
+    "stopHint": "Clique para encerrar a conversa por voz",
+    "enableHint": "Ative a entrada de voz em Configurações",
+    "unavailable": "Reconhecimento de voz indisponível no servidor",
+    "startHint": "Fale e o Nicx responde em voz alta, sem tocar no teclado",
+    "phase": {
+      "off": "Conversa por voz",
+      "listening": "Ouvindo…",
+      "transcribing": "Transcrevendo…",
+      "thinking": "Pensando…",
+      "speaking": "Falando…"
+    },
+    "endedIdle": "Conversa por voz encerrada: ninguém falou por um minuto."
+  },
+  "log": {
+    "research": "Pesquisa: \"{{text}}\"",
+    "request": "Pedido: \"{{text}}\" → {{model}}",
+    "search": "Busca: \"{{query}}\"",
+    "searchPerson": "Busca: \"{{query}}\" (pessoa: {{person}})",
+    "researchError": "Erro na pesquisa profunda: {{message}}",
+    "generatingWith": "Gerando com {{model}}...",
+    "callingTool": "Chamando {{call}}",
+    "streamError": "Erro na transmissão: {{message}}",
+    "response": "Resposta: {{chars}} caracteres"
+  },
+  "message": {
+    "code": "código",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "copyMessage": "Copiar mensagem"
+  },
+  "mic": {
+    "notEnabled": "Ative em Configurações",
+    "noBackend": "Reconhecimento de voz não configurado",
+    "waitReply": "Aguarde a resposta",
+    "stopRecording": "Parar gravação",
+    "transcribing": "Transcrevendo...",
+    "speak": "Falar"
+  },
+  "speak": {
+    "loading": "Gerando a voz...",
+    "stop": "Parar",
+    "readAloud": "Ler em voz alta",
+    "stopReading": "Parar a leitura",
+    "readMessageAloud": "Ler a mensagem em voz alta"
+  },
+  "tool": {
+    "args": "argumentos",
+    "result": "resultado"
+  },
+  "xray": {
+    "inputTokens": "{{n}} tokens de entrada",
+    "outputTokens": "{{n}} tokens de saída",
+    "tokens": "{{n}} tokens",
+    "mode": "Modo",
+    "engine": "Motor",
+    "generated": "{{n}} gerados",
+    "prompt": "{{n}} no prompt",
+    "thinking": "~{{n}} pensando",
+    "tokensLabel": "Tokens",
+    "complexity": "Complexidade",
+    "tokenBudget": "Limite de tokens",
+    "speed": "Velocidade",
+    "total": "Total {{time}}",
+    "latency": "Latência"
+  },
+  "floating": {
+    "goodbye": "Até logo!",
+    "ended": "Conversa encerrada",
+    "preparing": "Preparando…",
+    "you": "Você:",
+    "hint": "Pode falar. Diga “tchau” para eu sair.",
+    "listenAgain": "Ouvir de novo",
+    "end": "Encerrar"
+  }
+}

@@ -8,6 +8,7 @@ import {
   rms,
   type SilenceOptions,
 } from '../lib/audio-level';
+import i18n from '../i18n';
 
 export type SpeechState = 'idle' | 'recording' | 'transcribing';
 
@@ -33,9 +34,9 @@ function audioContextCtor(): typeof AudioContext | null {
 
 function micErrorMessage(err: unknown): string {
   const name = err instanceof DOMException ? err.name : '';
-  if (name === 'NotFoundError' || name === 'OverconstrainedError') return 'Nenhum microfone encontrado';
-  if (name === 'NotReadableError') return 'O microfone está em uso por outro programa';
-  return 'Acesso ao microfone negado';
+  if (name === 'NotFoundError' || name === 'OverconstrainedError') return i18n.t('errors.mic.notFound');
+  if (name === 'NotReadableError') return i18n.t('errors.mic.inUse');
+  return i18n.t('errors.mic.denied');
 }
 
 /** Return the mascot to idle, unless someone else changed its mood meanwhile. */
@@ -137,7 +138,7 @@ export function useSpeech() {
     setError(null);
 
     if (!navigator.mediaDevices?.getUserMedia) {
-      setError('Microfone não suportado neste navegador');
+      setError(i18n.t('errors.mic.unsupported'));
       return false;
     }
 
@@ -180,7 +181,7 @@ export function useSpeech() {
     return new Promise((resolve, reject) => {
       const recorder = mediaRecorderRef.current;
       if (!recorder || recorder.state !== 'recording') {
-        reject(new Error('Nada sendo gravado'));
+        reject(new Error(i18n.t('errors.mic.notRecording')));
         return;
       }
       mediaRecorderRef.current = null;
@@ -199,7 +200,7 @@ export function useSpeech() {
           resolve(result.text);
         } catch (err) {
           setState('idle');
-          const msg = err instanceof Error ? err.message : 'Falha na transcrição';
+          const msg = err instanceof Error ? err.message : i18n.t('errors.transcriptionFailed');
           setError(msg);
           reject(err);
         }

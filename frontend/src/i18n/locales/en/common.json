@@ -1,0 +1,98 @@
+{
+  "theme": {
+    "light": "light",
+    "dark": "dark",
+    "system": "system"
+  },
+  "backendUnreachable": "Cannot reach the Nicx backend",
+  "changeUrl": "Change URL",
+  "close": "Close",
+  "modelPicker": {
+    "note": {
+      "fastLight": "fast, lightweight",
+      "recommended": "recommended default",
+      "largest": "largest",
+      "fastMultimodal": "fast, multimodal",
+      "cheapFast": "cheap, fast",
+      "reasoning": "reasoning",
+      "balanced": "balanced",
+      "mostCapable": "most capable",
+      "fastest": "fastest",
+      "flagship": "flagship",
+      "fast": "fast",
+      "latest": "latest",
+      "auto": "best model for the task"
+    },
+    "keyStatusFailed": "Failed to read cloud key status",
+    "keySaveFailed": "Failed to save {{provider}} API key",
+    "downloadFailed": "Download failed",
+    "log": {
+      "switching": "Switching to {{model}}...",
+      "loaded": "{{model}} loaded",
+      "loadFailed": "Failed to load {{model}}: {{message}}",
+      "downloaded": "Downloaded {{model}}",
+      "downloadFailed": "Download failed for {{model}}: {{message}}",
+      "deleted": "Deleted {{model}}",
+      "keySaved": "{{provider}} API key saved. Refreshing model list...",
+      "keyRemoved": "{{provider}} API key removed. Refreshing model list..."
+    },
+    "tabInstalled": "Installed models ({{n}})",
+    "tabDownload": "Download",
+    "tabCloud": "Cloud models",
+    "searchInstalled": "Search installed models...",
+    "searchDownload": "Search models to download...",
+    "downloadedOk": "Downloaded {{model}} successfully",
+    "noModels": "No models available — switch to \"Download\" to get started",
+    "noMatches": "No matching models",
+    "active": "Active",
+    "deleteModel": "Delete model",
+    "downloading": "Downloading...",
+    "installed": "Installed",
+    "download": "Download",
+    "customLabel": "Or enter any Ollama model name:",
+    "customPlaceholder": "e.g. codellama:7b",
+    "pull": "Pull",
+    "cloudDesktopHint": "Add your API keys to use cloud models. Keys are stored in secure desktop storage.",
+    "cloudServerHint": "Configure cloud provider keys in the server environment to use cloud models.",
+    "connected": "Connected",
+    "keySaved": "Saved in secure storage",
+    "showKey": "Show key",
+    "hideKey": "Hide key",
+    "saving": "Saving",
+    "remove": "Remove",
+    "navigate": "Navigate",
+    "select": "Select",
+    "catalogueFooter": "Models are downloaded from the Ollama registry",
+    "cloudFooter": "API keys are stored locally and never sent to Nicx servers"
+  },
+  "approvals": {
+    "title": "Agent approvals",
+    "pending": "Pending: {{n}}",
+    "empty": "No pending approvals",
+    "tier": {
+      "trivial": "Trivial",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "viewDetails": "View details",
+    "hideDetails": "Hide details",
+    "approve": "Approve",
+    "deny": "Deny"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "unexpected": "An unexpected error occurred.",
+    "retry": "Try again"
+  },
+  "mascot": {
+    "mood": {
+      "idle": "calm",
+      "listening": "listening",
+      "thinking": "thinking",
+      "speaking": "speaking",
+      "happy": "happy",
+      "error": "something went wrong"
+    }
+  }
+}

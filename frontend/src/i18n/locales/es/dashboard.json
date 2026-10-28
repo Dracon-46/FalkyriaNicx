@@ -1,0 +1,49 @@
+{
+  "title": "Resumen del sistema",
+  "subtitle": "Telemetría en vivo del motor que funciona en tu equipo: consumo de energía, tokens procesados y ahorro frente a las API en la nube.",
+  "cost": {
+    "title": "Comparación de costos",
+    "waiting": "esperando la primera respuesta…",
+    "local": "Local (tu equipo)",
+    "requests": "{{n}} solicitudes",
+    "tokens": "{{n}} tokens",
+    "electricityOnly": "solo la electricidad",
+    "saved": "{{amount}} ahorrados",
+    "footnote": "La estimación de ahorro supone que los modelos locales (como Qwen, Nemotron o Kimi) generan, en promedio, la misma cantidad de tokens por solicitud que los modelos cerrados en la nube."
+  },
+  "energy": {
+    "title": "Monitoreo de energía",
+    "waiting": "esperando datos de telemetría…",
+    "cool": "Frío",
+    "warm": "Tibio",
+    "hot": "Caliente",
+    "totalEnergy": "Energía total",
+    "energyPerToken": "Energía / token",
+    "avgPower": "Potencia media",
+    "totalRequests": "Total de solicitudes",
+    "thermal": "Temperatura",
+    "tokensProcessed": "Tokens procesados",
+    "power": "Potencia"
+  },
+  "traces": {
+    "title": "Trazas de las respuestas",
+    "untitled": "Pregunta sin título",
+    "steps": "{{n}} pasos",
+    "loadFailed": "No se pudieron cargar las trazas",
+    "empty": "Aún no hay trazas. Haz preguntas para verlas aquí.",
+    "select": "Elige una traza para ver los detalles"
+  },
+  "logs": {
+    "title": "Registros",
+    "entries": "{{n}} registros",
+    "copyAll": "Copiar todo",
+    "clear": "Limpiar",
+    "subtitle": "Actividad reciente de esta sesión: conversaciones, cambios de modelo, uso de herramientas y mensajes del sistema.",
+    "empty": "Aún no hay registros. Aparecen a medida que conversas, cambias de modelo y usas la app."
+  },
+  "painel": {
+    "description": "Las estadísticas anónimas de uso de Nicx están en el panel web, solo para administradores de Falkyria. El acceso pide contraseña y el código de la app de autenticación.",
+    "open": "Abrir el panel",
+    "restricted": "Acceso restringido y registrado."
+  }
+}

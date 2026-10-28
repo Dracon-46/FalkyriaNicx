@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronRight, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import type { ToolCallInfo } from '../../types';
 import { serializeToolCallArguments } from '../../lib/tool-call';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   toolCall: ToolCallInfo;
@@ -33,6 +34,7 @@ function previewArgs(raw: string): string {
 }
 
 export function ToolCallCard({ toolCall }: Props) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const config = statusConfig[toolCall.status];
   const StatusIcon = config.icon;
@@ -110,7 +112,7 @@ export function ToolCallCard({ toolCall }: Props) {
                   marginBottom: 3,
                 }}
               >
-                args
+                {t('chat.tool.args')}
               </div>
               <pre
                 className="p-1.5 rounded overflow-auto"
@@ -139,7 +141,7 @@ export function ToolCallCard({ toolCall }: Props) {
                   marginBottom: 3,
                 }}
               >
-                result
+                {t('chat.tool.result')}
               </div>
               <pre
                 className="p-1.5 rounded overflow-auto"

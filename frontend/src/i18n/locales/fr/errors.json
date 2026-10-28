@@ -1,0 +1,67 @@
+{
+  "serverUnreachable": "Impossible de se connecter au serveur",
+  "mic": {
+    "notFound": "Aucun micro trouvé",
+    "inUse": "Le micro est utilisé par un autre programme",
+    "denied": "Accès au micro refusé",
+    "unsupported": "Micro non pris en charge par ce navigateur",
+    "notRecording": "Aucun enregistrement en cours"
+  },
+  "transcriptionFailed": "Échec de la transcription",
+  "transcriptionFailedStatus": "Échec de la transcription : {{status}}",
+  "playbackFailed": "Échec de la lecture audio",
+  "synthesisFailed": "Échec de la synthèse vocale",
+  "synthesisFailedStatus": "Échec de la synthèse vocale : {{status}}",
+  "wakeUnsupported": "Ce serveur Nicx n'a pas encore l'écoute : redémarrez-le pour l'utiliser.",
+  "wakeFailed": "Échec de l'écoute : {{status}}",
+  "noModel": "Aucun modèle disponible",
+  "chatRequestFailed": "La requête de discussion a échoué : {{status}}",
+  "researchRequestFailed": "La requête de recherche a échoué : {{status}}",
+  "requestFailed": "La requête a échoué : {{status}}",
+  "fetchFailed": "Échec de la récupération",
+  "desktopOnly": {
+    "cloudKeys": "Les clés API cloud ne peuvent être enregistrées que dans l'application de bureau.",
+    "backend": "Le serveur local n'est disponible que dans l'application de bureau.",
+    "setupReset": "La réinitialisation du moteur n'est possible que dans l'application de bureau.",
+    "inferenceSource": "La source d'inférence ne se configure que dans l'application de bureau."
+  },
+  "cloudKeySaveFailed": "Impossible d'enregistrer la clé cloud",
+  "serverHtml": "Serveur Nicx indisponible (l'API a répondu en HTML)",
+  "backendStartFailed": "Impossible de démarrer le serveur local",
+  "setupResetFailed": "Impossible de réinitialiser la configuration du moteur",
+  "modelsFetchFailed": "Impossible de récupérer les modèles : {{status}}",
+  "modelPullFailed": "Impossible de télécharger le modèle : {{detail}}",
+  "deleteFailed": "Échec de la suppression",
+  "modelDeleteFailed": "Impossible de supprimer le modèle : {{detail}}",
+  "preloadFailed": "Échec du préchargement : {{status}}",
+  "modelLoadTimeout": "Le chargement du modèle a expiré (120 s)",
+  "verificationFailed": "La vérification a échoué : {{status}}",
+  "webhookFailed": "L'enregistrement du webhook a échoué : {{status}}",
+  "testMessageFailed": "Le message de test a échoué : {{status}}",
+  "apiUnreachable": "Impossible de joindre l'API de Nicx. Vérifiez l'état du serveur et l'adresse de l'API, puis réessayez.",
+  "memory": {
+    "statusFailed": "Impossible de lire l'état de la mémoire",
+    "searchFailed": "Impossible de chercher dans la mémoire",
+    "storeFailed": "Impossible d'enregistrer dans la mémoire",
+    "indexFailed": "Impossible d'indexer le chemin",
+    "configFailed": "Impossible de lire la configuration de la mémoire"
+  },
+  "inferenceSourceReadFailed": "Impossible de lire la source d'inférence",
+  "inferenceSourceSaveFailed": "Impossible d'enregistrer la source d'inférence",
+  "connectors": {
+    "listFailed": "Impossible de lister les sources de données : {{status}}",
+    "getFailed": "Impossible de lire la source {{id}} : {{status}}",
+    "connectFailed": "Impossible de connecter {{id}} : {{status}}",
+    "authTimeout": "L'autorisation a expiré. Réessayez.",
+    "disconnectFailed": "Impossible de déconnecter {{id}} : {{status}}",
+    "syncStatusFailed": "Impossible de lire la synchronisation de {{id}} : {{status}}",
+    "syncFailed": "La synchronisation a échoué : {{status}}"
+  },
+  "privacy": {
+    "serverUnreachable": "Impossible de joindre le serveur de Nicx. Réessayez.",
+    "saveChoiceFailed": "Impossible d'enregistrer votre choix. Réessayez.",
+    "forgetFailed": "Impossible de supprimer vos données pour le moment. Réessayez.",
+    "documentUnreachable": "Impossible de charger le document. Vérifiez que Nicx est lancé.",
+    "documentFailed": "Impossible de charger le document."
+  }
+}

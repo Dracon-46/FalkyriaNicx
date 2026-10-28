@@ -1,0 +1,25 @@
+{
+  "chat": "المحادثة",
+  "dashboard": "لوحة المعلومات",
+  "painel": "لوحة Falkyria",
+  "dataSources": "مصادر البيانات",
+  "agents": "الوكلاء",
+  "logs": "السجلات",
+  "settings": "الإعدادات",
+  "getStarted": "البدء",
+  "openSidebar": "فتح الشريط الجانبي",
+  "closeSidebar": "إغلاق الشريط الجانبي",
+  "themeToggle": "السمة: {{theme}} (انقر للتبديل إلى {{next}})",
+  "newChat": "محادثة جديدة",
+  "selectModel": "اختيار النموذج",
+  "loadingModel": "جارٍ تحميل النموذج...",
+  "searchChats": "البحث في المحادثات...",
+  "chats": {
+    "justNow": "الآن",
+    "noMatches": "لا توجد محادثات مطابقة",
+    "empty": "لا توجد محادثات بعد",
+    "stopBeforeDelete": "أوقف التوليد قبل حذف هذه المحادثة",
+    "delete": "حذف المحادثة",
+    "overlay": "محادثة سريعة"
+  }
+}

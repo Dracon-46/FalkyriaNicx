@@ -1,0 +1,49 @@
+{
+  "title": "Visão geral do sistema",
+  "subtitle": "Telemetria ao vivo do motor que roda no seu computador: consumo de energia, tokens processados e economia em relação às APIs na nuvem.",
+  "cost": {
+    "title": "Comparação de custo",
+    "waiting": "aguardando a primeira resposta…",
+    "local": "Local (seu computador)",
+    "requests": "{{n}} pedidos",
+    "tokens": "{{n}} tokens",
+    "electricityOnly": "só a energia elétrica",
+    "saved": "{{amount}} economizados",
+    "footnote": "A estimativa de economia supõe que os modelos locais (como Qwen, Nemotron e Kimi) geram, em média, a mesma quantidade de tokens por pedido que os modelos fechados na nuvem."
+  },
+  "energy": {
+    "title": "Monitoramento de energia",
+    "waiting": "aguardando dados de telemetria…",
+    "cool": "Frio",
+    "warm": "Morno",
+    "hot": "Quente",
+    "totalEnergy": "Energia total",
+    "energyPerToken": "Energia / token",
+    "avgPower": "Potência média",
+    "totalRequests": "Total de pedidos",
+    "thermal": "Temperatura",
+    "tokensProcessed": "Tokens processados",
+    "power": "Potência"
+  },
+  "traces": {
+    "title": "Rastros das respostas",
+    "untitled": "Pergunta sem título",
+    "steps": "{{n}} etapas",
+    "loadFailed": "Não consegui carregar os rastros",
+    "empty": "Nenhum rastro ainda. Faça perguntas para vê-los aqui.",
+    "select": "Escolha um rastro para ver os detalhes"
+  },
+  "logs": {
+    "title": "Registros",
+    "entries": "{{n}} registros",
+    "copyAll": "Copiar tudo",
+    "clear": "Limpar",
+    "subtitle": "Atividade recente desta sessão: conversas, trocas de modelo, uso de ferramentas e mensagens do sistema.",
+    "empty": "Nenhum registro ainda. Eles aparecem conforme você conversa, troca de modelo e usa o app."
+  },
+  "painel": {
+    "description": "As estatísticas anônimas de uso do Nicx ficam no painel da web, só para administradores da Falkyria. A entrada pede senha e o código do app autenticador.",
+    "open": "Abrir o painel",
+    "restricted": "Acesso restrito e registrado."
+  }
+}

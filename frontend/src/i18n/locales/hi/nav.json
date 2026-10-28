@@ -1,0 +1,25 @@
+{
+  "chat": "चैट",
+  "dashboard": "डैशबोर्ड",
+  "painel": "Falkyria पैनल",
+  "dataSources": "डेटा स्रोत",
+  "agents": "एजेंट",
+  "logs": "लॉग",
+  "settings": "सेटिंग्स",
+  "getStarted": "शुरू करें",
+  "openSidebar": "साइडबार खोलें",
+  "closeSidebar": "साइडबार बंद करें",
+  "themeToggle": "थीम: {{theme}} ({{next}} के लिए क्लिक करें)",
+  "newChat": "नई चैट",
+  "selectModel": "मॉडल चुनें",
+  "loadingModel": "मॉडल लोड हो रहा है...",
+  "searchChats": "चैट खोजें...",
+  "chats": {
+    "justNow": "अभी-अभी",
+    "noMatches": "कोई मिलती-जुलती चैट नहीं",
+    "empty": "अभी कोई बातचीत नहीं",
+    "stopBeforeDelete": "इस बातचीत को हटाने से पहले जवाब रोकें",
+    "delete": "बातचीत हटाएँ",
+    "overlay": "ओवरले चैट"
+  }
+}

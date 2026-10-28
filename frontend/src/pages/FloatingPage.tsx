@@ -20,6 +20,8 @@ import {
   notifyFloatingProblem,
   notifyFloatingReady,
 } from '../lib/floating';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 /** Longest goodbye wait before the window closes anyway. */
 const GOODBYE_MS = 5000;
@@ -60,6 +62,7 @@ function waitForTtsIdle(timeoutMs: number): Promise<void> {
  * silence, on "Nicx, tchau" / "desligar", or with the close button.
  */
 export default function FloatingPage() {
+  const { t } = useTranslation();
   const speech = useSpeech();
   const conversationId = useRef<string | null>(null);
   const closing = useRef(false);
@@ -101,7 +104,7 @@ export default function FloatingPage() {
     void (async () => {
       await useTtsStore.getState().ensureHealth();
       if (useTtsStore.getState().available) {
-        void useTtsStore.getState().speak('nicx-tchau', 'Até logo!');
+        void useTtsStore.getState().speak('nicx-tchau', i18n.t('chat.floating.goodbye'));
         await waitForTtsIdle(GOODBYE_MS);
       }
       if (!(await closeFloatingWindow())) setEnded(true);
@@ -177,8 +180,8 @@ export default function FloatingPage() {
         <button
           type="button"
           onClick={() => void finish()}
-          aria-label="Fechar"
-          title="Fechar"
+          aria-label={t('common.close')}
+          title={t('common.close')}
           className="rounded-md p-1 cursor-pointer"
           style={{ color: 'var(--color-text-secondary)' }}
         >
@@ -193,7 +196,7 @@ export default function FloatingPage() {
           style={{ color: conversation.active ? 'var(--color-accent)' : 'var(--color-text-secondary)' }}
           aria-live="polite"
         >
-          {ended ? 'Conversa encerrada' : conversation.active ? conversation.label : 'Preparando…'}
+          {ended ? t('chat.floating.ended') : conversation.active ? conversation.label : t('chat.floating.preparing')}
         </div>
 
         <div
@@ -203,7 +206,7 @@ export default function FloatingPage() {
         >
           {lastUser && (
             <p>
-              <span style={{ color: 'var(--color-text-tertiary)' }}>Você: </span>
+              <span style={{ color: 'var(--color-text-tertiary)' }}>{t('chat.floating.you')} </span>
               {lastUser.content}
             </p>
           )}
@@ -217,7 +220,7 @@ export default function FloatingPage() {
           )}
           {!lastUser && !ended && (
             <p className="text-center" style={{ color: 'var(--color-text-tertiary)' }}>
-              Pode falar. Diga “tchau” para eu sair.
+              {t('chat.floating.hint')}
             </p>
           )}
         </div>
@@ -231,7 +234,7 @@ export default function FloatingPage() {
             className="flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-sm cursor-pointer"
             style={{ background: 'var(--color-accent)', color: 'var(--color-bg)' }}
           >
-            <Mic size={14} /> Ouvir de novo
+            <Mic size={14} /> {t('chat.floating.listenAgain')}
           </button>
         ) : (
           <button
@@ -240,7 +243,7 @@ export default function FloatingPage() {
             className="w-full rounded-lg py-2 text-sm cursor-pointer"
             style={{ border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }}
           >
-            Encerrar
+            {t('chat.floating.end')}
           </button>
         )}
       </footer>

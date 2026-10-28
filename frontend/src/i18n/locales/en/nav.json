@@ -1,0 +1,25 @@
+{
+  "chat": "Chat",
+  "dashboard": "Dashboard",
+  "painel": "Falkyria Panel",
+  "dataSources": "Data sources",
+  "agents": "Agents",
+  "logs": "Logs",
+  "settings": "Settings",
+  "getStarted": "Get started",
+  "openSidebar": "Open sidebar",
+  "closeSidebar": "Close sidebar",
+  "themeToggle": "Theme: {{theme}} (click for {{next}})",
+  "newChat": "New chat",
+  "selectModel": "Select model",
+  "loadingModel": "Loading model...",
+  "searchChats": "Search chats...",
+  "chats": {
+    "justNow": "Just now",
+    "noMatches": "No matching chats",
+    "empty": "No conversations yet",
+    "stopBeforeDelete": "Stop generating before deleting this conversation",
+    "delete": "Delete conversation",
+    "overlay": "Overlay chat"
+  }
+}

@@ -1,6 +1,7 @@
 import { Volume2, Square } from 'lucide-react';
 import { useTts } from '../../hooks/useTts';
 import { useAppStore } from '../../lib/store';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   messageId: string;
@@ -9,6 +10,7 @@ interface Props {
 
 /** Reads one assistant message aloud through the server's TTS backend. */
 export function SpeakMessageButton({ messageId, content }: Props) {
+  const { t } = useTranslation();
   const voiceOutputEnabled = useAppStore((s) => s.settings.voiceOutputEnabled);
   const { speak, stop, speakingId, available, state, error, errorId } = useTts();
 
@@ -32,12 +34,12 @@ export function SpeakMessageButton({ messageId, content }: Props) {
         title={
           messageError ||
           (isMine && state === 'loading'
-            ? 'Gerando a voz...'
+            ? t('chat.speak.loading')
             : isMine && state === 'speaking'
-              ? 'Parar'
-              : 'Ler em voz alta')
+              ? t('chat.speak.stop')
+              : t('chat.speak.readAloud'))
         }
-        aria-label={busy ? 'Parar a leitura' : 'Ler a mensagem em voz alta'}
+        aria-label={busy ? t('chat.speak.stopReading') : t('chat.speak.readMessageAloud')}
       >
         {busy ? <Square size={14} /> : <Volume2 size={14} />}
       </button>

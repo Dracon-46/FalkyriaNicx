@@ -19,6 +19,7 @@
 
 import { create } from 'zustand';
 import { apiFetch } from './api';
+import i18n from '../i18n';
 
 /**
  * Mirror of the Python event catalog (src/nicx/privacidade/events.py
@@ -152,11 +153,11 @@ export async function setAnalyticsPreference(enabled: boolean): Promise<Analytic
       body: JSON.stringify({ enabled }),
     });
   } catch {
-    throw new Error('Não foi possível falar com o servidor do Nicx. Tente de novo.');
+    throw new Error(i18n.t('errors.privacy.serverUnreachable'));
   }
   if (!response.ok) {
     throw new Error(
-      await errorDetail(response, 'Não foi possível salvar sua escolha. Tente de novo.'),
+      await errorDetail(response, i18n.t('errors.privacy.saveChoiceFailed')),
     );
   }
   return storeIdentity(normalizeIdentity(await response.json()), { supersede: true });
@@ -171,11 +172,11 @@ export async function forgetAnalyticsData(): Promise<ForgetResult> {
   try {
     response = await apiFetch('/v1/analytics/forget', { method: 'POST' });
   } catch {
-    throw new Error('Não foi possível falar com o servidor do Nicx. Tente de novo.');
+    throw new Error(i18n.t('errors.privacy.serverUnreachable'));
   }
   if (!response.ok) {
     throw new Error(
-      await errorDetail(response, 'Não foi possível apagar seus dados agora. Tente de novo.'),
+      await errorDetail(response, i18n.t('errors.privacy.forgetFailed')),
     );
   }
   const body = await response.json();
@@ -198,14 +199,14 @@ export async function fetchLegalDocument(name: LegalDocument): Promise<string> {
   try {
     response = await apiFetch(`/v1/analytics/legal/${name}`);
   } catch {
-    throw new Error('Não foi possível carregar o documento. Verifique se o Nicx está rodando.');
+    throw new Error(i18n.t('errors.privacy.documentUnreachable'));
   }
   if (!response.ok) {
-    throw new Error(await errorDetail(response, 'Não foi possível carregar o documento.'));
+    throw new Error(await errorDetail(response, i18n.t('errors.privacy.documentFailed')));
   }
   const text = await response.text();
   if (/^\s*</.test(text)) {
-    throw new Error('Não foi possível carregar o documento. Verifique se o Nicx está rodando.');
+    throw new Error(i18n.t('errors.privacy.documentUnreachable'));
   }
   legalCache.set(name, text);
   return text;

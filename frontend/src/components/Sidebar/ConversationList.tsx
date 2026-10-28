@@ -1,6 +1,8 @@
 import { Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useAppStore } from '../../lib/store';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n';
 
 interface Props {
   searchQuery: string;
@@ -9,16 +11,25 @@ interface Props {
 function formatRelativeTime(timestamp: number): string {
   const diff = Date.now() - timestamp;
   const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return 'Just now';
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1) return i18n.t('nav.chats.justNow');
+  const rtf = new Intl.RelativeTimeFormat(i18n.language, { numeric: 'auto', style: 'short' });
+  if (minutes < 60) return rtf.format(-minutes, 'minute');
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return rtf.format(-hours, 'hour');
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(timestamp).toLocaleDateString();
+  if (days < 7) return rtf.format(-days, 'day');
+  return new Date(timestamp).toLocaleDateString(i18n.language);
+}
+
+/** Default titles are stored in English (the store compares them); show them translated. */
+function displayTitle(title: string): string {
+  if (title === 'New chat') return i18n.t('nav.newChat');
+  if (title === 'Overlay chat') return i18n.t('nav.chats.overlay');
+  return title;
 }
 
 export function ConversationList({ searchQuery }: Props) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const conversations = useAppStore((s) => s.conversations);
   const activeId = useAppStore((s) => s.activeId);
@@ -30,14 +41,14 @@ export function ConversationList({ searchQuery }: Props) {
 
   const filtered = searchQuery
     ? conversations.filter((c) =>
-        c.title.toLowerCase().includes(searchQuery.toLowerCase()),
+        displayTitle(c.title).toLowerCase().includes(searchQuery.toLowerCase()),
       )
     : conversations;
 
   if (filtered.length === 0) {
     return (
       <div className="px-3 py-8 text-center text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-        {searchQuery ? 'No matching chats' : 'No conversations yet'}
+        {searchQuery ? t('nav.chats.noMatches') : t('nav.chats.empty')}
       </div>
     );
   }
@@ -75,7 +86,7 @@ export function ConversationList({ searchQuery }: Props) {
                   fontWeight: isActive ? 500 : 400,
                 }}
               >
-                {conv.title}
+                {displayTitle(conv.title)}
               </div>
               <div className="text-[11px] mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>
                 {formatRelativeTime(conv.updatedAt)}
@@ -95,8 +106,8 @@ export function ConversationList({ searchQuery }: Props) {
               onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-tertiary)')}
               title={
                 isStreaming
-                  ? 'Stop generating before deleting this conversation'
-                  : 'Delete conversation'
+                  ? t('nav.chats.stopBeforeDelete')
+                  : t('nav.chats.delete')
               }
             >
               <Trash2 size={14} />

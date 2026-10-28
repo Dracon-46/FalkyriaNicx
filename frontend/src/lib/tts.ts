@@ -3,6 +3,7 @@ import { synthesizeSpeech, fetchTtsHealth } from './api';
 import { toSpeakableText } from './message-text';
 import { useMascot } from './mascot';
 import { LEVEL_FPS, LEVEL_INTERVAL_MS, wavEnvelope } from './audio-level';
+import i18n from '../i18n';
 
 export type TtsState = 'idle' | 'loading' | 'speaking';
 
@@ -176,7 +177,7 @@ export const useTtsStore = create<TtsStore>((set, get) => ({
       el.onerror = () => {
         if (mine !== token) return;
         teardown();
-        set({ state: 'idle', speakingId: null, error: 'Falha ao reproduzir o áudio', errorId: id });
+        set({ state: 'idle', speakingId: null, error: i18n.t('errors.playbackFailed'), errorId: id });
       };
 
       await el.play();
@@ -191,7 +192,7 @@ export const useTtsStore = create<TtsStore>((set, get) => ({
       set({
         state: 'idle',
         speakingId: null,
-        error: err instanceof Error ? err.message : 'Falha ao sintetizar a voz',
+        error: err instanceof Error ? err.message : i18n.t('errors.synthesisFailed'),
         errorId: id,
       });
     }

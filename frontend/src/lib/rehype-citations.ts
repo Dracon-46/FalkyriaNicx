@@ -1,4 +1,5 @@
 import type { ResearchSource } from '../types';
+import i18n from '../i18n';
 
 interface HastNode {
   type: string;
@@ -20,17 +21,17 @@ const SKIP_TAGS = new Set(['code', 'pre', 'script', 'style']);
 const CITATION_RE =
   /\[(\s*\d+(?:\s*,\s*\d+)*\s*)\](\s+(?=[.,;:!?]))?/g;
 
-const TOOLTIP_DATE = new Intl.DateTimeFormat('en-US', {
+const TOOLTIP_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
   month: 'short',
   day: 'numeric',
   year: 'numeric',
-});
+};
 
 function formatTooltipDate(iso: string | undefined): string | null {
   if (!iso) return null;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso.trim() || null;
-  return TOOLTIP_DATE.format(d);
+  return new Intl.DateTimeFormat(i18n.language, TOOLTIP_DATE_OPTIONS).format(d);
 }
 
 function buildTooltip(src: ResearchSource): string {
@@ -54,7 +55,7 @@ function buildPill(n: number, src: ResearchSource): HastNode {
       rel: 'noopener noreferrer',
       className: ['research-citation'],
       'data-ref': String(n),
-      title: buildTooltip(src) || `Source ${n}`,
+      title: buildTooltip(src) || i18n.t('chat.research.source', { n }),
     },
     children: [{ type: 'text', value: String(n) }],
   };

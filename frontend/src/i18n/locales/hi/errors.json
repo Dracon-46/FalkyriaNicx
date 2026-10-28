@@ -1,0 +1,67 @@
+{
+  "serverUnreachable": "सर्वर से कनेक्ट नहीं हो पा रहा",
+  "mic": {
+    "notFound": "कोई माइक्रोफ़ोन नहीं मिला",
+    "inUse": "माइक्रोफ़ोन किसी दूसरे प्रोग्राम में इस्तेमाल हो रहा है",
+    "denied": "माइक्रोफ़ोन की अनुमति नहीं मिली",
+    "unsupported": "इस ब्राउज़र में माइक्रोफ़ोन समर्थित नहीं है",
+    "notRecording": "कुछ भी रिकॉर्ड नहीं हो रहा"
+  },
+  "transcriptionFailed": "लिखित रूप बनाना विफल रहा",
+  "transcriptionFailedStatus": "लिखित रूप बनाना विफल रहा: {{status}}",
+  "playbackFailed": "ऑडियो नहीं चल सका",
+  "synthesisFailed": "आवाज़ नहीं बन सकी",
+  "synthesisFailedStatus": "आवाज़ नहीं बन सकी: {{status}}",
+  "wakeUnsupported": "इस Nicx सर्वर में अभी सुनने की सुविधा नहीं है: इस्तेमाल के लिए इसे रीस्टार्ट करें।",
+  "wakeFailed": "सुनने की सुविधा विफल रही: {{status}}",
+  "noModel": "कोई मॉडल उपलब्ध नहीं",
+  "chatRequestFailed": "चैट अनुरोध विफल रहा: {{status}}",
+  "researchRequestFailed": "शोध अनुरोध विफल रहा: {{status}}",
+  "requestFailed": "अनुरोध विफल रहा: {{status}}",
+  "fetchFailed": "प्राप्त नहीं हो सका",
+  "desktopOnly": {
+    "cloudKeys": "क्लाउड API कुंजियाँ सिर्फ़ डेस्कटॉप ऐप में सहेजी जा सकती हैं।",
+    "backend": "डेस्कटॉप बैकएंड सिर्फ़ डेस्कटॉप ऐप में उपलब्ध है।",
+    "setupReset": "इंजन सेटअप फिर से शुरू करना सिर्फ़ डेस्कटॉप ऐप में संभव है।",
+    "inferenceSource": "इंजन का स्रोत सिर्फ़ डेस्कटॉप ऐप में सेट किया जा सकता है।"
+  },
+  "cloudKeySaveFailed": "क्लाउड कुंजी सहेजी नहीं जा सकी",
+  "serverHtml": "Nicx सर्वर उपलब्ध नहीं (API ने HTML लौटाया)",
+  "backendStartFailed": "डेस्कटॉप बैकएंड शुरू नहीं हो सका",
+  "setupResetFailed": "इंजन सेटअप रीसेट नहीं हो सका",
+  "modelsFetchFailed": "मॉडल सूची नहीं मिल सकी: {{status}}",
+  "modelPullFailed": "मॉडल डाउनलोड नहीं हो सका: {{detail}}",
+  "deleteFailed": "हटाया नहीं जा सका",
+  "modelDeleteFailed": "मॉडल हटाया नहीं जा सका: {{detail}}",
+  "preloadFailed": "मॉडल पहले से लोड नहीं हो सका: {{status}}",
+  "modelLoadTimeout": "मॉडल लोड होने में बहुत देर लगी (120 सेकंड)",
+  "verificationFailed": "सत्यापन विफल रहा: {{status}}",
+  "webhookFailed": "वेबहुक पंजीकरण विफल रहा: {{status}}",
+  "testMessageFailed": "टेस्ट संदेश विफल रहा: {{status}}",
+  "apiUnreachable": "Nicx API से संपर्क नहीं हो सका। सर्वर की स्थिति और API URL जाँचें, फिर दोबारा कोशिश करें।",
+  "memory": {
+    "statusFailed": "मेमोरी की स्थिति नहीं मिल सकी",
+    "searchFailed": "मेमोरी में खोज नहीं हो सकी",
+    "storeFailed": "मेमोरी में सहेजा नहीं जा सका",
+    "indexFailed": "पाथ इंडेक्स नहीं हो सका",
+    "configFailed": "मेमोरी कॉन्फ़िगरेशन नहीं मिल सका"
+  },
+  "inferenceSourceReadFailed": "इंजन का स्रोत पढ़ा नहीं जा सका",
+  "inferenceSourceSaveFailed": "इंजन का स्रोत सहेजा नहीं जा सका",
+  "connectors": {
+    "listFailed": "डेटा स्रोतों की सूची नहीं मिल सकी: {{status}}",
+    "getFailed": "स्रोत {{id}} नहीं मिल सका: {{status}}",
+    "connectFailed": "{{id}} से कनेक्ट नहीं हो सका: {{status}}",
+    "authTimeout": "अनुमति में बहुत देर लगी — कृपया फिर से कोशिश करें।",
+    "disconnectFailed": "{{id}} को डिस्कनेक्ट नहीं किया जा सका: {{status}}",
+    "syncStatusFailed": "{{id}} की सिंक स्थिति नहीं मिल सकी: {{status}}",
+    "syncFailed": "सिंक विफल रहा: {{status}}"
+  },
+  "privacy": {
+    "serverUnreachable": "Nicx सर्वर से संपर्क नहीं हो सका। कृपया फिर से कोशिश करें।",
+    "saveChoiceFailed": "आपकी पसंद सहेजी नहीं जा सकी। कृपया फिर से कोशिश करें।",
+    "forgetFailed": "अभी आपका डेटा हटाया नहीं जा सका। कृपया फिर से कोशिश करें।",
+    "documentUnreachable": "दस्तावेज़ लोड नहीं हो सका। जाँचें कि Nicx चल रहा है।",
+    "documentFailed": "दस्तावेज़ लोड नहीं हो सका।"
+  }
+}

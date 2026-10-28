@@ -1,0 +1,98 @@
+{
+  "theme": {
+    "light": "浅色",
+    "dark": "深色",
+    "system": "跟随系统"
+  },
+  "backendUnreachable": "无法连接 Nicx 后端",
+  "changeUrl": "更改地址",
+  "close": "关闭",
+  "modelPicker": {
+    "note": {
+      "fastLight": "快速、轻量",
+      "recommended": "推荐默认",
+      "largest": "最大",
+      "fastMultimodal": "快速、多模态",
+      "cheapFast": "便宜、快速",
+      "reasoning": "推理",
+      "balanced": "均衡",
+      "mostCapable": "能力最强",
+      "fastest": "最快",
+      "flagship": "旗舰",
+      "fast": "快速",
+      "latest": "最新",
+      "auto": "为任务挑选最佳模型"
+    },
+    "keyStatusFailed": "无法读取云端密钥状态",
+    "keySaveFailed": "无法保存 {{provider}} API 密钥",
+    "downloadFailed": "下载失败",
+    "log": {
+      "switching": "正在切换到 {{model}}...",
+      "loaded": "{{model}} 已加载",
+      "loadFailed": "加载 {{model}} 失败：{{message}}",
+      "downloaded": "已下载 {{model}}",
+      "downloadFailed": "下载 {{model}} 失败：{{message}}",
+      "deleted": "已删除 {{model}}",
+      "keySaved": "{{provider}} API 密钥已保存，正在刷新模型列表...",
+      "keyRemoved": "{{provider}} API 密钥已移除，正在刷新模型列表..."
+    },
+    "tabInstalled": "已安装模型（{{n}}）",
+    "tabDownload": "下载",
+    "tabCloud": "云端模型",
+    "searchInstalled": "搜索已安装的模型...",
+    "searchDownload": "搜索可下载的模型...",
+    "downloadedOk": "{{model}} 下载成功",
+    "noModels": "暂无可用模型，切换到“下载”开始",
+    "noMatches": "没有匹配的模型",
+    "active": "当前",
+    "deleteModel": "删除模型",
+    "downloading": "下载中...",
+    "installed": "已安装",
+    "download": "下载",
+    "customLabel": "或输入任意 Ollama 模型名称：",
+    "customPlaceholder": "例如：codellama:7b",
+    "pull": "拉取",
+    "cloudDesktopHint": "添加 API 密钥即可使用云端模型。密钥保存在本机的安全存储中。",
+    "cloudServerHint": "请在服务器环境中配置云服务商密钥以使用云端模型。",
+    "connected": "已连接",
+    "keySaved": "已保存在安全存储中",
+    "showKey": "显示密钥",
+    "hideKey": "隐藏密钥",
+    "saving": "保存中",
+    "remove": "移除",
+    "navigate": "浏览",
+    "select": "选择",
+    "catalogueFooter": "模型从 Ollama 仓库下载",
+    "cloudFooter": "API 密钥保存在本地，绝不会发送到 Nicx 服务器"
+  },
+  "approvals": {
+    "title": "智能体审批",
+    "pending": "待处理：{{n}}",
+    "empty": "没有待审批的操作",
+    "tier": {
+      "trivial": "极低",
+      "low": "低",
+      "medium": "中",
+      "high": "高"
+    },
+    "viewDetails": "查看详情",
+    "hideDetails": "隐藏详情",
+    "approve": "批准",
+    "deny": "拒绝"
+  },
+  "errorBoundary": {
+    "title": "出了点问题",
+    "unexpected": "发生了意外错误。",
+    "retry": "重试"
+  },
+  "mascot": {
+    "mood": {
+      "idle": "平静",
+      "listening": "在听",
+      "thinking": "思考中",
+      "speaking": "说话中",
+      "happy": "开心",
+      "error": "出了点问题"
+    }
+  }
+}

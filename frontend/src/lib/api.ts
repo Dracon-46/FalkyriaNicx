@@ -19,19 +19,19 @@ export async function getCloudKeyStatus(): Promise<CloudKeyStatus> {
     const rows = await invoke<Array<{ key: string; set: boolean }>>('get_cloud_key_status');
     return Object.fromEntries(rows.map((row) => [row.key, row.set]));
   } catch (e: any) {
-    throw new Error(e?.message ?? e ?? 'Failed to read cloud key status');
+    throw new Error(e?.message ?? e ?? i18n.t('common.modelPicker.keyStatusFailed'));
   }
 }
 
 export async function saveCloudKey(keyName: string, keyValue: string): Promise<void> {
   if (!isTauri()) {
-    throw new Error('Cloud API keys can be saved in the desktop app only.');
+    throw new Error(i18n.t('errors.desktopOnly.cloudKeys'));
   }
   try {
     const { invoke } = await import('@tauri-apps/api/core');
     await invoke('save_cloud_key', { keyName, keyValue });
   } catch (e: any) {
-    throw new Error(e?.message ?? e ?? 'Failed to save cloud key');
+    throw new Error(e?.message ?? e ?? i18n.t('errors.cloudKeySaveFailed'));
   }
 }
 
@@ -123,7 +123,7 @@ export const apiFetch = (
     // starting): treat it as unreachable instead of as a successful reply.
     const type = response.headers.get('content-type') ?? '';
     if (type.includes('text/html')) {
-      throw new TypeError('Nicx server unavailable (HTML response from the API)');
+      throw new TypeError(i18n.t('errors.serverHtml'));
     }
     return response;
   });
@@ -162,23 +162,23 @@ export async function getSetupStatus(): Promise<SetupStatus | null> {
 
 /** Start desktop services after an inference source has been persisted. */
 export async function startBackend(): Promise<void> {
-  if (!isTauri()) throw new Error('The desktop backend is available in the desktop app only.');
+  if (!isTauri()) throw new Error(i18n.t('errors.desktopOnly.backend'));
   try {
     const { invoke } = await import('@tauri-apps/api/core');
     await invoke<void>('start_backend');
   } catch (e: any) {
-    throw new Error(e?.message ?? e ?? 'Failed to start the desktop backend');
+    throw new Error(e?.message ?? e ?? i18n.t('errors.backendStartFailed'));
   }
 }
 
 /** Stop an in-flight setup and return the desktop to its inert source chooser. */
 export async function resetInferenceSource(): Promise<void> {
-  if (!isTauri()) throw new Error('Inference setup recovery is available in the desktop app only.');
+  if (!isTauri()) throw new Error(i18n.t('errors.desktopOnly.setupReset'));
   try {
     const { invoke } = await import('@tauri-apps/api/core');
     await invoke<void>('reset_inference_source');
   } catch (e: any) {
-    throw new Error(e?.message ?? e ?? 'Failed to reset inference setup');
+    throw new Error(e?.message ?? e ?? i18n.t('errors.setupResetFailed'));
   }
 }
 
@@ -196,14 +196,14 @@ export async function fetchModels(): Promise<ModelInfo[]> {
     }
   }
   const res = await apiFetch(`/v1/models`);
-  if (!res.ok) throw new Error(`Failed to fetch models: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.modelsFetchFailed', { status: res.status }));
   const data = await res.json();
   return data.data || [];
 }
 
 export async function fetchRecommendedModel(): Promise<{ model: string; reason: string }> {
   const res = await apiFetch(`/v1/recommended-model`);
-  if (!res.ok) return { model: '', reason: 'Failed to fetch' };
+  if (!res.ok) return { model: '', reason: i18n.t('errors.fetchFailed') };
   return res.json();
 }
 
@@ -216,7 +216,7 @@ export async function pullModel(modelName: string): Promise<void> {
       await invoke('pull_ollama_model', { modelName });
       return;
     } catch (e: any) {
-      throw new Error(e?.message || e || 'Download failed');
+      throw new Error(e?.message || e || i18n.t('common.modelPicker.downloadFailed'));
     }
   }
   const res = await apiFetch(`/v1/models/pull`, {
@@ -226,7 +226,7 @@ export async function pullModel(modelName: string): Promise<void> {
   });
   if (!res.ok) {
     const detail = await res.text().catch(() => res.statusText);
-    throw new Error(`Failed to pull model: ${detail}`);
+    throw new Error(i18n.t('errors.modelPullFailed', { detail }));
   }
 }
 
@@ -237,7 +237,7 @@ export async function deleteModel(modelName: string): Promise<void> {
       await invoke('delete_ollama_model', { modelName });
       return;
     } catch (e: any) {
-      throw new Error(e?.message || e || 'Delete failed');
+      throw new Error(e?.message || e || i18n.t('errors.deleteFailed'));
     }
   }
   const res = await apiFetch(`/v1/models/${encodeURIComponent(modelName)}`, {
@@ -245,7 +245,7 @@ export async function deleteModel(modelName: string): Promise<void> {
   });
   if (!res.ok) {
     const detail = await res.text().catch(() => res.statusText);
-    throw new Error(`Failed to delete model: ${detail}`);
+    throw new Error(i18n.t('errors.modelDeleteFailed', { detail }));
   }
 }
 
@@ -265,22 +265,22 @@ export async function preloadModel(modelName: string, owner?: string): Promise<v
       body: JSON.stringify({ model: modelName, prompt: '', keep_alive: '5m' }),
       signal: AbortSignal.timeout(120_000),
     });
-    if (!res.ok) throw new Error(`Preload failed: ${res.status}`);
+    if (!res.ok) throw new Error(i18n.t('errors.preloadFailed', { status: res.status }));
   } catch (e: any) {
-    if (e.name === 'TimeoutError') throw new Error('Model load timed out (120s)');
+    if (e.name === 'TimeoutError') throw new Error(i18n.t('errors.modelLoadTimeout'));
     throw e;
   }
 }
 
 export async function fetchSavings(): Promise<SavingsData> {
   const res = await apiFetch(`/v1/savings`);
-  if (!res.ok) throw new Error(`Failed to fetch savings: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   return res.json();
 }
 
 export async function fetchServerInfo(): Promise<ServerInfo> {
   const res = await apiFetch(`/v1/info`);
-  if (!res.ok) throw new Error(`Failed to fetch server info: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   return res.json();
 }
 
@@ -328,7 +328,7 @@ export async function fetchEnergy(): Promise<unknown> {
     } catch {}
   }
   const res = await apiFetch(`/v1/telemetry/energy`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   return res.json();
 }
 
@@ -339,7 +339,7 @@ export async function fetchTelemetry(): Promise<unknown> {
     } catch {}
   }
   const res = await apiFetch(`/v1/telemetry/stats`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   return res.json();
 }
 
@@ -350,7 +350,7 @@ export async function fetchTraces(limit: number = 50): Promise<unknown> {
     } catch {}
   }
   const res = await apiFetch(`/v1/traces?limit=${limit}`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   return res.json();
 }
 
@@ -382,7 +382,7 @@ export async function transcribeAudio(audioBlob: Blob, filename = 'recording.web
       });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      throw new Error(msg || 'Falha na transcrição');
+      throw new Error(msg || i18n.t('errors.transcriptionFailed'));
     }
   }
   const formData = new FormData();
@@ -400,7 +400,7 @@ export async function transcribeAudio(audioBlob: Blob, filename = 'recording.web
     } catch {
       // Keep the status-only message below when the body is not JSON.
     }
-    throw new Error(detail || `Falha na transcrição: ${res.status}`);
+    throw new Error(detail || i18n.t('errors.transcriptionFailedStatus', { status: res.status }));
   }
   return res.json();
 }
@@ -436,7 +436,7 @@ export async function synthesizeSpeech(
     } catch {
       // Keep the status-only message below when the body is not JSON.
     }
-    throw new Error(detail || `Falha ao sintetizar a voz: ${res.status}`);
+    throw new Error(detail || i18n.t('errors.synthesisFailedStatus', { status: res.status }));
   }
   return res.blob();
 }
@@ -484,7 +484,7 @@ let wakeMissingSince = 0;
 /** The running server has no `/v1/speech/wake` (it needs a restart). */
 export class WakeUnsupportedError extends Error {
   constructor() {
-    super('Este servidor do Nicx ainda não tem a escuta: reinicie-o para usar.');
+    super(i18n.t('errors.wakeUnsupported'));
     this.name = 'WakeUnsupportedError';
   }
 }
@@ -506,7 +506,7 @@ async function wakeResponse(res: Response): Promise<WakeStatus> {
     } catch {
       // Status-only message below.
     }
-    throw new Error(detail || `Falha na escuta: ${res.status}`);
+    throw new Error(detail || i18n.t('errors.wakeFailed', { status: res.status }));
   }
   return res.json();
 }
@@ -628,14 +628,14 @@ export interface AgentMessage {
 
 export async function fetchManagedAgents(): Promise<ManagedAgent[]> {
   const res = await apiFetch(`/v1/managed-agents`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   const data = await res.json();
   return data.agents || [];
 }
 
 export async function fetchManagedAgent(agentId: string): Promise<ManagedAgent> {
   const res = await apiFetch(`/v1/managed-agents/${agentId}`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   return res.json();
 }
 
@@ -650,7 +650,7 @@ export async function createManagedAgent(body: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   return res.json();
 }
 
@@ -663,28 +663,28 @@ export async function updateManagedAgent(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   return res.json();
 }
 
 export async function deleteManagedAgent(agentId: string): Promise<void> {
   const res = await apiFetch(`/v1/managed-agents/${agentId}`, { method: 'DELETE' });
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
 }
 
 export async function pauseManagedAgent(agentId: string): Promise<void> {
   const res = await apiFetch(`/v1/managed-agents/${agentId}/pause`, { method: 'POST' });
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
 }
 
 export async function resumeManagedAgent(agentId: string): Promise<void> {
   const res = await apiFetch(`/v1/managed-agents/${agentId}/resume`, { method: 'POST' });
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
 }
 
 export async function fetchAgentTasks(agentId: string): Promise<AgentTask[]> {
   const res = await apiFetch(`/v1/managed-agents/${agentId}/tasks`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   const data = await res.json();
   return data.tasks || [];
 }
@@ -695,13 +695,13 @@ export async function createAgentTask(agentId: string, description: string): Pro
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ description }),
   });
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   return res.json();
 }
 
 export async function fetchAgentChannels(agentId: string): Promise<ChannelBinding[]> {
   const res = await apiFetch(`/v1/managed-agents/${agentId}/channels`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   const data = await res.json();
   return data.bindings || [];
 }
@@ -723,7 +723,7 @@ export async function bindAgentChannel(
       }),
     },
   );
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   return res.json();
 }
 
@@ -735,7 +735,7 @@ export async function unbindAgentChannel(
     `${getBase()}/v1/managed-agents/${agentId}/channels/${bindingId}`,
     { method: 'DELETE' },
   );
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
 }
 
 // -- SendBlue auto-setup helpers ------------------------------------------
@@ -751,7 +751,7 @@ export async function sendblueVerify(
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || `Verification failed: ${res.status}`);
+    throw new Error(err.detail || i18n.t('errors.verificationFailed', { status: res.status }));
   }
   return res.json();
 }
@@ -772,7 +772,7 @@ export async function sendblueRegisterWebhook(
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || `Webhook registration failed: ${res.status}`);
+    throw new Error(err.detail || i18n.t('errors.webhookFailed', { status: res.status }));
   }
   return res.json();
 }
@@ -795,7 +795,7 @@ export async function sendblueTest(
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || `Test message failed: ${res.status}`);
+    throw new Error(err.detail || i18n.t('errors.testMessageFailed', { status: res.status }));
   }
   return res.json();
 }
@@ -808,7 +808,7 @@ export async function sendblueHealth(): Promise<{ channel_connected: boolean; br
 
 export async function fetchTemplates(): Promise<AgentTemplate[]> {
   const res = await apiFetch(`/v1/templates`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   const data = await res.json();
   return data.templates || [];
 }
@@ -817,7 +817,7 @@ export async function runManagedAgent(agentId: string): Promise<void> {
   const res = await apiFetch(`/v1/managed-agents/${agentId}/run`, { method: 'POST' });
   if (!res.ok) {
     const body = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(body.detail || `Failed: ${res.status}`);
+    throw new Error(body.detail || i18n.t('errors.requestFailed', { status: res.status }));
   }
 }
 
@@ -825,7 +825,7 @@ export async function recoverManagedAgent(agentId: string): Promise<{ recovered:
   const res = await apiFetch(`/v1/managed-agents/${agentId}/recover`, { method: 'POST' });
   if (!res.ok) {
     const body = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(body.detail || `Failed: ${res.status}`);
+    throw new Error(body.detail || i18n.t('errors.requestFailed', { status: res.status }));
   }
   return res.json();
 }
@@ -838,7 +838,7 @@ export async function fetchAgentState(agentId: string): Promise<{
   checkpoint: unknown;
 }> {
   const res = await apiFetch(`/v1/managed-agents/${agentId}/state`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   return res.json();
 }
 
@@ -871,7 +871,7 @@ export async function sendAgentMessage(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ content, mode, stream: true }),
   });
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
 
   // If streaming, consume the SSE response so the agent runs
   const contentType = res.headers.get('content-type') || '';
@@ -986,20 +986,20 @@ export async function askAgent(agentId: string, content: string): Promise<AgentM
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ content, mode: 'immediate', stream: false }),
   });
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   return res.json();
 }
 
 export async function fetchAgentMessages(agentId: string): Promise<AgentMessage[]> {
   const res = await apiFetch(`/v1/managed-agents/${agentId}/messages`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   const data = await res.json();
   return data.messages || [];
 }
 
 export async function fetchErrorAgents(): Promise<ManagedAgent[]> {
   const res = await apiFetch(`/v1/agents/errors`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   const data = await res.json();
   return data.agents || [];
 }
@@ -1039,7 +1039,7 @@ export interface ToolInfo {
 
 export async function fetchAvailableTools(): Promise<ToolInfo[]> {
   const res = await apiFetch(`/v1/tools`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   const data = await res.json();
   return data.tools || [];
 }
@@ -1053,14 +1053,14 @@ export async function saveToolCredentials(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(credentials),
   });
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
 }
 
 export async function fetchToolCredentialStatus(
   toolName: string,
 ): Promise<Record<string, boolean>> {
   const res = await apiFetch(`/v1/tools/${toolName}/credentials/status`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   return await res.json();
 }
 
@@ -1072,7 +1072,7 @@ export async function deleteToolCredential(
     `/v1/tools/${encodeURIComponent(toolName)}/credentials/${encodeURIComponent(keyName)}`,
     { method: 'DELETE' },
   );
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
 }
 
 export interface AgentTraceDetail {
@@ -1092,26 +1092,26 @@ export interface AgentTraceDetail {
 
 export async function fetchLearningLog(agentId: string): Promise<LearningLogEntry[]> {
   const res = await apiFetch(`/v1/managed-agents/${agentId}/learning`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   const data = await res.json();
   return data.learning_log || [];
 }
 
 export async function triggerLearning(agentId: string): Promise<void> {
   const res = await apiFetch(`/v1/managed-agents/${agentId}/learning/run`, { method: 'POST' });
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
 }
 
 export async function fetchAgentTraces(agentId: string, limit = 20): Promise<AgentTrace[]> {
   const res = await apiFetch(`/v1/managed-agents/${agentId}/traces?limit=${limit}`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   const data = await res.json();
   return data.traces || [];
 }
 
 export async function fetchAgentTrace(agentId: string, traceId: string): Promise<AgentTraceDetail> {
   const res = await apiFetch(`/v1/managed-agents/${agentId}/traces/${traceId}`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   return res.json();
 }
 
@@ -1163,10 +1163,10 @@ export async function getMemoryStats(): Promise<MemoryStats> {
   try {
     res = await apiFetch(`/v1/memory/stats`);
   } catch {
-    throw new Error('Could not reach the Nicx API. Check the server status and API URL, then retry.');
+    throw new Error(i18n.t('errors.apiUnreachable'));
   }
   if (!res.ok) {
-    const detail = await memoryErrorDetail(res, 'Memory status request failed');
+    const detail = await memoryErrorDetail(res, i18n.t('errors.memory.statusFailed'));
     throw new Error(`${detail} (HTTP ${res.status})`);
   }
   return res.json();
@@ -1178,7 +1178,7 @@ export async function searchMemory(query: string, topK: number = 5): Promise<Mem
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query, top_k: topK }),
   });
-  if (!res.ok) throw new Error('Failed to search memory');
+  if (!res.ok) throw new Error(i18n.t('errors.memory.searchFailed'));
   const data = await res.json();
   return data.results;
 }
@@ -1189,7 +1189,7 @@ export async function storeMemory(content: string, metadata?: Record<string, unk
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ content, metadata }),
   });
-  if (!res.ok) throw new Error(await memoryErrorDetail(res, 'Failed to store memory'));
+  if (!res.ok) throw new Error(await memoryErrorDetail(res, i18n.t('errors.memory.storeFailed')));
 }
 
 export async function indexMemoryPath(path: string): Promise<{ chunks_indexed: number; note?: string }> {
@@ -1198,13 +1198,13 @@ export async function indexMemoryPath(path: string): Promise<{ chunks_indexed: n
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ path }),
   });
-  if (!res.ok) throw new Error(await memoryErrorDetail(res, 'Failed to index path'));
+  if (!res.ok) throw new Error(await memoryErrorDetail(res, i18n.t('errors.memory.indexFailed')));
   return res.json();
 }
 
 export async function getMemoryConfig(): Promise<MemoryConfig> {
   const res = await apiFetch(`/v1/memory/config`);
-  if (!res.ok) throw new Error('Failed to fetch memory config');
+  if (!res.ok) throw new Error(i18n.t('errors.memory.configFailed'));
   return res.json();
 }
 
@@ -1226,19 +1226,19 @@ export interface PendingApproval {
 
 export async function fetchPendingApprovals(): Promise<PendingApproval[]> {
   const res = await apiFetch(`/v1/approvals/pending`);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
   const data = await res.json();
   return data.actions || [];
 }
 
 export async function approveAction(actionId: string): Promise<void> {
   const res = await apiFetch(`/v1/approvals/${actionId}/approve`, { method: 'POST' });
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
 }
 
 export async function denyAction(actionId: string): Promise<void> {
   const res = await apiFetch(`/v1/approvals/${actionId}/deny`, { method: 'POST' });
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.requestFailed', { status: res.status }));
 }
 
 // ---------------------------------------------------------------------------
@@ -1258,7 +1258,7 @@ export async function getInferenceSource(): Promise<InferenceSource> {
       const { invoke } = await import('@tauri-apps/api/core');
       return await invoke<InferenceSource>('get_inference_source');
     } catch (e: any) {
-      throw new Error(e?.message ?? e ?? 'Failed to read inference source');
+      throw new Error(e?.message ?? e ?? i18n.t('errors.inferenceSourceReadFailed'));
     }
   }
   return { kind: 'ollama' };
@@ -1268,7 +1268,7 @@ export async function setInferenceSource(
   src: InferenceSource & { apiKey?: string },
   options: { pending?: boolean } = {},
 ): Promise<void> {
-  if (!isTauri()) throw new Error('Inference source is configurable in the desktop app only.');
+  if (!isTauri()) throw new Error(i18n.t('errors.desktopOnly.inferenceSource'));
   try {
     const { invoke } = await import('@tauri-apps/api/core');
     await invoke<void>('set_inference_source', {
@@ -1282,7 +1282,7 @@ export async function setInferenceSource(
   } catch (e: any) {
     // Surface the backend's actionable error strings (e.g. "A server URL is
     // required…", "Could not store the API key…") as proper Error instances.
-    throw new Error(e?.message ?? e ?? 'Failed to save inference source');
+    throw new Error(e?.message ?? e ?? i18n.t('errors.inferenceSourceSaveFailed'));
   }
 }
 

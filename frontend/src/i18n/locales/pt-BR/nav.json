@@ -1,0 +1,25 @@
+{
+  "chat": "Conversa",
+  "dashboard": "Métricas",
+  "painel": "Painel Falkyria",
+  "dataSources": "Fontes de dados",
+  "agents": "Agentes",
+  "logs": "Registros",
+  "settings": "Configurações",
+  "getStarted": "Primeiros passos",
+  "openSidebar": "Abrir barra lateral",
+  "closeSidebar": "Fechar barra lateral",
+  "themeToggle": "Tema: {{theme}} (clique para {{next}})",
+  "newChat": "Nova conversa",
+  "selectModel": "Escolher modelo",
+  "loadingModel": "Carregando o modelo...",
+  "searchChats": "Buscar conversas...",
+  "chats": {
+    "justNow": "Agora mesmo",
+    "noMatches": "Nenhuma conversa encontrada",
+    "empty": "Nenhuma conversa ainda",
+    "stopBeforeDelete": "Pare a resposta antes de apagar esta conversa",
+    "delete": "Apagar conversa",
+    "overlay": "Conversa rápida"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "serverUnreachable": "Cannot connect to server",
+  "mic": {
+    "notFound": "No microphone found",
+    "inUse": "The microphone is in use by another program",
+    "denied": "Microphone access denied",
+    "unsupported": "Microphone not supported in this browser",
+    "notRecording": "Nothing is being recorded"
+  },
+  "transcriptionFailed": "Transcription failed",
+  "transcriptionFailedStatus": "Transcription failed: {{status}}",
+  "playbackFailed": "Audio playback failed",
+  "synthesisFailed": "Speech synthesis failed",
+  "synthesisFailedStatus": "Speech synthesis failed: {{status}}",
+  "wakeUnsupported": "This Nicx server doesn't have wake listening yet: restart it to use it.",
+  "wakeFailed": "Wake listening failed: {{status}}",
+  "noModel": "No model available",
+  "chatRequestFailed": "Chat request failed: {{status}}",
+  "researchRequestFailed": "Research request failed: {{status}}",
+  "requestFailed": "Request failed: {{status}}",
+  "fetchFailed": "Failed to fetch",
+  "desktopOnly": {
+    "cloudKeys": "Cloud API keys can be saved in the desktop app only.",
+    "backend": "The desktop backend is available in the desktop app only.",
+    "setupReset": "Inference setup recovery is available in the desktop app only.",
+    "inferenceSource": "Inference source is configurable in the desktop app only."
+  },
+  "cloudKeySaveFailed": "Failed to save cloud key",
+  "serverHtml": "Nicx server unavailable (HTML response from the API)",
+  "backendStartFailed": "Failed to start the desktop backend",
+  "setupResetFailed": "Failed to reset inference setup",
+  "modelsFetchFailed": "Failed to fetch models: {{status}}",
+  "modelPullFailed": "Failed to pull model: {{detail}}",
+  "deleteFailed": "Delete failed",
+  "modelDeleteFailed": "Failed to delete model: {{detail}}",
+  "preloadFailed": "Preload failed: {{status}}",
+  "modelLoadTimeout": "Model load timed out (120s)",
+  "verificationFailed": "Verification failed: {{status}}",
+  "webhookFailed": "Webhook registration failed: {{status}}",
+  "testMessageFailed": "Test message failed: {{status}}",
+  "apiUnreachable": "Could not reach the Nicx API. Check the server status and API URL, then retry.",
+  "memory": {
+    "statusFailed": "Memory status request failed",
+    "searchFailed": "Failed to search memory",
+    "storeFailed": "Failed to store memory",
+    "indexFailed": "Failed to index path",
+    "configFailed": "Failed to fetch memory config"
+  },
+  "inferenceSourceReadFailed": "Failed to read inference source",
+  "inferenceSourceSaveFailed": "Failed to save inference source",
+  "connectors": {
+    "listFailed": "Failed to list connectors: {{status}}",
+    "getFailed": "Failed to get connector {{id}}: {{status}}",
+    "connectFailed": "Failed to connect {{id}}: {{status}}",
+    "authTimeout": "Authorization timed out — please try again.",
+    "disconnectFailed": "Failed to disconnect {{id}}: {{status}}",
+    "syncStatusFailed": "Failed to get sync status for {{id}}: {{status}}",
+    "syncFailed": "Sync failed: {{status}}"
+  },
+  "privacy": {
+    "serverUnreachable": "Couldn't reach the Nicx server. Please try again.",
+    "saveChoiceFailed": "Couldn't save your choice. Please try again.",
+    "forgetFailed": "Couldn't delete your data right now. Please try again.",
+    "documentUnreachable": "Couldn't load the document. Check that Nicx is running.",
+    "documentFailed": "Couldn't load the document."
+  }
+}

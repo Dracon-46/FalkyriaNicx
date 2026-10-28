@@ -1,0 +1,49 @@
+{
+  "title": "System overview",
+  "subtitle": "Live telemetry for the on-device inference engine — power draw, token throughput, and cost savings versus cloud APIs.",
+  "cost": {
+    "title": "Cost comparison",
+    "waiting": "awaiting first inference…",
+    "local": "Local (your hardware)",
+    "requests": "{{n}} requests",
+    "tokens": "{{n}} tokens",
+    "electricityOnly": "electricity only",
+    "saved": "{{amount}} saved",
+    "footnote": "Savings estimates assume local models (e.g. Qwen, Nemotron, Kimi) produce roughly the same number of tokens per request, on average, as closed-source cloud models."
+  },
+  "energy": {
+    "title": "Energy monitoring",
+    "waiting": "awaiting telemetry stream…",
+    "cool": "Cool",
+    "warm": "Warm",
+    "hot": "Hot",
+    "totalEnergy": "Total energy",
+    "energyPerToken": "Energy / token",
+    "avgPower": "Avg power",
+    "totalRequests": "Total requests",
+    "thermal": "Thermal",
+    "tokensProcessed": "Tokens processed",
+    "power": "Power"
+  },
+  "traces": {
+    "title": "Trace debugger",
+    "untitled": "Untitled query",
+    "steps": "{{n}} steps",
+    "loadFailed": "Cannot load traces",
+    "empty": "No traces yet. Start making queries to see them here.",
+    "select": "Select a trace to view details"
+  },
+  "logs": {
+    "title": "Logs",
+    "entries": "{{n}} entries",
+    "copyAll": "Copy all",
+    "clear": "Clear",
+    "subtitle": "Recent activity — chat events, model switches, tool calls, and system messages from this session.",
+    "empty": "No log entries yet. Logs appear as you chat, switch models, and interact with the app."
+  },
+  "painel": {
+    "description": "Nicx's anonymous usage statistics live in the web panel, for Falkyria administrators only. Signing in asks for a password and the authenticator app code.",
+    "open": "Open the panel",
+    "restricted": "Restricted and logged access."
+  }
+}

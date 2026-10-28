@@ -1,0 +1,49 @@
+{
+  "title": "Vue d'ensemble du système",
+  "subtitle": "Télémétrie en direct du moteur qui tourne sur votre ordinateur : consommation électrique, débit de jetons et économies par rapport aux API cloud.",
+  "cost": {
+    "title": "Comparaison des coûts",
+    "waiting": "en attente de la première réponse…",
+    "local": "Local (votre matériel)",
+    "requests": "{{n}} requêtes",
+    "tokens": "{{n}} jetons",
+    "electricityOnly": "électricité uniquement",
+    "saved": "{{amount}} économisés",
+    "footnote": "L'estimation des économies suppose que les modèles locaux (comme Qwen, Nemotron ou Kimi) produisent en moyenne à peu près autant de jetons par requête que les modèles cloud propriétaires."
+  },
+  "energy": {
+    "title": "Suivi de l'énergie",
+    "waiting": "en attente des données de télémétrie…",
+    "cool": "Froid",
+    "warm": "Tiède",
+    "hot": "Chaud",
+    "totalEnergy": "Énergie totale",
+    "energyPerToken": "Énergie / jeton",
+    "avgPower": "Puissance moyenne",
+    "totalRequests": "Total des requêtes",
+    "thermal": "Température",
+    "tokensProcessed": "Jetons traités",
+    "power": "Puissance"
+  },
+  "traces": {
+    "title": "Traces des réponses",
+    "untitled": "Requête sans titre",
+    "steps": "{{n}} étapes",
+    "loadFailed": "Impossible de charger les traces",
+    "empty": "Aucune trace pour l'instant. Posez des questions pour les voir ici.",
+    "select": "Choisissez une trace pour voir les détails"
+  },
+  "logs": {
+    "title": "Journaux",
+    "entries": "{{n}} entrées",
+    "copyAll": "Tout copier",
+    "clear": "Effacer",
+    "subtitle": "Activité récente de cette session : discussions, changements de modèle, appels d'outils et messages système.",
+    "empty": "Aucune entrée pour l'instant. Les journaux apparaissent quand vous discutez, changez de modèle et utilisez l'app."
+  },
+  "painel": {
+    "description": "Les statistiques d'utilisation anonymes de Nicx se trouvent dans le panneau web, réservé aux administrateurs de Falkyria. La connexion demande un mot de passe et le code de l'application d'authentification.",
+    "open": "Ouvrir le panneau",
+    "restricted": "Accès restreint et journalisé."
+  }
+}

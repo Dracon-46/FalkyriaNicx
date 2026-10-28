@@ -1,0 +1,67 @@
+{
+  "serverUnreachable": "تعذّر الاتصال بالخادم",
+  "mic": {
+    "notFound": "لم يتم العثور على ميكروفون",
+    "inUse": "الميكروفون مستخدم من برنامج آخر",
+    "denied": "تم رفض الوصول إلى الميكروفون",
+    "unsupported": "الميكروفون غير مدعوم في هذا المتصفح",
+    "notRecording": "لا يوجد تسجيل جارٍ"
+  },
+  "transcriptionFailed": "فشل التفريغ",
+  "transcriptionFailedStatus": "فشل التفريغ: {{status}}",
+  "playbackFailed": "فشل تشغيل الصوت",
+  "synthesisFailed": "فشل توليد الصوت",
+  "synthesisFailedStatus": "فشل توليد الصوت: {{status}}",
+  "wakeUnsupported": "خادم Nicx هذا لا يدعم الاستماع بعد: أعد تشغيله لاستخدامه.",
+  "wakeFailed": "فشل الاستماع: {{status}}",
+  "noModel": "لا يوجد نموذج متاح",
+  "chatRequestFailed": "فشل طلب المحادثة: {{status}}",
+  "researchRequestFailed": "فشل طلب البحث: {{status}}",
+  "requestFailed": "فشل الطلب: {{status}}",
+  "fetchFailed": "تعذّر الجلب",
+  "desktopOnly": {
+    "cloudKeys": "لا يمكن حفظ مفاتيح API السحابية إلا في تطبيق سطح المكتب.",
+    "backend": "الخادم المحلي متاح في تطبيق سطح المكتب فقط.",
+    "setupReset": "إعادة ضبط إعداد المحرك متاحة في تطبيق سطح المكتب فقط.",
+    "inferenceSource": "لا يمكن ضبط مصدر الاستدلال إلا في تطبيق سطح المكتب."
+  },
+  "cloudKeySaveFailed": "تعذّر حفظ مفتاح السحابة",
+  "serverHtml": "خادم Nicx غير متاح (أعادت الواجهة صفحة HTML)",
+  "backendStartFailed": "تعذّر تشغيل الخادم المحلي",
+  "setupResetFailed": "تعذّرت إعادة ضبط إعداد المحرك",
+  "modelsFetchFailed": "تعذّر جلب النماذج: {{status}}",
+  "modelPullFailed": "تعذّر تنزيل النموذج: {{detail}}",
+  "deleteFailed": "فشل الحذف",
+  "modelDeleteFailed": "تعذّر حذف النموذج: {{detail}}",
+  "preloadFailed": "فشل التحميل المسبق: {{status}}",
+  "modelLoadTimeout": "انتهت مهلة تحميل النموذج (120 ثانية)",
+  "verificationFailed": "فشل التحقق: {{status}}",
+  "webhookFailed": "فشل تسجيل الـ webhook: {{status}}",
+  "testMessageFailed": "فشلت رسالة الاختبار: {{status}}",
+  "apiUnreachable": "تعذّر الوصول إلى واجهة Nicx. تحقّق من حالة الخادم وعنوان الواجهة، ثم أعد المحاولة.",
+  "memory": {
+    "statusFailed": "تعذّرت قراءة حالة الذاكرة",
+    "searchFailed": "تعذّر البحث في الذاكرة",
+    "storeFailed": "تعذّر الحفظ في الذاكرة",
+    "indexFailed": "تعذّرت فهرسة المسار",
+    "configFailed": "تعذّر جلب إعدادات الذاكرة"
+  },
+  "inferenceSourceReadFailed": "تعذّرت قراءة مصدر الاستدلال",
+  "inferenceSourceSaveFailed": "تعذّر حفظ مصدر الاستدلال",
+  "connectors": {
+    "listFailed": "تعذّر عرض مصادر البيانات: {{status}}",
+    "getFailed": "تعذّر جلب المصدر {{id}}: {{status}}",
+    "connectFailed": "تعذّر ربط {{id}}: {{status}}",
+    "authTimeout": "انتهت مهلة التفويض، حاول مرة أخرى.",
+    "disconnectFailed": "تعذّر فصل {{id}}: {{status}}",
+    "syncStatusFailed": "تعذّرت قراءة حالة مزامنة {{id}}: {{status}}",
+    "syncFailed": "فشلت المزامنة: {{status}}"
+  },
+  "privacy": {
+    "serverUnreachable": "تعذّر الوصول إلى خادم Nicx. حاول مرة أخرى.",
+    "saveChoiceFailed": "تعذّر حفظ اختيارك. حاول مرة أخرى.",
+    "forgetFailed": "تعذّر حذف بياناتك الآن. حاول مرة أخرى.",
+    "documentUnreachable": "تعذّر تحميل المستند. تأكّد من أن Nicx يعمل.",
+    "documentFailed": "تعذّر تحميل المستند."
+  }
+}

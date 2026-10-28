@@ -1,5 +1,6 @@
 import { apiFetch, getBase } from './api';
 import type { ConnectorInfo, SyncStatus, ConnectRequest, ConnectResponse } from '../types/connectors';
+import i18n from '../i18n';
 
 // ---------------------------------------------------------------------------
 // Connectors API
@@ -13,14 +14,14 @@ import type { ConnectorInfo, SyncStatus, ConnectRequest, ConnectResponse } from 
 
 export async function listConnectors(): Promise<ConnectorInfo[]> {
   const res = await apiFetch('/v1/connectors');
-  if (!res.ok) throw new Error(`Failed to list connectors: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.connectors.listFailed', { status: res.status }));
   const data = await res.json();
   return data.connectors || [];
 }
 
 export async function getConnector(id: string): Promise<ConnectorInfo> {
   const res = await apiFetch(`/v1/connectors/${encodeURIComponent(id)}`);
-  if (!res.ok) throw new Error(`Failed to get connector ${id}: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.connectors.getFailed', { id, status: res.status }));
   return res.json();
 }
 
@@ -34,7 +35,7 @@ export async function connectSource(id: string, req: ConnectRequest): Promise<Co
     // Surface the backend's actionable detail (e.g. malformed Client ID /
     // Secret) instead of a bare status code so the UI can render it.
     const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || `Failed to connect ${id}: ${res.status}`);
+    throw new Error(err.detail || i18n.t('errors.connectors.connectFailed', { id, status: res.status }));
   }
   return res.json();
 }
@@ -60,7 +61,7 @@ export function startServerOAuth(id: string, oauthStartPath?: string): Promise<v
     }, 2000);
     const timer = setTimeout(() => {
       clearInterval(interval);
-      reject(new Error('Authorization timed out — please try again.'));
+      reject(new Error(i18n.t('errors.connectors.authTimeout')));
     }, 180000);
   });
 }
@@ -86,7 +87,7 @@ export async function disconnectSource(
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
     throw new ConnectorApiError(
-      err.detail || `Failed to disconnect ${id}: ${res.status}`,
+      err.detail || i18n.t('errors.connectors.disconnectFailed', { id, status: res.status }),
       res.status,
     );
   }
@@ -146,7 +147,7 @@ export async function disconnectSourceUntilComplete(
 
 export async function getSyncStatus(id: string): Promise<SyncStatus> {
   const res = await apiFetch(`/v1/connectors/${encodeURIComponent(id)}/sync`);
-  if (!res.ok) throw new Error(`Failed to get sync status for ${id}: ${res.status}`);
+  if (!res.ok) throw new Error(i18n.t('errors.connectors.syncStatusFailed', { id, status: res.status }));
   return res.json();
 }
 
@@ -156,7 +157,7 @@ export async function triggerSync(id: string): Promise<{ connector_id: string; c
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || `Sync failed: ${res.status}`);
+    throw new Error(err.detail || i18n.t('errors.connectors.syncFailed', { status: res.status }));
   }
   return res.json();
 }

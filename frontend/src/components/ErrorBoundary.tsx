@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import type { ReactNode, ErrorInfo } from 'react';
 import { AlertTriangle, RotateCcw } from 'lucide-react';
+import i18n from '../i18n';
 
 interface Props {
   children: ReactNode;
@@ -37,10 +38,10 @@ export class ErrorBoundary extends Component<Props, State> {
               <AlertTriangle size={24} />
             </div>
             <h2 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
-              Something went wrong
+              {i18n.t('common.errorBoundary.title')}
             </h2>
             <p className="text-sm mb-4" style={{ color: 'var(--color-text-secondary)' }}>
-              {this.state.error?.message || 'An unexpected error occurred.'}
+              {this.state.error?.message || i18n.t('common.errorBoundary.unexpected')}
             </p>
             <button
               onClick={() => this.setState({ hasError: false, error: null })}
@@ -48,7 +49,7 @@ export class ErrorBoundary extends Component<Props, State> {
               style={{ background: 'var(--color-accent)', color: 'var(--color-on-accent)' }}
             >
               <RotateCcw size={14} />
-              Try again
+              {i18n.t('common.errorBoundary.retry')}
             </button>
           </div>
         </div>

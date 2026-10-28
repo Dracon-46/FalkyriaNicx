@@ -46,6 +46,7 @@ import {
 const CLOUD_KEY_STATUS_CHANGED = 'nicx-cloud-key-status-changed';
 
 function OllamaModelList() {
+  const { t } = useTranslation();
   const [models, setModels] = useState<Array<{ name: string; size: number }>>([]);
   useEffect(() => {
     fetch('http://localhost:11434/api/tags')
@@ -53,7 +54,7 @@ function OllamaModelList() {
       .then(data => setModels((data.models || []).map((m: any) => ({ name: m.name, size: m.size }))))
       .catch(() => setModels([]));
   }, []);
-  if (models.length === 0) return <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>No models loaded</span>;
+  if (models.length === 0) return <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{t('settings.models.none')}</span>;
   return (
     <div className="flex flex-wrap gap-1">
       {models.map(m => (
@@ -76,6 +77,7 @@ function ApiKeyInput({
   placeholder: string;
   toolName?: string;
 }) {
+  const { t } = useTranslation();
   const [value, setValue] = useState('');
   const [saved, setSaved] = useState(false);
   const [hasKey, setHasKey] = useState(false);
@@ -123,7 +125,7 @@ function ApiKeyInput({
       window.dispatchEvent(new Event(CLOUD_KEY_STATUS_CHANGED));
       setTimeout(() => setSaved(false), 2000);
     } catch (e: any) {
-      setError(e?.message || 'Failed to save API key');
+      setError(e?.message || t('settings.apiKeys.saveFailed'));
     }
   };
 
@@ -143,7 +145,7 @@ function ApiKeyInput({
       window.dispatchEvent(new Event(CLOUD_KEY_STATUS_CHANGED));
       setTimeout(() => setSaved(false), 2000);
     } catch (e: any) {
-      setError(e?.message || 'Failed to remove API key');
+      setError(e?.message || t('settings.apiKeys.removeFailed'));
     }
   };
 
@@ -154,7 +156,7 @@ function ApiKeyInput({
         value={value}
         onChange={e => setValue(e.target.value)}
         onBlur={() => { if (value.trim()) void save(value); }}
-        placeholder={hasKey ? (desktopKeyStorage ? 'Saved in secure storage' : 'Saved by local server') : placeholder}
+        placeholder={hasKey ? (desktopKeyStorage ? t('settings.apiKeys.savedSecure') : t('settings.apiKeys.savedServer')) : placeholder}
         disabled={!canManage}
         className="w-48 px-2 py-1 rounded text-xs"
         style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }} />
@@ -164,10 +166,10 @@ function ApiKeyInput({
           className="px-2 py-1 rounded text-[10px] cursor-pointer"
           style={{ color: 'var(--color-error)', border: '1px solid var(--color-error)' }}
         >
-          Remove
+          {t('settings.apiKeys.remove')}
         </button>
       )}
-      {saved && <span className="text-[10px]" style={{ color: 'var(--color-success)' }}>Saved</span>}
+      {saved && <span className="text-[10px]" style={{ color: 'var(--color-success)' }}>{t('settings.apiKeys.saved')}</span>}
       {error && <span className="text-[10px]" style={{ color: 'var(--color-error)' }}>{error}</span>}
     </div>
   );
@@ -272,15 +274,17 @@ function Toggle({
   );
 }
 
-const WAKE_STATE_LABEL: Record<string, string> = {
-  escutando: 'Escutando em segundo plano',
-  pausado: 'Pausada (ícone da bandeja)',
-  'mascote aberto': 'Mascote aberto',
-  parado: 'Parada',
+/** Estado vindo do servidor -> chave do texto (settings.wake.states.*). */
+const WAKE_STATE_KEY: Record<string, string> = {
+  escutando: 'listening',
+  pausado: 'paused',
+  'mascote aberto': 'mascotOpen',
+  parado: 'stopped',
 };
 
 /** "Nicx, ligar": opt-in background listener that brings the mascot up. */
 export function WakeWordSettings({ onSaved }: { onSaved: () => void }) {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<WakeStatus | null>(null);
   const [error, setError] = useState('');
   const [unsupported, setUnsupported] = useState(false);
@@ -306,7 +310,7 @@ export function WakeWordSettings({ onSaved }: { onSaved: () => void }) {
             setError(e.message);
             return;
           }
-          setError('Servidor do Nicx indisponível');
+          setError(t('settings.wake.serverUnavailable'));
           timer = setTimeout(refresh, 10000);
         });
     void refresh();
@@ -314,7 +318,7 @@ export function WakeWordSettings({ onSaved }: { onSaved: () => void }) {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, []);
+  }, [t]);
 
   const change = async (update: { enabled?: boolean; autostart?: boolean }) => {
     setSaving(true);
@@ -324,7 +328,7 @@ export function WakeWordSettings({ onSaved }: { onSaved: () => void }) {
       onSaved();
     } catch (e) {
       if (e instanceof WakeUnsupportedError) setUnsupported(true);
-      setError(e instanceof Error ? e.message : 'Não foi possível salvar');
+      setError(e instanceof Error ? e.message : t('settings.wake.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -332,32 +336,34 @@ export function WakeWordSettings({ onSaved }: { onSaved: () => void }) {
 
   const enabled = status?.enabled ?? false;
   const stateLabel = unsupported
-    ? 'Reinicie o servidor do Nicx'
+    ? t('settings.wake.restartServer')
     : !status
-    ? error || 'Verificando...'
+    ? error || t('settings.wake.checking')
     : enabled && !status.running
-      ? 'Iniciando...'
-      : WAKE_STATE_LABEL[status.state] ?? status.state;
+      ? t('settings.wake.starting')
+      : WAKE_STATE_KEY[status.state]
+        ? t(`settings.wake.states.${WAKE_STATE_KEY[status.state]}`)
+        : status.state;
 
   return (
     <>
       <SettingRow
-        label="Ativar “Nicx, ligar” (escuta em segundo plano)"
-        description="Diga “Nicx, ligar” (ou “Ei Nicx”) e o mascote aparece pronto para conversar por voz. O microfone fica aberto só neste computador: nada é gravado nem enviado."
+        label={t('settings.wake.enableLabel')}
+        description={t('settings.wake.enableDescription')}
       >
         <Toggle
           on={enabled}
           disabled={!status || saving}
-          label="Ativar “Nicx, ligar”"
+          label={t('settings.wake.enableToggle')}
           onClick={() => void change({ enabled: !enabled })}
         />
       </SettingRow>
       <SettingRow
-        label="Escuta"
+        label={t('settings.wake.listening')}
         description={
           status && !status.window_supported
-            ? 'Sem janela flutuante neste computador: a interface abre no navegador.'
-            : 'Diga “tchau” ou “desligar” para o mascote sair; ele também some após 1 minuto em silêncio.'
+            ? t('settings.wake.noWindow')
+            : t('settings.wake.howToStop')
         }
       >
         <div className="flex items-center gap-2">
@@ -373,11 +379,11 @@ export function WakeWordSettings({ onSaved }: { onSaved: () => void }) {
         </div>
       </SettingRow>
       {status?.autostart_supported && (
-        <SettingRow label="Iniciar com o Windows" description="Começa a escutar quando você entra no Windows (só se a opção acima estiver ativada)">
+        <SettingRow label={t('settings.wake.autostart')} description={t('settings.wake.autostartDescription')}>
           <Toggle
             on={status.autostart}
             disabled={saving}
-            label="Iniciar com o Windows"
+            label={t('settings.wake.autostart')}
             onClick={() => void change({ autostart: !status.autostart })}
           />
         </SettingRow>
@@ -403,24 +409,25 @@ export function MemoryStatusRow({
   status: MemoryStatus;
   onRetry: () => void;
 }) {
+  const { t } = useTranslation();
   const stats = status.kind === 'ready' ? status.stats : null;
   const description = status.kind === 'error'
     ? status.message
     : status.kind === 'loading'
-      ? 'Checking memory backend...'
+      ? t('settings.memory.checkingBackend')
       : stats?.backend === 'none'
-        ? 'Memory is not configured'
-        : `${stats?.backend} backend — ${stats?.entries} entries`;
+        ? t('settings.memory.notConfiguredLong')
+        : t('settings.memory.backendEntries', { backend: stats?.backend, entries: stats?.entries });
   const label = status.kind === 'loading'
-    ? 'Checking...'
+    ? t('settings.memory.checking')
     : stats?.backend === 'none'
-      ? 'Not configured'
+      ? t('settings.memory.notConfigured')
       : stats
-        ? `${stats.entries} entries`
-        : 'Unavailable';
+        ? t('settings.memory.entries', { entries: stats.entries })
+        : t('settings.memory.unavailable');
 
   return (
-    <SettingRow label="Memory status" description={description}>
+    <SettingRow label={t('settings.memory.status')} description={description}>
       <div className="flex items-center gap-2">
         <Brain size={14} style={{ color: stats && stats.backend !== 'none' ? 'var(--color-accent)' : 'var(--color-text-tertiary)' }} />
         <span className="text-xs whitespace-nowrap" style={{ color: 'var(--color-text-secondary)' }}>
@@ -433,7 +440,7 @@ export function MemoryStatusRow({
             className="text-xs underline cursor-pointer whitespace-nowrap"
             style={{ color: 'var(--color-accent)' }}
           >
-            Retry
+            {t('settings.memory.retry')}
           </button>
         )}
       </div>
@@ -442,9 +449,9 @@ export function MemoryStatusRow({
 }
 
 const themeOptions: { value: ThemeMode; label: string; icon: typeof Sun }[] = [
-  { value: 'light', label: 'Light', icon: Sun },
-  { value: 'dark', label: 'Dark', icon: Moon },
-  { value: 'system', label: 'System', icon: Monitor },
+  { value: 'light', label: 'settings.theme.light', icon: Sun },
+  { value: 'dark', label: 'settings.theme.dark', icon: Moon },
+  { value: 'system', label: 'settings.theme.system', icon: Monitor },
 ];
 
 export function SettingsPage() {
@@ -499,11 +506,11 @@ export function SettingsPage() {
       } else {
         await setInferenceSource({ kind: 'ollama' });
       }
-      setSrcMsg('Saved — restart the app to apply.');
+      setSrcMsg(t('settings.inference.saved'));
     } catch (e: any) {
-      setSrcMsg(e?.message ?? 'Failed to save.');
+      setSrcMsg(e?.message ?? t('settings.inference.saveFailed'));
     }
-  }, [srcKind, customHost, customModel, customEngine, customKey]);
+  }, [srcKind, customHost, customModel, customEngine, customKey, t]);
 
   const refreshMemoryStatus = useCallback(async () => {
     const requestId = ++memoryRequestId.current;
@@ -601,25 +608,25 @@ export function SettingsPage() {
         <header className="mb-6">
           <div className="flex items-center justify-between gap-3">
             <h1 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-              Settings
+              {t('settings.page.title')}
             </h1>
             {saved && (
               <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full" style={{
                 background: 'var(--color-accent-subtle)',
                 color: 'var(--color-success)',
               }}>
-                <Check size={12} /> Saved
+                <Check size={12} /> {t('settings.page.saved')}
               </span>
             )}
           </div>
           <p className="text-sm mt-2 max-w-2xl" style={{ color: 'var(--color-text-secondary)' }}>
-            App preferences — appearance, model defaults, keyboard shortcuts, and data management.
+            {t('settings.page.description')}
           </p>
         </header>
 
         <div className="flex flex-col gap-4">
           {/* Appearance */}
-          <Section title="Appearance">
+          <Section title={t('settings.sections.appearance')}>
             <SettingRow label={t('settings.language.label')} description={t('settings.language.description')}>
               <select
                 value={settings.language}
@@ -643,7 +650,7 @@ export function SettingsPage() {
                 ))}
               </select>
             </SettingRow>
-            <SettingRow label="Theme" description="Choose how Nicx looks">
+            <SettingRow label={t('settings.theme.label')} description={t('settings.theme.description')}>
               <div className="flex gap-1 p-0.5 rounded-lg" style={{ background: 'var(--color-bg-secondary)' }}>
                 {themeOptions.map((opt) => {
                   const isActive = settings.theme === opt.value;
@@ -659,13 +666,13 @@ export function SettingsPage() {
                       }}
                     >
                       <opt.icon size={14} />
-                      {opt.label}
+                      {t(opt.label)}
                     </button>
                   );
                 })}
               </div>
             </SettingRow>
-            <SettingRow label="Font size">
+            <SettingRow label={t('settings.fontSize.label')}>
               <select
                 value={settings.fontSize}
                 onChange={(e) => { updateSettings({ fontSize: e.target.value as any }); showSaved(); }}
@@ -676,39 +683,39 @@ export function SettingsPage() {
                   border: '1px solid var(--color-border)',
                 }}
               >
-                <option value="small">Small</option>
-                <option value="default">Default</option>
-                <option value="large">Large</option>
+                <option value="small">{t('settings.fontSize.small')}</option>
+                <option value="default">{t('settings.fontSize.default')}</option>
+                <option value="large">{t('settings.fontSize.large')}</option>
               </select>
             </SettingRow>
           </Section>
 
           {/* Connection */}
-          <Section title="Connection">
-            <SettingRow label="Server status" description={serverInfo ? `${serverInfo.engine} / ${serverInfo.model}` : 'Not connected'}>
+          <Section title={t('settings.sections.connection')}>
+            <SettingRow label={t('settings.connection.serverStatus')} description={serverInfo ? `${serverInfo.engine} / ${serverInfo.model}` : t('settings.connection.notConnected')}>
               <div className="flex items-center gap-2">
                 <span
                   className="w-2 h-2 rounded-full"
                   style={{ background: healthy === true ? 'var(--color-success)' : healthy === false ? 'var(--color-error)' : 'var(--color-text-tertiary)' }}
                 />
                 <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-                  {healthy === true ? 'Connected' : healthy === false ? 'Disconnected' : 'Checking...'}
+                  {healthy === true ? t('settings.connection.connected') : healthy === false ? t('settings.connection.disconnected') : t('settings.connection.checking')}
                 </span>
               </div>
             </SettingRow>
             <SettingRow
-              label="Endereço do servidor"
+              label={t('settings.connection.serverAddress')}
               description={
                 settings.apiUrl && !/^https?:\/\/[^\s/]+/i.test(settings.apiUrl.trim())
-                  ? 'Isso não é um endereço (precisa começar com http://). Deixe em branco para usar o padrão.'
-                  : 'Deixe em branco. Só mude se o servidor do Nicx rodar em outra porta ou máquina.'
+                  ? t('settings.connection.invalidAddress')
+                  : t('settings.connection.addressHint')
               }
             >
               <input
                 type="url"
                 value={settings.apiUrl}
                 onChange={(e) => { updateSettings({ apiUrl: e.target.value }); showSaved(); }}
-                placeholder="em branco = padrão"
+                placeholder={t('settings.connection.addressPlaceholder')}
                 aria-invalid={Boolean(settings.apiUrl) && !/^https?:\/\/[^\s/]+/i.test(settings.apiUrl.trim())}
                 className="text-sm px-3 py-1.5 rounded-lg outline-none w-56"
                 style={{
@@ -718,7 +725,7 @@ export function SettingsPage() {
                 }}
               />
             </SettingRow>
-            <SettingRow label="API key" description="Required only if the server was started with an API key">
+            <SettingRow label={t('settings.connection.apiKey')} description={t('settings.connection.apiKeyDescription')}>
               <input
                 type="password"
                 value={settings.apiKey}
@@ -736,31 +743,31 @@ export function SettingsPage() {
           </Section>
 
           {/* Inference source */}
-          <Section title="Inference source">
-            <SettingRow label="Source" description="Where the app runs models. Applies after restart.">
+          <Section title={t('settings.sections.inference')}>
+            <SettingRow label={t('settings.inference.source')} description={t('settings.inference.sourceDescription')}>
               <select
                 value={srcKind}
                 onChange={(e) => { setSrcKind(e.target.value as InferenceSource['kind']); setSrcMsg(''); }}
                 className="text-sm px-3 py-1.5 rounded-lg outline-none w-56"
                 style={{ background: 'var(--color-bg-secondary)', color: 'var(--color-text)', border: '1px solid var(--color-border)' }}
               >
-                <option value="ollama">Bundled Ollama (default)</option>
-                <option value="custom">Custom OpenAI-compatible server</option>
+                <option value="ollama">{t('settings.inference.ollama')}</option>
+                <option value="custom">{t('settings.inference.custom')}</option>
               </select>
             </SettingRow>
             {srcKind === 'custom' && (
               <>
-                <SettingRow label="Server URL" description="e.g. LM Studio: http://localhost:1234/v1">
+                <SettingRow label={t('settings.inference.serverUrl')} description={t('settings.inference.serverUrlDescription')}>
                   <input type="text" value={customHost} onChange={(e) => { setCustomHost(e.target.value); setSrcMsg(''); }} placeholder="http://localhost:1234/v1"
                     className="text-sm px-3 py-1.5 rounded-lg outline-none w-56"
                     style={{ background: 'var(--color-bg-secondary)', color: 'var(--color-text)', border: '1px solid var(--color-border)' }} />
                 </SettingRow>
-                <SettingRow label="Model" description="Model id served by your endpoint">
+                <SettingRow label={t('settings.inference.model')} description={t('settings.inference.modelDescription')}>
                   <input type="text" value={customModel} onChange={(e) => { setCustomModel(e.target.value); setSrcMsg(''); }} placeholder="qwen2.5-7b-instruct"
                     className="text-sm px-3 py-1.5 rounded-lg outline-none w-56"
                     style={{ background: 'var(--color-bg-secondary)', color: 'var(--color-text)', border: '1px solid var(--color-border)' }} />
                 </SettingRow>
-                <SettingRow label="Server type" description="OpenAI-compatible engine">
+                <SettingRow label={t('settings.inference.serverType')} description={t('settings.inference.serverTypeDescription')}>
                   <select value={customEngine} onChange={(e) => { setCustomEngine(e.target.value); setSrcMsg(''); }}
                     className="text-sm px-3 py-1.5 rounded-lg outline-none w-56"
                     style={{ background: 'var(--color-bg-secondary)', color: 'var(--color-text)', border: '1px solid var(--color-border)' }}>
@@ -771,8 +778,8 @@ export function SettingsPage() {
                     <option value="mlx">MLX</option>
                   </select>
                 </SettingRow>
-                <SettingRow label="API key (optional)" description="Only if your server requires one">
-                  <input type="password" value={customKey} onChange={(e) => { setCustomKey(e.target.value); setSrcMsg(''); }} placeholder="leave blank if none"
+                <SettingRow label={t('settings.inference.apiKey')} description={t('settings.inference.apiKeyDescription')}>
+                  <input type="password" value={customKey} onChange={(e) => { setCustomKey(e.target.value); setSrcMsg(''); }} placeholder={t('settings.inference.apiKeyPlaceholder')}
                     className="text-sm px-3 py-1.5 rounded-lg outline-none w-56"
                     style={{ background: 'var(--color-bg-secondary)', color: 'var(--color-text)', border: '1px solid var(--color-border)' }} />
                 </SettingRow>
@@ -782,20 +789,20 @@ export function SettingsPage() {
               <button onClick={saveSource}
                 className="text-sm px-3 py-1.5 rounded-lg outline-none cursor-pointer"
                 style={{ background: 'var(--color-accent, var(--color-bg-tertiary))', color: 'var(--color-text)', border: '1px solid var(--color-border)' }}>
-                Save inference source
+                {t('settings.inference.save')}
               </button>
             </SettingRow>
           </Section>
 
           {/* Models */}
-          <Section title="Models">
-            <SettingRow label="Local models (Ollama)" description="Models available for local inference">
+          <Section title={t('settings.sections.models')}>
+            <SettingRow label={t('settings.models.local')} description={t('settings.models.localDescription')}>
               <OllamaModelList />
             </SettingRow>
             <div className="text-xs mt-2 px-1" style={{ color: 'var(--color-text-tertiary)' }}>
-              Run <code className="px-1 py-0.5 rounded text-[11px]" style={{ background: 'var(--color-bg-tertiary)' }}>ollama pull &lt;model-name&gt;</code> in your terminal to add more models
+              {t('settings.models.pullBefore')} <code className="px-1 py-0.5 rounded text-[11px]" style={{ background: 'var(--color-bg-tertiary)' }}>ollama pull &lt;{t('settings.models.pullModelName')}&gt;</code> {t('settings.models.pullAfter')}
             </div>
-            <SettingRow label="Cloud providers" description="Green dot means API key is configured">
+            <SettingRow label={t('settings.models.cloud')} description={t('settings.models.cloudDescription')}>
               <div className="flex flex-wrap gap-3">
                 <CloudProviderStatus label="OpenAI" keyName="OPENAI_API_KEY" />
                 <CloudProviderStatus label="Anthropic" keyName="ANTHROPIC_API_KEY" />
@@ -807,35 +814,35 @@ export function SettingsPage() {
           </Section>
 
           {/* API Keys */}
-          <Section title="API Keys">
-            <SettingRow label="OpenAI" description="GPT-4, GPT-3.5, etc.">
+          <Section title={t('settings.sections.apiKeys')}>
+            <SettingRow label="OpenAI" description={t('settings.apiKeys.openaiDescription')}>
               <ApiKeyInput keyName="OPENAI_API_KEY" placeholder="sk-..." />
             </SettingRow>
-            <SettingRow label="Anthropic" description="Claude models">
+            <SettingRow label="Anthropic" description={t('settings.apiKeys.anthropicDescription')}>
               <ApiKeyInput keyName="ANTHROPIC_API_KEY" placeholder="sk-ant-..." />
             </SettingRow>
-            <SettingRow label="Google" description="Gemini models">
+            <SettingRow label="Google" description={t('settings.apiKeys.googleDescription')}>
               <ApiKeyInput keyName="GEMINI_API_KEY" placeholder="AI..." />
             </SettingRow>
-            <SettingRow label="OpenRouter" description="Multi-provider routing">
+            <SettingRow label="OpenRouter" description={t('settings.apiKeys.openrouterDescription')}>
               <ApiKeyInput keyName="OPENROUTER_API_KEY" placeholder="sk-or-..." />
             </SettingRow>
-            <SettingRow label="Atlas Cloud" description="Models routed through Atlas Cloud">
-              <ApiKeyInput keyName="ATLASCLOUD_API_KEY" placeholder="Atlas Cloud API key" />
+            <SettingRow label="Atlas Cloud" description={t('settings.apiKeys.atlasDescription')}>
+              <ApiKeyInput keyName="ATLASCLOUD_API_KEY" placeholder={t('settings.apiKeys.atlasPlaceholder')} />
             </SettingRow>
           </Section>
 
           {/* Tools */}
-          <Section title="Tools">
-            <SettingRow label="Web Search" description="Tavily key for web search tool">
+          <Section title={t('settings.sections.tools')}>
+            <SettingRow label={t('settings.tools.webSearch')} description={t('settings.tools.webSearchDescription')}>
               <ApiKeyInput keyName="TAVILY_API_KEY" placeholder="tvly-..." toolName="web_search" />
             </SettingRow>
           </Section>
 
           {/* Memory */}
-          <Section title="Memory">
+          <Section title={t('settings.sections.memory')}>
             <MemoryStatusRow status={memoryStatus} onRetry={() => { void refreshMemoryStatus(); }} />
-            <SettingRow label="Use memory context" description="Automatically inject relevant memories into conversations">
+            <SettingRow label={t('settings.memory.useContext')} description={t('settings.memory.useContextDescription')}>
               <button
                 onClick={() => {
                   const next = !memoryEnabled;
@@ -857,7 +864,7 @@ export function SettingsPage() {
                 />
               </button>
             </SettingRow>
-            <SettingRow label="Memory backend" description="Which retrieval engine to use">
+            <SettingRow label={t('settings.memory.backend')} description={t('settings.memory.backendDescription')}>
               <select
                 value={memoryBackend}
                 onChange={(e) => {
@@ -879,7 +886,7 @@ export function SettingsPage() {
                 <option value="hybrid">hybrid</option>
               </select>
             </SettingRow>
-            <SettingRow label="Results to inject" description={`${memoryTopK}`}>
+            <SettingRow label={t('settings.memory.topK')} description={`${memoryTopK}`}>
               <input
                 type="range"
                 min="1"
@@ -895,7 +902,7 @@ export function SettingsPage() {
                 className="w-32 cursor-pointer accent-[var(--color-accent)]"
               />
             </SettingRow>
-            <SettingRow label="Min relevance score" description={`${memoryMinScore}`}>
+            <SettingRow label={t('settings.memory.minScore')} description={`${memoryMinScore}`}>
               <input
                 type="range"
                 min="0"
@@ -911,7 +918,7 @@ export function SettingsPage() {
                 className="w-32 cursor-pointer accent-[var(--color-accent)]"
               />
             </SettingRow>
-            <SettingRow label="Max context tokens" description={`${memoryMaxTokens}`}>
+            <SettingRow label={t('settings.memory.maxTokens')} description={`${memoryMaxTokens}`}>
               <input
                 type="range"
                 min="256"
@@ -930,8 +937,8 @@ export function SettingsPage() {
           </Section>
 
           {/* Model defaults */}
-          <Section title="Model Defaults">
-            <SettingRow label="Temperature" description={`${settings.temperature}`}>
+          <Section title={t('settings.sections.modelDefaults')}>
+            <SettingRow label={t('settings.modelDefaults.temperature')} description={`${settings.temperature}`}>
               <input
                 type="range"
                 min="0"
@@ -942,7 +949,7 @@ export function SettingsPage() {
                 className="w-32 cursor-pointer accent-[var(--color-accent)]"
               />
             </SettingRow>
-            <SettingRow label="Max tokens" description={`${settings.maxTokens}`}>
+            <SettingRow label={t('settings.modelDefaults.maxTokens')} description={`${settings.maxTokens}`}>
               <input
                 type="range"
                 min="256"
@@ -956,8 +963,8 @@ export function SettingsPage() {
           </Section>
 
           {/* Speech */}
-          <Section title="Voz">
-            <SettingRow label="Entrada de voz" description="Usar o microfone para ditar e para a conversa por voz (reconhecimento local, em português)">
+          <Section title={t('settings.sections.voice')}>
+            <SettingRow label={t('settings.voice.input')} description={t('settings.voice.inputDescription')}>
               <button
                 onClick={() => { updateSettings({ speechEnabled: !settings.speechEnabled }); showSaved(); }}
                 className="relative w-11 h-6 rounded-full transition-colors cursor-pointer"
@@ -974,7 +981,7 @@ export function SettingsPage() {
                 />
               </button>
             </SettingRow>
-            <SettingRow label="Saída de voz" description="Mostrar o botão para ouvir as respostas do Nicx">
+            <SettingRow label={t('settings.voice.output')} description={t('settings.voice.outputDescription')}>
               <button
                 onClick={() => { updateSettings({ voiceOutputEnabled: !settings.voiceOutputEnabled }); showSaved(); }}
                 className="relative w-11 h-6 rounded-full transition-colors cursor-pointer"
@@ -991,7 +998,7 @@ export function SettingsPage() {
                 />
               </button>
             </SettingRow>
-            <SettingRow label="Falar as respostas automaticamente" description="Ler cada resposta em voz alta assim que ela termina">
+            <SettingRow label={t('settings.voice.autoplay')} description={t('settings.voice.autoplayDescription')}>
               <button
                 onClick={() => { updateSettings({ voiceAutoplay: !settings.voiceAutoplay }); showSaved(); }}
                 disabled={!settings.voiceOutputEnabled}
@@ -1012,7 +1019,7 @@ export function SettingsPage() {
               </button>
             </SettingRow>
             <WakeWordSettings onSaved={showSaved} />
-            <SettingRow label="Voz do Nicx" description="Mecanismo e voz usados nas respostas faladas">
+            <SettingRow label={t('settings.voice.tts')} description={t('settings.voice.ttsDescription')}>
               <div className="flex items-center gap-2">
                 <span
                   className="w-2 h-2 rounded-full"
@@ -1021,13 +1028,13 @@ export function SettingsPage() {
                   }}
                 />
                 <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-                  {ttsBackend === null ? 'Verificando...'
+                  {ttsBackend === null ? t('settings.voice.checking')
                     : ttsBackend.available ? `${ttsBackend.backend}${ttsBackend.voice_id ? ` / ${ttsBackend.voice_id}` : ''}`
-                    : 'Não configurado'}
+                    : t('settings.voice.notConfigured')}
                 </span>
               </div>
             </SettingRow>
-            <SettingRow label="Reconhecimento de voz" description="Whisper rodando no seu computador">
+            <SettingRow label={t('settings.voice.recognition')} description={t('settings.voice.recognitionDescription')}>
               <div className="flex items-center gap-2">
                 <span
                   className="w-2 h-2 rounded-full"
@@ -1038,23 +1045,23 @@ export function SettingsPage() {
                   }}
                 />
                 <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-                  {speechBackendAvailable === null ? 'Verificando...'
-                    : speechBackendAvailable ? 'Disponível'
-                    : 'Não configurado'}
+                  {speechBackendAvailable === null ? t('settings.voice.checking')
+                    : speechBackendAvailable ? t('settings.voice.available')
+                    : t('settings.voice.notConfigured')}
                 </span>
               </div>
             </SettingRow>
             {!speechBackendAvailable && speechBackendAvailable !== null && (
               <div className="text-xs mt-2 px-1" style={{ color: 'var(--color-text-tertiary)' }}>
-                Set up a speech backend to use voice input.
-                See the <a href="https://github.com/Dracon-46/FalkyriaNicx/blob/main/docs/user-guide/tools.md" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)' }}>documentation</a> for details.
+                {t('settings.voice.setupHint')}{' '}
+                {t('settings.voice.docsBefore')} <a href="https://github.com/Dracon-46/FalkyriaNicx/blob/main/docs/user-guide/tools.md" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)' }}>{t('settings.voice.docsLink')}</a> {t('settings.voice.docsAfter')}
               </div>
             )}
           </Section>
 
           {/* Data */}
-          <Section title="Data">
-            <SettingRow label="Conversations" description={`${conversations.length} stored locally`}>
+          <Section title={t('settings.sections.data')}>
+            <SettingRow label={t('settings.data.conversations')} description={t('settings.data.storedLocally', { total: conversations.length })}>
               <div className="flex gap-2">
                 <button
                   onClick={handleExport}
@@ -1063,7 +1070,7 @@ export function SettingsPage() {
                   onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-bg-tertiary)')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-bg-secondary)')}
                 >
-                  <Download size={12} /> Export
+                  <Download size={12} /> {t('settings.data.export')}
                 </button>
                 <button
                   onClick={handleImport}
@@ -1072,11 +1079,11 @@ export function SettingsPage() {
                   onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-bg-tertiary)')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-bg-secondary)')}
                 >
-                  <Upload size={12} /> Import
+                  <Upload size={12} /> {t('settings.data.import')}
                 </button>
               </div>
             </SettingRow>
-            <SettingRow label="Clear all data" description="Permanently delete all conversations">
+            <SettingRow label={t('settings.data.clearAll')} description={t('settings.data.clearAllDescription')}>
               <button
                 onClick={handleClear}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer"
@@ -1088,7 +1095,7 @@ export function SettingsPage() {
                 onMouseEnter={(e) => { if (!confirmClear) e.currentTarget.style.background = 'rgba(220,38,38,0.1)'; }}
                 onMouseLeave={(e) => { if (!confirmClear) e.currentTarget.style.background = 'transparent'; }}
               >
-                <Trash2 size={12} /> {confirmClear ? 'Click again to confirm' : 'Clear'}
+                <Trash2 size={12} /> {confirmClear ? t('settings.data.confirm') : t('settings.data.clear')}
               </button>
             </SettingRow>
           </Section>
@@ -1097,12 +1104,12 @@ export function SettingsPage() {
           <PrivacySection />
 
           {/* About */}
-          <Section title="About">
+          <Section title={t('settings.sections.about')}>
             <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
               <NicxMascot size="md" interactive className="-mt-4" />
               <div>
                 <p className="mb-2">
-                  <span className="font-semibold" style={{ color: 'var(--color-text)' }}>Nicx</span> — a inteligência artificial da Falkyria.
+                  <span className="font-semibold" style={{ color: 'var(--color-text)' }}>Nicx</span> — {t('settings.about.tagline')}
                 </p>
                 <div className="flex gap-3 mt-3 text-xs">
                   <a
@@ -1111,7 +1118,7 @@ export function SettingsPage() {
                     rel="noopener noreferrer"
                     style={{ color: 'var(--color-accent)' }}
                   >
-                    Repositório
+                    {t('settings.about.repository')}
                   </a>
                 </div>
               </div>

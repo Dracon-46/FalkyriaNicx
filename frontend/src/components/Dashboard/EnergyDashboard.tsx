@@ -11,6 +11,8 @@ import {
 import { Zap, Activity, Thermometer, Hash, Gauge } from 'lucide-react';
 import { fetchEnergy, fetchTelemetry } from '../../lib/api';
 import { useAppStore } from '../../lib/store';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n';
 
 interface EnergySample {
   timestamp: string;
@@ -65,6 +67,7 @@ function StatCard({
 }
 
 export function EnergyDashboard() {
+  const { t } = useTranslation();
   const savings = useAppStore((s) => s.savings);
   const [energy, setEnergy] = useState<EnergyData | null>(null);
   const [telemetry, setTelemetry] = useState<TelemetryStats | null>(null);
@@ -84,7 +87,7 @@ export function EnergyDashboard() {
         if (data.samples) {
           setChartData(
             data.samples.map((s) => ({
-              time: new Date(s.timestamp).toLocaleTimeString(),
+              time: new Date(s.timestamp).toLocaleTimeString(i18n.language),
               power: Math.round(s.power_w * 10) / 10,
             })),
           );
@@ -95,7 +98,7 @@ export function EnergyDashboard() {
         setTelemetry(telRes.value as TelemetryStats);
       }
     } catch {
-      setError('Cannot connect to server');
+      setError(i18n.t('errors.serverUnreachable'));
     }
   }, []);
 
@@ -106,20 +109,20 @@ export function EnergyDashboard() {
   }, [fetchData]);
 
   const thermalStatus = (energy?.avg_power_w ?? 0) < 50
-    ? { label: 'Cool', color: 'var(--color-success)' }
+    ? { label: t('dashboard.energy.cool'), color: 'var(--color-success)' }
     : (energy?.avg_power_w ?? 0) < 150
-    ? { label: 'Warm', color: 'var(--color-warning)' }
-    : { label: 'Hot', color: 'var(--color-error)' };
+    ? { label: t('dashboard.energy.warm'), color: 'var(--color-warning)' }
+    : { label: t('dashboard.energy.hot'), color: 'var(--color-error)' };
 
   if (error || !energy) {
     return (
       <div className="hud-panel p-6">
         <h3 className="hud-label flex items-center gap-2 mb-4">
           <Zap size={12} style={{ color: 'var(--color-accent)' }} />
-          Energy Monitoring
+          {t('dashboard.energy.title')}
         </h3>
         <div className="h-48 flex items-center justify-center text-sm" style={{ color: 'var(--color-text-tertiary)' }}>
-          <span className="hud-mono">{error || 'awaiting telemetry stream…'}</span>
+          <span className="hud-mono">{error || t('dashboard.energy.waiting')}</span>
         </div>
       </div>
     );
@@ -129,41 +132,41 @@ export function EnergyDashboard() {
     <div className="hud-panel p-6">
       <h3 className="hud-label flex items-center gap-2 mb-4">
         <Zap size={12} style={{ color: 'var(--color-accent)' }} />
-        Energy Monitoring
+        {t('dashboard.energy.title')}
       </h3>
 
       <div className="grid grid-cols-2 gap-3 mb-4">
         <StatCard
           icon={Zap}
-          label="Total Energy"
+          label={t('dashboard.energy.totalEnergy')}
           value={((energy.total_energy_j ?? 0) / 1000).toFixed(1)}
           unit="kJ"
         />
         <StatCard
           icon={Activity}
-          label="Energy / Token"
+          label={t('dashboard.energy.energyPerToken')}
           value={(energy.energy_per_token_j ?? 0).toFixed(3)}
           unit="J"
         />
         <StatCard
           icon={Thermometer}
-          label="Avg Power"
+          label={t('dashboard.energy.avgPower')}
           value={(energy.avg_power_w ?? 0).toFixed(1)}
           unit="W"
         />
         <StatCard
           icon={Hash}
-          label="Total Requests"
+          label={t('dashboard.energy.totalRequests')}
           value={String(savings?.total_calls ?? telemetry?.total_requests ?? 0)}
         />
         <StatCard
           icon={Gauge}
-          label="Thermal"
+          label={t('dashboard.energy.thermal')}
           value={thermalStatus.label}
         />
         <StatCard
           icon={Hash}
-          label="Tokens Processed"
+          label={t('dashboard.energy.tokensProcessed')}
           value={formatNumber(savings?.total_tokens ?? telemetry?.total_tokens ?? 0)}
         />
       </div>
@@ -185,7 +188,7 @@ export function EnergyDashboard() {
                   color: 'var(--color-text)',
                 }}
               />
-              <Line type="monotone" dataKey="power" stroke="var(--color-accent)" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="power" name={t('dashboard.energy.power')} stroke="var(--color-accent)" strokeWidth={2} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>

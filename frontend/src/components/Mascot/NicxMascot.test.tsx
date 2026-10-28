@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { MascotMood } from '../../lib/mascot';
 import { computeFrame, phasesAt, POSES, STILL_INPUT } from './mascot-geometry';
 import { mascotStillSvg } from './mascot-still';
-import { MASCOT_MOOD_LABELS, MASCOT_SIZES, NicxMascot } from './NicxMascot';
+import { mascotMoodLabel, MASCOT_SIZES, NicxMascot } from './NicxMascot';
 
 const MOODS: MascotMood[] = ['idle', 'listening', 'thinking', 'speaking', 'happy', 'error'];
 
@@ -15,7 +15,7 @@ describe('NicxMascot', () => {
 
     expect(html).toContain('<svg');
     expect(html).toContain(`data-mood="${mood}"`);
-    expect(html).toContain(`aria-label="Nicx (${MASCOT_MOOD_LABELS[mood]})"`);
+    expect(html).toContain(`aria-label="Nicx (${mascotMoodLabel(mood)})"`);
     expect(html).toContain('width="180"');
     // Two eyes, a nucleus, and never a mouth.
     expect(html.match(/data-part="eye"/g)).toHaveLength(2);

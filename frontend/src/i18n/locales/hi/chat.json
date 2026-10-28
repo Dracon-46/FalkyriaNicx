@@ -1,0 +1,157 @@
+{
+  "greeting": {
+    "morning": "सुप्रभात",
+    "afternoon": "नमस्कार",
+    "evening": "शुभ संध्या"
+  },
+  "systemPanel": {
+    "show": "सिस्टम पैनल दिखाएँ ({{shortcut}})",
+    "hide": "सिस्टम पैनल छिपाएँ ({{shortcut}})",
+    "title": "सिस्टम",
+    "close": "पैनल बंद करें",
+    "session": "सत्र",
+    "requests": "अनुरोध",
+    "outputTokens": "आउटपुट टोकन",
+    "device": "डिवाइस",
+    "cpuTemp": "CPU तापमान",
+    "gpuTemp": "GPU तापमान",
+    "power": "पावर",
+    "energy": "ऊर्जा",
+    "costComparison": "लागत तुलना",
+    "local": "लोकल"
+  },
+  "sourcesBanner": {
+    "text": "व्यक्तिगत जवाब पाने के लिए अपने डेटा स्रोत (Gmail, iMessage, Slack आदि) जोड़ें।",
+    "connect": "जोड़ें",
+    "dismiss": "सूचना बंद करें"
+  },
+  "empty": {
+    "title": "नमस्ते! मैं Nicx हूँ।",
+    "subtitle": "{{greeting}}! जो चाहें पूछें: मैं यहीं आपके कंप्यूटर पर, निजी रूप से चलता हूँ।",
+    "connectSources": "डेटा स्रोत जोड़ें",
+    "setupChannels": "मैसेजिंग चैनल सेट करें"
+  },
+  "audio": {
+    "title": "सुबह का सारांश",
+    "play": "चलाएँ",
+    "pause": "रोकें"
+  },
+  "input": {
+    "placeholder": "Nicx को संदेश भेजें...",
+    "pickModel": "पहले एक मॉडल चुनें (⌘K)",
+    "send": "संदेश भेजें",
+    "stop": "जनरेट करना रोकें",
+    "deepResearch": "गहन शोध",
+    "deepResearchOn": "गहन शोध: चालू",
+    "deepResearchOff": "गहन शोध: बंद",
+    "enterToSend": "भेजने के लिए",
+    "shiftEnterNewLine": "नई पंक्ति के लिए"
+  },
+  "phase": {
+    "generating": "जनरेट हो रहा है...",
+    "researching": "शोध हो रहा है...",
+    "thinking": "सोच रहा है...",
+    "searching": "खोज रहा है: {{query}}",
+    "callingTool": "{{tool}} चला रहा है..."
+  },
+  "reply": {
+    "stopped": "(जनरेट करना रोका गया)",
+    "error": "त्रुटि: {{message}}",
+    "empty": "कोई जवाब नहीं बना। कृपया फिर से कोशिश करें।",
+    "failed": "मैं जवाब नहीं दे सका। कृपया फिर से कोशिश करें।"
+  },
+  "research": {
+    "failedNoDetail": "शोध विफल रहा (कोई विवरण नहीं)",
+    "stopped": "शोध रुक गया:",
+    "failed": "शोध विफल रहा:",
+    "syncBefore": "खोज रहा है",
+    "syncAfter": "आइटम में — सिंक जारी है, ज़्यादा डेटा इंडेक्स होने पर नतीजे बेहतर होंगे।",
+    "after": "{{date}} के बाद",
+    "before": "{{date}} से पहले",
+    "searchCount": "खोजें: {{n}}",
+    "resultCount": "नतीजे: {{n}}",
+    "person": "व्यक्ति: {{person}}",
+    "time": "समय: {{time}}",
+    "step": "खोज {{n}}",
+    "analyzing": "सवाल का विश्लेषण हो रहा है",
+    "synthesizing": "नतीजों को जोड़ रहा है",
+    "collapse": "खोज विवरण छिपाएँ",
+    "expand": "खोज विवरण दिखाएँ",
+    "source": "स्रोत {{n}}"
+  },
+  "voice": {
+    "stopHint": "वॉइस बातचीत खत्म करने के लिए क्लिक करें",
+    "enableHint": "सेटिंग्स में वॉइस इनपुट चालू करें",
+    "unavailable": "सर्वर पर वाक् पहचान उपलब्ध नहीं है",
+    "startHint": "बोलिए और Nicx ज़ोर से जवाब देगा, कीबोर्ड छुए बिना",
+    "phase": {
+      "off": "वॉइस बातचीत",
+      "listening": "सुन रहा है…",
+      "transcribing": "लिख रहा है…",
+      "thinking": "सोच रहा है…",
+      "speaking": "बोल रहा है…"
+    },
+    "endedIdle": "वॉइस बातचीत खत्म: एक मिनट तक कोई नहीं बोला।"
+  },
+  "log": {
+    "research": "शोध: \"{{text}}\"",
+    "request": "अनुरोध: \"{{text}}\" → {{model}}",
+    "search": "खोज: \"{{query}}\"",
+    "searchPerson": "खोज: \"{{query}}\" (व्यक्ति: {{person}})",
+    "researchError": "गहन शोध में त्रुटि: {{message}}",
+    "generatingWith": "{{model}} से जनरेट हो रहा है...",
+    "callingTool": "{{call}} चला रहा है",
+    "streamError": "स्ट्रीम त्रुटि: {{message}}",
+    "response": "जवाब: {{chars}} अक्षर"
+  },
+  "message": {
+    "code": "कोड",
+    "copy": "कॉपी करें",
+    "copied": "कॉपी हो गया",
+    "copyMessage": "संदेश कॉपी करें"
+  },
+  "mic": {
+    "notEnabled": "सेटिंग्स में चालू करें",
+    "noBackend": "वाक् पहचान सेट नहीं है",
+    "waitReply": "जवाब का इंतज़ार करें",
+    "stopRecording": "रिकॉर्डिंग रोकें",
+    "transcribing": "लिख रहा है...",
+    "speak": "बोलें"
+  },
+  "speak": {
+    "loading": "आवाज़ बन रही है...",
+    "stop": "रोकें",
+    "readAloud": "ज़ोर से पढ़ें",
+    "stopReading": "पढ़ना रोकें",
+    "readMessageAloud": "संदेश ज़ोर से पढ़ें"
+  },
+  "tool": {
+    "args": "आर्ग्युमेंट",
+    "result": "नतीजा"
+  },
+  "xray": {
+    "inputTokens": "{{n}} इनपुट टोकन",
+    "outputTokens": "{{n}} आउटपुट टोकन",
+    "tokens": "{{n}} टोकन",
+    "mode": "मोड",
+    "engine": "इंजन",
+    "generated": "{{n}} जनरेट",
+    "prompt": "{{n}} प्रॉम्प्ट",
+    "thinking": "~{{n}} सोचने में",
+    "tokensLabel": "टोकन",
+    "complexity": "जटिलता",
+    "tokenBudget": "टोकन सीमा",
+    "speed": "गति",
+    "total": "कुल {{time}}",
+    "latency": "विलंब"
+  },
+  "floating": {
+    "goodbye": "फिर मिलेंगे!",
+    "ended": "बातचीत खत्म",
+    "preparing": "तैयार हो रहा है…",
+    "you": "आप:",
+    "hint": "बोलिए। मुझे बंद करने के लिए “tchau” कहें।",
+    "listenAgain": "फिर से सुनें",
+    "end": "खत्म करें"
+  }
+}

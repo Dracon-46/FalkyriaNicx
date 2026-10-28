@@ -3,6 +3,7 @@ import { streamChat } from './sse';
 import { fetchModels } from './api';
 import type { SendOutcome } from './voice-conversation';
 import type { ChatMessage, TokenUsage } from '../types';
+import i18n from '../i18n';
 
 let modelsRequest: Promise<void> | null = null;
 
@@ -50,7 +51,7 @@ export async function sendSpokenMessage(
       timestamp: Date.now(),
       level: 'error',
       category: 'chat',
-      message: 'Nenhum modelo disponível',
+      message: i18n.t('errors.noModel'),
     });
     return 'not-sent';
   }
@@ -76,7 +77,7 @@ export async function sendSpokenMessage(
   app.setStreamState({
     conversationId: convId,
     isStreaming: true,
-    phase: 'Generating...',
+    phase: i18n.t('chat.phase.generating'),
     elapsedMs: 0,
     activeToolCalls: [],
     content: '',
@@ -118,19 +119,19 @@ export async function sendSpokenMessage(
       stopped = true;
     } else {
       const message = err?.message || String(err);
-      reply = reply || `Erro: ${message}`;
+      reply = reply || i18n.t('chat.reply.error', { message });
       useAppStore.getState().addLogEntry({
         timestamp: Date.now(),
         level: 'error',
         category: 'chat',
-        message: `Stream error: ${message}`,
+        message: i18n.t('chat.log.streamError', { message }),
       });
     }
   } finally {
     const store = useAppStore.getState();
     store.updateLastAssistant(
       convId,
-      reply || (stopped ? '(Resposta interrompida)' : 'Não consegui responder. Tente de novo.'),
+      reply || (stopped ? i18n.t('chat.reply.stopped') : i18n.t('chat.reply.failed')),
       undefined,
       usage,
       // Telemetry marks the reply as finished (the mascot cheers for it).

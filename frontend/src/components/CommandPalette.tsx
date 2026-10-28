@@ -10,28 +10,34 @@ import {
   getCloudKeyStatus,
   saveCloudKey,
 } from '../lib/api';
+import { useTranslation } from 'react-i18next';
 
 /** Popular models that users can download from the catalogue. */
 const CATALOGUE_MODELS = [
-  { id: 'qwen3.5:0.8b', size: '~1 GB', desc: 'Qwen 3.5 0.8B — fast, lightweight' },
+  { id: 'qwen3.5:0.8b', size: '~1 GB', desc: 'Qwen 3.5 0.8B', note: 'fastLight' },
   { id: 'qwen3.5:2b', size: '~2.7 GB', desc: 'Qwen 3.5 2B' },
-  { id: 'qwen3.5:4b', size: '~3.4 GB', desc: 'Qwen 3.5 4B — recommended default' },
+  { id: 'qwen3.5:4b', size: '~3.4 GB', desc: 'Qwen 3.5 4B', note: 'recommended' },
   { id: 'qwen3.5:9b', size: '~6.6 GB', desc: 'Qwen 3.5 9B' },
   { id: 'qwen3.5:27b', size: '~17 GB', desc: 'Qwen 3.5 27B' },
   { id: 'qwen3.5:35b', size: '~24 GB', desc: 'Qwen 3.5 35B' },
-  { id: 'qwen3.5:122b', size: '~81 GB', desc: 'Qwen 3.5 122B — largest' },
+  { id: 'qwen3.5:122b', size: '~81 GB', desc: 'Qwen 3.5 122B', note: 'largest' },
   { id: 'llama3.3:latest', size: '~4.9 GB', desc: 'Llama 3.3 8B' },
   { id: 'mistral:latest', size: '~4.1 GB', desc: 'Mistral 7B' },
   { id: 'gemma3:latest', size: '~3.3 GB', desc: 'Gemma 3 4B' },
   { id: 'deepseek-r1:7b', size: '~4.7 GB', desc: 'DeepSeek R1 7B' },
   { id: 'phi4:latest', size: '~9.1 GB', desc: 'Phi-4 14B' },
-];
+] as Array<{ id: string; size: string; desc: string; note?: ModelNote }>;
+
+/** Short qualifier shown after a model name (text in common.modelPicker.note). */
+type ModelNote =
+  | 'fastLight' | 'recommended' | 'largest' | 'fastMultimodal' | 'cheapFast' | 'reasoning'
+  | 'balanced' | 'mostCapable' | 'fastest' | 'flagship' | 'fast' | 'latest' | 'auto';
 
 /** Cloud provider definitions */
 interface CloudProvider {
   name: string;
   envKey: string;
-  models: Array<{ id: string; desc: string }>;
+  models: Array<{ id: string; desc: string; note?: ModelNote }>;
 }
 
 const CLOUD_PROVIDERS: CloudProvider[] = [
@@ -39,34 +45,34 @@ const CLOUD_PROVIDERS: CloudProvider[] = [
     name: 'OpenAI',
     envKey: 'OPENAI_API_KEY',
     models: [
-      { id: 'gpt-4o', desc: 'GPT-4o — fast, multimodal' },
-      { id: 'gpt-4o-mini', desc: 'GPT-4o Mini — cheap, fast' },
-      { id: 'o3-mini', desc: 'o3-mini — reasoning' },
+      { id: 'gpt-4o', desc: 'GPT-4o', note: 'fastMultimodal' },
+      { id: 'gpt-4o-mini', desc: 'GPT-4o Mini', note: 'cheapFast' },
+      { id: 'o3-mini', desc: 'o3-mini', note: 'reasoning' },
     ],
   },
   {
     name: 'Anthropic',
     envKey: 'ANTHROPIC_API_KEY',
     models: [
-      { id: 'claude-sonnet-4-6', desc: 'Claude Sonnet 4.6 — balanced' },
-      { id: 'claude-opus-4-6', desc: 'Claude Opus 4.6 — most capable' },
-      { id: 'claude-haiku-4-5', desc: 'Claude Haiku 4.5 — fastest' },
+      { id: 'claude-sonnet-4-6', desc: 'Claude Sonnet 4.6', note: 'balanced' },
+      { id: 'claude-opus-4-6', desc: 'Claude Opus 4.6', note: 'mostCapable' },
+      { id: 'claude-haiku-4-5', desc: 'Claude Haiku 4.5', note: 'fastest' },
     ],
   },
   {
     name: 'Google',
     envKey: 'GEMINI_API_KEY',
     models: [
-      { id: 'gemini-2.5-pro', desc: 'Gemini 2.5 Pro — flagship' },
-      { id: 'gemini-2.5-flash', desc: 'Gemini 2.5 Flash — fast' },
-      { id: 'gemini-3-pro', desc: 'Gemini 3 Pro — latest' },
+      { id: 'gemini-2.5-pro', desc: 'Gemini 2.5 Pro', note: 'flagship' },
+      { id: 'gemini-2.5-flash', desc: 'Gemini 2.5 Flash', note: 'fast' },
+      { id: 'gemini-3-pro', desc: 'Gemini 3 Pro', note: 'latest' },
     ],
   },
   {
     name: 'OpenRouter',
     envKey: 'OPENROUTER_API_KEY',
     models: [
-      { id: 'openrouter/auto', desc: 'Auto — best model for the task' },
+      { id: 'openrouter/auto', desc: 'Auto', note: 'auto' },
       { id: 'openrouter/anthropic/claude-sonnet-4', desc: 'Claude Sonnet 4 via OpenRouter' },
       { id: 'openrouter/deepseek/deepseek-r1', desc: 'DeepSeek R1 via OpenRouter' },
     ],
@@ -85,6 +91,9 @@ const CLOUD_PROVIDERS: CloudProvider[] = [
 type Tab = 'installed' | 'catalogue' | 'cloud';
 
 export function CommandPalette() {
+  const { t } = useTranslation();
+  const describe = (m: { desc: string; note?: ModelNote }) =>
+    m.note ? `${m.desc} — ${t(`common.modelPicker.note.${m.note}`)}` : m.desc;
   const [query, setQuery] = useState('');
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [tab, setTab] = useState<Tab>('installed');
@@ -118,9 +127,9 @@ export function CommandPalette() {
       setCloudKeyStatus(await getCloudKeyStatus());
       setCloudKeyError(null);
     } catch (e: any) {
-      setCloudKeyError(e?.message || 'Failed to read cloud key status');
+      setCloudKeyError(e?.message || t('common.modelPicker.keyStatusFailed'));
     }
-  }, [desktopKeyStorage]);
+  }, [desktopKeyStorage, t]);
 
   const filtered = tab === 'installed'
     ? (query
@@ -129,7 +138,7 @@ export function CommandPalette() {
     : tab === 'catalogue'
     ? CATALOGUE_MODELS.filter((m) =>
         !installedIds.has(m.id) &&
-        (!query || m.id.toLowerCase().includes(query.toLowerCase()) || m.desc.toLowerCase().includes(query.toLowerCase()))
+        (!query || m.id.toLowerCase().includes(query.toLowerCase()) || describe(m).toLowerCase().includes(query.toLowerCase()))
       )
     : []; // cloud tab doesn't use filtered
 
@@ -147,8 +156,8 @@ export function CommandPalette() {
 
   useEffect(() => {
     if (pullSuccess) {
-      const t = setTimeout(() => setPullSuccess(null), 3000);
-      return () => clearTimeout(t);
+      const timer = setTimeout(() => setPullSuccess(null), 3000);
+      return () => clearTimeout(timer);
     }
   }, [pullSuccess]);
 
@@ -160,12 +169,12 @@ export function CommandPalette() {
     if (modelId !== previousModel) {
       const { setModelLoading, addLogEntry } = useAppStore.getState();
       setModelLoading(true);
-      addLogEntry({ timestamp: Date.now(), level: 'info', category: 'model', message: `Switching to ${modelId}...` });
+      addLogEntry({ timestamp: Date.now(), level: 'info', category: 'model', message: t('common.modelPicker.log.switching', { model: modelId }) });
       try {
         await preloadModel(modelId, owner);
-        addLogEntry({ timestamp: Date.now(), level: 'info', category: 'model', message: `${modelId} loaded` });
+        addLogEntry({ timestamp: Date.now(), level: 'info', category: 'model', message: t('common.modelPicker.log.loaded', { model: modelId }) });
       } catch (e: any) {
-        addLogEntry({ timestamp: Date.now(), level: 'error', category: 'model', message: `Failed to load ${modelId}: ${e.message}` });
+        addLogEntry({ timestamp: Date.now(), level: 'error', category: 'model', message: t('common.modelPicker.log.loadFailed', { model: modelId, message: e.message }) });
       } finally {
         setModelLoading(false);
       }
@@ -187,15 +196,15 @@ export function CommandPalette() {
       setPullSuccess(modelId);
       useAppStore.getState().addLogEntry({
         timestamp: Date.now(), level: 'info', category: 'model',
-        message: `Downloaded ${modelId}`,
+        message: t('common.modelPicker.log.downloaded', { model: modelId }),
       });
       await refreshModels();
       setSelectedModel(modelId);
     } catch (e: any) {
-      setPullError(e.message || 'Download failed');
+      setPullError(e.message || t('common.modelPicker.downloadFailed'));
       useAppStore.getState().addLogEntry({
         timestamp: Date.now(), level: 'error', category: 'model',
-        message: `Download failed for ${modelId}: ${e.message}`,
+        message: t('common.modelPicker.log.downloadFailed', { model: modelId, message: e.message }),
       });
     } finally {
       setPulling(null);
@@ -208,7 +217,7 @@ export function CommandPalette() {
       await deleteModel(modelId);
       useAppStore.getState().addLogEntry({
         timestamp: Date.now(), level: 'info', category: 'model',
-        message: `Deleted ${modelId}`,
+        message: t('common.modelPicker.log.deleted', { model: modelId }),
       });
       await refreshModels();
       if (selectedModel === modelId) {
@@ -238,11 +247,11 @@ export function CommandPalette() {
       await refreshCloudKeyStatus();
       useAppStore.getState().addLogEntry({
         timestamp: Date.now(), level: 'info', category: 'model',
-        message: `${provider.name} API key ${keyValue ? 'saved' : 'removed'}. Refreshing model list...`,
+        message: t(keyValue ? 'common.modelPicker.log.keySaved' : 'common.modelPicker.log.keyRemoved', { provider: provider.name }),
       });
       await refreshModels();
     } catch (e: any) {
-      setCloudKeyError(e?.message || `Failed to save ${provider.name} API key`);
+      setCloudKeyError(e?.message || t('common.modelPicker.keySaveFailed', { provider: provider.name }));
     } finally {
       setSavingKey(null);
     }
@@ -270,9 +279,9 @@ export function CommandPalette() {
   };
 
   const TAB_LABELS: Record<Tab, string> = {
-    installed: `Installed Models (${models.length})`,
-    catalogue: 'Download',
-    cloud: 'Cloud Models',
+    installed: t('common.modelPicker.tabInstalled', { n: models.length }),
+    catalogue: t('common.modelPicker.tabDownload'),
+    cloud: t('common.modelPicker.tabCloud'),
   };
 
   return (
@@ -293,18 +302,18 @@ export function CommandPalette() {
       >
         {/* Tabs */}
         <div className="flex" style={{ borderBottom: '1px solid var(--color-border)' }}>
-          {(['installed', 'catalogue', 'cloud'] as Tab[]).map((t) => (
+          {(['installed', 'catalogue', 'cloud'] as Tab[]).map((id) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
+              key={id}
+              onClick={() => setTab(id)}
               className="flex-1 px-3 py-2.5 text-xs font-medium transition-colors cursor-pointer"
               style={{
-                color: tab === t ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
-                borderBottom: tab === t ? '2px solid var(--color-accent)' : '2px solid transparent',
+                color: tab === id ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
+                borderBottom: tab === id ? '2px solid var(--color-accent)' : '2px solid transparent',
                 background: 'transparent',
               }}
             >
-              {TAB_LABELS[t]}
+              {TAB_LABELS[id]}
             </button>
           ))}
         </div>
@@ -322,12 +331,14 @@ export function CommandPalette() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={tab === 'installed' ? 'Search installed models...' : 'Search models to download...'}
+              placeholder={tab === 'installed' ? t('common.modelPicker.searchInstalled') : t('common.modelPicker.searchDownload')}
               className="flex-1 bg-transparent outline-none text-sm"
               style={{ color: 'var(--color-text)' }}
             />
             <button
               onClick={() => setCommandPaletteOpen(false)}
+              aria-label={t('common.close')}
+              title={t('common.close')}
               className="p-1 rounded cursor-pointer"
               style={{ color: 'var(--color-text-tertiary)' }}
             >
@@ -344,7 +355,7 @@ export function CommandPalette() {
         )}
         {pullSuccess && (
           <div className="px-4 py-2 text-xs flex items-center gap-1.5" style={{ color: 'var(--color-success)', background: 'color-mix(in srgb, var(--color-success) 5%, transparent)' }}>
-            <Check size={12} /> Downloaded {pullSuccess} successfully
+            <Check size={12} /> {t('common.modelPicker.downloadedOk', { model: pullSuccess })}
           </div>
         )}
         {tab === 'cloud' && cloudKeyError && (
@@ -359,8 +370,8 @@ export function CommandPalette() {
             filtered.length === 0 ? (
               <div className="px-4 py-6 text-center text-sm" style={{ color: 'var(--color-text-tertiary)' }}>
                 {models.length === 0
-                  ? 'No models available — switch to "Download" to get started'
-                  : 'No matching models'}
+                  ? t('common.modelPicker.noModels')
+                  : t('common.modelPicker.noMatches')}
               </div>
             ) : (
               (filtered as typeof models).map((model, idx) => {
@@ -391,7 +402,7 @@ export function CommandPalette() {
                       </div>
                       {isActive && (
                         <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'var(--color-accent-subtle)', color: 'var(--color-accent)' }}>
-                          Active
+                          {t('common.modelPicker.active')}
                         </span>
                       )}
                     </button>
@@ -401,7 +412,8 @@ export function CommandPalette() {
                         disabled={isDeleting}
                         className="p-1 rounded transition-colors cursor-pointer"
                         style={{ color: 'var(--color-text-tertiary)', opacity: 0 }}
-                        title="Delete model"
+                        title={t('common.modelPicker.deleteModel')}
+                        aria-label={t('common.modelPicker.deleteModel')}
                         onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.color = 'var(--color-error)'; }}
                         onMouseLeave={(e) => { e.currentTarget.style.opacity = '0'; e.currentTarget.style.color = 'var(--color-text-tertiary)'; }}
                       >
@@ -422,7 +434,7 @@ export function CommandPalette() {
                     <Download size={16} style={{ color: 'var(--color-text-tertiary)' }} />
                     <div className="flex-1 min-w-0">
                       <div className="text-sm truncate" style={{ color: 'var(--color-text)' }}>{model.id}</div>
-                      <div className="text-[11px]" style={{ color: 'var(--color-text-tertiary)' }}>{model.desc} &middot; {model.size}</div>
+                      <div className="text-[11px]" style={{ color: 'var(--color-text-tertiary)' }}>{describe(model)} &middot; {model.size}</div>
                     </div>
                     <button
                       onClick={() => handlePull(model.id)}
@@ -434,21 +446,21 @@ export function CommandPalette() {
                         opacity: (isPulling || (pulling && !isPulling)) ? 0.5 : 1,
                       }}
                     >
-                      {isPulling ? <><Loader2 size={12} className="animate-spin" /> Downloading...</> :
-                       justInstalled ? <><Check size={12} /> Installed</> :
-                       <><Download size={12} /> Download</>}
+                      {isPulling ? <><Loader2 size={12} className="animate-spin" /> {t('common.modelPicker.downloading')}</> :
+                       justInstalled ? <><Check size={12} /> {t('common.modelPicker.installed')}</> :
+                       <><Download size={12} /> {t('common.modelPicker.download')}</>}
                     </button>
                   </div>
                 );
               })}
               <div className="px-4 py-3 mt-1" style={{ borderTop: '1px solid var(--color-border)' }}>
-                <div className="text-[11px] mb-2" style={{ color: 'var(--color-text-tertiary)' }}>Or enter any Ollama model name:</div>
+                <div className="text-[11px] mb-2" style={{ color: 'var(--color-text-tertiary)' }}>{t('common.modelPicker.customLabel')}</div>
                 <div className="flex gap-2">
                   <input
                     type="text" value={customModel}
                     onChange={(e) => setCustomModel(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleCustomPull(); } }}
-                    placeholder="e.g. codellama:7b"
+                    placeholder={t('common.modelPicker.customPlaceholder')}
                     className="flex-1 text-sm px-3 py-1.5 rounded-lg outline-none"
                     style={{ background: 'var(--color-bg-secondary)', color: 'var(--color-text)', border: '1px solid var(--color-border)' }}
                   />
@@ -457,7 +469,7 @@ export function CommandPalette() {
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer"
                     style={{ background: 'var(--color-accent)', color: 'var(--color-on-accent)', opacity: (!customModel.trim() || pulling) ? 0.5 : 1 }}
                   >
-                    <Download size={12} /> Pull
+                    <Download size={12} /> {t('common.modelPicker.pull')}
                   </button>
                 </div>
               </div>
@@ -467,8 +479,8 @@ export function CommandPalette() {
             <div className="px-4 py-2">
               <div className="text-[11px] mb-3" style={{ color: 'var(--color-text-tertiary)' }}>
                 {desktopKeyStorage
-                  ? 'Add your API keys to use cloud models. Keys are stored in secure desktop storage.'
-                  : 'Configure cloud provider keys in the server environment to use cloud models.'}
+                  ? t('common.modelPicker.cloudDesktopHint')
+                  : t('common.modelPicker.cloudServerHint')}
               </div>
 
               {CLOUD_PROVIDERS.map((provider) => {
@@ -485,7 +497,7 @@ export function CommandPalette() {
                       <span className="text-xs font-medium" style={{ color: 'var(--color-text)' }}>{provider.name}</span>
                       {hasKey && (
                         <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: 'color-mix(in srgb, var(--color-success) 10%, transparent)', color: 'var(--color-success)' }}>
-                          Connected
+                          {t('common.modelPicker.connected')}
                         </span>
                       )}
                     </div>
@@ -499,7 +511,7 @@ export function CommandPalette() {
                           value={key}
                           onChange={(e) => setApiKeys((prev) => ({ ...prev, [provider.envKey]: e.target.value }))}
                           onBlur={() => handleKeyBlur(provider)}
-                          placeholder={hasSavedKey ? 'Saved in secure storage' : provider.envKey}
+                          placeholder={hasSavedKey ? t('common.modelPicker.keySaved') : provider.envKey}
                           disabled={!desktopKeyStorage || isSaving}
                           className="flex-1 text-xs px-2 py-1.5 bg-transparent outline-none font-mono"
                           style={{ color: 'var(--color-text)' }}
@@ -507,6 +519,8 @@ export function CommandPalette() {
                         <button
                           onClick={() => setShowKeys((prev) => ({ ...prev, [provider.envKey]: !prev[provider.envKey] }))}
                           className="px-2 cursor-pointer" style={{ color: 'var(--color-text-tertiary)' }}
+                          aria-label={isVisible ? t('common.modelPicker.hideKey') : t('common.modelPicker.showKey')}
+                          title={isVisible ? t('common.modelPicker.hideKey') : t('common.modelPicker.showKey')}
                         >
                           {isVisible ? <EyeOff size={12} /> : <Eye size={12} />}
                         </button>
@@ -518,7 +532,7 @@ export function CommandPalette() {
                           className="px-2 py-1 rounded-lg text-[10px] cursor-pointer"
                           style={{ color: 'var(--color-error)', border: '1px solid var(--color-error)', opacity: isSaving ? 0.5 : 1 }}
                         >
-                          {isSaving ? 'Saving' : 'Remove'}
+                          {isSaving ? t('common.modelPicker.saving') : t('common.modelPicker.remove')}
                         </button>
                       )}
                     </div>
@@ -543,12 +557,12 @@ export function CommandPalette() {
                                   {model.id}
                                 </div>
                                 <div className="text-[10px] truncate" style={{ color: 'var(--color-text-tertiary)' }}>
-                                  {model.desc}
+                                  {describe(model)}
                                 </div>
                               </div>
                               {isActive && (
                                 <span className="text-[9px] px-1.5 py-0.5 rounded-full shrink-0" style={{ background: 'var(--color-accent-subtle)', color: 'var(--color-accent)' }}>
-                                  Active
+                                  {t('common.modelPicker.active')}
                                 </span>
                               )}
                             </button>
@@ -570,14 +584,14 @@ export function CommandPalette() {
         >
           {tab === 'installed' ? (
             <>
-              <span><kbd className="font-mono">↑↓</kbd> Navigate</span>
-              <span><kbd className="font-mono">Enter</kbd> Select</span>
-              <span><kbd className="font-mono">Esc</kbd> Close</span>
+              <span><kbd className="font-mono">↑↓</kbd> {t('common.modelPicker.navigate')}</span>
+              <span><kbd className="font-mono">Enter</kbd> {t('common.modelPicker.select')}</span>
+              <span><kbd className="font-mono">Esc</kbd> {t('common.close')}</span>
             </>
           ) : tab === 'catalogue' ? (
-            <span>Models are downloaded from the Ollama registry</span>
+            <span>{t('common.modelPicker.catalogueFooter')}</span>
           ) : (
-            <span>API keys are stored locally and never sent to Nicx servers</span>
+            <span>{t('common.modelPicker.cloudFooter')}</span>
           )}
         </div>
       </div>

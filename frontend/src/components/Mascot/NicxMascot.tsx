@@ -14,20 +14,18 @@ import {
   type FrameInput,
 } from './mascot-geometry';
 import './NicxMascot.css';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n';
 
 export type MascotSize = 'sm' | 'md' | 'lg' | number;
 
 /** Avatar, inline companion and hero sizes, in px. */
 export const MASCOT_SIZES = { sm: 28, md: 72, lg: 180 } as const;
 
-export const MASCOT_MOOD_LABELS: Record<MascotMood, string> = {
-  idle: 'tranquilo',
-  listening: 'ouvindo',
-  thinking: 'pensando',
-  speaking: 'falando',
-  happy: 'feliz',
-  error: 'algo deu errado',
-};
+/** How the mood is read out by screen readers ("Nicx (pensando)"), in the UI language. */
+export function mascotMoodLabel(mood: MascotMood): string {
+  return i18n.t(`common.mascot.mood.${mood}`);
+}
 
 /** A fixed frame to render instead of animating (stills, exports, tests). */
 export type MascotStill = Partial<Omit<FrameInput, 'small'>>;
@@ -123,7 +121,8 @@ export function NicxMascot({
     });
   }, [live, px, interactive]);
 
-  const label = `Nicx (${MASCOT_MOOD_LABELS[mood]})`;
+  const { t } = useTranslation();
+  const label = `Nicx (${t(`common.mascot.mood.${mood}`)})`;
   const outlineWidth = small ? 1.9 : 1.1;
   const lids = [ids.lidL, ids.lidR];
 

@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import {
-  CONVERSATION_PHASE_LABEL,
+  conversationPhaseLabel,
   VoiceConversation,
   type ConversationPhase,
   type SendOutcome,
@@ -50,7 +50,7 @@ export function useVoiceConversation(
   return {
     phase,
     active,
-    label: CONVERSATION_PHASE_LABEL[phase],
+    label: conversationPhaseLabel(phase),
     start: () => controller.start(),
     stop: () => controller.stop(),
     toggle: () => (controller.phase === 'off' ? controller.start() : controller.stop()),

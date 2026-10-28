@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { Play, Pause, Volume2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface AudioPlayerProps {
   src: string;
@@ -12,6 +13,7 @@ function formatTime(seconds: number): string {
 }
 
 export function AudioPlayer({ src }: AudioPlayerProps) {
+  const { t } = useTranslation();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -71,6 +73,7 @@ export function AudioPlayer({ src }: AudioPlayerProps) {
 
       <button
         onClick={toggle}
+        aria-label={playing ? t('chat.audio.pause') : t('chat.audio.play')}
         className="flex items-center justify-center w-9 h-9 rounded-full transition-colors shrink-0"
         style={{
           background: 'var(--color-accent)',
@@ -88,7 +91,7 @@ export function AudioPlayer({ src }: AudioPlayerProps) {
             className="text-xs font-medium"
             style={{ color: 'var(--color-text-secondary)' }}
           >
-            Morning Digest
+            {t('chat.audio.title')}
           </span>
         </div>
 

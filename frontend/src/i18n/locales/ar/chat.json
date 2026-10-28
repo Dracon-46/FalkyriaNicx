@@ -1,0 +1,157 @@
+{
+  "greeting": {
+    "morning": "صباح الخير",
+    "afternoon": "مساء الخير",
+    "evening": "مساء الخير"
+  },
+  "systemPanel": {
+    "show": "إظهار لوحة النظام ({{shortcut}})",
+    "hide": "إخفاء لوحة النظام ({{shortcut}})",
+    "title": "النظام",
+    "close": "إغلاق اللوحة",
+    "session": "الجلسة",
+    "requests": "الطلبات",
+    "outputTokens": "رموز الإخراج",
+    "device": "الجهاز",
+    "cpuTemp": "حرارة المعالج",
+    "gpuTemp": "حرارة GPU",
+    "power": "القدرة",
+    "energy": "الطاقة",
+    "costComparison": "مقارنة التكلفة",
+    "local": "محلي"
+  },
+  "sourcesBanner": {
+    "text": "اربط مصادر بياناتك (Gmail وiMessage وSlack وغيرها) لتحصل على إجابات مخصصة لك.",
+    "connect": "ربط",
+    "dismiss": "إغلاق التنبيه"
+  },
+  "empty": {
+    "title": "مرحبًا! أنا Nicx.",
+    "subtitle": "{{greeting}}! اسألني ما تشاء: أعمل هنا على حاسوبك، مع الحفاظ على خصوصيتك.",
+    "connectSources": "ربط مصادر البيانات",
+    "setupChannels": "إعداد قنوات المراسلة"
+  },
+  "audio": {
+    "title": "ملخص الصباح",
+    "play": "تشغيل",
+    "pause": "إيقاف مؤقت"
+  },
+  "input": {
+    "placeholder": "اكتب إلى Nicx...",
+    "pickModel": "اختر نموذجًا أولًا (⌘K)",
+    "send": "إرسال الرسالة",
+    "stop": "إيقاف التوليد",
+    "deepResearch": "بحث معمّق",
+    "deepResearchOn": "البحث المعمّق: مفعّل",
+    "deepResearchOff": "البحث المعمّق: معطّل",
+    "enterToSend": "للإرسال",
+    "shiftEnterNewLine": "لسطر جديد"
+  },
+  "phase": {
+    "generating": "جارٍ التوليد...",
+    "researching": "جارٍ البحث...",
+    "thinking": "أفكّر...",
+    "searching": "أبحث عن: {{query}}",
+    "callingTool": "أستخدم {{tool}}..."
+  },
+  "reply": {
+    "stopped": "(تم إيقاف التوليد)",
+    "error": "خطأ: {{message}}",
+    "empty": "لم يتم توليد أي رد. حاول مرة أخرى.",
+    "failed": "لم أتمكن من الرد. حاول مرة أخرى."
+  },
+  "research": {
+    "failedNoDetail": "فشل البحث (بلا تفاصيل)",
+    "stopped": "توقف البحث:",
+    "failed": "فشل البحث:",
+    "syncBefore": "أبحث في",
+    "syncAfter": "عنصرًا — المزامنة جارية، وستتحسن النتائج كلما فُهرست بيانات أكثر.",
+    "after": "بعد {{date}}",
+    "before": "قبل {{date}}",
+    "searchCount": "عمليات البحث: {{n}}",
+    "resultCount": "النتائج: {{n}}",
+    "person": "الشخص: {{person}}",
+    "time": "الفترة: {{time}}",
+    "step": "البحث {{n}}",
+    "analyzing": "أحلّل السؤال",
+    "synthesizing": "أجمع ما وجدته",
+    "collapse": "طيّ سجل البحث",
+    "expand": "توسيع سجل البحث",
+    "source": "المصدر {{n}}"
+  },
+  "voice": {
+    "stopHint": "انقر لإنهاء المحادثة الصوتية",
+    "enableHint": "فعّل الإدخال الصوتي من الإعدادات",
+    "unavailable": "التعرّف على الكلام غير متاح على الخادم",
+    "startHint": "تحدّث وسيجيبك Nicx بصوت عالٍ دون لمس لوحة المفاتيح",
+    "phase": {
+      "off": "محادثة صوتية",
+      "listening": "أستمع…",
+      "transcribing": "جارٍ التفريغ…",
+      "thinking": "أفكّر…",
+      "speaking": "أتحدث…"
+    },
+    "endedIdle": "انتهت المحادثة الصوتية: لم يتحدث أحد لمدة دقيقة."
+  },
+  "log": {
+    "research": "بحث: \"{{text}}\"",
+    "request": "طلب: \"{{text}}\" ← {{model}}",
+    "search": "بحث: \"{{query}}\"",
+    "searchPerson": "بحث: \"{{query}}\" (الشخص: {{person}})",
+    "researchError": "خطأ في البحث المعمّق: {{message}}",
+    "generatingWith": "جارٍ التوليد باستخدام {{model}}...",
+    "callingTool": "استدعاء {{call}}",
+    "streamError": "خطأ في البث: {{message}}",
+    "response": "الرد: {{chars}} حرفًا"
+  },
+  "message": {
+    "code": "كود",
+    "copy": "نسخ",
+    "copied": "تم النسخ",
+    "copyMessage": "نسخ الرسالة"
+  },
+  "mic": {
+    "notEnabled": "فعّله من الإعدادات",
+    "noBackend": "لم يتم إعداد التعرّف على الكلام",
+    "waitReply": "انتظر الرد",
+    "stopRecording": "إيقاف التسجيل",
+    "transcribing": "جارٍ التفريغ...",
+    "speak": "تحدّث"
+  },
+  "speak": {
+    "loading": "جارٍ توليد الصوت...",
+    "stop": "إيقاف",
+    "readAloud": "قراءة بصوت عالٍ",
+    "stopReading": "إيقاف القراءة",
+    "readMessageAloud": "قراءة الرسالة بصوت عالٍ"
+  },
+  "tool": {
+    "args": "المعاملات",
+    "result": "النتيجة"
+  },
+  "xray": {
+    "inputTokens": "{{n}} رمز إدخال",
+    "outputTokens": "{{n}} رمز إخراج",
+    "tokens": "{{n}} رمز",
+    "mode": "الوضع",
+    "engine": "المحرك",
+    "generated": "{{n}} مولّدة",
+    "prompt": "{{n}} في الموجّه",
+    "thinking": "~{{n}} للتفكير",
+    "tokensLabel": "الرموز",
+    "complexity": "التعقيد",
+    "tokenBudget": "حد الرموز",
+    "speed": "السرعة",
+    "total": "الإجمالي {{time}}",
+    "latency": "زمن الاستجابة"
+  },
+  "floating": {
+    "goodbye": "إلى اللقاء!",
+    "ended": "انتهت المحادثة",
+    "preparing": "جارٍ التحضير…",
+    "you": "أنت:",
+    "hint": "تفضّل بالكلام. قل “tchau” لأغلق.",
+    "listenAgain": "الاستماع مجددًا",
+    "end": "إنهاء"
+  }
+}

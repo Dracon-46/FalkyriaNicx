@@ -27,7 +27,7 @@ export async function* streamChat(
   });
 
   if (!response.ok) {
-    throw new Error(`Chat request failed: ${response.status}`);
+    throw new Error(i18n.t('errors.chatRequestFailed', { status: response.status }));
   }
 
   const reader = response.body!.getReader();
@@ -79,7 +79,7 @@ export async function* streamResearch(
   });
 
   if (!response.ok) {
-    throw new Error(`Research request failed: ${response.status}`);
+    throw new Error(i18n.t('errors.researchRequestFailed', { status: response.status }));
   }
 
   const reader = response.body!.getReader();

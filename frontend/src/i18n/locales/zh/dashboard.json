@@ -1,0 +1,49 @@
+{
+  "title": "系统概览",
+  "subtitle": "本机推理引擎的实时遥测：功耗、Token 吞吐量，以及相对云端 API 节省的成本。",
+  "cost": {
+    "title": "成本对比",
+    "waiting": "等待首次推理…",
+    "local": "本地（你的硬件）",
+    "requests": "{{n}} 次请求",
+    "tokens": "{{n}} 个 Token",
+    "electricityOnly": "仅电费",
+    "saved": "节省 {{amount}}",
+    "footnote": "节省估算假设本地模型（如 Qwen、Nemotron、Kimi）每次请求平均生成的 Token 数量与闭源云端模型大致相同。"
+  },
+  "energy": {
+    "title": "能耗监测",
+    "waiting": "等待遥测数据…",
+    "cool": "凉爽",
+    "warm": "温热",
+    "hot": "过热",
+    "totalEnergy": "总能耗",
+    "energyPerToken": "每 Token 能耗",
+    "avgPower": "平均功率",
+    "totalRequests": "总请求数",
+    "thermal": "温度状态",
+    "tokensProcessed": "已处理 Token",
+    "power": "功率"
+  },
+  "traces": {
+    "title": "追踪调试器",
+    "untitled": "无标题查询",
+    "steps": "{{n}} 个步骤",
+    "loadFailed": "无法加载追踪记录",
+    "empty": "还没有追踪记录。开始提问后会显示在这里。",
+    "select": "选择一条追踪查看详情"
+  },
+  "logs": {
+    "title": "日志",
+    "entries": "{{n}} 条记录",
+    "copyAll": "全部复制",
+    "clear": "清空",
+    "subtitle": "本次会话的近期活动：聊天事件、模型切换、工具调用和系统消息。",
+    "empty": "还没有日志。聊天、切换模型或使用应用时会显示在这里。"
+  },
+  "painel": {
+    "description": "Nicx 的匿名使用统计在网页面板中，仅限 Falkyria 管理员访问。登录需要密码和身份验证器应用的验证码。",
+    "open": "打开面板",
+    "restricted": "访问受限且会被记录。"
+  }
+}

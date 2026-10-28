@@ -1,0 +1,67 @@
+{
+  "serverUnreachable": "无法连接服务器",
+  "mic": {
+    "notFound": "未找到麦克风",
+    "inUse": "麦克风正被其他程序占用",
+    "denied": "麦克风访问被拒绝",
+    "unsupported": "此浏览器不支持麦克风",
+    "notRecording": "当前没有在录音"
+  },
+  "transcriptionFailed": "转写失败",
+  "transcriptionFailedStatus": "转写失败：{{status}}",
+  "playbackFailed": "音频播放失败",
+  "synthesisFailed": "语音合成失败",
+  "synthesisFailedStatus": "语音合成失败：{{status}}",
+  "wakeUnsupported": "此 Nicx 服务器还没有唤醒监听功能：请重启后再使用。",
+  "wakeFailed": "唤醒监听失败：{{status}}",
+  "noModel": "没有可用的模型",
+  "chatRequestFailed": "聊天请求失败：{{status}}",
+  "researchRequestFailed": "研究请求失败：{{status}}",
+  "requestFailed": "请求失败：{{status}}",
+  "fetchFailed": "获取失败",
+  "desktopOnly": {
+    "cloudKeys": "云端 API 密钥只能在桌面应用中保存。",
+    "backend": "桌面后端仅在桌面应用中可用。",
+    "setupReset": "仅桌面应用可以重置推理设置。",
+    "inferenceSource": "推理来源只能在桌面应用中配置。"
+  },
+  "cloudKeySaveFailed": "无法保存云端密钥",
+  "serverHtml": "Nicx 服务器不可用（API 返回了 HTML）",
+  "backendStartFailed": "无法启动桌面后端",
+  "setupResetFailed": "无法重置推理设置",
+  "modelsFetchFailed": "无法获取模型列表：{{status}}",
+  "modelPullFailed": "无法下载模型：{{detail}}",
+  "deleteFailed": "删除失败",
+  "modelDeleteFailed": "无法删除模型：{{detail}}",
+  "preloadFailed": "预加载失败：{{status}}",
+  "modelLoadTimeout": "模型加载超时（120 秒）",
+  "verificationFailed": "验证失败：{{status}}",
+  "webhookFailed": "Webhook 注册失败：{{status}}",
+  "testMessageFailed": "测试消息发送失败：{{status}}",
+  "apiUnreachable": "无法连接 Nicx API。请检查服务器状态和 API 地址，然后重试。",
+  "memory": {
+    "statusFailed": "无法获取记忆状态",
+    "searchFailed": "无法搜索记忆",
+    "storeFailed": "无法保存到记忆",
+    "indexFailed": "无法为该路径建立索引",
+    "configFailed": "无法获取记忆配置"
+  },
+  "inferenceSourceReadFailed": "无法读取推理来源",
+  "inferenceSourceSaveFailed": "无法保存推理来源",
+  "connectors": {
+    "listFailed": "无法列出数据源：{{status}}",
+    "getFailed": "无法获取数据源 {{id}}：{{status}}",
+    "connectFailed": "无法连接 {{id}}：{{status}}",
+    "authTimeout": "授权超时，请重试。",
+    "disconnectFailed": "无法断开 {{id}}：{{status}}",
+    "syncStatusFailed": "无法获取 {{id}} 的同步状态：{{status}}",
+    "syncFailed": "同步失败：{{status}}"
+  },
+  "privacy": {
+    "serverUnreachable": "无法连接 Nicx 服务器，请重试。",
+    "saveChoiceFailed": "无法保存你的选择，请重试。",
+    "forgetFailed": "现在无法删除你的数据，请重试。",
+    "documentUnreachable": "无法加载文档。请确认 Nicx 正在运行。",
+    "documentFailed": "无法加载文档。"
+  }
+}

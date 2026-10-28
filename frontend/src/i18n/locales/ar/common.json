@@ -1,0 +1,98 @@
+{
+  "theme": {
+    "light": "فاتح",
+    "dark": "داكن",
+    "system": "النظام"
+  },
+  "backendUnreachable": "تعذّر الوصول إلى خادم Nicx",
+  "changeUrl": "تغيير العنوان",
+  "close": "إغلاق",
+  "modelPicker": {
+    "note": {
+      "fastLight": "سريع وخفيف",
+      "recommended": "الخيار الموصى به",
+      "largest": "الأكبر",
+      "fastMultimodal": "سريع ومتعدد الوسائط",
+      "cheapFast": "رخيص وسريع",
+      "reasoning": "استدلال",
+      "balanced": "متوازن",
+      "mostCapable": "الأكثر قدرة",
+      "fastest": "الأسرع",
+      "flagship": "الرائد",
+      "fast": "سريع",
+      "latest": "الأحدث",
+      "auto": "أفضل نموذج للمهمة"
+    },
+    "keyStatusFailed": "تعذّرت قراءة حالة مفاتيح السحابة",
+    "keySaveFailed": "تعذّر حفظ مفتاح API لـ {{provider}}",
+    "downloadFailed": "فشل التنزيل",
+    "log": {
+      "switching": "جارٍ التبديل إلى {{model}}...",
+      "loaded": "تم تحميل {{model}}",
+      "loadFailed": "فشل تحميل {{model}}: {{message}}",
+      "downloaded": "تم تنزيل {{model}}",
+      "downloadFailed": "فشل تنزيل {{model}}: {{message}}",
+      "deleted": "تم حذف {{model}}",
+      "keySaved": "تم حفظ مفتاح API لـ {{provider}}. جارٍ تحديث قائمة النماذج...",
+      "keyRemoved": "تمت إزالة مفتاح API لـ {{provider}}. جارٍ تحديث قائمة النماذج..."
+    },
+    "tabInstalled": "النماذج المثبتة ({{n}})",
+    "tabDownload": "تنزيل",
+    "tabCloud": "نماذج سحابية",
+    "searchInstalled": "البحث في النماذج المثبتة...",
+    "searchDownload": "البحث عن نماذج للتنزيل...",
+    "downloadedOk": "تم تنزيل {{model}} بنجاح",
+    "noModels": "لا توجد نماذج متاحة — انتقل إلى \"تنزيل\" للبدء",
+    "noMatches": "لا توجد نماذج مطابقة",
+    "active": "نشط",
+    "deleteModel": "حذف النموذج",
+    "downloading": "جارٍ التنزيل...",
+    "installed": "مثبّت",
+    "download": "تنزيل",
+    "customLabel": "أو أدخل اسم أي نموذج من Ollama:",
+    "customPlaceholder": "مثال: codellama:7b",
+    "pull": "تنزيل",
+    "cloudDesktopHint": "أضف مفاتيح API لاستخدام النماذج السحابية. تُحفظ المفاتيح في التخزين الآمن على جهازك.",
+    "cloudServerHint": "اضبط مفاتيح مزوّدي السحابة في بيئة الخادم لاستخدام النماذج السحابية.",
+    "connected": "متصل",
+    "keySaved": "محفوظ في التخزين الآمن",
+    "showKey": "إظهار المفتاح",
+    "hideKey": "إخفاء المفتاح",
+    "saving": "جارٍ الحفظ",
+    "remove": "إزالة",
+    "navigate": "تنقّل",
+    "select": "اختيار",
+    "catalogueFooter": "تُنزَّل النماذج من مستودع Ollama",
+    "cloudFooter": "تُحفظ مفاتيح API محليًا ولا تُرسل أبدًا إلى خوادم Nicx"
+  },
+  "approvals": {
+    "title": "موافقات الوكلاء",
+    "pending": "قيد الانتظار: {{n}}",
+    "empty": "لا توجد موافقات معلّقة",
+    "tier": {
+      "trivial": "بسيط",
+      "low": "منخفض",
+      "medium": "متوسط",
+      "high": "مرتفع"
+    },
+    "viewDetails": "عرض التفاصيل",
+    "hideDetails": "إخفاء التفاصيل",
+    "approve": "موافقة",
+    "deny": "رفض"
+  },
+  "errorBoundary": {
+    "title": "حدث خطأ ما",
+    "unexpected": "حدث خطأ غير متوقع.",
+    "retry": "حاول مرة أخرى"
+  },
+  "mascot": {
+    "mood": {
+      "idle": "هادئ",
+      "listening": "يستمع",
+      "thinking": "يفكّر",
+      "speaking": "يتحدث",
+      "happy": "سعيد",
+      "error": "حدث خطأ ما"
+    }
+  }
+}

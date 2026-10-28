@@ -2,5 +2,171 @@
   "language": {
     "label": "Idioma",
     "description": "Idioma da interface, das respostas do Nicx e da voz."
+  },
+  "page": {
+    "title": "Configurações",
+    "saved": "Salvo",
+    "description": "Preferências do app: aparência, modelos, voz, memória e seus dados."
+  },
+  "sections": {
+    "appearance": "Aparência",
+    "connection": "Conexão",
+    "inference": "Fonte dos modelos",
+    "models": "Modelos",
+    "apiKeys": "Chaves de API",
+    "tools": "Ferramentas",
+    "memory": "Memória",
+    "modelDefaults": "Padrões do modelo",
+    "voice": "Voz",
+    "data": "Dados",
+    "about": "Sobre"
+  },
+  "theme": {
+    "label": "Tema",
+    "description": "Escolha a aparência do Nicx",
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema"
+  },
+  "fontSize": {
+    "label": "Tamanho da letra",
+    "small": "Pequeno",
+    "default": "Padrão",
+    "large": "Grande"
+  },
+  "connection": {
+    "serverStatus": "Status do servidor",
+    "notConnected": "Não conectado",
+    "connected": "Conectado",
+    "disconnected": "Desconectado",
+    "checking": "Verificando...",
+    "serverAddress": "Endereço do servidor",
+    "invalidAddress": "Isso não é um endereço (precisa começar com http://). Deixe em branco para usar o padrão.",
+    "addressHint": "Deixe em branco. Só mude se o servidor do Nicx rodar em outra porta ou máquina.",
+    "addressPlaceholder": "em branco = padrão",
+    "apiKey": "Chave de API",
+    "apiKeyDescription": "Só é necessária se o servidor foi iniciado com uma chave de API"
+  },
+  "inference": {
+    "source": "Fonte",
+    "sourceDescription": "Onde o app roda os modelos. Vale depois de reiniciar.",
+    "ollama": "Ollama do app (padrão)",
+    "custom": "Servidor próprio compatível com OpenAI",
+    "serverUrl": "Endereço do servidor",
+    "serverUrlDescription": "ex.: LM Studio: http://localhost:1234/v1",
+    "model": "Modelo",
+    "modelDescription": "ID do modelo servido pelo seu servidor",
+    "serverType": "Tipo de servidor",
+    "serverTypeDescription": "Motor compatível com OpenAI",
+    "apiKey": "Chave de API (opcional)",
+    "apiKeyDescription": "Só se o seu servidor pedir uma",
+    "apiKeyPlaceholder": "deixe em branco se não tiver",
+    "save": "Salvar fonte dos modelos",
+    "saved": "Salvo. Reinicie o app para aplicar.",
+    "saveFailed": "Não foi possível salvar."
+  },
+  "models": {
+    "none": "Nenhum modelo carregado",
+    "local": "Modelos locais (Ollama)",
+    "localDescription": "Modelos que rodam neste computador",
+    "pullBefore": "Rode",
+    "pullModelName": "nome-do-modelo",
+    "pullAfter": "no terminal para baixar mais modelos",
+    "cloud": "Provedores na nuvem",
+    "cloudDescription": "Ponto verde: chave de API configurada"
+  },
+  "apiKeys": {
+    "openaiDescription": "Modelos GPT",
+    "anthropicDescription": "Modelos Claude",
+    "googleDescription": "Modelos Gemini",
+    "openrouterDescription": "Vários provedores num só lugar",
+    "atlasDescription": "Modelos pelo Atlas Cloud",
+    "atlasPlaceholder": "Chave de API do Atlas Cloud",
+    "savedSecure": "Salva no armazenamento seguro",
+    "savedServer": "Salva pelo servidor local",
+    "remove": "Remover",
+    "saved": "Salva",
+    "saveFailed": "Não foi possível salvar a chave de API",
+    "removeFailed": "Não foi possível remover a chave de API"
+  },
+  "tools": {
+    "webSearch": "Pesquisa na web",
+    "webSearchDescription": "Chave do Tavily para a ferramenta de pesquisa na web"
+  },
+  "memory": {
+    "status": "Status da memória",
+    "checkingBackend": "Verificando a memória...",
+    "notConfiguredLong": "A memória não está configurada",
+    "backendEntries": "{{backend}} — itens guardados: {{entries}}",
+    "checking": "Verificando...",
+    "notConfigured": "Não configurada",
+    "entries": "Itens: {{entries}}",
+    "unavailable": "Indisponível",
+    "retry": "Tentar de novo",
+    "useContext": "Usar a memória nas conversas",
+    "useContextDescription": "Inclui lembranças relevantes nas conversas automaticamente",
+    "backend": "Mecanismo da memória",
+    "backendDescription": "Qual mecanismo de busca usar",
+    "topK": "Resultados incluídos",
+    "minScore": "Relevância mínima",
+    "maxTokens": "Máximo de tokens de contexto"
+  },
+  "modelDefaults": {
+    "temperature": "Temperatura",
+    "maxTokens": "Máximo de tokens"
+  },
+  "voice": {
+    "input": "Entrada de voz",
+    "inputDescription": "Usar o microfone para ditar e para a conversa por voz (reconhecimento local)",
+    "output": "Saída de voz",
+    "outputDescription": "Mostrar o botão para ouvir as respostas do Nicx",
+    "autoplay": "Falar as respostas automaticamente",
+    "autoplayDescription": "Ler cada resposta em voz alta assim que ela termina",
+    "tts": "Voz do Nicx",
+    "ttsDescription": "Mecanismo e voz usados nas respostas faladas",
+    "recognition": "Reconhecimento de voz",
+    "recognitionDescription": "Whisper rodando no seu computador",
+    "checking": "Verificando...",
+    "available": "Disponível",
+    "notConfigured": "Não configurado",
+    "setupHint": "Configure o reconhecimento de voz para usar a entrada por voz.",
+    "docsBefore": "Veja a",
+    "docsLink": "documentação",
+    "docsAfter": "para mais detalhes."
+  },
+  "wake": {
+    "enableLabel": "Ativar “Nicx, ligar” (escuta em segundo plano)",
+    "enableDescription": "Diga “Nicx, ligar” (ou “Ei Nicx”) e o mascote aparece pronto para conversar por voz. O microfone fica aberto só neste computador: nada é gravado nem enviado.",
+    "enableToggle": "Ativar “Nicx, ligar”",
+    "listening": "Escuta",
+    "noWindow": "Sem janela flutuante neste computador: a interface abre no navegador.",
+    "howToStop": "Diga “tchau” ou “desligar” para o mascote sair; ele também some após 1 minuto em silêncio.",
+    "autostart": "Iniciar com o Windows",
+    "autostartDescription": "Começa a escutar quando você entra no Windows (só se a opção acima estiver ativada)",
+    "serverUnavailable": "Servidor do Nicx indisponível",
+    "saveFailed": "Não foi possível salvar",
+    "restartServer": "Reinicie o servidor do Nicx",
+    "checking": "Verificando...",
+    "starting": "Iniciando...",
+    "states": {
+      "listening": "Escutando em segundo plano",
+      "paused": "Pausada (ícone da bandeja)",
+      "mascotOpen": "Mascote aberto",
+      "stopped": "Parada"
+    }
+  },
+  "data": {
+    "conversations": "Conversas",
+    "storedLocally": "Guardadas neste computador: {{total}}",
+    "export": "Exportar",
+    "import": "Importar",
+    "clearAll": "Apagar todos os dados",
+    "clearAllDescription": "Apaga todas as conversas de vez",
+    "confirm": "Clique de novo para confirmar",
+    "clear": "Apagar"
+  },
+  "about": {
+    "tagline": "a inteligência artificial da Falkyria.",
+    "repository": "Repositório"
   }
 }
