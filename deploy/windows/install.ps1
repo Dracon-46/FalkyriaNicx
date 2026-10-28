@@ -299,7 +299,13 @@ if (Test-Path (Join-Path $srcDir '.git')) {
     # Preserve history without partial-clone lazy fetches from local sources,
     # which may themselves be shallow. Remote sources can omit old blobs.
     if ($repoUrl -like 'file://*' -or (Test-Path -LiteralPath $repoUrl -ErrorAction SilentlyContinue)) {
-        & $gitExe clone $repoUrl $srcDir
+        # Git for Windows cannot open file:// URLs whose path has characters
+        # such as '[' ("does not appear to be a git repository"); the plain
+        # local path always works, so clone from it.
+        $localSource = if ($repoUrl -like 'file://*') {
+            ([System.Uri]$repoUrl).LocalPath
+        } else { $repoUrl }
+        & $gitExe clone $localSource $srcDir
     } else {
         & $gitExe clone --filter=blob:none $repoUrl $srcDir
     }

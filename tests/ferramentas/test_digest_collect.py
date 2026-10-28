@@ -12,7 +12,10 @@ from nicx.nucleo.registry import ConnectorRegistry, ToolRegistry
 def test_digest_collect_registered():
     from nicx.ferramentas.agentes.digest_collect import DigestCollectTool
 
-    ToolRegistry.register_value("digest_collect", DigestCollectTool)
+    # Importar o módulo já registra a ferramenta; outros testes podem ter
+    # limpado o registro antes, então só registra de novo se faltar.
+    if not ToolRegistry.contains("digest_collect"):
+        ToolRegistry.register_value("digest_collect", DigestCollectTool)
     assert ToolRegistry.contains("digest_collect")
 
 

@@ -134,13 +134,17 @@ if ($Case -eq 'winget-shadowed-python') {
 
 def _run_case(tmp_path: Path, case: str) -> dict:
     script = tmp_path / "prerequisites.ps1"
-    script.write_text(_HARNESS)
+    script.write_text(_HARNESS, encoding="utf-8")
     result = subprocess.run(
         [
             _POWERSHELL,
             "-NoLogo",
             "-NoProfile",
             "-NonInteractive",
+            # The default Windows policy (Restricted) refuses to run any .ps1;
+            # the installer and its helpers are always started with Bypass.
+            "-ExecutionPolicy",
+            "Bypass",
             "-File",
             str(script),
             "-Installer",

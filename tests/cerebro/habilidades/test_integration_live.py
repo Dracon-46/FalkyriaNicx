@@ -2,28 +2,69 @@
 
 These tests require a running Ollama instance with qwen3.5:4b.
 Mark: live
+
+Sem o Ollama com o modelo, ou sem as habilidades instaladas em
+``~/.nicx/skills/``, os testes que dependem disso são pulados.
 """
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
+
+import httpx
 import pytest
 
 from nicx.cerebro.habilidades.manager import SkillManager
 from nicx.cerebro.habilidades.tool_adapter import SkillTool
+from nicx.motores.ollama import _normalize_host
 from nicx.nucleo.events import EventBus, EventType
 from nicx.nucleo.sistema import SystemBuilder
+
+_MODEL = "qwen3.5:4b"
+_SKILLS_DIR = Path("~/.nicx/skills/").expanduser()
+
+
+def _ollama_has_model() -> bool:
+    """True só se o Ollama responde *e* já tem o modelo baixado."""
+    base = _normalize_host(os.environ.get("OLLAMA_HOST") or "127.0.0.1:11434")
+    try:
+        resp = httpx.get(f"{base}/api/tags", timeout=1.0)
+        resp.raise_for_status()
+        models = resp.json().get("models", [])
+    except (httpx.HTTPError, ValueError):
+        return False
+    return any(_MODEL in (m.get("model"), m.get("name")) for m in models)
+
+
+requires_ollama = pytest.mark.skipif(
+    not _ollama_has_model(),
+    reason=f"Ollama desligado ou sem o modelo {_MODEL} (rode `ollama serve`)",
+)
+
+
+def _discover_or_skip(mgr: SkillManager, *needed: str) -> None:
+    mgr.discover(paths=[_SKILLS_DIR])
+    missing = [name for name in needed if name not in mgr.skill_names()]
+    if missing:
+        pytest.skip(
+            f"habilidades não instaladas em {_SKILLS_DIR}: {', '.join(missing)}"
+        )
 
 
 @pytest.mark.live
 class TestSkillSystemIntegration:
     """Integration tests verifying skills flow end-to-end with a real engine."""
 
+    @requires_ollama
     def test_system_builder_discovers_skills(self):
         """SystemBuilder.build() discovers installed skills and adds them to tools."""
         system = SystemBuilder().engine("ollama").model("qwen3.5:4b").build()
         try:
             assert system.skill_manager is not None, "SkillManager should be created"
             skill_names = system.skill_manager.skill_names()
+            if not skill_names:
+                pytest.skip("nenhuma habilidade instalada para descobrir")
             assert len(skill_names) > 0, f"Should discover skills, got: {skill_names}"
             print(f"  Discovered skills: {skill_names}")
 
@@ -42,9 +83,9 @@ class TestSkillSystemIntegration:
         """The skill catalog XML should be generated correctly."""
         bus = EventBus()
         mgr = SkillManager(bus=bus)
-        from pathlib import Path
-
-        mgr.discover(paths=[Path("~/.nicx/skills/").expanduser()])
+        _discover_or_skip(
+            mgr, "research-and-summarize", "code-explainer", "math-solver"
+        )
 
         catalog = mgr.get_catalog_xml()
         assert "<available_skills>" in catalog
@@ -57,9 +98,7 @@ class TestSkillSystemIntegration:
         """Invoking a skill tool returns meaningful content."""
         bus = EventBus(record_history=True)
         mgr = SkillManager(bus=bus)
-        from pathlib import Path
-
-        mgr.discover(paths=[Path("~/.nicx/skills/").expanduser()])
+        _discover_or_skip(mgr, "code-explainer")
 
         # Test instruction-only skill
         tools = mgr.get_skill_tools()
@@ -81,6 +120,7 @@ class TestSkillSystemIntegration:
         # emit them, covered in TestSkillEventsAndTracing below)
         assert bus.history is not None
 
+    @requires_ollama
     def test_agent_ask_with_skills_available(self):
         """Agent can answer a query with skills available in the tool list."""
         system = (

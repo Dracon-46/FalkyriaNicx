@@ -60,6 +60,20 @@ def _to_apple_ts(dt: datetime) -> float:
     return (dt - _APPLE_EPOCH).total_seconds()
 
 
+def _day_str(dt: datetime) -> str:
+    """``Monday, March 3 2025``: dia sem zero à esquerda em qualquer sistema.
+
+    ``%-d`` e ``%-I`` só existem na glibc e no macOS; no Windows o
+    ``strftime`` recusa ("Invalid format string").
+    """
+    return f"{dt:%A, %B} {dt.day} {dt:%Y}"
+
+
+def _time_str(dt: datetime) -> str:
+    """``3:05 PM``: hora de 12 h sem zero à esquerda em qualquer sistema."""
+    return f"{dt.hour % 12 or 12}:{dt:%M %p}"
+
+
 def _open_db(path: Path) -> sqlite3.Connection | None:
     try:
         return sqlite3.connect(f"file:{path}?mode=ro", uri=True)
@@ -240,11 +254,11 @@ class AppleCalendarConnector(BaseConnector):
         )
 
         if all_day:
-            date_str = start_dt.strftime("%A, %B %-d %Y (all day)")
+            date_str = f"{_day_str(start_dt)} (all day)"
         else:
-            date_str = start_dt.strftime("%A, %B %-d %Y at %-I:%M %p")
+            date_str = f"{_day_str(start_dt)} at {_time_str(start_dt)}"
             if end_dt:
-                date_str += end_dt.strftime(" – %-I:%M %p")
+                date_str += f" – {_time_str(end_dt)}"
             if start_tz and start_tz != "_float":
                 date_str += f" ({start_tz})"
 

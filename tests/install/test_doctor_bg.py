@@ -6,12 +6,15 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
+from nicx.comandos.instalacao._bg_state import marker_name
 from nicx.comandos.instalacao.doctor import doctor
 
 
 def test_doctor_shows_bg_section_when_state_present(tmp_nicx_home: Path) -> None:
-    (tmp_nicx_home / ".state" / "extension-built").write_text("")
-    (tmp_nicx_home / ".state" / "models" / "qwen3.5:9b.ready").write_text("")
+    (tmp_nicx_home / ".state" / "extension-built").write_text("", encoding="utf-8")
+    (
+        tmp_nicx_home / ".state" / "models" / marker_name("qwen3.5:9b", "ready")
+    ).write_text("", encoding="utf-8")
     runner = CliRunner()
     result = runner.invoke(doctor, [], catch_exceptions=False)
     assert "Background tasks" in result.output
@@ -21,7 +24,7 @@ def test_doctor_shows_bg_section_when_state_present(tmp_nicx_home: Path) -> None
 
 
 def test_doctor_exit_code_when_bg_failed(tmp_nicx_home: Path) -> None:
-    (tmp_nicx_home / ".state" / "extension-failed").write_text("oom")
+    (tmp_nicx_home / ".state" / "extension-failed").write_text("oom", encoding="utf-8")
     runner = CliRunner()
     result = runner.invoke(doctor, [], catch_exceptions=False)
     # Doctor should exit non-zero when any bg task is failed.

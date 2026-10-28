@@ -109,6 +109,10 @@ def call_with_refresh(
     end here; transient 5xx / timeout retries belong further up the stack.
     """
     token = current_access_token(credentials_path)
+    if not token:
+        # Sem token o httpx recusa o cabeçalho "Bearer " vazio com um erro
+        # confuso; tenta o refresh_token e, sem ele, avisa que falta conectar.
+        token = refresh_access_token(credentials_path)
     try:
         return api_fn(token, *args, **kwargs)
     except httpx.HTTPStatusError as exc:

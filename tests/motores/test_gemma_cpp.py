@@ -370,7 +370,24 @@ class TestGemmaCppDiscovery:
         assert EngineRegistry.contains("gemma_cpp")
 
 
+def _gemma_live_missing() -> str:
+    """Motivo para pular os testes reais do gemma.cpp, ou "" se dá para rodar."""
+    try:
+        import pygemma  # noqa: F401
+    except ImportError:
+        return "pygemma não está instalado"
+    for var in ("GEMMA_CPP_MODEL_PATH", "GEMMA_CPP_TOKENIZER_PATH"):
+        value = os.environ.get(var, "")
+        if not value or not os.path.isfile(value):
+            return f"{var} não aponta para um arquivo baixado do Gemma"
+    return ""
+
+
+_GEMMA_LIVE_MISSING = _gemma_live_missing()
+
+
 @pytest.mark.live
+@pytest.mark.skipif(bool(_GEMMA_LIVE_MISSING), reason=_GEMMA_LIVE_MISSING)
 class TestGemmaCppLive:
     """Integration tests — require pygemma and downloaded Gemma weights.
 

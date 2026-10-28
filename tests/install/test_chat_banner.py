@@ -6,11 +6,14 @@ from pathlib import Path
 
 from nicx.comandos.conversa._chat_banner import render_startup_banner
 from nicx.comandos.instalacao import _bg_state
+from nicx.comandos.instalacao._bg_state import marker_name
 
 
 def test_banner_empty_when_all_ready(tmp_nicx_home: Path) -> None:
-    (tmp_nicx_home / ".state" / "extension-built").write_text("")
-    (tmp_nicx_home / ".state" / "models" / "qwen3.5:9b.ready").write_text("")
+    (tmp_nicx_home / ".state" / "extension-built").write_text("", encoding="utf-8")
+    (
+        tmp_nicx_home / ".state" / "models" / marker_name("qwen3.5:9b", "ready")
+    ).write_text("", encoding="utf-8")
     s = _bg_state.get_status()
     banner = render_startup_banner(s)
     assert banner == ""
@@ -25,9 +28,11 @@ def test_banner_shows_rust_building(tmp_nicx_home: Path) -> None:
 
 
 def test_banner_shows_model_downloading(tmp_nicx_home: Path) -> None:
-    (tmp_nicx_home / ".state" / "extension-built").write_text("")
+    (tmp_nicx_home / ".state" / "extension-built").write_text("", encoding="utf-8")
     models_dir = tmp_nicx_home / ".state" / "models"
-    (models_dir / "qwen3.5:9b.downloading").write_text("")
+    (models_dir / marker_name("qwen3.5:9b", "downloading")).write_text(
+        "", encoding="utf-8"
+    )
     s = _bg_state.get_status()
     banner = render_startup_banner(s)
     assert "qwen3.5:9b" in banner
@@ -35,7 +40,9 @@ def test_banner_shows_model_downloading(tmp_nicx_home: Path) -> None:
 
 
 def test_banner_shows_failed_in_dim_warning(tmp_nicx_home: Path) -> None:
-    (tmp_nicx_home / ".state" / "extension-failed").write_text("error tail")
+    (tmp_nicx_home / ".state" / "extension-failed").write_text(
+        "error tail", encoding="utf-8"
+    )
     s = _bg_state.get_status()
     banner = render_startup_banner(s)
     assert "failed" in banner.lower()

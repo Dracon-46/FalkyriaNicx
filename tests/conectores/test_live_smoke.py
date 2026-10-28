@@ -6,7 +6,6 @@ Exercises: ObsidianConnector → SyncEngine → KnowledgeStore → knowledge_sea
 
 from __future__ import annotations
 
-import tempfile
 from pathlib import Path
 
 import pytest
@@ -22,22 +21,21 @@ DOCS_DIR = Path(__file__).resolve().parents[2] / "docs"
 
 
 @pytest.mark.live
-def test_live_obsidian_full_pipeline() -> None:
+def test_live_obsidian_full_pipeline(tmp_path: Path) -> None:
     """Smoke test: index real .md files, then search them."""
     assert DOCS_DIR.is_dir(), f"Docs dir not found: {DOCS_DIR}"
 
-    with tempfile.TemporaryDirectory() as tmp:
-        tmp_path = Path(tmp)
+    # 1. Set up the full pipeline
+    store = KnowledgeStore(db_path=str(tmp_path / "live.db"))
+    pipeline = IngestionPipeline(store=store, max_tokens=256)
+    engine = SyncEngine(
+        pipeline=pipeline,
+        state_db=str(tmp_path / "state.db"),
+    )
+    connector = ObsidianConnector(vault_path=str(DOCS_DIR))
 
-        # 1. Set up the full pipeline
-        store = KnowledgeStore(db_path=str(tmp_path / "live.db"))
-        pipeline = IngestionPipeline(store=store, max_tokens=256)
-        engine = SyncEngine(
-            pipeline=pipeline,
-            state_db=str(tmp_path / "state.db"),
-        )
-        connector = ObsidianConnector(vault_path=str(DOCS_DIR))
-
+    # Windows does not delete open SQLite files: close both before cleanup.
+    try:
         # 2. Verify connection
         assert connector.is_connected(), "Connector should see docs dir"
 
@@ -86,3 +84,6 @@ def test_live_obsidian_full_pipeline() -> None:
         print(
             f"\n  SMOKE TEST PASSED — {items} chunks indexed, search working end-to-end"
         )
+    finally:
+        engine.close()
+        store.close()
