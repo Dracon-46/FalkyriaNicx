@@ -218,3 +218,19 @@ def test_stop_started_server_only_touches_what_nicx_started(monkeypatch):
     ollama.stop_started_server()
     assert calls == ["terminate", "wait"]
     assert not ollama.started_by_nicx()
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("0.0.0.0", "http://127.0.0.1:11434"),
+        ("127.0.0.1:11434", "http://127.0.0.1:11434"),
+        ("0.0.0.0:12000", "http://127.0.0.1:12000"),
+        ("http://localhost:11434/", "http://localhost:11434"),
+        ("https://ollama.exemplo.com", "https://ollama.exemplo.com"),
+    ],
+)
+def test_ollama_host_in_ollama_format(raw, expected):
+    from nicx.motores.ollama import _normalize_host
+
+    assert _normalize_host(raw) == expected

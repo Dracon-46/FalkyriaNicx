@@ -53,10 +53,24 @@ def _load() -> List[Reminder]:
         return []
     try:
         raw = json.loads(path.read_text(encoding="utf-8"))
-        return [Reminder(**item) for item in raw]
+        if not isinstance(raw, list):
+            raise ValueError("não é uma lista")
     except (ValueError, TypeError) as exc:
-        logger.warning("lembretes.json ilegível (%s); começando vazio", exc)
+        # Guarda o arquivo ruim em vez de sobrescrever no próximo lembrete.
+        backup = path.with_suffix(".json.bak")
+        os.replace(path, backup)
+        logger.warning("lembretes.json ilegível (%s); guardado em %s", exc, backup.name)
         return []
+    items: List[Reminder] = []
+    for item in raw:
+        try:
+            reminder = Reminder(**item)
+            reminder.due_at  # data inválida (edição à mão) fica de fora
+        except (TypeError, ValueError):
+            logger.warning("Lembrete inválido ignorado: %r", item)
+            continue
+        items.append(reminder)
+    return items
 
 
 def _save(items: List[Reminder]) -> None:

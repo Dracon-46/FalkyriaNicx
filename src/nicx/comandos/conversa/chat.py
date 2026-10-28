@@ -139,6 +139,11 @@ def chat(
         console.print("[red]No inference engine available.[/red]")
         sys.exit(1)
 
+    # Lembretes marcados na conversa avisam enquanto o chat estiver aberto.
+    from nicx.acoes import lembretes
+
+    lembretes.start_alarm()
+
     engine_name, engine = resolved
     from nicx.comandos.conversa._model_switch import (
         interactive_pick_model,

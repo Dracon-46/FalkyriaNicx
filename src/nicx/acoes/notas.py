@@ -43,8 +43,13 @@ def all_notes() -> List[str]:
 
 
 def clear() -> int:
+    """Apaga as anotações do Nicx. Texto escrito à mão no arquivo fica, e uma
+    cópia do arquivo antes de apagar vai para notas.md.bak."""
     count = len(all_notes())
     file = path()
-    if file.exists():
-        file.write_text("# Anotações do Nicx\n\n", encoding="utf-8")
+    if file.exists() and count:
+        text = file.read_text(encoding="utf-8")
+        file.with_suffix(".md.bak").write_text(text, encoding="utf-8")
+        kept = [line for line in text.splitlines() if not line.startswith("- [")]
+        file.write_text("\n".join(kept).rstrip() + "\n\n", encoding="utf-8")
     return count

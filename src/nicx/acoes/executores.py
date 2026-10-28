@@ -266,7 +266,14 @@ def confirm() -> Outcome:
     threading.Timer(
         3.0,
         lambda: subprocess.run(  # noqa: S603, S607
-            ["rundll32.exe", "powrprof.dll,SetSuspendState", "0,1,0"],
+            [
+                "powershell",
+                "-NoProfile",
+                "-Command",
+                "Add-Type -AssemblyName System.Windows.Forms; "
+                "[System.Windows.Forms.Application]::SetSuspendState("
+                "'Suspend', $false, $false)",
+            ],
             capture_output=True,
             creationflags=_NO_WINDOW,
         ),

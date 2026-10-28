@@ -402,7 +402,8 @@ async def _stream_research(
             loop.call_soon_threadsafe(queue.put_nowait, event)
 
         config = load_config()
-        engine_key, engine, model = _build_planner_engine(
+        engine_key, engine, model = await asyncio.to_thread(
+            _build_planner_engine,
             config,
             active_engine=active_engine,
             active_engine_key=active_engine_key,

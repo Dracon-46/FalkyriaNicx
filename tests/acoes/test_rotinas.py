@@ -191,6 +191,8 @@ def test_notes_are_kept_in_a_markdown_file(nicx_home):
 
 @pytest.fixture
 def commands(monkeypatch):
+    import psutil  # noqa: F401 - antes de trocar sys.platform (no Linux quebraria)
+
     ran: list[list[str]] = []
     monkeypatch.setattr(executores.sys, "platform", "win32")
     monkeypatch.setattr(
@@ -366,3 +368,41 @@ def test_cancel_the_timer_keeps_other_reminders():
     assert [r.text for r in lembretes.pending()] == ["pagar a conta"]
     assert handle("cancela os alarmes").message == "Não havia alarmes para cancelar."
     assert handle("cancela os lembretes").message == "Cancelei 1 lembrete."
+
+
+def test_clearing_notes_keeps_hand_written_text(nicx_home):
+    notas.add("comprar pão")
+    file = notas.path()
+    file.write_text(
+        file.read_text(encoding="utf-8") + "Texto meu, escrito à mão.\n",
+        encoding="utf-8",
+    )
+    assert notas.clear() == 1
+    text = file.read_text(encoding="utf-8")
+    assert "Texto meu, escrito à mão." in text and "comprar pão" not in text
+    assert "comprar pão" in file.with_suffix(".md.bak").read_text(encoding="utf-8")
+
+
+def test_bad_reminder_entry_does_not_break_the_list(nicx_home):
+    good = lembretes.add("beber água", NOW + timedelta(hours=1))
+    path = nicx_home / "lembretes.json"
+    import json
+
+    items = json.loads(path.read_text(encoding="utf-8"))
+    items.append({"id": "x", "text": "quebrado", "due": "ontem", "created": "?"})
+    path.write_text(json.dumps(items), encoding="utf-8")
+    assert [r.id for r in lembretes.pending()] == [good.id]
+
+
+def test_unreadable_reminders_file_is_kept_aside(nicx_home):
+    path = nicx_home / "lembretes.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("{isso não é json", encoding="utf-8")
+    assert lembretes.pending() == []
+    assert (nicx_home / "lembretes.json.bak").exists()
+
+
+def test_suspend_alone_and_pode_desligar(commands):
+    assert parse("suspende").kind == "power"
+    handle("desliga o computador")
+    assert handle("pode desligar").message.startswith("Desligando em 30 segundos")

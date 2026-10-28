@@ -138,9 +138,32 @@ def test_faster_whisper_falls_back_from_unsupported_float16():
         )
         assert backend._ensure_model() is mock_model
 
+    # Primeiro o cache local: recarregar depois do ócio não consulta a rede.
     mock_whisper.assert_called_once_with(
-        "base", device="cpu", compute_type="int8", cpu_threads=ANY
+        "base",
+        local_files_only=True,
+        device="cpu",
+        compute_type="int8",
+        cpu_threads=ANY,
     )
+
+
+def test_faster_whisper_downloads_when_not_cached():
+    mock_model = MagicMock()
+    calls = []
+
+    def fake(size, **kwargs):
+        calls.append(kwargs.get("local_files_only", False))
+        if kwargs.get("local_files_only"):
+            raise RuntimeError("não está no cache")
+        return mock_model
+
+    with patch("nicx.voz.faster_whisper.WhisperModel", side_effect=fake):
+        backend = FasterWhisperBackend(
+            model_size="base", device="cpu", compute_type="int8"
+        )
+        assert backend._ensure_model() is mock_model
+    assert calls == [True, False]
 
 
 def test_faster_whisper_missing_dependency_hint_uses_desktop_extra():

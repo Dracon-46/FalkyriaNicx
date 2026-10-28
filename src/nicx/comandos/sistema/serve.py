@@ -269,9 +269,15 @@ def serve(
         merge_discovered_models(ek, model_ids)
 
     multi_entries = [(engine_name, engine)]
+    # Só modelos locais: um motor de nuvem descoberto (ex.: litellm instalado)
+    # não entra ao lado do local; nuvem só com chave configurada (cloud_engine).
+    main_is_cloud = bool(getattr(engine, "is_cloud", False))
     for discovered_name, discovered_engine in all_engines:
-        if discovered_name != engine_name:
-            multi_entries.append((discovered_name, discovered_engine))
+        if discovered_name == engine_name:
+            continue
+        if not main_is_cloud and getattr(discovered_engine, "is_cloud", False):
+            continue
+        multi_entries.append((discovered_name, discovered_engine))
     if cloud_engine is not None:
         multi_entries.append(("cloud", cloud_engine))
 

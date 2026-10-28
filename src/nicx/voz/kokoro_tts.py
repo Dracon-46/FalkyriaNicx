@@ -286,6 +286,7 @@ class KokoroTTSBackend(TTSBackend):
         # fail to load a voice with an empty name.
         voice_id = voice_id or _DEFAULT_VOICE_ID
         lang_code = self._lang_for_voice(voice_id)
+        self._idle.touch()  # uma síntese longa não deixa o timer descarregar no meio
         with self._pipeline_lock:
             pipeline = self._ensure_pipeline(lang_code)
             samples = []

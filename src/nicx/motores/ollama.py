@@ -212,6 +212,26 @@ def stop_started_server() -> None:
         logger.debug("Ollama ligado pelo Nicx não desligou: %s", exc)
 
 
+def _normalize_host(host: str) -> str:
+    """'0.0.0.0', '127.0.0.1:11434' (formato do OLLAMA_HOST) -> URL completa.
+
+    Endereço sem esquema é do jeito do Ollama: porta padrão 11434, e 0.0.0.0
+    (escuta em tudo) vira 127.0.0.1 para conectar. URL completa (ex.: um
+    Ollama remoto atrás de proxy HTTPS) fica como veio.
+    """
+    host = host.strip().rstrip("/")
+    if "://" in host:
+        return host
+    if host.count(":") > 1 and not host.startswith("["):
+        host = f"[{host}]"  # IPv6 sem colchetes ("::1")
+    url = httpx.URL(f"http://{host}")
+    hostname = url.host or "localhost"
+    if hostname in ("0.0.0.0", "::"):
+        hostname = "127.0.0.1"
+    netloc = f"[{hostname}]" if ":" in hostname else hostname
+    return f"http://{netloc}:{url.port or 11434}"
+
+
 def _find_ollama() -> str | None:
     """Caminho do executável do Ollama: PATH ou a instalação padrão do Windows."""
     import shutil
@@ -251,7 +271,7 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
         if host is None:
             env_host = os.environ.get("OLLAMA_HOST")
             host = env_host or self._DEFAULT_HOST
-        self._host = host.rstrip("/")
+        self._host = _normalize_host(host)
         # Used by the shared async streaming plumbing (AsyncHTTPEngineMixin) so a
         # wedged token read is bounded by ``timeout`` instead of hanging the
         # single event loop for the httpx default.
@@ -709,8 +729,12 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
         flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
         global _started
         try:
+            # Na mesma porta que o Nicx vai procurar.
+            url = httpx.URL(self._host)
+            env = {**os.environ, "OLLAMA_HOST": f"{url.host}:{url.port or 11434}"}
             process = subprocess.Popen(
                 [exe, "serve"],
+                env=env,
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,

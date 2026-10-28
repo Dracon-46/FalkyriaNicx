@@ -296,7 +296,7 @@ def _power(t: str) -> Optional[Action]:
     if re.fullmatch(r"(?:reinicia|reinicie|reiniciar|reinicializa)" + pc, t):
         return Action("power", op="restart")
     if re.fullmatch(
-        r"(?:suspende|suspenda|suspender|hiberna|hibernar)" + pc + r"?"
+        r"(?:suspende|suspenda|suspender|hiberna|hibernar)(?:" + pc + r")?"
         r"|(?:coloca|poe|bota)" + pc + r" (?:pra|para) dormir"
         r"|modo (?:de )?(?:suspensao|hibernacao)",
         t,
@@ -313,7 +313,7 @@ def _confirmation(t: str) -> Optional[Action]:
         return None
     if re.fullmatch(
         r"(?:sim|confirmo|confirma|confirmado|pode|pode sim|sim pode|isso|claro|"
-        r"pode (?:desligar|reiniciar|suspender|ir))(?: sim)?",
+        r"(?:pode )?(?:desligar|reiniciar|suspender|ir))(?: sim)?",
         t,
     ):
         return Action("confirm")

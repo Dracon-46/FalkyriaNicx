@@ -127,14 +127,20 @@ class FasterWhisperBackend(SpeechBackend):
                 )
                 raise ImportError(self._last_error)
             compute_type = self._resolve_compute_type()
-            self._model = WhisperModel(
-                self._model_size,
+            options = dict(
                 device=self._device,
                 compute_type=compute_type,
                 # CTranslate2 defaults to 4 threads; "small" with 8 was ~15%
                 # faster here (12 cores), more brings little.
                 cpu_threads=min(8, os.cpu_count() or 4),
             )
+            try:
+                # Recarregar depois do ócio não precisa consultar o Hugging Face.
+                self._model = WhisperModel(
+                    self._model_size, local_files_only=True, **options
+                )
+            except Exception:
+                self._model = WhisperModel(self._model_size, **options)
         self._last_error = None
         return self._model
 
@@ -216,7 +222,8 @@ class FasterWhisperBackend(SpeechBackend):
             return True
         if WhisperModel is None:
             self._last_error = (
-                "faster-whisper is not installed. Install with: uv sync --extra desktop"
+                "O reconhecimento de voz (faster-whisper) não está instalado. "
+                "Instale com: uv sync --extra desktop"
             )
             return False
         return True
