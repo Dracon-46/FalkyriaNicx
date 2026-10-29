@@ -160,7 +160,7 @@ New-Item -ItemType Directory -Force -Path $BuildDir, $DistDir, $WheelDir, $Brand
 # 1. Interface
 # ---------------------------------------------------------------------------
 
-$staticIndex = Join-Path $Repo 'src\nicx\server\static\index.html'
+$staticIndex = Join-Path $Repo 'src\nicx\servidor\static\index.html'
 if ($SkipFrontend) {
     Write-Step 'Interface: reaproveitando src/nicx/servidor/static (-SkipFrontend)'
 } else {
@@ -168,7 +168,7 @@ if ($SkipFrontend) {
     Invoke-Native 'npm.cmd' @('run', 'build') (Join-Path $Repo 'frontend')
 }
 if (-not (Test-Path -LiteralPath $staticIndex)) { Stop-Build "Interface ausente: $staticIndex" }
-Write-Ok "interface em src\nicx\server\static ($((Get-Item $staticIndex).LastWriteTime))"
+Write-Ok "interface em src\nicx\servidor\static ($((Get-Item $staticIndex).LastWriteTime))"
 
 # ---------------------------------------------------------------------------
 # 2. Wheel do nicx
@@ -379,7 +379,7 @@ try {
 Write-Ok 'ícone, imagens do assistente e do lançador'
 
 # Termos de uso como texto simples (página de licença do assistente).
-$termsMd = Join-Path $Repo 'src\nicx\legal\termos-de-uso.md'
+$termsMd = Join-Path $Repo 'src\nicx\privacidade\textos\termos-de-uso.md'
 $termsTxt = Join-Path $BuildDir 'termos-de-uso.txt'
 $md = [IO.File]::ReadAllText($termsMd, [Text.Encoding]::UTF8)
 $md = [regex]::Replace($md, '\*\*(.+?)\*\*', '$1', [Text.RegularExpressions.RegexOptions]::Singleline)
