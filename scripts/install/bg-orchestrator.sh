@@ -25,6 +25,10 @@ trap cleanup EXIT
 
 echo "[$(date -u +%FT%TZ)] bg-orchestrator started, pid=$$" >> "$LOG"
 
+# Keep PATH sane for a detached process (uv in ~/.local/bin, cargo in
+# ~/.cargo/bin, ollama possibly from Homebrew or the macOS app link).
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+
 # Sequential: install rust, then build extension.
 (
     "$SCRIPTS_DIR/install-rust.sh" >> "$LOG" 2>&1 \
@@ -42,7 +46,8 @@ done
 # Wait for all subprocesses; non-zero exits don't fail the orchestrator
 # because per-task state files already record success/failure.
 wait "$RUST_PID" || true
-for pid in "${MODEL_PIDS[@]}"; do
+# ${arr[@]+...}: an empty array trips `set -u` on the macOS bash 3.2.
+for pid in ${MODEL_PIDS[@]+"${MODEL_PIDS[@]}"}; do
     wait "$pid" || true
 done
 

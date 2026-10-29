@@ -1,31 +1,35 @@
 #!/usr/bin/env bash
-# nicx-uninstall.sh — clean removal of Nicx from $HOME.
+# nicx-uninstall.sh — remove o Nicx do seu usuário.
 #
-# Removes:
-#   ~/.nicx/
-#   ~/.local/bin/nicx
-#   ~/.local/bin/nicx-uninstall
+# Remove:
+#   ~/.nicx/                       (código, ambiente Python, configuração e dados)
+#   ~/.local/bin/nicx, nicx-abrir, nicx-uninstall
+#   ~/Applications/Nicx.app        (macOS)
+#   ~/Library/LaunchAgents/br.com.falkyria.nicx.plist (macOS, se ligado)
+#   a linha do PATH que o instalador pôs no .zshrc/.bash_profile/.bashrc
 #
-# Does NOT remove: ollama, uv, or the Rust toolchain.
+# Não remove: Ollama e os modelos baixados (~/.ollama), uv, Rust.
 
 set -euo pipefail
 
 NICX_HOME="${NICX_HOME:-$HOME/.nicx}"
 ASSUME_YES=false
+LAUNCHD_LABEL="br.com.falkyria.nicx"
+PATH_MARKER="# Nicx: comandos em ~/.local/bin"
 
 usage() {
     cat <<'EOF'
 Usage: nicx-uninstall [-y|--yes]
 
-Removes Nicx and its local data. Without --yes, an explicit confirmation
-is required before config, memory, skills, databases, or connector tokens are
-deleted.
+Remove o Nicx e os dados locais dele. Sem --yes, pede confirmação antes de
+apagar configuração, memória, habilidades, bancos de dados e credenciais de
+conectores.
 EOF
 }
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        -y|--yes)
+        -y|--yes|--sim)
             ASSUME_YES=true
             ;;
         -h|--help)
@@ -33,7 +37,7 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
         *)
-            echo "Unknown option: $1" >&2
+            echo "Opção desconhecida: $1" >&2
             usage >&2
             exit 2
             ;;
@@ -42,9 +46,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 refuse_unsafe_root() {
-    echo "Refusing unsafe NICX_HOME: $NICX_HOME" >&2
+    echo "Refusing unsafe NICX_HOME: $NICX_HOME (pasta não parece ser do Nicx; nada foi apagado)" >&2
     exit 2
 }
+
+OLLAMA_APP_BY_NICX=""
 
 if [[ -d "$NICX_HOME" ]]; then
     resolved_install_root="$(cd "$NICX_HOME" && pwd -P)"
@@ -79,55 +85,112 @@ if [[ -d "$NICX_HOME" ]]; then
 
     if [[ "$ASSUME_YES" != true ]]; then
         cat <<EOF
-WARNING: This permanently deletes all Nicx data under:
+ATENÇÃO: isto apaga de vez todos os dados do Nicx em:
   $NICX_HOME
 
-That includes config.toml, SOUL.md/MEMORY.md/USER.md, skills, scheduler and
-telemetry databases, stored memory, and connector/OAuth credentials.
+Inclui config.toml, SOUL.md/MEMORY.md/USER.md, habilidades, agendamentos,
+bancos de telemetria, memória guardada e credenciais de conectores.
 EOF
-        printf 'Type "yes" to continue: '
+        printf 'Digite "sim" para continuar: '
         reply=""
         read -r reply || true
         case "$reply" in
-            yes|YES|Yes) ;;
+            sim|SIM|Sim|yes|YES|Yes) ;;
             *)
-                echo "Nicx was not removed."
+                echo "O Nicx não foi removido."
                 exit 0
                 ;;
         esac
     fi
+
+    if [[ -f "$NICX_HOME/.state/ollama-instalado-pelo-nicx" ]]; then
+        OLLAMA_APP_BY_NICX="$(cat "$NICX_HOME/.state/ollama-instalado-pelo-nicx" 2>/dev/null || true)"
+    fi
+fi
+
+# macOS login service (install.sh --servico).
+launch_agent="$HOME/Library/LaunchAgents/$LAUNCHD_LABEL.plist"
+if [[ -f "$launch_agent" ]]; then
+    launchctl bootout "gui/$(id -u)/$LAUNCHD_LABEL" >/dev/null 2>&1 \
+        || launchctl unload "$launch_agent" >/dev/null 2>&1 || true
+    rm -f "$launch_agent"
+    echo "Serviço removido: $launch_agent"
+fi
+
+# Stop the server (and the Ollama it started) before deleting its files.
+if [[ -x "$NICX_HOME/.venv/bin/nicx" ]]; then
+    "$NICX_HOME/.venv/bin/nicx" stop >/dev/null 2>&1 || true
 fi
 
 if [[ -f "$NICX_HOME/.state/bg.pid" ]]; then
     pid=$(cat "$NICX_HOME/.state/bg.pid" 2>/dev/null || echo "")
     if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
-        echo "Stopping background work (pid=$pid)..."
+        echo "Parando as tarefas em segundo plano (pid=$pid)..."
+        pkill -TERM -P "$pid" 2>/dev/null || true
         kill "$pid" 2>/dev/null || true
     fi
 fi
 
-if command -v ollama >/dev/null 2>&1; then
-    ollama stop >/dev/null 2>&1 || true
-fi
-
 if [[ -d "$NICX_HOME" ]]; then
     rm -rf -- "$NICX_HOME"
-    echo "Removed $NICX_HOME"
+    echo "Removido: $NICX_HOME"
 fi
 
-for f in "$HOME/.local/bin/nicx" "$HOME/.local/bin/nicx-uninstall"; do
+for f in "$HOME/.local/bin/nicx" "$HOME/.local/bin/nicx-uninstall" "$HOME/.local/bin/nicx-abrir"; do
     if [[ -L "$f" ]] || [[ -f "$f" ]]; then
         rm -f "$f"
-        echo "Removed $f"
+        echo "Removido: $f"
     fi
 done
 
+# The ~/Applications launcher, only if it is the one install.sh made.
+mac_app="$HOME/Applications/Nicx.app"
+if [[ -f "$mac_app/Contents/Info.plist" ]] \
+    && grep -q "br.com.falkyria.nicx.abrir" "$mac_app/Contents/Info.plist" 2>/dev/null; then
+    rm -rf -- "$mac_app"
+    echo "Removido: $mac_app"
+fi
+
+# The PATH line install.sh appended: the marker comment plus the export
+# right after it. Anything else in the file stays byte for byte.
+remove_path_block() {
+    local rc="$1" tmp
+    [[ -f "$rc" ]] || return 0
+    grep -qxF "$PATH_MARKER" "$rc" 2>/dev/null || grep -qx '# Nicx' "$rc" 2>/dev/null || return 0
+    tmp="$(mktemp "${TMPDIR:-/tmp}/nicx-rc.XXXXXX")"
+    awk -v m1="$PATH_MARKER" -v m2="# Nicx" -v ex='export PATH="$HOME/.local/bin:$PATH"' '
+        pending != "" {
+            if ($0 == ex) { pending = ""; next }
+            print pending
+            pending = ""
+        }
+        $0 == m1 || $0 == m2 { pending = $0; next }
+        { print }
+        END { if (pending != "") print pending }
+    ' "$rc" > "$tmp"
+    if ! cmp -s "$rc" "$tmp"; then
+        # cat (not mv) keeps the file's permissions and any symlink.
+        cat "$tmp" > "$rc"
+        echo "PATH do Nicx removido de $rc"
+    fi
+    rm -f "$tmp"
+}
+for rc in "${ZDOTDIR:-$HOME}/.zshrc" "$HOME/.zshrc" "$HOME/.bashrc" "$HOME/.bash_profile" \
+    "$HOME/.bash_login" "$HOME/.profile"; do
+    remove_path_block "$rc"
+done
+
+ollama_hint="brew uninstall ollama  (ou apague o Ollama.app em Aplicativos)"
+if [[ -n "$OLLAMA_APP_BY_NICX" ]]; then
+    ollama_hint="rm -rf \"$OLLAMA_APP_BY_NICX\" ~/.local/bin/ollama"
+fi
+
 cat <<EOF
 
-Nicx removed.
+Nicx removido.
 
-Left intact (may be used by other tools):
-  - Ollama       (uninstall: brew uninstall ollama  /  rm -f /usr/local/bin/ollama)
-  - uv           (uninstall: rm -rf ~/.local/share/uv ~/.cargo/bin/uv)
-  - Rust toolchain (uninstall: rustup self uninstall)
+Mantidos (outros programas podem usar):
+  - Ollama e modelos  (remover: $ollama_hint; modelos: rm -rf ~/.ollama)
+  - uv                (remover: rm -f ~/.local/bin/uv ~/.local/bin/uvx; rm -rf ~/.local/share/uv)
+  - Rust              (remover: rustup self uninstall)
 EOF

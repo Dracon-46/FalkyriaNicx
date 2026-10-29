@@ -62,8 +62,8 @@ def test_declining_confirmation_preserves_data_and_shims(tmp_path: Path) -> None
     result = _run_uninstaller(tmp_path, answer="no\n")
 
     assert result.returncode == 0
-    assert 'Type "yes"' in result.stdout
-    assert "was not removed" in result.stdout
+    assert 'Digite "sim"' in result.stdout
+    assert "não foi removido" in result.stdout
     assert (data_home / "MEMORY.md").read_text(encoding="utf-8") == "remember this"
     assert shim.exists()
 

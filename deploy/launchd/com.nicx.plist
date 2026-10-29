@@ -1,37 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Serviço do Nicx no macOS (launchd, por usuário).
+
+  Modelo usado pelo install.sh (opção "servico"), que troca __NICX_BIN__,
+  __NICX_LOGS__ e __NICX_PATH__ e grava o resultado em
+  ~/Library/LaunchAgents/br.com.falkyria.nicx.plist. Para usar à mão, troque
+  os três marcadores e rode:
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/br.com.falkyria.nicx.plist
+  Para desligar: nicx-uninstall, ou
+    launchctl bootout gui/$(id -u)/br.com.falkyria.nicx
+-->
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.nicx</string>
+    <string>br.com.falkyria.nicx</string>
     <!-- Binds loopback only: the personal-device default, reachable from this
          Mac but not the network, so no API key is required. To expose it on
          your LAN, change the host below to 0.0.0.0 AND uncomment the
-         EnvironmentVariables block to set an API key (an unauthenticated
-         0.0.0.0 server will refuse to start). -->
+         NICX_API_KEY entry below (an unauthenticated 0.0.0.0 server will
+         refuse to start). -->
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/local/bin/nicx</string>
+        <string>__NICX_BIN__</string>
         <string>serve</string>
         <string>--host</string>
         <string>127.0.0.1</string>
         <string>--port</string>
         <string>8000</string>
     </array>
-    <!--
+    <!-- launchd starts jobs with a bare PATH; Nicx needs to find `ollama`. -->
     <key>EnvironmentVariables</key>
     <dict>
+        <key>PATH</key>
+        <string>__NICX_PATH__</string>
+        <!--
         <key>NICX_API_KEY</key>
         <string>REPLACE_WITH_A_REAL_KEY</string>
+        -->
     </dict>
-    -->
     <key>RunAtLoad</key>
     <true/>
+    <!-- Restart only after a crash: `nicx stop` must really stop it. -->
     <key>KeepAlive</key>
-    <true/>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
     <key>StandardOutPath</key>
-    <string>/tmp/nicx.stdout.log</string>
+    <string>__NICX_LOGS__/servico.out.log</string>
     <key>StandardErrorPath</key>
-    <string>/tmp/nicx.stderr.log</string>
+    <string>__NICX_LOGS__/servico.err.log</string>
 </dict>
 </plist>

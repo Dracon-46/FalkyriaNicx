@@ -51,7 +51,7 @@ def main() -> int:
                     break
                 output.extend(chunk)
                 prompts = output.count(
-                    "Aperte Enter ou S para aceitar, ou N para recusar: ".encode(
+                    "Digite S para aceitar ou N para recusar (Enter: decidir depois): ".encode(
                         "utf-8"
                     )
                 )

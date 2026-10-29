@@ -6,6 +6,10 @@ setup() {
     mkdir -p "$NICX_HOME/.state"
     mkdir -p "$NICX_HOME/src/rust/crates/nicx-ponte"
     touch "$NICX_HOME/src/rust/crates/nicx-ponte/Cargo.toml"
+    # The serving venv's python: the import check must run here.
+    mkdir -p "$NICX_HOME/.venv/bin"
+    printf '#!/usr/bin/env bash\necho "$@" >> "$NICX_HOME/python.log"\nexit "${PY_STUB_EXIT:-0}"\n' > "$NICX_HOME/.venv/bin/python"
+    chmod +x "$NICX_HOME/.venv/bin/python"
     export UV_STUB_LOG="$TEST_TMPDIR/uv.log"
     : > "$UV_STUB_LOG"
     export PATH="$BATS_TEST_DIRNAME/stubs:$PATH"
@@ -36,10 +40,17 @@ teardown() {
     [ -f "$NICX_HOME/.state/extension-built" ]
 }
 
-@test "calls uv run maturin develop with the right manifest" {
+@test "installs the crate into the serving venv, not the project venv" {
     UV_STUB_EXIT=0 run bash "$SCRIPT"
-    grep -q "run maturin develop -m" "$UV_STUB_LOG"
-    grep -q "rust/crates/nicx-ponte/Cargo.toml" "$UV_STUB_LOG"
+    grep -q "^pip install --python $NICX_HOME/.venv/bin/python .*rust/crates/nicx-ponte" "$UV_STUB_LOG"
+    grep -q "import nicx_rust" "$NICX_HOME/python.log"
+}
+
+@test "fails when the serving venv cannot import the extension" {
+    UV_STUB_EXIT=0 PY_STUB_EXIT=1 run bash "$SCRIPT"
+    [ "$status" -ne 0 ]
+    [ -s "$NICX_HOME/.state/extension-failed" ]
+    [ ! -f "$NICX_HOME/.state/extension-built" ]
 }
 
 @test "atomic rename — no .tmp file left behind" {

@@ -36,6 +36,26 @@ LOG="$STATE_DIR/${SAFE}.log"
 rm -f "$READY" "$FAILED"
 touch "$DOWNLOADING"
 
+# `ollama pull` needs a running server. Start one only if none answers, and
+# stop it again at the end: Nicx starts Ollama on demand by itself.
+STARTED_PID=""
+# shellcheck disable=SC2329 # called by the EXIT trap
+stop_started_server() {
+    if [[ -n "$STARTED_PID" ]]; then
+        kill "$STARTED_PID" 2>/dev/null || true
+    fi
+}
+trap stop_started_server EXIT
+if ! curl -fsS --max-time 3 "http://127.0.0.1:11434/api/version" >/dev/null 2>&1; then
+    nohup ollama serve >>"$LOG" 2>&1 &
+    STARTED_PID=$!
+    for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 \
+             21 22 23 24 25 26 27 28 29 30; do
+        curl -fsS --max-time 3 "http://127.0.0.1:11434/api/version" >/dev/null 2>&1 && break
+        sleep 2
+    done
+fi
+
 MAX_RETRIES=3
 attempt=0
 last_exit=0

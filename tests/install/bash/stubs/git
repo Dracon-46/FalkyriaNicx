@@ -31,7 +31,7 @@ case "$1" in
         mkdir -p "$target/scripts/install"
         # Provide minimal expected files so install.sh can copy them.
         for s in install-rust.sh build-extension.sh pull-model.sh bg-orchestrator.sh \
-                 nicx-wrapper.sh nicx-uninstall.sh; do
+                 nicx-wrapper.sh nicx-uninstall.sh nicx-abrir.sh; do
             cat > "$target/scripts/install/$s" <<EOF2
 #!/usr/bin/env bash
 exit 0

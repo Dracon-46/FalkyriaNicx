@@ -118,7 +118,7 @@ PY
     export NICX_ANALYTICS_HOST="" NICX_ANALYTICS_KEY=""
     run python3 "$BATS_TEST_DIRNAME/run_installer_pty.py" "$SCRIPT" '["\n"]'
     [ "$status" -eq 0 ]
-    [[ "$output" != *"Aperte Enter ou S para aceitar"* ]]
+    [[ "$output" != *"Digite S para aceitar"* ]]
     ! grep -q '/rest/v1/nicx_events' "$CURL_STUB_LOG"
     [ ! -f "$NICX_HOME/anon_id" ]
 }
@@ -131,12 +131,28 @@ PY
     assert_analytics_preference "$NICX_HOME/config.toml" true true
 }
 
-@test "Enter at dedicated terminal prompt consents before the first beacon" {
-    run python3 "$BATS_TEST_DIRNAME/run_installer_pty.py" "$SCRIPT" '["\n"]'
+@test "S at dedicated terminal prompt consents before the first beacon" {
+    run python3 "$BATS_TEST_DIRNAME/run_installer_pty.py" "$SCRIPT" '["S\n"]'
     [ "$status" -eq 0 ]
-    [[ "$output" == *"Aperte Enter ou S para aceitar, ou N para recusar"* ]]
+    [[ "$output" == *"Digite S para aceitar ou N para recusar"* ]]
     grep -q '"event":"install_started"' "$CURL_STUB_LOG"
     assert_analytics_preference "$NICX_HOME/config.toml" true true
+}
+
+@test "Enter at the prompt leaves analytics off and undecided" {
+    run python3 "$BATS_TEST_DIRNAME/run_installer_pty.py" "$SCRIPT" '["\n"]'
+    [ "$status" -eq 0 ]
+    ! grep -q '/rest/v1/nicx_events' "$CURL_STUB_LOG"
+    [ ! -f "$NICX_HOME/anon_id" ]
+    assert_analytics_preference "$NICX_HOME/config.toml" false false
+}
+
+@test "non-interactive mode never prompts and keeps analytics off" {
+    NICX_INSTALL_NONINTERACTIVE=1 run python3 "$BATS_TEST_DIRNAME/run_installer_pty.py" "$SCRIPT" '["S\n"]'
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"Digite S para aceitar"* ]]
+    ! grep -q '/rest/v1/nicx_events' "$CURL_STUB_LOG"
+    assert_analytics_preference "$NICX_HOME/config.toml" false false
 }
 
 @test "N at terminal prompt declines every installer beacon" {
@@ -150,7 +166,7 @@ PY
 @test "invalid answer retries without silently consenting" {
     run python3 "$BATS_TEST_DIRNAME/run_installer_pty.py" "$SCRIPT" '["invalid\n", "n\n"]'
     [ "$status" -eq 0 ]
-    [[ "$output" == *"Aperte Enter, digite S ou digite N."* ]]
+    [[ "$output" == *"Digite S, N ou só Enter."* ]]
     ! grep -q '/rest/v1/nicx_events' "$CURL_STUB_LOG"
 }
 
@@ -312,8 +328,9 @@ IDEOF
     : > "$GIT_STUB_LOG"
     run bash "$SCRIPT" --no-bg-orchestrator --force
     [ "$status" -eq 0 ]
-    # With --force, second run re-clones (clone is in git.log again).
-    grep -q "clone" "$GIT_STUB_LOG"
+    # With --force, the existing checkout is updated (git pull) instead of
+    # a re-clone, which git refuses into a non-empty directory.
+    grep -q "pull --ff-only" "$GIT_STUB_LOG"
 }
 
 @test "--minimal skips foreground model pull" {
@@ -372,10 +389,64 @@ IDEOF
     [ "$second_count" -eq 1 ]
 }
 
-@test "create_venv picks newest in requires-python range, not hardcoded 3.11" {
+@test "create_venv uses the uv-managed Python 3.12 by default" {
     run bash "$SCRIPT" --no-bg-orchestrator --minimal
     [ "$status" -eq 0 ]
-    # uv stub logs every invocation. We should see `venv --python 3.13 ...`
-    # (the upper bound of >=3.10,<3.14 is 3.14, so the highest usable is 3.13).
-    grep -q '^venv --python 3.13' "$UV_STUB_LOG"
+    grep -q '^venv .*--python 3.12 ' "$UV_STUB_LOG"
+}
+
+@test "NICX_PYTHON_VERSION overrides the Python version" {
+    NICX_PYTHON_VERSION=3.13 run bash "$SCRIPT" --no-bg-orchestrator --minimal
+    [ "$status" -eq 0 ]
+    grep -q '^venv .*--python 3.13 ' "$UV_STUB_LOG"
+}
+
+@test "dependencies come from the lock file with the server extra" {
+    run bash "$SCRIPT" --no-bg-orchestrator --minimal
+    [ "$status" -eq 0 ]
+    grep -q '^sync --frozen --inexact --no-default-groups .*--extra server' "$UV_STUB_LOG"
+}
+
+@test "config.toml is created once, local-only and with analytics off" {
+    run bash "$SCRIPT" --no-bg-orchestrator --minimal
+    [ "$status" -eq 0 ]
+    grep -q '^default = "ollama"' "$NICX_HOME/config.toml"
+    grep -q '^default_model = "qwen3.5:' "$NICX_HOME/config.toml"
+    ! grep -qiE 'cloud|api_key' "$NICX_HOME/config.toml"
+    echo '# minha linha' >> "$NICX_HOME/config.toml"
+    run bash "$SCRIPT" --no-bg-orchestrator --minimal --force
+    [ "$status" -eq 0 ]
+    grep -q '^# minha linha' "$NICX_HOME/config.toml"
+}
+
+@test "NICX_MODEL picks the model written to config.toml" {
+    NICX_MODEL=qwen3.5:2b run bash "$SCRIPT" --no-bg-orchestrator --minimal
+    [ "$status" -eq 0 ]
+    grep -q '^default_model = "qwen3.5:2b"' "$NICX_HOME/config.toml"
+}
+
+@test "model download pulls the configured model, and NICX_SKIP_MODEL skips it" {
+    NICX_MODEL=qwen3.5:4b run bash "$SCRIPT" --no-bg-orchestrator
+    [ "$status" -eq 0 ]
+    grep -q '^pull qwen3.5:4b' "$OLLAMA_STUB_LOG"
+    : > "$OLLAMA_STUB_LOG"
+    NICX_SKIP_MODEL=1 run bash "$SCRIPT" --no-bg-orchestrator
+    [ "$status" -eq 0 ]
+    ! grep -q '^pull ' "$OLLAMA_STUB_LOG"
+}
+
+@test "PATH line is added once to the shell rc file" {
+    SHELL=/bin/zsh run bash "$SCRIPT" --no-bg-orchestrator --minimal
+    [ "$status" -eq 0 ]
+    [ "$(grep -c '^# Nicx: comandos em ~/.local/bin$' "$FAKE_HOME/.zshrc")" -eq 1 ]
+    SHELL=/bin/zsh run bash "$SCRIPT" --no-bg-orchestrator --minimal
+    [ "$status" -eq 0 ]
+    [ "$(grep -c '^# Nicx: comandos em ~/.local/bin$' "$FAKE_HOME/.zshrc")" -eq 1 ]
+}
+
+@test "creates nicx-abrir and nicx-uninstall links" {
+    run bash "$SCRIPT" --no-bg-orchestrator --minimal
+    [ "$status" -eq 0 ]
+    [ -L "$FAKE_HOME/.local/bin/nicx-abrir" ]
+    [ -L "$FAKE_HOME/.local/bin/nicx-uninstall" ]
 }

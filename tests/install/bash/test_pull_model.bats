@@ -20,14 +20,14 @@ teardown() {
 @test "writes .downloading marker, then .ready on success" {
     OLLAMA_STUB_EXIT=0 run bash "$SCRIPT" qwen3.5:2b
     [ "$status" -eq 0 ]
-    [ -f "$NICX_HOME/.state/models/qwen3.5:2b.ready" ]
-    [ ! -f "$NICX_HOME/.state/models/qwen3.5:2b.downloading" ]
+    [ -f "$NICX_HOME/.state/models/qwen3.5%3A2b.ready" ]
+    [ ! -f "$NICX_HOME/.state/models/qwen3.5%3A2b.downloading" ]
 }
 
 @test "writes .failed on error after retries exhausted" {
     OLLAMA_STUB_EXIT=1 run bash "$SCRIPT" qwen3.5:2b
     [ "$status" -ne 0 ]
-    [ -f "$NICX_HOME/.state/models/qwen3.5:2b.failed" ]
+    [ -f "$NICX_HOME/.state/models/qwen3.5%3A2b.failed" ]
 }
 
 @test "calls ollama pull with the right model name" {

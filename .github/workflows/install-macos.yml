@@ -1,0 +1,209 @@
+name: Instalação no macOS
+
+# Testa o instalador de um comando (scripts/install/install.sh) num Mac de
+# verdade (Apple Silicon): instala do zero como `curl | bash` com o bash 3.2
+# do macOS, confere o resultado, sobe o servidor e desinstala. Não usa
+# segredos nem publica nada. Só sob demanda ou quando o instalador muda.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/install/**'
+      - 'deploy/launchd/**'
+      - 'tests/install/bash/**'
+      - '.github/workflows/install-macos.yml'
+
+concurrency:
+  group: install-macos-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  instalar:
+    name: Instalar, usar e desinstalar
+    runs-on: macos-latest
+    timeout-minutes: 30
+    env:
+      # Sem perguntas e sem o modelo de ~3,4 GB; o Ollama vem do download
+      # oficial (o caminho de quem não tem Homebrew).
+      NICX_INSTALL_NONINTERACTIVE: '1'
+      NICX_SKIP_MODEL: '1'
+      NICX_OLLAMA_METHOD: download
+      HOMEBREW_NO_AUTO_UPDATE: '1'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # O instalador clona este checkout; a versão vem das tags (hatch-vcs).
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Ambiente
+        run: |
+          sw_vers
+          uname -m
+          echo "SHELL=$SHELL"
+          /bin/bash --version | head -1
+          echo "RAM: $(( $(sysctl -n hw.memsize) / 1073741824 )) GB"
+          for t in git curl node npm uv ollama brew; do
+            printf '%-7s %s\n' "$t" "$(command -v "$t" || echo '-')"
+          done
+
+      - name: Instalar (como curl | bash, a partir deste checkout)
+        run: |
+          export NICX_REPO_URL="file://$GITHUB_WORKSPACE"
+          # O script entra pelo stdin, como no curl | bash, e roda no bash
+          # 3.2 que vem com o macOS.
+          /bin/bash -s -- --no-bg-orchestrator < scripts/install/install.sh 2>&1 | tee /tmp/instalacao.log
+          test "${PIPESTATUS[0]}" -eq 0
+
+      - name: Conferir a instalação
+        run: |
+          set -x
+          test -d ~/.nicx/src/.git
+          test -x ~/.nicx/.venv/bin/nicx
+          test -f ~/.nicx/.state/install-state.json
+          test -f ~/.nicx/src/src/nicx/servidor/static/index.html
+          test -L ~/.local/bin/nicx
+          test -L ~/.local/bin/nicx-abrir
+          test -L ~/.local/bin/nicx-uninstall
+          test -x ~/Applications/Nicx.app/Contents/MacOS/Nicx
+          plutil -lint ~/Applications/Nicx.app/Contents/Info.plist
+          # Ollama: app oficial conferido (SHA-256 + assinatura), comando
+          # ligado em ~/.local/bin, sem sudo (a menos que o Mac já tivesse um).
+          export PATH="$HOME/.local/bin:$PATH"
+          command -v ollama
+          if [ -f ~/.nicx/.state/ollama-instalado-pelo-nicx ]; then
+            app="$(cat ~/.nicx/.state/ollama-instalado-pelo-nicx)"
+            test -x "$app/Contents/Resources/ollama"
+            codesign --verify --deep --strict "$app"
+            test "$(readlink ~/.local/bin/ollama)" = "$app/Contents/Resources/ollama"
+          fi
+          ollama --version || true
+          # Configuração local, estatísticas desligadas e nada enviado.
+          grep -q '^default = "ollama"' ~/.nicx/config.toml
+          grep -q '^default_model = "qwen3.5:' ~/.nicx/config.toml
+          grep -q '^enabled = false' ~/.nicx/config.toml
+          if grep -q 'choice_recorded' ~/.nicx/config.toml; then exit 1; fi
+          test ! -e ~/.nicx/anon_id
+          # PATH do zsh/bash, quando ~/.local/bin ainda não estava nele.
+          grep -ls 'Nicx: comandos em ~/.local/bin' ~/.zshrc ~/.bash_profile ~/.bashrc ~/.profile || echo "(PATH já tinha ~/.local/bin)"
+          ~/.local/bin/nicx --version
+
+      - name: Instalar de novo (só confere, não refaz)
+        run: |
+          grep '^default_model' ~/.nicx/config.toml > /tmp/modelo.antes
+          export NICX_REPO_URL="file://$GITHUB_WORKSPACE"
+          /bin/bash -s -- --no-bg-orchestrator < scripts/install/install.sh 2>&1 | tee /tmp/reinstalacao.log
+          test "${PIPESTATUS[0]}" -eq 0
+          grep -q 'configuração existente mantida' /tmp/reinstalacao.log
+          grep '^default_model' ~/.nicx/config.toml | cmp - /tmp/modelo.antes
+          test "$(grep -c '^\[engine\]' ~/.nicx/config.toml)" -eq 1
+
+      - name: nicx doctor
+        run: ~/.local/bin/nicx doctor
+
+      - name: Extensão nativa (Rust)
+        env:
+          CARGO_BUILD_JOBS: '3'
+        run: |
+          ~/.nicx/.scripts/install-rust.sh
+          if ! ~/.nicx/.scripts/build-extension.sh; then
+            tail -n 80 ~/.nicx/.state/extension-build.log
+            exit 1
+          fi
+          ~/.nicx/.venv/bin/python -c "import nicx_rust; print('nicx_rust ok')"
+
+      - name: Subir o servidor e checar /health
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          ollama serve > /tmp/ollama.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:11434/api/version && break
+            sleep 1
+          done
+          # Modelo minúsculo só para o servidor subir (o padrão tem ~3,4 GB).
+          ollama pull smollm2:135m
+          ~/.local/bin/nicx-abrir --sem-navegador
+          curl -fsS http://127.0.0.1:8000/health | tee /tmp/health.json
+          echo
+          curl -fsS http://127.0.0.1:8000/ | grep -qi '<html'
+          ~/.local/bin/nicx stop
+
+      - name: Serviço do launchd (--servico)
+        run: |
+          export NICX_REPO_URL="file://$GITHUB_WORKSPACE"
+          /bin/bash -s -- --no-bg-orchestrator --servico < scripts/install/install.sh
+          plutil -lint ~/Library/LaunchAgents/br.com.falkyria.nicx.plist
+          if grep -q '__NICX_' ~/Library/LaunchAgents/br.com.falkyria.nicx.plist; then exit 1; fi
+
+      - name: Serviço do launchd responde
+        # A sessão gráfica dos Macs do GitHub nem sempre aceita LaunchAgents.
+        continue-on-error: true
+        run: |
+          launchctl print "gui/$(id -u)/br.com.falkyria.nicx" | head -20 || true
+          for _ in $(seq 1 60); do
+            curl -fsS http://127.0.0.1:8000/health && exit 0
+            sleep 2
+          done
+          tail -n 40 ~/.nicx/logs/servico.err.log || true
+          exit 1
+
+      - name: Desinstalar e conferir a limpeza
+        run: |
+          set -x
+          ~/.local/bin/nicx-uninstall --yes
+          test ! -e ~/.nicx
+          test ! -e ~/.local/bin/nicx && test ! -L ~/.local/bin/nicx
+          test ! -L ~/.local/bin/nicx-abrir
+          test ! -L ~/.local/bin/nicx-uninstall
+          test ! -e ~/Applications/Nicx.app
+          test ! -e ~/Library/LaunchAgents/br.com.falkyria.nicx.plist
+          if grep -qs 'Nicx: comandos em' ~/.zshrc ~/.bash_profile ~/.bashrc ~/.profile; then exit 1; fi
+          for _ in $(seq 1 15); do
+            curl -fsS --max-time 2 http://127.0.0.1:8000/health || break
+            sleep 1
+          done
+          if curl -fsS --max-time 2 http://127.0.0.1:8000/health; then exit 1; fi
+          # O Ollama e os modelos ficam: outros programas podem usar.
+          PATH="$HOME/.local/bin:$PATH" command -v ollama
+
+      - name: Registros (se falhar)
+        if: failure()
+        run: |
+          for f in /tmp/instalacao.log /tmp/reinstalacao.log /tmp/ollama.log \
+                   ~/.nicx/.state/*.log ~/.nicx/logs/*.log; do
+            if [ -f "$f" ]; then
+              echo "::group::$f"
+              tail -n 100 "$f"
+              echo "::endgroup::"
+            fi
+          done
+
+  bats:
+    # Os testes do instalador (stubs, sem rede) no bash 3.2 do macOS.
+    name: Testes do instalador (bash 3.2)
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Preparar
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: '1'
+        run: |
+          brew install bats-core
+          python -m pip install --quiet tomlkit
+
+      - name: bats
+        run: |
+          export NICX_TEST_PYTHON="$(command -v python)"
+          bats tests/install/bash/

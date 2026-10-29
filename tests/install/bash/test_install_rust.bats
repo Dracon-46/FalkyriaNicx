@@ -30,6 +30,6 @@ teardown() {
 }
 
 @test "runs rustup curl-pipe-bash when cargo is missing" {
-    PATH="$STUBS_NO_CARGO:/usr/bin:/bin:/usr/local/bin" run bash "$SCRIPT"
+    HOME="$TEST_TMPDIR" PATH="$STUBS_NO_CARGO:/usr/bin:/bin:/usr/local/bin" run bash "$SCRIPT"
     grep -q "sh.rustup.rs" "$CURL_STUB_LOG"
 }
