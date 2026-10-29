@@ -18,6 +18,7 @@ from nicx.comandos.conversa._voice_chat import (
     VoiceSession,
     read_voice_input,
     speak,
+    start_continuous_speech,
 )
 from nicx.memoria import publish_completed_exchange
 from nicx.nucleo.config import load_config
@@ -25,6 +26,69 @@ from nicx.nucleo.events import EventBus
 from nicx.nucleo.types import Message, Role
 
 logger = logging.getLogger(__name__)
+
+
+def _stream_and_speak(
+    engine,
+    messages: List[Message],
+    model: str,
+    engine_kwargs: dict,
+    console: Console,
+    voice_session: VoiceSession,
+) -> Optional[str]:
+    """Mostra e fala a resposta frase a frase enquanto o modelo escreve.
+
+    Devolve o texto completo, ou None quando não há stream nem voz (aí o
+    chamador usa ``generate`` e fala tudo no fim, como antes).
+    """
+    import asyncio
+    import inspect
+
+    stream = getattr(engine, "stream", None)
+    if stream is None:
+        return None
+    try:
+        pedacos = stream(messages, model=model, **engine_kwargs)
+    except Exception:
+        logger.debug("Motor sem stream utilizável", exc_info=True)
+        return None
+    if not inspect.isasyncgen(pedacos):
+        return None
+    fala = start_continuous_speech(console, voice_session)
+    if fala is None:
+        aclose = getattr(pedacos, "aclose", None)
+        if aclose is not None:
+            asyncio.run(aclose())
+        return None
+    partes: list[str] = []
+
+    async def consumir() -> None:
+        async for pedaco in pedacos:
+            if not pedaco:
+                continue
+            partes.append(pedaco)
+            console.print(pedaco, end="", markup=False, highlight=False)
+            fala.adicionar(pedaco)
+
+    console.print()
+    try:
+        asyncio.run(consumir())
+    except KeyboardInterrupt:
+        fala.cancelar()
+        raise
+    except Exception:
+        logger.debug("Stream da resposta falhou", exc_info=True)
+        if not partes:
+            fala.cancelar()
+            return None
+    console.print("\n")
+    fala.terminar()
+    if fala.erro is not None:
+        console.print(
+            f"[dim yellow]A voz falhou: {escape(str(fala.erro))}[/dim yellow]"
+        )
+        voice_session.discard_tts_backend()
+    return "".join(partes)
 
 
 def _safe_rich_label(value: object) -> str:
@@ -485,6 +549,7 @@ def chat(
                 logger.debug("Failed to inject memory context", exc_info=True)
 
         # Generate response even when optional memory context is unavailable.
+        spoken = False
         try:
             if agent is not None:
                 from nicx.cerebro.agentes._stubs import AgentContext
@@ -500,22 +565,38 @@ def chat(
                     response.content if hasattr(response, "content") else str(response)
                 )
             else:
-                result = engine.generate(
-                    generation_history,
-                    model=model,
-                    **engine_kwargs,
-                )
-                content = (
-                    result.get("content", "")
-                    if isinstance(result, dict)
-                    else str(result)
-                )
+                content = None
+                if voice_mode:
+                    # Fala frase a frase enquanto o modelo ainda escreve.
+                    assert voice_session is not None
+                    content = _stream_and_speak(
+                        engine,
+                        generation_history,
+                        model,
+                        engine_kwargs,
+                        console,
+                        voice_session,
+                    )
+                if content is None:
+                    result = engine.generate(
+                        generation_history,
+                        model=model,
+                        **engine_kwargs,
+                    )
+                    content = (
+                        result.get("content", "")
+                        if isinstance(result, dict)
+                        else str(result)
+                    )
+                else:
+                    spoken = True
 
             history.append(Message(role=Role.ASSISTANT, content=content))
-            console.print()
-            console.print(Markdown(content))
-            console.print()
-            if voice_mode:
+            if not (voice_mode and agent is None and spoken):
+                console.print()
+                console.print(Markdown(content))
+                console.print()
+            if voice_mode and not (agent is None and spoken):
                 assert voice_session is not None
                 speak(content, console, voice_session)
 

@@ -202,6 +202,39 @@ def record_voice(
         return None
 
 
+def start_continuous_speech(console: Any, session: VoiceSession) -> Any:
+    """Fala frase a frase enquanto a resposta chega; None sem voz disponível.
+
+    Use ``.adicionar(pedaco)`` a cada pedaço do stream e ``.terminar()`` no
+    fim (ou ``.cancelar()``). Erro de síntese fica em ``.erro``.
+    """
+    from nicx.comandos.conversa._fala_continua import FalaContinua
+    from nicx.voz.voice_io import play_wav
+
+    try:
+        session.get_voice_preferences()
+        backend = session.get_tts_backend()
+        if backend is None:
+            return None
+        voice_id, speed = session.voice_for_backend(backend, console)
+    except Exception as exc:
+        console.print(
+            f"[red]Configuração de voz inválida: {_terminal_safe_text(exc)}[/red]"
+        )
+        return None
+
+    def sintetizar(frase: str) -> tuple[bytes, int] | None:
+        kwargs: dict[str, Any] = {"output_format": "wav", "speed": speed}
+        if voice_id:
+            kwargs["voice_id"] = voice_id
+        result = backend.synthesize(frase, **kwargs)
+        return (result.audio, result.sample_rate) if result.audio else None
+
+    return FalaContinua(
+        sintetizar, lambda audio, taxa: play_wav(audio, sample_rate=taxa)
+    )
+
+
 def speak(text: str, console: Any, session: VoiceSession | None = None) -> None:
     """Synthesize and play text, reusing a healthy backend for the session."""
     from nicx.voz.voice_io import play_wav
@@ -242,4 +275,11 @@ def speak(text: str, console: Any, session: VoiceSession | None = None) -> None:
     )
 
 
-__all__ = ["VOICE_EXIT", "VoiceSession", "read_voice_input", "record_voice", "speak"]
+__all__ = [
+    "VOICE_EXIT",
+    "VoiceSession",
+    "read_voice_input",
+    "record_voice",
+    "speak",
+    "start_continuous_speech",
+]
