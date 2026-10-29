@@ -10,7 +10,7 @@ import subprocess
 import sys
 import time
 from contextlib import contextmanager
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import Iterator
 
 import click
@@ -110,12 +110,23 @@ def _read_pid_identity() -> dict:
     return identity if linux or windows else {}
 
 
+def _program_name(path: str) -> str:
+    """Nome do programa no caminho, com o separador do sistema do processo.
+
+    No Windows o caminho vem com barra invertida; ``PureWindowsPath`` aceita
+    as duas barras e funciona mesmo quando o código roda em outro sistema.
+    """
+    if sys.platform == "win32":
+        return PureWindowsPath(path).name
+    return Path(path).name
+
+
 def _legacy_cli_args(argv: list[str]) -> list[str] | None:
     """Find CLI arguments without treating script arguments as Python options."""
     entry_points = {"nicx", "nicx.exe"}
     if not argv:
         return None
-    executable = Path(argv[0]).name
+    executable = _program_name(argv[0])
     if executable in entry_points:
         return argv[1:]
     if not re.fullmatch(
@@ -158,7 +169,7 @@ def _legacy_cli_args(argv: list[str]) -> list[str] | None:
         index += 1
     # The first positional argument is the script. Never look beyond it for
     # -m: those tokens belong to that script, not the Python interpreter.
-    if index < len(argv) and Path(argv[index]).name in entry_points:
+    if index < len(argv) and _program_name(argv[index]) in entry_points:
         return argv[index + 1 :]
     return None
 

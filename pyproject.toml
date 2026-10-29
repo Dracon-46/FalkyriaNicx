@@ -38,6 +38,8 @@ dependencies = [
     # Process identity and descendant cleanup for the source-checkout GUI.
     "psutil>=5.9",
     "python-telegram-bot>=22.8",
+    # Habilidades (SKILL.md com cabeçalho YAML).
+    "pyyaml>=6.0",
     "rich>=13",
     "tomli>=2.0; python_version < '3.11'",
     "tomlkit>=0.12",
