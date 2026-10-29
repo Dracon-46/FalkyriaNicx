@@ -19,7 +19,7 @@ enabled = ["digest_collect", "text_to_speech"]
 [digest]
 enabled = true
 persona = "nicx"
-honorific = "sir"
+honorific = ""  # tratamento no briefing; vazio = nenhum
 tts_backend = "openai"
 voice_id = "onyx"
 sections = ["messages", "calendar"]

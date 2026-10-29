@@ -56,14 +56,21 @@ class MorningDigestAgent(ToolUsingAgent):
         self._voice_speed = kwargs.pop("voice_speed", 1.0)
         self._tts_backend = kwargs.pop("tts_backend", "kokoro")
         self._digest_store_path = kwargs.pop("digest_store_path", "")
-        self._honorific = kwargs.pop("honorific", "sir")
+        self._honorific = kwargs.pop("honorific", "")
         super().__init__(*args, **kwargs)
 
     def _build_system_prompt(self) -> str:
         """Assemble the system prompt from persona + briefing structure."""
         persona_text = _load_persona(self._persona)
         now = datetime.now()
-        honorific = getattr(self, "_honorific", "sir")
+        honorific = (getattr(self, "_honorific", "") or "").strip()
+        # Sem tratamento configurado, nada de "sir"/"senhor": só o cumprimento.
+        address = (
+            f"The user's preferred form of address is: {honorific}\n\n"
+            if honorific
+            else "The user has no preferred form of address: greet without one "
+            "(no sir, senhor or similar).\n\n"
+        )
         sections = dict.fromkeys(
             str(section).strip().casefold()
             for section in self._sections
@@ -78,7 +85,7 @@ class MorningDigestAgent(ToolUsingAgent):
             f"{persona_text}\n\n"
             f"Today is {now.strftime('%A, %B %d, %Y')}. "
             f"The time is {now.strftime('%I:%M %p')} in {self._timezone}.\n"
-            f"The user's preferred honorific is: {honorific}\n\n"
+            f"{address}"
             "You receive structured data from the user's connected services. "
             "The data has ALREADY been collected — it appears in the user "
             "message. You do NOT fetch anything yourself.\n\n"
@@ -86,7 +93,7 @@ class MorningDigestAgent(ToolUsingAgent):
             "Cover only the configured sections below and only when the collected "
             "data supports them. Silently omit absent data and sources.\n\n"
             f"CONFIGURED SECTIONS:\n{section_block or '- None'}\n\n"
-            "Open briefly with the honorific and end after the last supported item. "
+            "Open with a brief greeting and end after the last supported item. "
             "Do not add conversational offers or personal asides.\n\n"
             "ABSOLUTE RULES (violations are unacceptable):\n"
             "- ONLY facts from the data. Zero hallucination.\n"
@@ -149,7 +156,7 @@ class MorningDigestAgent(ToolUsingAgent):
                     f"the briefing:\n\n<collected_data>\n{collected_data}\n"
                     "</collected_data>\n\nUse configured sections only. Omit missing "
                     "data and sources. Do not add personal context or activities. "
-                    "Use the honorific no more than three times and keep the "
+                    "Use the form of address (if any) at most twice and keep the "
                     "briefing under 200 words."
                 ),
             ),

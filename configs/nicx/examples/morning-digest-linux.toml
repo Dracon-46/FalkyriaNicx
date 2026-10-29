@@ -31,7 +31,7 @@ enabled = true
 schedule = "0 7 * * *"
 timezone = "America/New_York"      # Change to your timezone
 persona = "nicx"
-honorific = "sir"
+honorific = ""  # tratamento no briefing; vazio = nenhum
 tts_backend = "openai"             # OpenAI TTS works everywhere
 voice_id = "onyx"                  # Deep male voice
 voice_speed = 1.1

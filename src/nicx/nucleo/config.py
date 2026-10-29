@@ -1829,7 +1829,7 @@ class DigestConfig:
     optional_sections: List[str] = field(
         default_factory=lambda: ["github", "financial", "music", "fitness"]
     )
-    honorific: str = "sir"
+    honorific: str = ""  # tratamento no briefing; vazio = nenhum (ou o primeiro nome)
     voice_id: str = ""
     voice_speed: float = 1.0
     tts_backend: str = "kokoro"  # local and free; voice_id "" = Kokoro default

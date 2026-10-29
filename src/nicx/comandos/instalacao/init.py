@@ -496,7 +496,7 @@ enabled = true
 schedule = "0 7 * * *"
 timezone = "America/Sao_Paulo"
 persona = "nicx"
-honorific = "sir"
+honorific = ""  # tratamento no briefing; vazio = nenhum
 tts_backend = "kokoro"
 voice_id = "pf_dora"
 voice_speed = 1.0
