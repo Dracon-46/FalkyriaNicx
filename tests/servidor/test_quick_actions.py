@@ -29,7 +29,7 @@ def _config(quick_actions=True):
 def ran(monkeypatch):
     calls: list[str] = []
 
-    def fake_handle(text):
+    def fake_handle(text, idioma=None):
         calls.append(text)
         return Outcome(True, "Aumentei o volume.") if "volume" in text else None
 
@@ -99,3 +99,33 @@ def test_caller_tools_bypass_commands(ran):
     tool = {"type": "function", "function": {"name": "f", "parameters": {}}}
     client.post("/v1/chat/completions", json=_body("aumenta o volume", tools=[tool]))
     assert ran == []
+
+
+def test_interface_language_reaches_the_action(monkeypatch):
+    seen: list[tuple[str, object]] = []
+
+    def fake_handle(text, idioma=None):
+        seen.append((text, idioma))
+        return Outcome(True, "It's 9:05 PM.")
+
+    monkeypatch.setattr("nicx.acoes.handle", fake_handle)
+    client, engine = _client()
+    resp = client.post(
+        "/v1/chat/completions", json=_body("what time is it", language="en")
+    )
+    assert resp.json()["choices"][0]["message"]["content"] == "It's 9:05 PM."
+    assert seen == [("what time is it", "en")]
+    engine.generate.assert_not_called()
+
+
+def test_real_action_answers_in_the_interface_language(monkeypatch):
+    from nicx.acoes import sistema
+
+    monkeypatch.setattr(sistema, "_press", lambda vk, times=1: None)
+    monkeypatch.setattr(sistema.sys, "platform", "win32")
+    client, engine = _client()
+    resp = client.post(
+        "/v1/chat/completions", json=_body("sube el volumen", language="es")
+    )
+    assert resp.json()["choices"][0]["message"]["content"] == "Subí el volumen."
+    engine.generate.assert_not_called()

@@ -10,6 +10,8 @@ import re
 from datetime import date, datetime, timedelta
 from typing import Optional
 
+from nicx.acoes import textos
+
 _UNITS = {
     "zero": 0,
     "um": 1,
@@ -186,24 +188,14 @@ def parse_when(text: str, now: Optional[datetime] = None) -> Optional[datetime]:
     return parse_clock(text, now)
 
 
-def say_when(when: datetime, now: Optional[datetime] = None) -> str:
-    """Hora do lembrete do jeito que se fala: 'às 15h30', 'amanhã às 8h'."""
-    now = now or datetime.now()
-    hhmm = f"{when.hour}h" if when.minute == 0 else f"{when.hour}h{when.minute:02d}"
-    # Perto: em minutos, mesmo virando o dia (timer às 23h57 = "em 5 minutos").
-    delta = when - now
-    if delta < timedelta(minutes=1):
-        secs = max(1, round(delta.total_seconds()))
-        return f"em {secs} segundo{'s' if secs > 1 else ''}"
-    if delta < timedelta(hours=1):
-        mins = max(1, round(delta.total_seconds() / 60))
-        return f"em {mins} minuto{'s' if mins > 1 else ''}"
-    days = (when.date() - now.date()).days
-    if days == 0:
-        return f"às {hhmm}"
-    if days == 1:
-        return f"amanhã às {hhmm}"
-    return f"dia {when.day:02d}/{when.month:02d} às {hhmm}"
+def say_when(
+    when: datetime, now: Optional[datetime] = None, idioma: Optional[str] = None
+) -> str:
+    """Hora do lembrete do jeito que se fala: 'às 15h30', 'amanhã às 8h'.
+
+    No idioma dado (ou no atual das ações; ver ``textos.usando``).
+    """
+    return textos.quando(when, now or datetime.now(), idioma)
 
 
 # ---------------------------------------------------------------------------
@@ -338,20 +330,11 @@ def parse_moment(
 
 
 def say_day(
-    when: datetime, now: Optional[datetime] = None, *, with_time: bool = True
+    when: datetime,
+    now: Optional[datetime] = None,
+    *,
+    with_time: bool = True,
+    idioma: Optional[str] = None,
 ) -> str:
-    """'hoje às 15h', 'amanhã', 'sexta (31/10) às 9h30'."""
-    now = now or datetime.now()
-    days = (when.date() - now.date()).days
-    if days == 0:
-        label = "hoje"
-    elif days == 1:
-        label = "amanhã"
-    elif 1 < days < 7:
-        label = f"{WEEKDAY_NAMES[when.weekday()]} ({when.day:02d}/{when.month:02d})"
-    else:
-        label = f"dia {when.day:02d}/{when.month:02d}"
-    if not with_time:
-        return label
-    hhmm = f"{when.hour}h" if when.minute == 0 else f"{when.hour}h{when.minute:02d}"
-    return f"{label} às {hhmm}"
+    """'hoje às 15h', 'amanhã', 'sexta (31/10) às 9h30' (no idioma das ações)."""
+    return textos.dia(when, now or datetime.now(), com_hora=with_time, idioma=idioma)

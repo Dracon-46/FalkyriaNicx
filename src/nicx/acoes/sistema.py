@@ -14,9 +14,12 @@ import sys
 import webbrowser
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 from urllib.parse import quote_plus
 
+from nicx.acoes import textos
 from nicx.acoes.intencoes import APPS, Action
+from nicx.acoes.textos import texto
 
 logger = logging.getLogger(__name__)
 
@@ -30,29 +33,6 @@ _KEYEVENTF_KEYUP = 0x0002
 # Do zero ao máximo são 50 toques (2% cada).
 _VOLUME_KEY_STEPS = 50
 
-_WEEKDAYS = (
-    "segunda-feira",
-    "terça-feira",
-    "quarta-feira",
-    "quinta-feira",
-    "sexta-feira",
-    "sábado",
-    "domingo",
-)
-_MONTHS = (
-    "janeiro",
-    "fevereiro",
-    "março",
-    "abril",
-    "maio",
-    "junho",
-    "julho",
-    "agosto",
-    "setembro",
-    "outubro",
-    "novembro",
-    "dezembro",
-)
 _SEARCH_URLS = {
     "google": "https://www.google.com/search?q={}",
     "youtube": "https://www.youtube.com/results?search_query={}",
@@ -75,7 +55,7 @@ def _press(vk: int, times: int = 1) -> None:
 
 
 def _windows_only() -> Outcome:
-    return Outcome(False, "Isso eu só sei fazer no Windows por enquanto.")
+    return Outcome(False, texto("windows_only"))
 
 
 def _volume(action: Action) -> Outcome:
@@ -83,31 +63,31 @@ def _volume(action: Action) -> Outcome:
         return _windows_only()
     if action.op == "mute":
         _press(_VK_VOLUME_MUTE)
-        return Outcome(True, "Pronto, alternei o mudo.")
+        return Outcome(True, texto("mudo"))
     if action.op == "set":
         level = max(0, min(100, action.value or 0))
         # Sem ler o nível atual: zera e sobe até o pedido.
         _press(_VK_VOLUME_DOWN, _VOLUME_KEY_STEPS)
         _press(_VK_VOLUME_UP, round(level / 2))
-        return Outcome(True, f"Volume em {level}%.")
+        return Outcome(True, texto("volume_em", n=level))
     steps = action.value or 5
     if action.op == "up":
         _press(_VK_VOLUME_UP, steps)
-        return Outcome(True, "Aumentei o volume.")
+        return Outcome(True, texto("volume_mais"))
     _press(_VK_VOLUME_DOWN, steps)
-    return Outcome(True, "Abaixei o volume.")
+    return Outcome(True, texto("volume_menos"))
 
 
 def _media(action: Action) -> Outcome:
     if sys.platform != "win32":
         return _windows_only()
     key, message = {
-        "toggle": (_VK_MEDIA_PLAY_PAUSE, "Pronto."),
-        "next": (_VK_MEDIA_NEXT, "Próxima."),
-        "prev": (_VK_MEDIA_PREV, "Voltei para a anterior."),
+        "toggle": (_VK_MEDIA_PLAY_PAUSE, "midia_alternar"),
+        "next": (_VK_MEDIA_NEXT, "midia_proxima"),
+        "prev": (_VK_MEDIA_PREV, "midia_anterior"),
     }[action.op]
     _press(key)
-    return Outcome(True, message)
+    return Outcome(True, texto(message))
 
 
 def _start(target: str) -> None:
@@ -137,28 +117,25 @@ def _open(action: Action) -> Outcome:
             _start(shutil.which(app.value) or app.value)
     except OSError as exc:
         logger.info("Não abriu %s: %s", app.value, exc)
-        return Outcome(False, f"Não encontrei {app.label} neste computador.")
-    return Outcome(True, f"Abrindo {app.label}.")
+        return Outcome(
+            False, texto("app_nao_encontrado", app=textos.nome_app(app.label))
+        )
+    return Outcome(True, texto("abrindo", alvo=textos.nome_app(app.label)))
 
 
 def _search(action: Action) -> Outcome:
     url = _SEARCH_URLS[action.site].format(quote_plus(action.target))
     webbrowser.open(url)
-    where = "no YouTube" if action.site == "youtube" else "no Google"
-    return Outcome(True, f"Pesquisando {action.target} {where}.")
+    chave = "pesquisando_youtube" if action.site == "youtube" else "pesquisando_google"
+    return Outcome(True, texto(chave, q=action.target))
 
 
 def _time() -> Outcome:
-    now = datetime.now()
-    if now.minute == 0:
-        return Outcome(True, f"São {now.hour}h em ponto.")
-    return Outcome(True, f"São {now.hour}h{now.minute:02d}.")
+    return Outcome(True, textos.frase_hora(datetime.now()))
 
 
 def _date() -> Outcome:
-    now = datetime.now()
-    weekday = _WEEKDAYS[now.weekday()]
-    return Outcome(True, f"Hoje é {weekday}, {now.day} de {_MONTHS[now.month - 1]}.")
+    return Outcome(True, textos.frase_data(datetime.now()))
 
 
 def _battery() -> Outcome:
@@ -169,9 +146,11 @@ def _battery() -> Outcome:
     except Exception:  # noqa: BLE001 - sem sensor é o mesmo que sem bateria
         battery = None
     if battery is None:
-        return Outcome(False, "Não encontrei bateria neste computador.")
-    charging = ", carregando" if battery.power_plugged else ""
-    return Outcome(True, f"Bateria em {round(battery.percent)}%{charging}.")
+        return Outcome(False, texto("sem_bateria"))
+    charging = texto("carregando") if battery.power_plugged else ""
+    return Outcome(
+        True, texto("bateria", n=round(battery.percent), carregando=charging)
+    )
 
 
 def _lock() -> Outcome:
@@ -180,11 +159,20 @@ def _lock() -> Outcome:
     import ctypes
 
     ctypes.windll.user32.LockWorkStation()  # type: ignore[attr-defined]
-    return Outcome(True, "Tela bloqueada.")
+    return Outcome(True, texto("tela_bloqueada"))
 
 
-def run(action: Action) -> Outcome:
-    """Executa a ação. Nunca levanta: falhas viram uma frase explicando."""
+def run(action: Action, idioma: Optional[str] = None) -> Outcome:
+    """Executa a ação. Nunca levanta: falhas viram uma frase explicando.
+
+    A resposta sai em ``idioma`` (código da interface: "en", "es"...); sem
+    ele, no idioma atual das ações (português, se ninguém mudou).
+    """
+    with textos.usando(idioma):
+        return _run(action)
+
+
+def _run(action: Action) -> Outcome:
     try:
         if action.kind == "volume":
             return _volume(action)
@@ -209,5 +197,5 @@ def run(action: Action) -> Outcome:
             return outcome
     except Exception as exc:  # noqa: BLE001 - a resposta explica a falha
         logger.warning("Ação %s falhou: %s", action, exc)
-        return Outcome(False, "Não consegui fazer isso agora.")
-    return Outcome(False, "Não sei fazer isso ainda.")
+        return Outcome(False, texto("falhou"))
+    return Outcome(False, texto("nao_sei"))

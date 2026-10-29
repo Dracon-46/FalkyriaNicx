@@ -191,6 +191,8 @@ async def _quick_action_reply(req: ChatCompletionRequest, config: Any) -> str | 
 
     Only plain chat turns qualify: callers that pass their own ``tools`` want
     the model's raw tool calls, and the command must be the newest message.
+    ``req.language`` (the interface language) picks the reply language and
+    the extra phrasings understood besides Portuguese.
     """
     agent_cfg = getattr(config, "agent", None)
     if req.tools or not getattr(agent_cfg, "quick_actions", True):
@@ -200,7 +202,7 @@ async def _quick_action_reply(req: ChatCompletionRequest, config: Any) -> str | 
         return None
     from nicx.acoes import handle
 
-    outcome = await asyncio.to_thread(handle, last.content)
+    outcome = await asyncio.to_thread(handle, last.content, req.language)
     return outcome.message if outcome is not None else None
 
 

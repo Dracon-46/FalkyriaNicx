@@ -1,5 +1,7 @@
 """Execução das rotinas: lembretes, anotações, estado do PC, pastas, print,
 fechar apps e energia. Cada função devolve uma frase curta, boa para falar.
+
+As frases vêm de ``textos`` e saem no idioma atual das ações.
 """
 
 from __future__ import annotations
@@ -11,17 +13,33 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Optional
 
-from nicx.acoes import agenda, arquivos, confirmacao, lembretes, notas, youtube
+from nicx.acoes import (
+    agenda,
+    arquivos,
+    confirmacao,
+    lembretes,
+    notas,
+    textos,
+    youtube,
+)
 from nicx.acoes.intencoes import Action
 from nicx.acoes.rotinas import CLOSABLE, FOLDERS
 from nicx.acoes.sistema import Outcome, _start, _windows_only
 from nicx.acoes.tempo import parse_day, say_day, say_when
+from nicx.acoes.textos import contar, texto
 
 _NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
+# Textos internos dos lembretes de timer e alarme (ver ``lembretes.kind_of``).
+_TIMER_TEXT = "o tempo acabou"
+_ALARM_TEXT = "alarme"
 
-def _plural(n: int, one: str, many: str) -> str:
-    return f"{n} {one if n == 1 else many}"
+
+def _folder_label(key: str) -> str:
+    """Nome da pasta conhecida no idioma das respostas."""
+    if key not in FOLDERS:
+        return key
+    return textos.nome_pasta(key, FOLDERS[key][0])
 
 
 # ---------------------------------------------------------------------------
@@ -33,66 +51,78 @@ def remind(action: Action) -> Outcome:
     when = action.when or datetime.now()
     reminder = lembretes.add(action.target, when)
     spoken = say_when(reminder.due_at)
-    if action.target == "o tempo acabou":
-        return Outcome(True, f"Timer marcado: aviso {spoken}.")
-    if action.target == "alarme":
-        return Outcome(True, f"Alarme marcado {spoken}.")
-    return Outcome(True, f"Combinado: {spoken} eu te lembro de {action.target}.")
+    if action.target == _TIMER_TEXT:
+        return Outcome(True, texto("timer_marcado", quando=spoken))
+    if action.target == _ALARM_TEXT:
+        return Outcome(True, texto("alarme_marcado", quando=spoken))
+    return Outcome(True, texto("lembrete_marcado", quando=spoken, o_que=action.target))
 
 
 def remind_list() -> Outcome:
     items = lembretes.pending()
     if not items:
-        return Outcome(True, "Você não tem lembretes marcados.")
-    names = {"o tempo acabou": "timer"}
+        return Outcome(True, texto("sem_lembretes"))
+    names = {_TIMER_TEXT: texto("nome_timer"), _ALARM_TEXT: texto("nome_alarme")}
     parts = [f"{names.get(r.text, r.text)} {say_when(r.due_at)}" for r in items[:5]]
-    more = f" e mais {len(items) - 5}" if len(items) > 5 else ""
-    head = _plural(len(items), "lembrete", "lembretes")
-    return Outcome(True, f"Você tem {head}: " + "; ".join(parts) + more + ".")
+    more = texto("e_mais", n=len(items) - 5) if len(items) > 5 else ""
+    return Outcome(
+        True,
+        texto(
+            "lista_lembretes",
+            qtd=contar("lembrete", len(items)),
+            itens="; ".join(parts),
+            mais=more,
+        ),
+    )
 
 
+# tipo do lembrete -> (chave do nome contável, chave do nome com artigo)
 _KIND_NAMES = {
-    "": ("lembrete", "lembretes"),
-    "timer": ("timer", "timers"),
-    "alarme": ("alarme", "alarmes"),
+    "": ("lembrete", "o_lembrete"),
+    "timer": ("timer", "o_timer"),
+    "alarme": ("alarme", "o_alarme"),
 }
 
 
 def remind_clear(action: Action) -> Outcome:
-    one, many = _KIND_NAMES.get(action.target, _KIND_NAMES[""])
+    noun, _the = _KIND_NAMES.get(action.target, _KIND_NAMES[""])
     n = lembretes.cancel_all(action.target)
     if n == 0:
-        return Outcome(True, f"Não havia {many} para cancelar.")
-    return Outcome(True, f"Cancelei {_plural(n, one, many)}.")
+        return Outcome(True, texto("nada_cancelar_varios", nomes=textos.nome(noun, 2)))
+    return Outcome(True, texto("cancelei_qtd", qtd=contar(noun, n)))
 
 
 def remind_cancel(action: Action) -> Outcome:
-    one, _many = _KIND_NAMES.get(action.target, _KIND_NAMES[""])
+    noun, the = _KIND_NAMES.get(action.target, _KIND_NAMES[""])
     reminder = lembretes.cancel_next(action.target)
     if reminder is None:
-        return Outcome(True, f"Não havia {one} para cancelar.")
+        return Outcome(True, texto("nada_cancelar_um", nome=textos.nome(noun)))
     if lembretes.kind_of(reminder) == "lembrete":
-        return Outcome(True, f"Cancelei o lembrete de {reminder.text}.")
-    return Outcome(True, f"Cancelei o {one} de {say_when(reminder.due_at)}.")
+        return Outcome(True, texto("cancelei_lembrete", o_que=reminder.text))
+    return Outcome(
+        True,
+        texto("cancelei_tipo", o_nome=texto(the), quando=say_when(reminder.due_at)),
+    )
 
 
 def note_add(action: Action) -> Outcome:
     notas.add(action.target)
-    return Outcome(True, "Anotado.")
+    return Outcome(True, texto("anotado"))
 
 
 def notes_list() -> Outcome:
     items = notas.all_notes()
     if not items:
-        return Outcome(True, "Você ainda não tem anotações.")
+        return Outcome(True, texto("sem_anotacoes"))
     last = items[-5:]
-    head = "Sua anotação" if len(items) == 1 else f"Suas últimas {len(last)} anotações"
-    return Outcome(True, f"{head}: " + "; ".join(last) + ".")
+    if len(items) == 1:
+        return Outcome(True, texto("sua_anotacao", itens="; ".join(last)))
+    return Outcome(True, texto("suas_anotacoes", n=len(last), itens="; ".join(last)))
 
 
 def notes_clear() -> Outcome:
     n = notas.clear()
-    return Outcome(True, f"Apaguei {_plural(n, 'anotação', 'anotações')}.")
+    return Outcome(True, texto("apaguei_qtd", qtd=contar("anotacao", n)))
 
 
 # ---------------------------------------------------------------------------
@@ -101,7 +131,7 @@ def notes_clear() -> Outcome:
 
 
 def _gb(n: float) -> str:
-    return f"{n / 1024**3:.1f}".replace(".", ",")
+    return textos.decimal(n / 1024**3)
 
 
 def status() -> Outcome:
@@ -110,12 +140,12 @@ def status() -> Outcome:
     cpu = psutil.cpu_percent(interval=0.5)
     mem = psutil.virtual_memory()
     parts = [
-        f"processador em {cpu:.0f}%",
-        f"memória {mem.percent:.0f}% usada ({_gb(mem.available)} GB livres)",
+        texto("st_cpu", n=f"{cpu:.0f}"),
+        texto("st_mem", n=f"{mem.percent:.0f}", gb=_gb(mem.available)),
     ]
     try:
         disk = psutil.disk_usage(Path.home().anchor or "/")
-        parts.append(f"disco com {_gb(disk.free)} GB livres")
+        parts.append(texto("st_disco", gb=_gb(disk.free)))
     except OSError:
         pass
     try:
@@ -123,8 +153,8 @@ def status() -> Outcome:
     except Exception:  # noqa: BLE001 - sem sensor, sem bateria na frase
         battery = None
     if battery is not None:
-        charging = ", carregando" if battery.power_plugged else ""
-        parts.append(f"bateria em {round(battery.percent)}%{charging}")
+        charging = texto("carregando") if battery.power_plugged else ""
+        parts.append(texto("st_bateria", n=round(battery.percent), carregando=charging))
 
     # Quem mais pesa na memória, somando as várias janelas de cada programa.
     usage: dict[str, int] = {}
@@ -135,10 +165,10 @@ def status() -> Outcome:
         except (psutil.Error, AttributeError, TypeError):
             continue
     heavy = sorted(usage.items(), key=lambda kv: kv[1], reverse=True)[:2]
-    message = "Agora: " + ", ".join(parts) + "."
+    message = texto("st_agora", partes=texto("sep").join(parts))
     if heavy and mem.percent >= 70:
-        top = " e ".join(f"{n} ({_gb(b)} GB)" for n, b in heavy)
-        message += f" O que mais usa memória: {top}."
+        top = texto("e").join(texto("st_item", nome=n, gb=_gb(b)) for n, b in heavy)
+        message += texto("st_pesados", top=top)
     return Outcome(True, message)
 
 
@@ -157,25 +187,25 @@ def folder_path(key: str) -> Optional[Path]:
 
 
 def folder(action: Action) -> Outcome:
-    label = FOLDERS[action.target][0]
+    label = _folder_label(action.target)
     path = folder_path(action.target)
     if path is None:
-        return Outcome(False, f"Não achei a pasta {label}.")
+        return Outcome(False, texto("pasta_nao_achei", pasta=label))
     _start(str(path))
-    return Outcome(True, f"Abrindo {label}.")
+    return Outcome(True, texto("abrindo", alvo=label))
 
 
 def screenshot() -> Outcome:
     try:
         from PIL import ImageGrab
     except ImportError:
-        return Outcome(False, "Para tirar print eu preciso do pacote Pillow.")
+        return Outcome(False, texto("sem_pillow"))
     base = folder_path("imagens") or Path.home()
     target_dir = base / "Nicx"
     target_dir.mkdir(parents=True, exist_ok=True)
     target = target_dir / f"print-{datetime.now():%Y%m%d-%H%M%S}.png"
     ImageGrab.grab(all_screens=True).save(target)
-    return Outcome(True, f"Print salvo em {base.name}\\Nicx.")
+    return Outcome(True, texto("print_salvo", pasta=base.name))
 
 
 # ---------------------------------------------------------------------------
@@ -187,6 +217,7 @@ def close(action: Action) -> Outcome:
     import psutil
 
     label, exes = CLOSABLE[action.target]
+    label = textos.nome_app(label)
     wanted = {e.lower() for e in exes}
     running = {
         (p.info["name"] or "")
@@ -194,7 +225,7 @@ def close(action: Action) -> Outcome:
         if (p.info["name"] or "").lower() in wanted
     }
     if not running:
-        return Outcome(True, f"{label[0].upper()}{label[1:]} não está aberto.")
+        return Outcome(True, texto("nao_esta_aberto", App=textos.maiuscula(label)))
     if sys.platform == "win32":
         # Sem /F: o programa recebe o pedido de fechar e pode perguntar se
         # quer salvar, como ao clicar no X.
@@ -206,18 +237,12 @@ def close(action: Action) -> Outcome:
         for proc in psutil.process_iter(["name"]):
             if (proc.info["name"] or "") in running:
                 proc.terminate()
-    return Outcome(True, f"Fechando {label}.")
+    return Outcome(True, texto("fechando", app=label))
 
 
 # ---------------------------------------------------------------------------
 # Energia (sempre com confirmação)
 # ---------------------------------------------------------------------------
-
-_POWER_ASK = {
-    "shutdown": "desligar o computador",
-    "restart": "reiniciar o computador",
-    "suspend": "suspender o computador",
-}
 
 
 def power(action: Action) -> Outcome:
@@ -227,19 +252,15 @@ def power(action: Action) -> Outcome:
         subprocess.run(  # noqa: S603, S607
             ["shutdown", "/a"], capture_output=True, creationflags=_NO_WINDOW
         )
-        return Outcome(True, "Desligamento cancelado.")
+        return Outcome(True, texto("desligamento_cancelado"))
     confirmacao.ask(action)
-    return Outcome(
-        True,
-        f"Tem certeza que quer {_POWER_ASK[action.op]}? "
-        'Diga "confirmo" em até 30 segundos.',
-    )
+    return Outcome(True, texto("pergunta_energia", acao=texto(f"acao_{action.op}")))
 
 
 def confirm() -> Outcome:
     action = confirmacao.take()
     if action is None:
-        return Outcome(False, "Não há nada esperando confirmação.")
+        return Outcome(False, texto("nada_confirmar"))
     if action.kind == "organize":
         return _organize_now(action)
     if sys.platform != "win32":
@@ -250,20 +271,14 @@ def confirm() -> Outcome:
             capture_output=True,
             creationflags=_NO_WINDOW,
         )
-        return Outcome(
-            True,
-            'Desligando em 30 segundos. Para cancelar, diga "cancela o desligamento".',
-        )
+        return Outcome(True, texto("desligando"))
     if action.op == "restart":
         subprocess.run(  # noqa: S603, S607
             ["shutdown", "/r", "/t", "30"],
             capture_output=True,
             creationflags=_NO_WINDOW,
         )
-        return Outcome(
-            True,
-            'Reiniciando em 30 segundos. Para cancelar, diga "cancela o reinício".',
-        )
+        return Outcome(True, texto("reiniciando"))
     # Suspender corta tudo na hora: espera a resposta chegar antes.
     threading.Timer(
         3.0,
@@ -280,12 +295,12 @@ def confirm() -> Outcome:
             creationflags=_NO_WINDOW,
         ),
     ).start()
-    return Outcome(True, "Suspendendo em 3 segundos.")
+    return Outcome(True, texto("suspendendo"))
 
 
 def deny() -> Outcome:
     confirmacao.drop()
-    return Outcome(True, "Tudo bem, não vou fazer nada.")
+    return Outcome(True, texto("nada_feito"))
 
 
 # ---------------------------------------------------------------------------
@@ -293,15 +308,11 @@ def deny() -> Outcome:
 # ---------------------------------------------------------------------------
 
 
-def _hhmm(when: datetime) -> str:
-    return f"{when.hour}h" if when.minute == 0 else f"{when.hour}h{when.minute:02d}"
-
-
 def _event_line(event: "agenda.Event", now: datetime) -> str:
     if event.all_day:
         day = say_day(event.start_at, now, with_time=False)
-        return f"{event.title} {day}, o dia todo"
-    return f"{event.title} {say_day(event.start_at, now)}"
+        return texto("evento_dia_todo", titulo=event.title, dia=day)
+    return texto("evento", titulo=event.title, quando=say_day(event.start_at, now))
 
 
 def agenda_add(action: Action) -> Outcome:
@@ -309,17 +320,23 @@ def agenda_add(action: Action) -> Outcome:
     when = action.when or now
     all_day = action.op == "dia"
     if (when.date() < now.date()) if all_day else (when < now):
-        return Outcome(
-            False, f"Esse horário já passou ({say_day(when, now)}). Me diz outro."
-        )
+        return Outcome(False, texto("horario_passou", quando=say_day(when, now)))
     event = agenda.add(action.target, when, all_day=all_day, now=now)
     if all_day:
         day = say_day(event.start_at, now, with_time=False)
-        aviso = " Te aviso às 8h do dia." if event.reminder_id else ""
-        return Outcome(True, f"Marquei {event.title} {day}, o dia todo.{aviso}")
-    aviso = " Te aviso 15 minutos antes." if event.reminder_id else ""
+        aviso = texto("aviso_8h") if event.reminder_id else ""
+        return Outcome(
+            True, texto("marquei_dia_todo", titulo=event.title, dia=day, aviso=aviso)
+        )
+    aviso = texto("aviso_15min") if event.reminder_id else ""
     return Outcome(
-        True, f"Marquei {event.title} {say_day(event.start_at, now)}.{aviso}"
+        True,
+        texto(
+            "marquei",
+            titulo=event.title,
+            quando=say_day(event.start_at, now),
+            aviso=aviso,
+        ),
     )
 
 
@@ -329,25 +346,33 @@ def agenda_list(action: Action) -> Outcome:
         events = agenda.on_day(action.when.date())
         label = say_day(action.when, now, with_time=False)
         if not events:
-            return Outcome(True, f"Nada marcado para {label}.")
+            return Outcome(True, texto("nada_no_dia", dia=label))
         parts = [
-            f"{e.title} o dia todo"
+            texto("item_dia_todo", titulo=e.title)
             if e.all_day
-            else f"{e.title} às {_hhmm(e.start_at)}"
+            else texto(
+                "item_hora",
+                titulo=e.title,
+                hora=textos.hora_curta(e.start_at),
+                a_las="a la" if e.start_at.hour == 1 else "a las",
+            )
             for e in events
         ]
         return Outcome(
-            True, f"{label.capitalize()} você tem: " + "; ".join(parts) + "."
+            True,
+            texto(
+                "voce_tem_no_dia", Dia=textos.maiuscula(label), itens="; ".join(parts)
+            ),
         )
     events = agenda.upcoming(now, days=7)
     if not events:
-        return Outcome(True, "Nada marcado nos próximos 7 dias.")
+        return Outcome(True, texto("nada_7_dias"))
     shown = [_event_line(e, now) for e in events[:6]]
-    more = f" e mais {len(events) - 6}" if len(events) > 6 else ""
-    head = (
-        "Nos próximos 7 dias" if action.op == "semana" else "Seus próximos compromissos"
+    more = texto("e_mais", n=len(events) - 6) if len(events) > 6 else ""
+    head = texto(
+        "proximos_7_dias" if action.op == "semana" else "proximos_compromissos"
     )
-    return Outcome(True, f"{head}: " + "; ".join(shown) + more + ".")
+    return Outcome(True, texto("lista", titulo=head, itens="; ".join(shown), mais=more))
 
 
 def _split_day(query: str) -> tuple[str, Optional[date]]:
@@ -369,49 +394,66 @@ def agenda_cancel(action: Action) -> Outcome:
         upcoming = agenda.upcoming(now, days=366)
         event = upcoming[0] if upcoming else None
     if event is None:
-        return Outcome(False, "Não achei esse compromisso na agenda.")
+        return Outcome(False, texto("compromisso_nao_achei"))
     agenda.cancel(event)
-    return Outcome(True, f"Desmarquei {_event_line(event, now)}.")
+    return Outcome(True, texto("desmarquei", evento=_event_line(event, now)))
 
 
 def agenda_export() -> Outcome:
     events = agenda.upcoming(days=366)
     if not events:
-        return Outcome(True, "Não há compromissos marcados para mandar.")
+        return Outcome(True, texto("nada_exportar"))
     path = agenda.export_ics(events)
-    n = _plural(len(events), "compromisso", "compromissos")
+    n = contar("compromisso", len(events))
     if sys.platform != "win32":
-        return Outcome(True, f"Salvei {n} em {path}. Abra no seu calendário.")
+        return Outcome(True, texto("ics_salvo", qtd=n, caminho=path))
     _start(str(path))
-    return Outcome(True, f"Abri {n} no calendário do Windows: é só confirmar por lá.")
+    return Outcome(True, texto("ics_aberto", qtd=n))
 
 
 # ---------------------------------------------------------------------------
 # Arquivos, fotos e YouTube
 # ---------------------------------------------------------------------------
 
-_KIND_LABEL = {
-    "imagem": ("foto", "fotos"),
-    "print": ("print", "prints"),
-    "video": ("vídeo", "vídeos"),
-    "musica": ("música", "músicas"),
-    "pdf": ("PDF", "PDFs"),
-    "documento": ("documento", "documentos"),
-    "planilha": ("planilha", "planilhas"),
-    "apresentacao": ("apresentação", "apresentações"),
-    "": ("arquivo", "arquivos"),
-    "download": ("download", "downloads"),
+_KINDS = {
+    "imagem",
+    "print",
+    "video",
+    "musica",
+    "pdf",
+    "documento",
+    "planilha",
+    "apresentacao",
+    "",
+    "download",
 }
+
+
+def _kind_noun(kind: str) -> str:
+    """Chave do nome contável do tipo de arquivo (ver ``textos.nome``)."""
+    return f"k_{kind if kind in _KINDS else ''}"
 
 
 def _open_path(path: Path) -> Outcome:
     _start(str(path))
-    return Outcome(True, f"Abrindo {arquivos.describe(path)}.")
+    return Outcome(True, texto("abrindo", alvo=arquivos.describe(path)))
+
+
+def _not_found(noun: str, query: str) -> Outcome:
+    return Outcome(
+        False,
+        texto(
+            "nao_achei_nome",
+            nome=textos.nome(noun),
+            nomes=textos.nome(noun, 2),
+            q=query,
+        ),
+    )
 
 
 def file_latest(action: Action) -> Outcome:
     kind = action.target
-    one, _many = _KIND_LABEL.get(kind, _KIND_LABEL[""])
+    noun = _kind_noun(kind)
     if kind == "print":
         path = arquivos.latest("imagem", arquivos.screenshots_folders() or None)
     elif kind == "download":
@@ -424,88 +466,87 @@ def file_latest(action: Action) -> Outcome:
     else:
         path = arquivos.latest(kind)
     if path is None:
-        return Outcome(False, f"Não achei nenhum {one} nas suas pastas.")
+        return Outcome(
+            False,
+            texto("nenhum_arquivo", nome=textos.nome(noun), nomes=textos.nome(noun, 2)),
+        )
     return _open_path(path)
 
 
 def file_open(action: Action) -> Outcome:
-    one, _many = _KIND_LABEL.get(action.op, _KIND_LABEL[""])
+    noun = _kind_noun(action.op)
     found = arquivos.search(action.target, kind=action.op or None, limit=5)
     if not found:
-        return Outcome(False, f'Não achei {one} com "{action.target}" no nome.')
+        return _not_found(noun, action.target)
     outcome = _open_path(found[0])
     if len(found) > 1:
         outcome = Outcome(
-            True, f"{outcome.message} Achei outros {len(found) - 1} parecidos."
+            True, texto("outros_parecidos", msg=outcome.message, n=len(found) - 1)
         )
     return outcome
 
 
 def file_find(action: Action) -> Outcome:
-    one, many = _KIND_LABEL.get(action.op, _KIND_LABEL[""])
+    noun = _kind_noun(action.op)
     found = arquivos.search(action.target, kind=action.op or None, limit=5)
     if not found:
-        return Outcome(False, f'Não achei {one} com "{action.target}" no nome.')
+        return _not_found(noun, action.target)
     names = "; ".join(arquivos.describe(p) for p in found)
-    head = f"Achei {_plural(len(found), one, many)}"
-    return Outcome(True, f"{head}: {names}.")
+    return Outcome(True, texto("achei", qtd=contar(noun, len(found)), nomes=names))
 
 
 def folder_list(action: Action) -> Outcome:
     path = folder_path(action.target)
-    label = FOLDERS[action.target][0] if action.target in FOLDERS else action.target
+    label = _folder_label(action.target)
     if path is None:
-        return Outcome(False, f"Não achei a pasta {label}.")
+        return Outcome(False, texto("pasta_nao_achei", pasta=label))
     names, total = arquivos.list_folder(path, limit=10)
     if total == 0:
-        return Outcome(True, f"A pasta {label} está vazia.")
-    more = f" e mais {total - len(names)}" if total > len(names) else ""
+        return Outcome(True, texto("pasta_vazia", pasta=label))
+    more = texto("e_mais", n=total - len(names)) if total > len(names) else ""
     return Outcome(
-        True, f"Em {label} (mais recentes): " + "; ".join(names) + more + "."
+        True, texto("na_pasta", pasta=label, nomes="; ".join(names), mais=more)
     )
 
 
 def organize(action: Action) -> Outcome:
     path = folder_path(action.target)
-    label = FOLDERS[action.target][0] if action.target in FOLDERS else action.target
+    label = _folder_label(action.target)
     if path is None:
-        return Outcome(False, f"Não achei a pasta {label}.")
+        return Outcome(False, texto("pasta_nao_achei", pasta=label))
     groups = arquivos.plan(path)
     total = sum(len(files) for files in groups.values())
     if total == 0:
-        return Outcome(True, f"{label} já está organizada: nada solto para mover.")
+        return Outcome(True, texto("ja_organizada", pasta=label))
     resumo = ", ".join(f"{name} {len(files)}" for name, files in sorted(groups.items()))
     confirmacao.ask(action)
     return Outcome(
         True,
-        f"Vou separar {_plural(total, 'arquivo', 'arquivos')} de {label} em pastas"
-        f" ({resumo}). Nada é apagado e dá para desfazer."
-        ' Diga "confirmo" em até 30 segundos.',
+        texto(
+            "vou_organizar", qtd=contar("arquivo", total), pasta=label, resumo=resumo
+        ),
     )
 
 
 def _organize_now(action: Action) -> Outcome:
     path = folder_path(action.target)
     if path is None:
-        return Outcome(False, "Não achei a pasta.")
+        return Outcome(False, texto("pasta_sumiu"))
     moved, _log = arquivos.organize(path, arquivos.plan(path))
-    label = FOLDERS[action.target][0]
+    label = _folder_label(action.target)
     return Outcome(
-        True,
-        f"Pronto: {_plural(moved, 'arquivo organizado', 'arquivos organizados')} em"
-        f' {label}. Se não gostar, diga "desfaz a organização".',
+        True, texto("organizado", qtd=contar("arquivo_organizado", moved), pasta=label)
     )
 
 
 def organize_undo() -> Outcome:
     result = arquivos.undo_last()
     if result is None:
-        return Outcome(True, "Não há organização para desfazer.")
+        return Outcome(True, texto("nada_desfazer"))
     restored, folder_name = result
     return Outcome(
         True,
-        f"Desfeito: {_plural(restored, 'arquivo voltou', 'arquivos voltaram')}"
-        f" para {folder_name}.",
+        texto("desfeito", qtd=contar("arquivo_voltou", restored), pasta=folder_name),
     )
 
 
@@ -513,9 +554,9 @@ def play_youtube(action: Action) -> Outcome:
     url = youtube.first_video(action.target)
     if url is None:
         _start(youtube.search_url(action.target))
-        return Outcome(True, f"Abri a busca por {action.target} no YouTube.")
+        return Outcome(True, texto("youtube_busca", q=action.target))
     _start(url)
-    return Outcome(True, f"Tocando {action.target} no YouTube.")
+    return Outcome(True, texto("youtube_tocando", q=action.target))
 
 
 def run(action: Action) -> Optional[Outcome]:

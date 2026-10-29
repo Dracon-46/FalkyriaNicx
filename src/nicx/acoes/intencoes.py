@@ -1,5 +1,7 @@
 """Entende comandos diretos em português ("aumenta o volume", "abre o YouTube").
 
+Outros idiomas (inglês, espanhol, francês) ficam em ``outros_idiomas.py``.
+
 Só reconhece a frase inteira como comando: "aumenta o volume" vira ação,
 "como eu aumento o volume do Windows?" não (vai para o modelo responder).
 Tudo aqui é texto puro, sem tocar no sistema; quem executa é ``sistema.py``.
@@ -308,18 +310,27 @@ def _info(t: str) -> Optional[Action]:
     return None
 
 
-def parse(text: str) -> Optional[Action]:
-    """A ação que a frase pede, ou None se não for um comando direto."""
-    from nicx.acoes import rotinas
+def parse(text: str, idioma: Optional[str] = None) -> Optional[Action]:
+    """A ação que a frase pede, ou None se não for um comando direto.
+
+    O português vale sempre. Com ``idioma`` (código da interface: "en", "es",
+    "fr"...) também valem os pedidos comuns daquele idioma; sem ele, o idioma
+    atual das ações (ver ``textos.usando``).
+    """
+    from nicx.acoes import outros_idiomas, rotinas, textos
 
     t, where = clean_with_map(text)
     if not t or len(t) > 200:
         return None
     action = rotinas.parse(text, t, where)
-    if action is not None or len(t) > 80:
+    if action is None and len(t) <= 80:
+        for matcher in (_volume, _media, _open, _search, _info):
+            action = matcher(t)
+            if action is not None:
+                break
+    if action is not None:
         return action
-    for matcher in (_volume, _media, _open, _search, _info):
-        action = matcher(t)
-        if action is not None:
-            return action
-    return None
+    codigo = textos.codigo(idioma)
+    if codigo == textos.PADRAO:
+        return None
+    return outros_idiomas.parse(text, t, where, codigo)
