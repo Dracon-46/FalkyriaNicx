@@ -1,0 +1,54 @@
+{
+  "saveFailed": "Impossible d'enregistrer votre choix.",
+  "consent": {
+    "fallbackTitle": "Aidez à améliorer Nicx",
+    "fallbackText": "Avec votre permission, Nicx envoie à Falkyria des **statistiques d'utilisation anonymes** : les fonctions que vous utilisez, les temps de réponse et les types d'erreur.\n\nNous n'envoyons **jamais** vos conversations, fichiers, nom ou e-mail. C'est facultatif, et vous pouvez changer d'avis ou supprimer les données à tout moment dans **Paramètres → Confidentialité**.",
+    "notNow": "Pas maintenant",
+    "accept": "Accepter",
+    "readPolicy": "Lire la politique de confidentialité",
+    "version": "version {{version}}"
+  },
+  "legal": {
+    "titles": {
+      "privacidade": "Politique de confidentialité",
+      "termos": "Conditions d'utilisation",
+      "consentimento": "Statistiques d'utilisation anonymes"
+    },
+    "loadFailed": "Impossible de charger le document.",
+    "loading": "Chargement du texte",
+    "close": "Fermer",
+    "retry": "Réessayer"
+  },
+  "modal": {
+    "close": "Fermer",
+    "cancel": "Annuler"
+  },
+  "section": {
+    "title": "Confidentialité",
+    "intro": "Vos conversations, fichiers et mémoires restent sur votre ordinateur. Avec votre permission, Nicx envoie à Falkyria uniquement des statistiques d'utilisation anonymes (fonctions utilisées, temps, types d'erreur), sur des serveurs au Brésil, supprimées au bout de 24 mois.",
+    "toggleLabel": "Envoyer des statistiques d'utilisation anonymes",
+    "readFailed": "Impossible de lire votre choix : le serveur de Nicx n'a pas répondu.",
+    "checking": "Vérification...",
+    "on": "Activé. Merci d'aider à améliorer Nicx.",
+    "off": "Désactivé. Rien n'est envoyé.",
+    "documents": "Documents",
+    "policyVersion": "Politique de confidentialité, version {{version}}",
+    "howWeTreat": "Comment Falkyria traite vos données",
+    "policy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "forgetTitle": "Supprimer mes données",
+    "forgetHint": "Supprime des serveurs de Falkyria les événements envoyés par cette installation et génère un nouveau code anonyme.",
+    "forgetButton": "Supprimer mes données",
+    "forgetFailed": "Impossible de supprimer vos données pour le moment. Réessayez.",
+    "confirmTitle": "Supprimer vos données d'utilisation ?",
+    "confirmBody1": "Les événements d'utilisation envoyés par cette installation seront supprimés des serveurs de Falkyria, et Nicx utilisera un nouveau code anonyme.",
+    "confirmBody2": "Vos conversations ne sont pas concernées : elles ne quittent jamais votre ordinateur. Cette action est irréversible.",
+    "deleting": "Suppression...",
+    "deleteData": "Supprimer les données"
+  },
+  "forget": {
+    "none": "Aucun événement de cette installation ne se trouvait sur les serveurs de Falkyria.",
+    "one": "1 événement supprimé des serveurs de Falkyria.",
+    "many": "{{n}} événements supprimés des serveurs de Falkyria."
+  }
+}

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FileText, ScrollText, ShieldCheck, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n';
 import {
   forgetAnalyticsData,
   loadAnalyticsIdentity,
@@ -10,19 +12,18 @@ import {
 import { LegalDocumentDialog } from './LegalDocumentDialog';
 import { ConfirmModal, buttonClass, buttonStyle } from './Modal';
 
-/** "N eventos apagados dos servidores da Falkyria." in correct Portuguese. */
+/** "N eventos apagados dos servidores da Falkyria.", worded for zero, one or many. */
 export function forgetMessage(removed: number): string {
-  if (removed <= 0) return 'Nenhum evento desta instalação estava nos servidores da Falkyria.';
-  const n = removed.toLocaleString('pt-BR');
-  return removed === 1
-    ? '1 evento apagado dos servidores da Falkyria.'
-    : `${n} eventos apagados dos servidores da Falkyria.`;
+  if (removed <= 0) return i18n.t('privacy.forget.none');
+  if (removed === 1) return i18n.t('privacy.forget.one');
+  return i18n.t('privacy.forget.many', { n: removed.toLocaleString(i18n.language || 'pt-BR') });
 }
 
 type Notice = { tone: 'ok' | 'error'; text: string } | null;
 
 /** Settings → Privacidade: consent toggle, legal texts and data deletion. */
 export function PrivacySection() {
+  const { t } = useTranslation();
   const identity = useAnalyticsIdentity((s) => s.identity);
   const [loadFailed, setLoadFailed] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -51,7 +52,7 @@ export function PrivacySection() {
     try {
       await setAnalyticsPreference(!enabled);
     } catch (e) {
-      setToggleError(e instanceof Error ? e.message : 'Não foi possível salvar sua escolha.');
+      setToggleError(e instanceof Error ? e.message : t('privacy.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -66,7 +67,7 @@ export function PrivacySection() {
     } catch (e) {
       setNotice({
         tone: 'error',
-        text: e instanceof Error ? e.message : 'Não foi possível apagar seus dados agora. Tente de novo.',
+        text: e instanceof Error ? e.message : t('privacy.section.forgetFailed'),
       });
     } finally {
       setForgetting(false);
@@ -86,12 +87,10 @@ export function PrivacySection() {
         style={{ color: 'var(--color-text)' }}
       >
         <ShieldCheck size={15} aria-hidden="true" style={{ color: 'var(--color-accent)' }} />
-        Privacidade
+        {t('privacy.section.title')}
       </h3>
       <p className="text-xs leading-relaxed mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-        Suas conversas, arquivos e memórias ficam no seu computador. Com a sua permissão, o
-        Nicx envia à Falkyria apenas estatísticas anônimas de uso (recursos usados, tempos,
-        tipos de erro), em servidores no Brasil, apagadas após 24 meses.
+        {t('privacy.section.intro')}
       </p>
 
       <div
@@ -100,16 +99,16 @@ export function PrivacySection() {
       >
         <div className="min-w-0">
           <div id="privacy-toggle-label" className="text-sm" style={{ color: 'var(--color-text)' }}>
-            Enviar estatísticas anônimas de uso
+            {t('privacy.section.toggleLabel')}
           </div>
           <div id="privacy-toggle-hint" className="text-xs mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>
             {identity === null
               ? loadFailed
-                ? 'Não foi possível ler sua escolha: o servidor do Nicx não respondeu.'
-                : 'Verificando...'
+                ? t('privacy.section.readFailed')
+                : t('privacy.section.checking')
               : enabled
-                ? 'Ativado. Obrigado por ajudar a melhorar o Nicx.'
-                : 'Desativado. Nada é enviado.'}
+                ? t('privacy.section.on')
+                : t('privacy.section.off')}
           </div>
         </div>
         <button
@@ -144,11 +143,11 @@ export function PrivacySection() {
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
         <div className="min-w-0">
-          <div className="text-sm" style={{ color: 'var(--color-text)' }}>Documentos</div>
+          <div className="text-sm" style={{ color: 'var(--color-text)' }}>{t('privacy.section.documents')}</div>
           <div className="text-xs mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>
             {identity?.policy_version
-              ? `Política de privacidade, versão ${identity.policy_version}`
-              : 'Como a Falkyria trata os seus dados'}
+              ? t('privacy.section.policyVersion', { version: identity.policy_version })
+              : t('privacy.section.howWeTreat')}
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -158,7 +157,7 @@ export function PrivacySection() {
             className={buttonClass('sm')}
             style={buttonStyle('neutral')}
           >
-            <FileText size={13} aria-hidden="true" /> Política de privacidade
+            <FileText size={13} aria-hidden="true" /> {t('privacy.section.policy')}
           </button>
           <button
             type="button"
@@ -166,17 +165,16 @@ export function PrivacySection() {
             className={buttonClass('sm')}
             style={buttonStyle('neutral')}
           >
-            <ScrollText size={13} aria-hidden="true" /> Termos de uso
+            <ScrollText size={13} aria-hidden="true" /> {t('privacy.section.terms')}
           </button>
         </div>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 pt-3">
         <div className="min-w-0 max-w-sm">
-          <div className="text-sm" style={{ color: 'var(--color-text)' }}>Apagar meus dados</div>
+          <div className="text-sm" style={{ color: 'var(--color-text)' }}>{t('privacy.section.forgetTitle')}</div>
           <div className="text-xs mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>
-            Remove dos servidores da Falkyria os eventos enviados por esta instalação e gera um
-            novo código anônimo.
+            {t('privacy.section.forgetHint')}
           </div>
         </div>
         <button
@@ -193,7 +191,7 @@ export function PrivacySection() {
             border: '1px solid var(--color-error)',
           }}
         >
-          <Trash2 size={13} aria-hidden="true" /> Apagar meus dados
+          <Trash2 size={13} aria-hidden="true" /> {t('privacy.section.forgetButton')}
         </button>
       </div>
       {notice && (
@@ -217,20 +215,14 @@ export function PrivacySection() {
         onOpenChange={(next) => {
           if (!forgetting) setConfirmOpen(next);
         }}
-        title="Apagar seus dados de uso?"
+        title={t('privacy.section.confirmTitle')}
         description={
           <>
-            <p className="mb-2">
-              Os eventos de uso que esta instalação enviou serão apagados dos servidores da
-              Falkyria, e o Nicx passará a usar um novo código anônimo.
-            </p>
-            <p>
-              Suas conversas não são afetadas: elas nunca saem do seu computador. Esta ação não
-              pode ser desfeita.
-            </p>
+            <p className="mb-2">{t('privacy.section.confirmBody1')}</p>
+            <p>{t('privacy.section.confirmBody2')}</p>
           </>
         }
-        confirmLabel={forgetting ? 'Apagando...' : 'Apagar dados'}
+        confirmLabel={forgetting ? t('privacy.section.deleting') : t('privacy.section.deleteData')}
         onConfirm={() => void forget()}
         busy={forgetting}
         destructive

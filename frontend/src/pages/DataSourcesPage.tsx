@@ -1516,11 +1516,11 @@ function SendBlueSection({
               rel="noopener noreferrer"
               style={{ color: 'var(--color-accent)', fontSize: 12, textDecoration: 'underline' }}
             >
-              2. Go to your API Credentials page &rarr;
+              {t('dataSources.sendblue.credentialsLink')} &rarr;
             </a>
           </div>
           <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 6 }}>
-            Copy the "API Key" and "API Secret" from the credentials page and paste them below.
+            {t('dataSources.sendblue.copyCredentials')}
           </div>
           <input value={apiKey} onChange={(e) => setApiKey(e.target.value)}
             placeholder="API Key" style={{ ...inputStyle, marginTop: 4 }} />
@@ -1531,11 +1531,11 @@ function SendBlueSection({
       canAdvance: apiKey.trim() && apiSecret.trim(),
     },
     {
-      title: 'Enter your phone number',
+      title: t('dataSources.sendblue.step2Title'),
       content: (
         <div>
           <div style={{ fontSize: 12, marginBottom: 8 }}>
-            Which phone number should SendBlue use? This is the number people will text to reach your agent.
+            {t('dataSources.sendblue.step2Intro')}
           </div>
           <input value={phone} onChange={(e) => setPhone(e.target.value)}
             placeholder="+1XXXXXXXXXX" style={inputStyle} />
@@ -1544,11 +1544,11 @@ function SendBlueSection({
       canAdvance: phone.trim().length >= 10,
     },
     {
-      title: 'Set up webhook (ngrok tunnel)',
+      title: t('dataSources.sendblue.step3Title'),
       content: (
         <div>
           <div style={{ fontSize: 12, marginBottom: 8 }}>
-            SendBlue needs a public URL to send incoming messages to your local server. Use ngrok to create a tunnel.
+            {t('dataSources.sendblue.step3Intro')}
           </div>
           <div style={{
             fontSize: 11, lineHeight: 1.6,
@@ -1558,9 +1558,9 @@ function SendBlueSection({
             borderRadius: 6,
             borderLeft: '3px solid var(--color-accent, var(--color-accent-purple))',
           }}>
-            <div><strong>1.</strong> Open a terminal and run: <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }}>ngrok http 8000</code></div>
-            <div style={{ marginTop: 4 }}><strong>2.</strong> Copy the <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }}>https://</code> forwarding URL (e.g. https://abc123.ngrok.io)</div>
-            <div style={{ marginTop: 4 }}><strong>3.</strong> Paste it below and click "Register Webhook"</div>
+            <div><strong>1.</strong> {t('dataSources.sendblue.ngrokRun')} <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }}>ngrok http 8000</code></div>
+            <div style={{ marginTop: 4 }}><strong>2.</strong> {t('dataSources.sendblue.ngrokCopyBefore')} <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }}>https://</code> {t('dataSources.sendblue.ngrokCopyAfter')}</div>
+            <div style={{ marginTop: 4 }}><strong>3.</strong> {t('dataSources.sendblue.ngrokPaste', { button: t('dataSources.sendblue.register') })}</div>
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
             <input
@@ -1580,24 +1580,24 @@ function SendBlueSection({
                 opacity: !webhookUrl.trim() || webhookStatus === 'registering' ? 0.5 : 1,
               }}
             >
-              {webhookStatus === 'registering' ? 'Registering...'
-                : webhookStatus === 'done' ? 'Registered!'
-                : webhookStatus === 'error' ? 'Retry'
-                : 'Register Webhook'}
+              {webhookStatus === 'registering' ? t('dataSources.sendblue.registering')
+                : webhookStatus === 'done' ? t('dataSources.sendblue.registered')
+                : webhookStatus === 'error' ? t('dataSources.common.retry')
+                : t('dataSources.sendblue.register')}
             </button>
           </div>
           {webhookStatus === 'done' && (
             <div style={{ fontSize: 11, color: 'var(--color-success)', marginTop: 6 }}>
-              Webhook registered! Incoming texts will be forwarded to your agent.
+              {t('dataSources.sendblue.webhookDone')}
             </div>
           )}
           {webhookStatus === 'error' && (
             <div style={{ fontSize: 11, color: 'var(--color-error)', marginTop: 6 }}>
-              Failed to register webhook. Check your ngrok URL and SendBlue credentials.
+              {t('dataSources.sendblue.webhookFailed')}
             </div>
           )}
           <div style={{ fontSize: 10, color: 'var(--color-text-tertiary)', marginTop: 8 }}>
-            Don't have ngrok? <a href="https://ngrok.com/download" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>Download it free</a>. You can also skip this step and register the webhook later.
+            {t('dataSources.sendblue.noNgrok')} <a href="https://ngrok.com/download" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>{t('dataSources.sendblue.downloadNgrok')}</a>. {t('dataSources.sendblue.skipWebhook')}
           </div>
         </div>
       ),
@@ -1630,7 +1630,7 @@ function SendBlueSection({
       setWebhookUrl('');
       setWebhookStatus('idle');
     } catch (err: any) {
-      setError(err.message || 'Failed to connect');
+      setError(err.message || t('dataSources.connect.failed'));
     } finally {
       setLoading(false);
     }
@@ -1654,11 +1654,11 @@ function SendBlueSection({
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 600, fontSize: 13 }}>iMessage + SMS (SendBlue)</div>
           <div style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>
-            Let people text your agent from any phone
+            {t('dataSources.sendblue.subtitle')}
           </div>
         </div>
         <span style={{ color: 'var(--color-accent-purple)', fontSize: 11, fontWeight: 500 }}>
-          {step >= 0 ? 'Set Up' : '+ Add'}
+          {step >= 0 ? t('dataSources.common.setUp') : t('dataSources.common.add')}
         </span>
       </div>
 
@@ -1697,7 +1697,7 @@ function SendBlueSection({
                   border: '1px solid var(--color-border)',
                   borderRadius: 5, cursor: 'pointer',
                 }}
-              >Back</button>
+              >{t('dataSources.common.back')}</button>
             )}
             {step < steps.length - 1 ? (
               <button
@@ -1710,7 +1710,7 @@ function SendBlueSection({
                   cursor: 'pointer', fontWeight: 600,
                   opacity: steps[step]?.canAdvance ? 1 : 0.5,
                 }}
-              >Next</button>
+              >{t('dataSources.common.next')}</button>
             ) : (
               <button
                 onClick={handleFinish}
@@ -1722,7 +1722,7 @@ function SendBlueSection({
                   cursor: 'pointer', fontWeight: 600,
                   opacity: loading || !steps[step]?.canAdvance ? 0.5 : 1,
                 }}
-              >{loading ? 'Connecting...' : 'Connect'}</button>
+              >{loading ? t('dataSources.common.connecting') : t('dataSources.common.connect')}</button>
             )}
           </div>
         </div>
@@ -1732,6 +1732,7 @@ function SendBlueSection({
 }
 
 function MessagingSection({ agentId }: { agentId: string }) {
+  const { t } = useTranslation();
   const [bindings, setBindings] = useState<ChannelBinding[]>([]);
   const [setupType, setSetupType] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
@@ -1812,7 +1813,7 @@ function MessagingSection({ agentId }: { agentId: string }) {
                   fontSize: 11,
                   color: binding ? 'var(--color-success)' : 'var(--color-text-secondary)',
                 }}>
-                  {binding ? ch.activeLabel(cfg) : ch.description}
+                  {binding ? t(ch.activeLabel(cfg)) : t(ch.description)}
                 </div>
               </div>
               {binding ? (
@@ -1821,7 +1822,7 @@ function MessagingSection({ agentId }: { agentId: string }) {
                     background: 'color-mix(in srgb, var(--color-success) 22%, transparent)', color: 'var(--color-success)',
                     padding: '2px 8px', borderRadius: 10,
                     fontSize: 10, fontWeight: 600,
-                  }}>Active</span>
+                  }}>{t('dataSources.messaging.active')}</span>
                   <button
                     onClick={() => handleRemove(binding.id)}
                     style={{
@@ -1830,7 +1831,7 @@ function MessagingSection({ agentId }: { agentId: string }) {
                       border: '1px solid var(--color-border)',
                       borderRadius: 4, cursor: 'pointer',
                     }}
-                  >Remove</button>
+                  >{t('dataSources.common.remove')}</button>
                 </div>
               ) : (
                 <button
@@ -1840,7 +1841,7 @@ function MessagingSection({ agentId }: { agentId: string }) {
                     color: 'var(--color-on-accent)', border: 'none', borderRadius: 5,
                     cursor: 'pointer', fontWeight: 600,
                   }}
-                >{isSetup ? 'Cancel' : 'Set Up'}</button>
+                >{isSetup ? t('dataSources.common.cancel') : t('dataSources.common.setUp')}</button>
               )}
             </div>
 
@@ -1851,7 +1852,7 @@ function MessagingSection({ agentId }: { agentId: string }) {
               }}>
                 <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'flex-start', gap: 6 }}>
                   <span style={{ flexShrink: 0 }}>{'\u2192'}</span>
-                  <span>{ch.howToUse(cfg)}</span>
+                  <span>{t(ch.howToUse(cfg))}</span>
                 </div>
               </div>
             )}
@@ -1893,13 +1894,13 @@ function MessagingSection({ agentId }: { agentId: string }) {
                                 border: 'none', borderRadius: 3,
                                 cursor: 'pointer', fontWeight: 600,
                               }}
-                            >Copy</button>
+                            >{t('dataSources.common.copy')}</button>
                           </div>
                         </div>
                       );
                     }
                     return (
-                      <div key={i} style={{ marginBottom: i < ch.setupSteps.length - 1 ? 4 : 0 }}>{s}</div>
+                      <div key={i} style={{ marginBottom: i < ch.setupSteps.length - 1 ? 4 : 0 }}>{t(s)}</div>
                     );
                   })}
                 </div>
@@ -1910,7 +1911,7 @@ function MessagingSection({ agentId }: { agentId: string }) {
                       color: 'var(--color-text-secondary)',
                       marginBottom: 3, fontWeight: 500,
                     }}>
-                      {field.label}{field.required ? ' *' : ''}
+                      {t(field.label)}{field.required ? ' *' : ''}
                     </label>
                     <input
                       type={field.type || 'text'}
@@ -1930,7 +1931,7 @@ function MessagingSection({ agentId }: { agentId: string }) {
                     cursor: 'pointer', fontWeight: 600,
                     opacity: loading || !canConnect ? 0.5 : 1, marginTop: 4,
                   }}
-                >{loading ? 'Connecting...' : 'Connect'}</button>
+                >{loading ? t('dataSources.common.connecting') : t('dataSources.common.connect')}</button>
               </div>
             )}
           </div>
@@ -1945,6 +1946,7 @@ function MessagingSection({ agentId }: { agentId: string }) {
 // ---------------------------------------------------------------------------
 
 function MemorySection() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<MemoryStats | null>(null);
   const [statsError, setStatsError] = useState('');
 
@@ -1973,7 +1975,7 @@ function MemorySection() {
       .then((s) => { setStats(s); setStatsError(''); })
       .catch((error: unknown) => {
         setStats(null);
-        setStatsError(error instanceof Error && error.message ? error.message : 'Could not reach memory backend');
+        setStatsError(error instanceof Error && error.message ? error.message : i18n.t('dataSources.memory.unreachable'));
       });
   }, []);
 
@@ -2003,7 +2005,7 @@ function MemorySection() {
     if (isTauri()) {
       try {
         const { open } = await import('@tauri-apps/plugin-dialog');
-        const selected = await open({ directory: true, multiple: false, title: 'Select folder to index' });
+        const selected = await open({ directory: true, multiple: false, title: t('dataSources.memory.selectFolder') });
         if (selected) setIndexPath(selected as string);
         return;
       } catch {
@@ -2031,11 +2033,11 @@ function MemorySection() {
     setIndexError('');
     try {
       const res = await indexMemoryPath(indexPath.trim());
-      setIndexResult(`Indexed ${res.chunks_indexed} chunk${res.chunks_indexed !== 1 ? 's' : ''}`);
+      setIndexResult(t('dataSources.memory.indexedResult', { n: res.chunks_indexed }));
       setIndexPath('');
       loadStats();
     } catch (err: any) {
-      setIndexError(err.message || 'Indexing failed');
+      setIndexError(err.message || t('dataSources.memory.indexFailed'));
     } finally {
       setIndexing(false);
     }
@@ -2048,11 +2050,11 @@ function MemorySection() {
     setStoreError('');
     try {
       await storeMemory(storeContent.trim());
-      setStoreResult('Stored successfully');
+      setStoreResult(t('dataSources.memory.stored'));
       setStoreContent('');
       loadStats();
     } catch (err: any) {
-      setStoreError(err.message || 'Failed to store');
+      setStoreError(err.message || t('dataSources.memory.storeFailed'));
     } finally {
       setStoring(false);
     }
@@ -2077,18 +2079,18 @@ function MemorySection() {
               <Brain size={18} style={{ color: 'var(--color-accent-purple)' }} />
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Memory Backend</h3>
+              <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>{t('dataSources.memory.backendTitle')}</h3>
               {statsError ? (
                 <div className="mt-0.5">
                   <p role="alert" className="text-xs break-words" style={{ color: 'var(--color-error)' }}>{statsError}</p>
                   <button
                     type="button"
                     onClick={loadStats}
-                    aria-label="Retry memory backend status"
+                    aria-label={t('dataSources.memory.retryAria')}
                     className="text-xs underline cursor-pointer mt-1"
                     style={{ color: 'var(--color-accent)' }}
                   >
-                    Retry
+                    {t('dataSources.common.retry')}
                   </button>
                 </div>
               ) : stats ? (
@@ -2097,21 +2099,21 @@ function MemorySection() {
                     background: stats.entries > 0 ? 'var(--color-success)' : 'var(--color-text-tertiary)',
                   }} />
                   <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-                    {stats.backend} &middot; {stats.entries.toLocaleString()} {stats.entries === 1 ? 'chunk' : 'chunks'}
+                    {stats.backend} &middot; {stats.entries.toLocaleString(i18n.language)} {stats.entries === 1 ? t('dataSources.memory.chunk') : t('dataSources.memory.chunks')}
                   </span>
                 </div>
               ) : (
-                <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>Connecting...</p>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>{t('dataSources.common.connecting')}</p>
               )}
             </div>
           </div>
           {stats && stats.entries > 0 && (
             <div className="text-right">
               <div className="text-lg font-bold tabular-nums" style={{ color: 'var(--color-text)' }}>
-                {stats.entries.toLocaleString()}
+                {stats.entries.toLocaleString(i18n.language)}
               </div>
               <div className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--color-text-tertiary)' }}>
-                indexed
+                {t('dataSources.memory.indexedLabel')}
               </div>
             </div>
           )}
@@ -2125,7 +2127,7 @@ function MemorySection() {
       >
         <div className="flex items-center gap-2 mb-3">
           <Search size={14} style={{ color: 'var(--color-accent-purple)' }} />
-          <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Search Memory</h3>
+          <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>{t('dataSources.memory.searchTitle')}</h3>
         </div>
         <div className="flex gap-2">
           <div className="flex-1 relative">
@@ -2133,7 +2135,7 @@ function MemorySection() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
-              placeholder="What are you looking for?"
+              placeholder={t('dataSources.memory.searchPlaceholder')}
               className="w-full text-sm px-3 py-2 rounded-lg outline-none transition-colors"
               style={{
                 background: 'var(--color-bg)',
@@ -2153,7 +2155,7 @@ function MemorySection() {
             }}
           >
             {searching ? <Loader2 size={13} className="animate-spin" /> : <Search size={13} />}
-            {searching ? 'Searching' : 'Search'}
+            {searching ? t('dataSources.memory.searching') : t('dataSources.memory.search')}
           </button>
         </div>
 
@@ -2161,7 +2163,7 @@ function MemorySection() {
         {searchDone && searchResults.length === 0 && (
           <div className="flex flex-col items-center py-6 gap-2">
             <Search size={20} style={{ color: 'var(--color-text-tertiary)', opacity: 0.4 }} />
-            <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>No matching memories found</p>
+            <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{t('dataSources.memory.noResults')}</p>
           </div>
         )}
         {searchResults.length > 0 && (
@@ -2191,7 +2193,7 @@ function MemorySection() {
                         ? 'var(--color-warning)'
                         : 'var(--color-text-tertiary)',
                   }}>
-                    {(r.score * 100).toFixed(0)}% match
+                    {t('dataSources.memory.match', { n: (r.score * 100).toFixed(0) })}
                   </span>
                   {r.metadata?.source != null && (
                     <span className="text-[10px]" style={{ color: 'var(--color-text-tertiary)' }}>
@@ -2214,16 +2216,16 @@ function MemorySection() {
         >
           <div className="flex items-center gap-2 mb-3">
             <FolderOpen size={14} style={{ color: 'var(--color-accent-purple)' }} />
-            <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Index Folder</h3>
+            <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>{t('dataSources.memory.indexTitle')}</h3>
           </div>
           <p className="text-xs mb-3" style={{ color: 'var(--color-text-tertiary)' }}>
-            Scan a folder and index all supported files into memory.
+            {t('dataSources.memory.indexHint')}
           </p>
           <div className="flex gap-2 mb-2">
             <input
               value={indexPath}
               onChange={(e) => setIndexPath(e.target.value)}
-              placeholder="~/Documents/notes"
+              placeholder={t('dataSources.memory.indexPlaceholder')}
               className="flex-1 text-sm px-3 py-2 rounded-lg outline-none"
               style={{
                 background: 'var(--color-bg)',
@@ -2242,7 +2244,7 @@ function MemorySection() {
                 }}
               >
                 <FolderOpen size={12} />
-                Browse
+                {t('dataSources.memory.browse')}
               </button>
             )}
           </div>
@@ -2257,7 +2259,7 @@ function MemorySection() {
             }}
           >
             {indexing && <Loader2 size={13} className="animate-spin" />}
-            {indexing ? 'Indexing files...' : 'Index'}
+            {indexing ? t('dataSources.memory.indexing') : t('dataSources.memory.index')}
           </button>
           {indexResult && (
             <p className="text-xs mt-2 font-medium" style={{ color: 'var(--color-success)' }}>{indexResult}</p>
@@ -2274,15 +2276,15 @@ function MemorySection() {
         >
           <div className="flex items-center gap-2 mb-3">
             <FileText size={14} style={{ color: 'var(--color-accent-purple)' }} />
-            <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Store Text</h3>
+            <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>{t('dataSources.memory.storeTitle')}</h3>
           </div>
           <p className="text-xs mb-3" style={{ color: 'var(--color-text-tertiary)' }}>
-            Paste any text to add directly to your memory store.
+            {t('dataSources.memory.storeHint')}
           </p>
           <textarea
             value={storeContent}
             onChange={(e) => setStoreContent(e.target.value)}
-            placeholder="Paste or type content here..."
+            placeholder={t('dataSources.memory.storePlaceholder')}
             rows={4}
             className="w-full text-sm px-3 py-2 rounded-lg outline-none resize-y"
             style={{
@@ -2305,7 +2307,7 @@ function MemorySection() {
             }}
           >
             {storing && <Loader2 size={13} className="animate-spin" />}
-            {storing ? 'Storing...' : 'Store'}
+            {storing ? t('dataSources.memory.storing') : t('dataSources.memory.store')}
           </button>
           {storeResult && (
             <p className="text-xs mt-2 font-medium" style={{ color: 'var(--color-success)' }}>{storeResult}</p>
@@ -2324,6 +2326,7 @@ function MemorySection() {
 // ---------------------------------------------------------------------------
 
 export function DataSourcesPage() {
+  const { t } = useTranslation();
   const [agents, setAgents] = useState<ManagedAgent[]>([]);
   const [activeTab, setActiveTab] = useState<'sources' | 'messaging' | 'memory'>('sources');
   const [creatingAgent, setCreatingAgent] = useState(false);
@@ -2343,7 +2346,7 @@ export function DataSourcesPage() {
     setCreatingAgent(true);
     try {
       const agent = await createManagedAgent({
-        name: "My Assistant",
+        name: i18n.t('dataSources.page.defaultAgentName'),
         template_id: "personal_deep_research",
       });
       setAgents((prev) => [...prev, agent]);
@@ -2363,9 +2366,9 @@ export function DataSourcesPage() {
   }, [activeTab, firstAgent, creatingAgent, ensureAgent]);
 
   const tabs = [
-    { id: 'sources' as const, label: 'Data Sources', icon: Database },
-    { id: 'messaging' as const, label: 'Messaging Channels', icon: MessageSquare },
-    { id: 'memory' as const, label: 'Memory', icon: Brain },
+    { id: 'sources' as const, label: t('dataSources.page.tabs.sources'), icon: Database },
+    { id: 'messaging' as const, label: t('dataSources.page.tabs.messaging'), icon: MessageSquare },
+    { id: 'memory' as const, label: t('dataSources.page.tabs.memory'), icon: Brain },
   ];
 
   return (
@@ -2373,10 +2376,10 @@ export function DataSourcesPage() {
       <div className="max-w-5xl mx-auto">
       <header className="mb-6">
         <h1 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-          Data Sources, Channels &amp; Memory
+          {t('dataSources.page.title')}
         </h1>
         <p className="text-sm mt-2 max-w-2xl" style={{ color: 'var(--color-text-secondary)' }}>
-          Connect personal data so the assistant can search across everything, and set up messaging channels to chat from your phone.
+          {t('dataSources.page.subtitle')}
         </p>
       </header>
 
@@ -2418,7 +2421,7 @@ export function DataSourcesPage() {
           ) : creatingAgent ? (
             <div className="flex items-center gap-3 p-4 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
               <Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-accent)' }} />
-              Setting up your assistant...
+              {t('dataSources.page.settingUp')}
             </div>
           ) : null
         )}

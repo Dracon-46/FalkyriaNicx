@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NicxMascot } from '../Mascot/NicxMascot';
 import {
   loadAnalyticsIdentity,
@@ -7,13 +8,6 @@ import {
 } from '../../lib/analytics';
 import { LegalDocumentDialog, LegalLoading, LegalText, useLegalDocument } from './LegalDocumentDialog';
 import { Modal, buttonClass, buttonStyle } from './Modal';
-
-const FALLBACK_TITLE = 'Ajude a melhorar o Nicx';
-const FALLBACK_TEXT =
-  'Com a sua permissão, o Nicx envia à Falkyria **estatísticas anônimas de uso**: ' +
-  'quais recursos você usa, tempos de resposta e tipos de erro.\n\n' +
-  '**Nunca** enviamos suas conversas, arquivos, nome ou e-mail. É opcional, e você pode ' +
-  'mudar de ideia ou apagar os dados a qualquer momento em **Configurações → Privacidade**.';
 
 type Choice = 'accept' | 'decline';
 
@@ -31,6 +25,7 @@ interface ConsentDialogProps {
  * Both answers carry the same weight, and Esc means "Agora não".
  */
 export function ConsentDialog({ open, policyVersion, onChoose, onDismiss }: ConsentDialogProps) {
+  const { t } = useTranslation();
   const { state } = useLegalDocument('consentimento', open);
   const [busy, setBusy] = useState<Choice | null>(null);
   const [error, setError] = useState('');
@@ -48,14 +43,16 @@ export function ConsentDialog({ open, policyVersion, onChoose, onDismiss }: Cons
         // again next time instead of trapping the user here.
         onDismiss();
       } else {
-        setError(e instanceof Error ? e.message : 'Não foi possível salvar sua escolha.');
+        setError(e instanceof Error ? e.message : t('privacy.saveFailed'));
       }
     } finally {
       setBusy(null);
     }
   };
 
-  const title = state.kind === 'ready' ? state.title || FALLBACK_TITLE : FALLBACK_TITLE;
+  // Fallbacks for while the server's consent text loads or cannot be read.
+  const fallbackTitle = t('privacy.consent.fallbackTitle');
+  const title = state.kind === 'ready' ? state.title || fallbackTitle : fallbackTitle;
 
   return (
     <Modal
@@ -81,7 +78,7 @@ export function ConsentDialog({ open, policyVersion, onChoose, onDismiss }: Cons
             className={`${buttonClass()} sm:min-w-32`}
             style={buttonStyle('neutral')}
           >
-            Agora não
+            {t('privacy.consent.notNow')}
           </button>
           <button
             type="button"
@@ -91,14 +88,14 @@ export function ConsentDialog({ open, policyVersion, onChoose, onDismiss }: Cons
             className={`${buttonClass()} sm:min-w-32`}
             style={buttonStyle('neutral')}
           >
-            Aceitar
+            {t('privacy.consent.accept')}
           </button>
         </>
       }
     >
       {state.kind === 'loading' && <LegalLoading />}
       {state.kind !== 'loading' && (
-        <LegalText>{state.kind === 'ready' ? state.body : FALLBACK_TEXT}</LegalText>
+        <LegalText>{state.kind === 'ready' ? state.body : t('privacy.consent.fallbackText')}</LegalText>
       )}
       <p className="mt-4 text-sm">
         <button
@@ -107,11 +104,11 @@ export function ConsentDialog({ open, policyVersion, onChoose, onDismiss }: Cons
           className="underline underline-offset-2 cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-[var(--color-accent)]"
           style={{ color: 'var(--color-accent)' }}
         >
-          Ler a política de privacidade
+          {t('privacy.consent.readPolicy')}
         </button>
         {policyVersion && (
           <span className="ml-2 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-            versão {policyVersion}
+            {t('privacy.consent.version', { version: policyVersion })}
           </span>
         )}
       </p>

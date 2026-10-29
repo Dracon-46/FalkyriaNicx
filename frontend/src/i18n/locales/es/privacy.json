@@ -1,0 +1,54 @@
+{
+  "saveFailed": "No se pudo guardar tu elección.",
+  "consent": {
+    "fallbackTitle": "Ayuda a mejorar Nicx",
+    "fallbackText": "Con tu permiso, Nicx envía a Falkyria **estadísticas anónimas de uso**: qué funciones usas, tiempos de respuesta y tipos de error.\n\n**Nunca** enviamos tus conversaciones, archivos, nombre ni correo electrónico. Es opcional, y puedes cambiar de opinión o borrar los datos en cualquier momento en **Configuración → Privacidad**.",
+    "notNow": "Ahora no",
+    "accept": "Aceptar",
+    "readPolicy": "Leer la política de privacidad",
+    "version": "versión {{version}}"
+  },
+  "legal": {
+    "titles": {
+      "privacidade": "Política de privacidad",
+      "termos": "Términos de uso",
+      "consentimento": "Estadísticas anónimas de uso"
+    },
+    "loadFailed": "No se pudo cargar el documento.",
+    "loading": "Cargando el texto",
+    "close": "Cerrar",
+    "retry": "Intentar de nuevo"
+  },
+  "modal": {
+    "close": "Cerrar",
+    "cancel": "Cancelar"
+  },
+  "section": {
+    "title": "Privacidad",
+    "intro": "Tus conversaciones, archivos y memorias se quedan en tu computadora. Con tu permiso, Nicx envía a Falkyria solo estadísticas anónimas de uso (funciones usadas, tiempos, tipos de error), en servidores en Brasil, que se borran después de 24 meses.",
+    "toggleLabel": "Enviar estadísticas anónimas de uso",
+    "readFailed": "No se pudo leer tu elección: el servidor de Nicx no respondió.",
+    "checking": "Comprobando...",
+    "on": "Activado. Gracias por ayudar a mejorar Nicx.",
+    "off": "Desactivado. No se envía nada.",
+    "documents": "Documentos",
+    "policyVersion": "Política de privacidad, versión {{version}}",
+    "howWeTreat": "Cómo trata Falkyria tus datos",
+    "policy": "Política de privacidad",
+    "terms": "Términos de uso",
+    "forgetTitle": "Borrar mis datos",
+    "forgetHint": "Elimina de los servidores de Falkyria los eventos enviados por esta instalación y genera un nuevo código anónimo.",
+    "forgetButton": "Borrar mis datos",
+    "forgetFailed": "No se pudieron borrar tus datos ahora. Inténtalo de nuevo.",
+    "confirmTitle": "¿Borrar tus datos de uso?",
+    "confirmBody1": "Los eventos de uso que envió esta instalación se borrarán de los servidores de Falkyria, y Nicx pasará a usar un nuevo código anónimo.",
+    "confirmBody2": "Tus conversaciones no se ven afectadas: nunca salen de tu computadora. Esta acción no se puede deshacer.",
+    "deleting": "Borrando...",
+    "deleteData": "Borrar datos"
+  },
+  "forget": {
+    "none": "No había ningún evento de esta instalación en los servidores de Falkyria.",
+    "one": "1 evento borrado de los servidores de Falkyria.",
+    "many": "{{n}} eventos borrados de los servidores de Falkyria."
+  }
+}

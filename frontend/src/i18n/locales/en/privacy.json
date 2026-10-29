@@ -1,0 +1,54 @@
+{
+  "saveFailed": "Your choice could not be saved.",
+  "consent": {
+    "fallbackTitle": "Help improve Nicx",
+    "fallbackText": "With your permission, Nicx sends Falkyria **anonymous usage statistics**: which features you use, response times and error types.\n\nWe **never** send your conversations, files, name or e-mail. It is optional, and you can change your mind or delete the data at any time in **Settings → Privacy**.",
+    "notNow": "Not now",
+    "accept": "Accept",
+    "readPolicy": "Read the privacy policy",
+    "version": "version {{version}}"
+  },
+  "legal": {
+    "titles": {
+      "privacidade": "Privacy policy",
+      "termos": "Terms of use",
+      "consentimento": "Anonymous usage statistics"
+    },
+    "loadFailed": "The document could not be loaded.",
+    "loading": "Loading the text",
+    "close": "Close",
+    "retry": "Try again"
+  },
+  "modal": {
+    "close": "Close",
+    "cancel": "Cancel"
+  },
+  "section": {
+    "title": "Privacy",
+    "intro": "Your conversations, files and memories stay on your computer. With your permission, Nicx sends Falkyria only anonymous usage statistics (features used, timings, error types), stored on servers in Brazil and deleted after 24 months.",
+    "toggleLabel": "Send anonymous usage statistics",
+    "readFailed": "Your choice could not be read: the Nicx server did not respond.",
+    "checking": "Checking...",
+    "on": "On. Thank you for helping improve Nicx.",
+    "off": "Off. Nothing is sent.",
+    "documents": "Documents",
+    "policyVersion": "Privacy policy, version {{version}}",
+    "howWeTreat": "How Falkyria handles your data",
+    "policy": "Privacy policy",
+    "terms": "Terms of use",
+    "forgetTitle": "Delete my data",
+    "forgetHint": "Removes the events sent by this installation from Falkyria's servers and generates a new anonymous ID.",
+    "forgetButton": "Delete my data",
+    "forgetFailed": "Your data could not be deleted right now. Please try again.",
+    "confirmTitle": "Delete your usage data?",
+    "confirmBody1": "The usage events this installation sent will be deleted from Falkyria's servers, and Nicx will start using a new anonymous ID.",
+    "confirmBody2": "Your conversations are not affected: they never leave your computer. This action cannot be undone.",
+    "deleting": "Deleting...",
+    "deleteData": "Delete data"
+  },
+  "forget": {
+    "none": "No events from this installation were on Falkyria's servers.",
+    "one": "1 event deleted from Falkyria's servers.",
+    "many": "{{n}} events deleted from Falkyria's servers."
+  }
+}

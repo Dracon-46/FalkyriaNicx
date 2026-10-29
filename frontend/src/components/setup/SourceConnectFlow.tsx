@@ -472,7 +472,7 @@ function StepByStepPanel({
             cursor: 'pointer',
           }}
         >
-          Skip
+          {t('setup.connect.skip')}
         </button>
       </div>
     </div>
@@ -490,6 +490,7 @@ export function SourceConnectFlow({
   selectedIds: string[];
   onComplete: () => void;
 }) {
+  const { t } = useTranslation();
   const [entries, setEntries] = useState<SourceEntry[]>(() =>
     selectedIds.map((id) => ({ id, state: 'pending' as SourceState })),
   );
@@ -539,7 +540,7 @@ export function SourceConnectFlow({
       <div className="w-48 shrink-0 flex flex-col gap-1 py-1">
         <p className="text-xs font-semibold uppercase tracking-wider mb-2"
           style={{ color: 'var(--color-text-tertiary)' }}>
-          Sources
+          {t('setup.connect.sources')}
         </p>
         {entries.map((entry, idx) => {
           const card = SOURCE_CATALOG.find((c) => c.connector_id === entry.id);
@@ -584,7 +585,7 @@ export function SourceConnectFlow({
               <div className="flex items-center gap-2 text-sm"
                 style={{ color: 'var(--color-accent)' }}>
                 <CheckCircle2 size={18} />
-                Connected
+                {t('setup.connect.connected')}
               </div>
             ) : activeCard.steps ? (
               <StepByStepPanel
@@ -623,7 +624,7 @@ export function SourceConnectFlow({
           <div className="flex flex-col items-center justify-center flex-1 gap-3">
             <CheckCircle2 size={32} style={{ color: 'var(--color-accent)' }} />
             <p className="text-base font-semibold" style={{ color: 'var(--color-text)' }}>
-              All sources configured
+              {t('setup.connect.allConfigured')}
             </p>
           </div>
         )}
@@ -635,7 +636,7 @@ export function SourceConnectFlow({
               className="w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all"
               style={{ background: 'var(--color-accent)', color: 'var(--color-on-accent)' }}
             >
-              Continue →
+              {t('setup.connect.continue')}
             </button>
           </div>
         )}

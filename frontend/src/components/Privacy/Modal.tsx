@@ -2,6 +2,7 @@ import { useRef, type ReactNode } from 'react';
 import { Dialog } from '@base-ui/react/dialog';
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Modal dialogs in the Falkyria palette, built on Base UI: focus is trapped
@@ -63,6 +64,7 @@ export function Modal({
   disablePointerDismissal = false,
   focusDialog = false,
 }: ModalProps) {
+  const { t } = useTranslation();
   const popupRef = useRef<HTMLDivElement>(null);
   return (
     <Dialog.Root
@@ -83,7 +85,7 @@ export function Modal({
             <Dialog.Title className="text-base font-semibold leading-snug">{title}</Dialog.Title>
             {showClose && (
               <Dialog.Close
-                aria-label="Fechar"
+                aria-label={t('privacy.modal.close')}
                 className="absolute right-3 top-3 p-1.5 rounded-lg cursor-pointer transition-colors hover:bg-[var(--color-bg-tertiary)] focus-visible:outline-2 focus-visible:outline-[var(--color-accent)]"
                 style={{ color: 'var(--color-text-secondary)' }}
               >
@@ -117,6 +119,7 @@ interface ConfirmModalProps {
   title: ReactNode;
   description: ReactNode;
   confirmLabel: string;
+  /** Defaults to the translated "Cancel" (privacy.modal.cancel). */
   cancelLabel?: string;
   onConfirm: () => void;
   busy?: boolean;
@@ -124,18 +127,19 @@ interface ConfirmModalProps {
   destructive?: boolean;
 }
 
-/** A yes/no question (role="alertdialog"). Focus starts on "Cancelar". */
+/** A yes/no question (role="alertdialog"). Focus starts on the cancel button. */
 export function ConfirmModal({
   open,
   onOpenChange,
   title,
   description,
   confirmLabel,
-  cancelLabel = 'Cancelar',
+  cancelLabel,
   onConfirm,
   busy = false,
   destructive = false,
 }: ConfirmModalProps) {
+  const { t } = useTranslation();
   return (
     <AlertDialog.Root open={open} onOpenChange={(next) => onOpenChange(next)}>
       <AlertDialog.Portal>
@@ -158,7 +162,7 @@ export function ConfirmModal({
             style={{ borderTop: '1px solid var(--color-border)' }}
           >
             <AlertDialog.Close className={buttonClass()} style={buttonStyle('neutral')} disabled={busy}>
-              {cancelLabel}
+              {cancelLabel ?? t('privacy.modal.cancel')}
             </AlertDialog.Close>
             <button
               type="button"

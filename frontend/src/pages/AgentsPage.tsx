@@ -3630,7 +3630,7 @@ export function AgentsPage() {
           className="flex items-center gap-1 mb-4 text-sm cursor-pointer"
           style={{ color: 'var(--color-text-secondary)' }}
         >
-          <ChevronLeft size={16} /> Back to agents
+          <ChevronLeft size={16} /> {t('agents.detail.back')}
         </button>
 
         {/* Header */}
@@ -3656,7 +3656,7 @@ export function AgentsPage() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
                 style={{ background: 'var(--color-success)20', color: 'var(--color-success)', border: '1px solid var(--color-success)40' }}
               >
-                <MessageSquare size={13} /> Chat ready — just type below
+                <MessageSquare size={13} /> {t('agents.detail.chatReady')}
               </span>
             ) : (
               <button
@@ -3664,7 +3664,7 @@ export function AgentsPage() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer font-medium"
                 style={{ background: 'var(--color-accent)', color: 'var(--color-on-accent)' }}
               >
-                <Zap size={13} /> Run Now
+                <Zap size={13} /> {t('agents.common.runNow')}
               </button>
             )}
             {(selectedAgent.status === 'running' || selectedAgent.status === 'idle') && (
@@ -3673,7 +3673,7 @@ export function AgentsPage() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer"
                 style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
               >
-                <Pause size={13} /> Pause
+                <Pause size={13} /> {t('agents.common.pause')}
               </button>
             )}
             {selectedAgent.status === 'paused' && (
@@ -3682,7 +3682,7 @@ export function AgentsPage() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer"
                 style={{ background: 'var(--color-success)20', color: 'var(--color-success)', border: '1px solid var(--color-success)40' }}
               >
-                <Play size={13} /> Resume
+                <Play size={13} /> {t('agents.common.resume')}
               </button>
             )}
             {(selectedAgent.status === 'error' || selectedAgent.status === 'stalled' || selectedAgent.status === 'needs_attention') && (
@@ -3691,12 +3691,12 @@ export function AgentsPage() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer"
                 style={{ background: 'var(--color-error)20', color: 'var(--color-error)', border: '1px solid var(--color-error)40' }}
               >
-                <AlertTriangle size={13} /> Recover
+                <AlertTriangle size={13} /> {t('agents.common.recover')}
               </button>
             )}
             <button
               onClick={async () => {
-                if (window.confirm(`Delete ${selectedAgent.name}? This cannot be undone.`)) {
+                if (window.confirm(t('agents.detail.deleteConfirm', { name: selectedAgent.name }))) {
                   await deleteManagedAgent(selectedAgent.id);
                   setSelectedAgentId(null);
                   await refresh();
@@ -3704,7 +3704,7 @@ export function AgentsPage() {
               }}
               className="p-1.5 rounded-lg cursor-pointer transition-colors"
               style={{ color: 'var(--color-error)', background: 'var(--color-error)15' }}
-              title="Delete agent"
+              title={t('agents.detail.deleteTitle')}
             >
               <Trash2 size={15} />
             </button>
@@ -3742,7 +3742,7 @@ export function AgentsPage() {
               style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)' }}
             >
               <h3 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
-                Configuration
+                {t('agents.detail.configuration')}
               </h3>
               <AgentConfigGrid agent={selectedAgent} onAgentUpdated={refresh} />
               <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--color-border)' }}>
@@ -3763,19 +3763,26 @@ export function AgentsPage() {
               >
                 <Database size={16} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
                 <div style={{ color: 'var(--color-text-secondary)' }}>
-                  <strong>Tip:</strong> Connect your personal data in the{' '}
-                  <button
-                    onClick={() => setDetailTab('channels')}
-                    className="cursor-pointer underline"
-                    style={{ color: 'var(--color-accent)', background: 'none', border: 'none', padding: 0, font: 'inherit' }}
-                  >Data Sources</button>{' '}
-                  tab, then set up{' '}
-                  <button
-                    onClick={() => setDetailTab('messaging')}
-                    className="cursor-pointer underline"
-                    style={{ color: 'var(--color-accent)', background: 'none', border: 'none', padding: 0, font: 'inherit' }}
-                  >Messaging Channels</button>{' '}
-                  to talk to this agent from your phone.
+                  <Trans
+                    i18nKey="agents.detail.tip"
+                    components={{
+                      strong: <strong />,
+                      dataSources: (
+                        <button
+                          onClick={() => setDetailTab('channels')}
+                          className="cursor-pointer underline"
+                          style={{ color: 'var(--color-accent)', background: 'none', border: 'none', padding: 0, font: 'inherit' }}
+                        />
+                      ),
+                      messaging: (
+                        <button
+                          onClick={() => setDetailTab('messaging')}
+                          className="cursor-pointer underline"
+                          style={{ color: 'var(--color-accent)', background: 'none', border: 'none', padding: 0, font: 'inherit' }}
+                        />
+                      ),
+                    }}
+                  />
                 </div>
               </div>
             )}
@@ -3803,19 +3810,19 @@ export function AgentsPage() {
                   <div className="flex gap-0 flex-wrap items-stretch">
                     {/* Agent Statistics */}
                     <div className="pr-5">
-                      <p style={sectionTitle}>Agent Statistics</p>
+                      <p style={sectionTitle}>{t('agents.stats.title')}</p>
                       <div className="flex gap-5">
                         <div>
                           <p className="text-xl font-bold leading-none" style={{ color: 'var(--color-text)' }}>{selectedAgent.total_runs ?? 0}</p>
-                          <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Total Queries</p>
+                          <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>{t('agents.stats.totalQueries')}</p>
                         </div>
                         <div>
-                          <p className="text-xl font-bold leading-none" style={{ color: 'var(--color-text)' }}>{inTok.toLocaleString()}</p>
-                          <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Input Tokens</p>
+                          <p className="text-xl font-bold leading-none" style={{ color: 'var(--color-text)' }}>{inTok.toLocaleString(i18n.language)}</p>
+                          <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>{t('agents.stats.inputTokens')}</p>
                         </div>
                         <div>
-                          <p className="text-xl font-bold leading-none" style={{ color: 'var(--color-text)' }}>{outTok.toLocaleString()}</p>
-                          <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Output Tokens</p>
+                          <p className="text-xl font-bold leading-none" style={{ color: 'var(--color-text)' }}>{outTok.toLocaleString(i18n.language)}</p>
+                          <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>{t('agents.stats.outputTokens')}</p>
                         </div>
                       </div>
                     </div>
@@ -3823,22 +3830,22 @@ export function AgentsPage() {
                       <div style={{ width: 1, background: 'var(--color-border)' }} />
                       {/* Local Utilization */}
                       <div className="px-5">
-                        <p style={sectionTitle}>Local Utilization</p>
+                        <p style={sectionTitle}>{t('agents.stats.localUtilization')}</p>
                         <div className="flex gap-5">
                           <div>
                             <p className="text-xl font-bold leading-none" style={{ color: 'var(--color-success)' }}>{fmtFlops}</p>
-                            <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Compute</p>
+                            <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>{t('agents.stats.compute')}</p>
                           </div>
                           <div>
                             <p className="text-xl font-bold leading-none" style={{ color: 'var(--color-success)' }}>{energyKj.toFixed(2)} kJ</p>
-                            <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Energy</p>
+                            <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>{t('agents.stats.energy')}</p>
                           </div>
                         </div>
                       </div>
                       <div style={{ width: 1, background: 'var(--color-border)' }} />
                       {/* Dollars Saved */}
                       <div className="pl-5">
-                        <p style={sectionTitle}>Dollars Saved vs.</p>
+                        <p style={sectionTitle}>{t('agents.stats.dollarsSaved')}</p>
                         <div className="flex gap-5">
                           {providers.map((p) => {
                             const cost = (inTok / 1e6) * p.inPer1M + (outTok / 1e6) * p.outPer1M;
@@ -3863,7 +3870,7 @@ export function AgentsPage() {
                 style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)' }}
               >
                 <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
-                  Messaging Channels
+                  {t('agents.tabs.messaging')}
                 </h3>
                 {channels.map((b) => (
                   <div key={b.id} className="text-sm py-1" style={{ color: 'var(--color-text)' }}>
@@ -3908,14 +3915,14 @@ export function AgentsPage() {
                       color: statusColor(t.status),
                     }}
                   >
-                    {t.status}
+                    {statusLabel(t.status)}
                   </span>
                 </div>
               </div>
             ))}
             {tasks.length === 0 && (
               <div className="text-sm py-8 text-center" style={{ color: 'var(--color-text-tertiary)' }}>
-                No tasks assigned.
+                {t('agents.tasks.empty')}
               </div>
             )}
           </div>
@@ -3928,10 +3935,10 @@ export function AgentsPage() {
             style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)' }}
           >
             <h3 className="text-sm font-medium mb-3 flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }}>
-              <Brain size={14} /> Summary Memory
+              <Brain size={14} /> {t('agents.memory.title')}
             </h3>
             <p className="whitespace-pre-wrap text-sm" style={{ color: 'var(--color-text)' }}>
-              {selectedAgent.summary_memory || 'Agent has no stored memory yet.'}
+              {selectedAgent.summary_memory || t('agents.memory.empty')}
             </p>
           </div>
         )}
@@ -3970,7 +3977,7 @@ export function AgentsPage() {
       <header className="mb-6">
         <div className="flex justify-between items-center">
           <h1 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-            Agents
+            {t('agents.list.title')}
           </h1>
           <button
             onClick={() => agentManagerAvailable && setShowWizard(true)}
@@ -3981,11 +3988,11 @@ export function AgentsPage() {
               color: agentManagerAvailable === false ? 'var(--color-text-tertiary)' : 'var(--color-on-accent)',
             }}
           >
-            <Plus size={15} /> New Agent
+            <Plus size={15} /> {t('agents.list.newAgent')}
           </button>
         </div>
         <p className="text-sm mt-2 max-w-2xl" style={{ color: 'var(--color-text-secondary)' }}>
-          Long-running autonomous agents that can monitor sources, run tasks on a schedule, and message you through connected channels.
+          {t('agents.list.description')}
         </p>
       </header>
 
@@ -3999,7 +4006,7 @@ export function AgentsPage() {
           }}
         >
           <AlertTriangle size={16} />
-          <span>Agent manager is not enabled. Set <code className="font-mono text-xs">agent_manager.enabled = true</code> in your config.</span>
+          <span><Trans i18nKey="agents.list.managerDisabled" components={{ code: <code className="font-mono text-xs" /> }} /></span>
         </div>
       )}
 
@@ -4034,9 +4041,9 @@ export function AgentsPage() {
         <div className="text-center py-16" style={{ color: 'var(--color-text-tertiary)' }}>
           <Bot size={48} className="mx-auto mb-4 opacity-30" />
           <p className="mb-2 font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-            No agents yet
+            {t('agents.list.emptyTitle')}
           </p>
-          <p className="text-sm mb-6">Create your first agent to get started with autonomous task management.</p>
+          <p className="text-sm mb-6">{t('agents.list.emptyText')}</p>
           <button
             onClick={() => agentManagerAvailable && setShowWizard(true)}
             disabled={agentManagerAvailable === false}
@@ -4046,7 +4053,7 @@ export function AgentsPage() {
               color: agentManagerAvailable === false ? 'var(--color-text-tertiary)' : 'var(--color-on-accent)',
             }}
           >
-            <Plus size={15} /> Launch your first agent
+            <Plus size={15} /> {t('agents.list.launchFirst')}
           </button>
         </div>
       )}
