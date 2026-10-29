@@ -12,6 +12,9 @@ import sys
 import termios
 import time
 
+# Pergunta do consentimento de estatísticas no instalador.
+_PERGUNTA = "Digite S para aceitar ou N para recusar (Enter: decidir depois): "
+
 
 def main() -> int:
     script = sys.argv[1]
@@ -50,11 +53,7 @@ def main() -> int:
                 if not chunk:
                     break
                 output.extend(chunk)
-                prompts = output.count(
-                    "Digite S para aceitar ou N para recusar (Enter: decidir depois): ".encode(
-                        "utf-8"
-                    )
-                )
+                prompts = output.count(_PERGUNTA.encode("utf-8"))
                 if prompts > answered and answered < len(answers):
                     os.write(master, answers[answered].encode())
                     answered += 1

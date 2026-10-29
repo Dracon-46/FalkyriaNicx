@@ -299,6 +299,12 @@ IDEOF
 }
 
 @test "fails loudly when git is missing" {
+    # O instalador acha o Homebrew pelo caminho fixo e o soma ao PATH; nas
+    # máquinas Mac do GitHub ele já traz o git, então não dá para simular a
+    # falta do git ali (e com Homebrew o git realmente existe).
+    if [[ -x /opt/homebrew/bin/git || -x /usr/local/bin/git ]] &&        [[ -x /opt/homebrew/bin/brew || -x /usr/local/bin/brew ]]; then
+        skip "o Homebrew desta máquina já traz o git"
+    fi
     # Build a minimal stubs dir that has curl/uv/ollama but NO git.
     # We must NOT include /usr/bin or /bin in PATH because those dirs have real
     # git binaries on this system. Instead, provide only the commands the script
