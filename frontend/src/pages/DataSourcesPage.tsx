@@ -26,6 +26,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { SOURCE_CATALOG } from '../types/connectors';
 import type { ConnectRequest, ConnectorMeta, SyncStatus, OAuthSetupInfo } from '../types/connectors';
+import { localizeConnector, unitText } from '../i18n/connectors';
 import { listConnectors, connectSource, disconnectSourceUntilComplete, getConnector, getSyncStatus, triggerSync, startServerOAuth } from '../lib/connectors-api';
 
 // ---------------------------------------------------------------------------
@@ -534,10 +535,11 @@ const IconFor = ({ id, size = 18 }: { id: string; size?: number }) => {
 // The Gmail card unifies the OAuth (`gmail`) and IMAP (`gmail_imap`) backend
 // connectors — both should resolve to the gmail_imap catalog entry so the
 // connected card shows the same name, unit label, and troubleshooting tips
-// regardless of which underlying flow the user picked.
+// regardless of which underlying flow the user picked. Texts come back in
+// the interface language (localizeConnector).
 function metaFor(connectorId: string) {
   const id = connectorId === 'gmail' ? 'gmail_imap' : connectorId;
-  return SOURCE_CATALOG.find((s) => s.connector_id === id);
+  return localizeConnector(SOURCE_CATALOG.find((s) => s.connector_id === id));
 }
 
 // Advanced OAuth disclosure for the unified Gmail card. Hidden by default;
@@ -644,25 +646,6 @@ function formatBacklogRange(iso: string | null | undefined): string | null {
   const years = Math.round(days / 365);
   if (years <= 1) return i18n.t('dataSources.sync.range.year');
   return i18n.t('dataSources.sync.range.years', { n: years });
-}
-
-/** Unidades do catálogo de fontes (em inglês) -> chave em dataSources.units. */
-const UNIT_KEYS: Record<string, string> = {
-  items: 'items',
-  documents: 'documents',
-  emails: 'emails',
-  messages: 'messages',
-  pages: 'pages',
-  'meeting notes': 'meetingNotes',
-  notes: 'notes',
-  files: 'files',
-  events: 'events',
-  contacts: 'contacts',
-};
-
-function unitText(unit: string): string {
-  const key = UNIT_KEYS[unit];
-  return key ? i18n.t(`dataSources.units.${key}`) : unit;
 }
 
 export function SyncStatusDisplay({

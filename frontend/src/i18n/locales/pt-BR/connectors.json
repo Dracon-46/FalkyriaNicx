@@ -1,0 +1,214 @@
+{
+  "upload": {
+    "description": "Cole textos ou envie documentos",
+    "steps": {
+      "1": "Cole um texto ou envie arquivos (.txt, .md, .pdf, .docx, .csv) para incluí-los na sua base de conhecimento."
+    }
+  },
+  "gmail_imap": {
+    "description": "E-mails e conversas",
+    "steps": {
+      "1": "Confira se a verificação em duas etapas está ativa e gere uma senha de app de 16 caracteres (Mail / Other / \"Nicx\"). Cole abaixo: os espaços não atrapalham. Use a senha de app, não a senha normal do Gmail."
+    },
+    "links": {
+      "1": "Como gerar uma senha de app →"
+    },
+    "troubleshooting": {
+      "1": "Não aparece \"App Passwords\"? Ative primeiro a verificação em duas etapas.",
+      "2": "Usa Google Workspace? Talvez o administrador precise liberar as senhas de app para a sua organização."
+    },
+    "fields": {
+      "email": "voce@gmail.com",
+      "password": "Senha de app (xxxx xxxx xxxx xxxx)"
+    }
+  },
+  "imap": {
+    "description": "Qualquer caixa de e-mail IMAP",
+    "steps": {
+      "1": "Gere uma senha de app no seu provedor de e-mail (o IMAP precisa estar ativo) e informe seu e-mail e essa senha. Os provedores conhecidos são detectados sozinhos; para os outros, use as configurações opcionais de servidor."
+    },
+    "troubleshooting": {
+      "1": "A maioria dos provedores exige uma senha de app em vez da sua senha normal.",
+      "2": "Use TLS para TLS implícito (normalmente porta 993) ou STARTTLS (normalmente porta 143).",
+      "3": "Por segurança, endereços de servidor privados, de loopback, link-local ou que não sejam públicos são recusados."
+    },
+    "fields": {
+      "email": "voce@exemplo.com",
+      "password": "Senha de app",
+      "host": "Servidor IMAP (opcional; detectado sozinho)",
+      "port": "Porta (opcional; 993 ou 143)",
+      "security": "Segurança da conexão"
+    },
+    "options": {
+      "tls": "TLS (normalmente porta 993)",
+      "starttls": "STARTTLS (normalmente porta 143)"
+    }
+  },
+  "slack": {
+    "description": "Lê as mensagens de todos os canais, canais privados, DMs e DMs em grupo a que você tem acesso",
+    "steps": {
+      "1": "Acesse api.slack.com/apps e clique em \"Create New App\" → escolha \"From scratch\". Dê o nome \"Nicx\" e escolha seu workspace",
+      "2": "Na barra lateral esquerda, clique em \"OAuth & Permissions\". Desça até \"User Token Scopes\" (NÃO \"Bot Token Scopes\"). Clique em \"Add an OAuth Scope\" e adicione CADA um destes escopos, um por vez:",
+      "3": "channels:history • channels:read • groups:history • groups:read • im:history • im:read • mpim:history • mpim:read • users:read",
+      "4": "Na barra lateral esquerda, clique em \"Install App\" → \"Install to Workspace\" → \"Allow\". Depois de instalar, copie o \"User OAuth Token\" que aparece (começa com xoxp-, NÃO xoxb-)",
+      "5": "Cole o token de usuário abaixo. A sincronização indexa todos os canais, canais privados, DMs e DMs em grupo a que você tem acesso; não precisa convidar nada para os canais",
+      "6": "(Opcional) Coloque o ícone do app: na barra lateral esquerda, clique em \"Basic Information\" → desça até \"Display Information\" → envie o logo do Nicx"
+    },
+    "links": {
+      "1": "Abrir Slack Apps",
+      "6": "Baixar ícone"
+    }
+  },
+  "notion": {
+    "description": "Páginas e bancos de dados",
+    "steps": {
+      "1": "Acesse notion.so/profile/integrations → clique em \"+ New integration\". Dê o nome \"Nicx\", escolha seu workspace e clique em \"Submit\"",
+      "2": "Copie o \"Internal Integration Secret\" (começa com ntn_) e cole abaixo",
+      "3": "Para compartilhar TODAS as páginas de uma vez: abra uma página de nível superior → clique em \"...\" (canto superior direito) → \"Connections\" → \"Add connections\" → busque \"Nicx\" → clique nele. Isso compartilha a página e todas as subpáginas. Repita em cada página de nível superior, ou faça isso em todas as páginas raiz para compartilhar o workspace inteiro",
+      "4": "Dica: se uma única página de nível superior contém tudo, compartilhar só ela já compartilha todas as subpáginas"
+    },
+    "links": {
+      "1": "Abrir integrações do Notion"
+    }
+  },
+  "granola": {
+    "description": "Notas de reunião feitas por IA",
+    "steps": {
+      "1": "Abra o app Granola no computador. Clique na engrenagem (Settings) no canto inferior esquerdo e depois em \"API\"",
+      "2": "Clique em \"Generate API Key\" (ou copie a chave que você já tem) e cole abaixo"
+    }
+  },
+  "imessage": {
+    "description": "Histórico do app Mensagens do macOS",
+    "steps": {
+      "1": "Abra o menu Apple () → \"Ajustes do Sistema\" → \"Privacidade e Segurança\" (na barra lateral) → desça e clique em \"Acesso Total ao Disco\"",
+      "2": "Clique no botão \"+\" embaixo da lista. Vá em \"Applications\" → \"Utilities\" → escolha \"Terminal.app\" (ou iTerm2/Warp, se usar). Se você usa o app de desktop, adicione também o \"Nicx.app\" de \"Applications\"",
+      "3": "Ligue a chave ao lado de cada app que você adicionou. Feche e abra o terminal de novo (ou reinicie o Nicx). Os dados do iMessage são detectados sozinhos, sem credenciais"
+    }
+  },
+  "obsidian": {
+    "description": "Cofre de notas em Markdown",
+    "steps": {
+      "1": "Descubra o caminho do cofre: abra o Obsidian → clique no nome do cofre no canto inferior esquerdo → \"Manage Vaults\" → veja o caminho que aparece embaixo do nome. No macOS costuma ser ~/Documents/MyVault ou ~/Library/Mobile Documents/iCloud~md~obsidian/Documents/MyVault",
+      "2": "Outra opção: abra o Finder → vá até a pasta do cofre (ela tem uma pasta oculta .obsidian). Clique com o botão direito na pasta → \"Copy as Pathname\" para copiar o caminho completo",
+      "3": "Cole o caminho completo abaixo. O Nicx indexa todos os arquivos .md do cofre"
+    },
+    "fields": {
+      "path": "/Users/voce/Documents/MyVault"
+    }
+  },
+  "gdrive": {
+    "description": "Docs, Sheets e arquivos",
+    "steps": {
+      "1": "Abra o Google Cloud Console → crie um projeto (ou escolha um que já existe). Qualquer nome serve (ex.: \"Nicx\")",
+      "2": "Ative a Google Drive API: clique no link abaixo, confira se o seu projeto está selecionado no topo e clique em \"Enable\"",
+      "3": "Crie as credenciais OAuth: vá em \"Credentials\" (link abaixo) → \"+ Create Credentials\" → \"OAuth client ID\" → Application type: \"Web application\". Em \"Authorized redirect URIs\", adicione o retorno deste servidor (ex.: http://localhost:1313/v1/connectors/gdrive/oauth/callback, com o mesmo host/porta em que o servidor do Nicx está rodando) → clique em \"Create\".",
+      "4": "Uma janela mostra o Client ID e o Client Secret. Copie os dois, cole abaixo e clique em \"Conectar\": abre um login do Google para concluir a autorização. (Se fechar a janela sem copiar, clique no ícone de download ao lado do seu cliente OAuth para ver de novo.)"
+    },
+    "links": {
+      "1": "Criar projeto",
+      "2": "Ativar a Drive API",
+      "3": "Abrir credenciais"
+    },
+    "fields": {
+      "email": "Client ID (ex.: 123456-abc.apps.googleusercontent.com)",
+      "password": "Client Secret"
+    }
+  },
+  "gcalendar": {
+    "description": "Eventos e reuniões",
+    "steps": {
+      "1": "Abra o Google Cloud Console → use o mesmo projeto do Google Drive (ou crie outro)",
+      "2": "Ative a Google Calendar API: clique no link abaixo, escolha seu projeto e clique em \"Enable\"",
+      "3": "Vá em \"Credentials\" → \"+ Create Credentials\" → \"OAuth client ID\" → Application type: \"Desktop app\" → \"Create\". Copie o Client ID e o Client Secret",
+      "4": "Cole o Client ID e o Client Secret abaixo (dá para reaproveitar o mesmo cliente OAuth do Google Drive se as duas APIs estiverem ativas no mesmo projeto)"
+    },
+    "links": {
+      "1": "Abrir o Console",
+      "2": "Ativar a Calendar API",
+      "3": "Abrir credenciais"
+    },
+    "fields": {
+      "email": "Client ID",
+      "password": "Client Secret"
+    }
+  },
+  "gcontacts": {
+    "description": "Pessoas e dados de contato",
+    "steps": {
+      "1": "Abra o Google Cloud Console → use o mesmo projeto do Google Drive (ou crie outro)",
+      "2": "Ative a People API: clique no link abaixo, escolha seu projeto e clique em \"Enable\"",
+      "3": "Vá em \"Credentials\" → \"+ Create Credentials\" → \"OAuth client ID\" → Application type: \"Desktop app\" → \"Create\". Copie o Client ID e o Client Secret",
+      "4": "Cole o Client ID e o Client Secret abaixo"
+    },
+    "links": {
+      "1": "Abrir o Console",
+      "2": "Ativar a People API",
+      "3": "Abrir credenciais"
+    },
+    "fields": {
+      "email": "Client ID",
+      "password": "Client Secret"
+    }
+  },
+  "apple_notes": {
+    "description": "App Notas do macOS",
+    "steps": {
+      "1": "Abra o menu Apple () → \"Ajustes do Sistema\" → \"Privacidade e Segurança\" (na barra lateral) → desça e clique em \"Acesso Total ao Disco\"",
+      "2": "Clique no botão \"+\" embaixo da lista. Vá em \"Applications\" → \"Utilities\" → escolha \"Terminal.app\" (ou iTerm2/Warp, se usar). Se você usa o app de desktop, adicione também o \"Nicx.app\" de \"Applications\"",
+      "3": "Ligue a chave ao lado de cada app que você adicionou. Feche e abra o terminal de novo (ou reinicie o Nicx). O Apple Notes é detectado sozinho, sem credenciais"
+    }
+  },
+  "apple_contacts": {
+    "description": "App Contatos do macOS",
+    "steps": {
+      "1": "Abra o menu Apple () → \"Ajustes do Sistema\" → \"Privacidade e Segurança\" (na barra lateral) → desça e clique em \"Acesso Total ao Disco\"",
+      "2": "Clique no botão \"+\" embaixo da lista. Vá em \"Applications\" → \"Utilities\" → escolha \"Terminal.app\" (ou iTerm2/Warp, se usar). Se você usa o app de desktop, adicione também o \"Nicx.app\" de \"Applications\"",
+      "3": "Ligue a chave ao lado de cada app que você adicionou. Feche e abra o terminal de novo (ou reinicie o Nicx). O Apple Contacts é detectado sozinho, sem credenciais"
+    }
+  },
+  "outlook": {
+    "description": "E-mail e agenda da Microsoft",
+    "steps": {
+      "1": "Abra o Azure Portal → \"App Registrations\" → clique em \"+ New registration\". Dê o nome \"Nicx\", escolha \"Accounts in this organizational directory only\" e clique em \"Register\"",
+      "2": "Na barra lateral esquerda, clique em \"API Permissions\" → \"Add a permission\" → \"Microsoft Graph\" → \"Delegated permissions\" → busque e marque \"Mail.Read\" → clique em \"Add permissions\"",
+      "3": "Na barra lateral esquerda, clique em \"Certificates & secrets\" → \"New client secret\" → defina uma descrição e a validade → clique em \"Add\" → copie na hora o \"Value\" (ele não aparece de novo)",
+      "4": "Vá em \"Overview\" na barra lateral esquerda e copie o \"Application (client) ID\". Cole abaixo o Client ID e o Client Secret"
+    },
+    "links": {
+      "1": "Abrir App Registrations do Azure"
+    },
+    "fields": {
+      "email": "Application (client) ID",
+      "password": "Valor do Client Secret"
+    }
+  },
+  "dropbox": {
+    "description": "Arquivos na nuvem",
+    "steps": {
+      "1": "Abra o Dropbox App Console e clique em \"Create app\". Escolha \"Scoped access\" → \"Full Dropbox\" → dê um nome (ex.: \"Nicx\") → clique em \"Create app\"",
+      "2": "Clique na aba \"Permissions\" no topo. Marque \"files.metadata.read\" e \"files.content.read\" → clique em \"Submit\" no fim da página para salvar",
+      "3": "Volte para a aba \"Settings\". Em \"OAuth 2\", procure \"Generated access token\" e clique em \"Generate\". Copie o token e cole abaixo"
+    },
+    "links": {
+      "1": "Abrir o Dropbox App Console"
+    },
+    "fields": {
+      "token": "Token de acesso (sl.u...)"
+    }
+  },
+  "whatsapp": {
+    "description": "Mensagens do WhatsApp (Meta Cloud API)",
+    "steps": {
+      "1": "Abra o Meta for Developers → clique em \"Create App\" → escolha o tipo \"Business\" → preencha os dados do app e clique em \"Create App\"",
+      "2": "No painel do app, procure \"WhatsApp\" e clique em \"Set up\". Siga as instruções para adicionar um número de teste do WhatsApp. Vá em \"API Setup\" e copie o token de acesso temporário",
+      "3": "Copie o \"Phone Number ID\" (aparece na página \"API Setup\") e o token de acesso. Cole os dois abaixo, separados por dois-pontos. Ex.: 123456789:EAABx..."
+    },
+    "links": {
+      "1": "Abrir o Meta for Developers"
+    },
+    "fields": {
+      "token": "Phone Number ID:token de acesso"
+    }
+  }
+}

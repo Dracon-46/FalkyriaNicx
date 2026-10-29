@@ -1,0 +1,214 @@
+{
+  "upload": {
+    "description": "Paste text or upload documents",
+    "steps": {
+      "1": "Paste text or upload files (.txt, .md, .pdf, .docx, .csv) to add them to your knowledge base."
+    }
+  },
+  "gmail_imap": {
+    "description": "Email messages and threads",
+    "steps": {
+      "1": "Make sure 2-Step Verification is enabled, then generate a 16-character App Password (Mail / Other / \"Nicx\"). Paste it below — spaces are fine, and use the app password, not your regular Gmail password."
+    },
+    "links": {
+      "1": "How to get an app password →"
+    },
+    "troubleshooting": {
+      "1": "Don't see App Passwords? Make sure 2-Step Verification is enabled first.",
+      "2": "Google Workspace user? Your admin may need to enable App Passwords for your organization."
+    },
+    "fields": {
+      "email": "you@gmail.com",
+      "password": "App password (xxxx xxxx xxxx xxxx)"
+    }
+  },
+  "imap": {
+    "description": "Any IMAP mailbox",
+    "steps": {
+      "1": "Generate an app password with your email provider (IMAP must be enabled), then enter your email address and app password. Known providers are detected automatically; use the optional server settings for other providers."
+    },
+    "troubleshooting": {
+      "1": "Most providers require an app password rather than your normal password.",
+      "2": "Use TLS for implicit TLS (usually port 993), or STARTTLS (usually port 143).",
+      "3": "For security, private, loopback, link-local, and otherwise non-public server addresses are rejected."
+    },
+    "fields": {
+      "email": "you@example.com",
+      "password": "App password",
+      "host": "IMAP host (optional; auto-detected)",
+      "port": "Port (optional; 993 or 143)",
+      "security": "Connection security"
+    },
+    "options": {
+      "tls": "TLS (usually port 993)",
+      "starttls": "STARTTLS (usually port 143)"
+    }
+  },
+  "slack": {
+    "description": "Read messages from every channel, private channel, DM, and group DM you have access to",
+    "steps": {
+      "1": "Go to api.slack.com/apps and click \"Create New App\" → choose \"From scratch\". Name it \"Nicx\" and pick your workspace",
+      "2": "In the left sidebar, click \"OAuth & Permissions\". Scroll down to \"User Token Scopes\" (NOT \"Bot Token Scopes\"). Click \"Add an OAuth Scope\" and add EACH of these scopes one by one:",
+      "3": "channels:history • channels:read • groups:history • groups:read • im:history • im:read • mpim:history • mpim:read • users:read",
+      "4": "In the left sidebar, click \"Install App\" → click \"Install to Workspace\" → click \"Allow\". After installing, copy the \"User OAuth Token\" that appears (starts with xoxp-, NOT xoxb-)",
+      "5": "Paste the user token below. Sync indexes every channel, private channel, DM, and group DM you have access to — no need to invite anything to channels",
+      "6": "(Optional) Set the app icon: in the left sidebar click \"Basic Information\" → scroll to \"Display Information\" → upload the Nicx logo"
+    },
+    "links": {
+      "1": "Open Slack Apps",
+      "6": "Download icon"
+    }
+  },
+  "notion": {
+    "description": "Pages and databases",
+    "steps": {
+      "1": "Go to notion.so/profile/integrations → click \"+ New integration\". Name it \"Nicx\", select your workspace, and click Submit",
+      "2": "Copy the \"Internal Integration Secret\" (starts with ntn_) and paste it below",
+      "3": "To share ALL your pages at once: open any top-level page → click \"...\" (top right) → \"Connections\" → \"Add connections\" → search \"Nicx\" → click it. This shares the page and all its sub-pages. Repeat for each top-level page, or share your entire workspace by doing this on every root page",
+      "4": "Tip: if you have a single top-level page that contains everything, sharing just that one page will share all nested sub-pages automatically"
+    },
+    "links": {
+      "1": "Open Notion Integrations"
+    }
+  },
+  "granola": {
+    "description": "AI meeting notes",
+    "steps": {
+      "1": "Open the Granola desktop app. Click the gear icon (Settings) in the bottom-left corner, then click \"API\"",
+      "2": "Click \"Generate API Key\" (or copy your existing key). Paste the key below"
+    }
+  },
+  "imessage": {
+    "description": "macOS Messages history",
+    "steps": {
+      "1": "Open the Apple menu () → System Settings → Privacy & Security (in the left sidebar) → scroll down and click \"Full Disk Access\"",
+      "2": "Click the \"+\" button at the bottom of the list. Navigate to Applications → Utilities → select \"Terminal.app\" (or iTerm2/Warp if you use those). If you're using the desktop app, also add \"Nicx.app\" from Applications",
+      "3": "Toggle the switch ON next to each app you added. Close and reopen your terminal (or restart Nicx). iMessage data will be detected automatically — no credentials needed"
+    }
+  },
+  "obsidian": {
+    "description": "Markdown vault",
+    "steps": {
+      "1": "Find your vault path: open Obsidian → click the vault name in the bottom-left corner → \"Manage Vaults\" → look at the path shown under your vault name. On macOS this is usually ~/Documents/MyVault or ~/Library/Mobile Documents/iCloud~md~obsidian/Documents/MyVault",
+      "2": "Alternatively, open Finder → navigate to your vault folder (it contains a hidden .obsidian directory). Right-click the folder → \"Copy as Pathname\" to get the full path",
+      "3": "Paste the full path below. Nicx will index all .md files in the vault"
+    },
+    "fields": {
+      "path": "/Users/you/Documents/MyVault"
+    }
+  },
+  "gdrive": {
+    "description": "Docs, Sheets, and files",
+    "steps": {
+      "1": "Go to Google Cloud Console → create a new project (or select an existing one). Give it any name (e.g. \"Nicx\")",
+      "2": "Enable the Google Drive API: click the link below, make sure your project is selected at the top, then click \"Enable\"",
+      "3": "Create OAuth credentials: go to Credentials (link below) → click \"+ Create Credentials\" → choose \"OAuth client ID\" → Application type: \"Web application\". Under \"Authorized redirect URIs\" add this server's callback (e.g. http://localhost:1313/v1/connectors/gdrive/oauth/callback — match the host/port your Nicx server is bound to) → click \"Create\".",
+      "4": "A dialog will show your Client ID and Client Secret. Copy both and paste them below, then click Connect — a Google sign-in window opens to finish authorization. (If you miss the dialog, click the download icon next to your OAuth client to see them again.)"
+    },
+    "links": {
+      "1": "Create Project",
+      "2": "Enable Drive API",
+      "3": "Open Credentials"
+    },
+    "fields": {
+      "email": "Client ID (e.g. 123456-abc.apps.googleusercontent.com)",
+      "password": "Client Secret"
+    }
+  },
+  "gcalendar": {
+    "description": "Events and meetings",
+    "steps": {
+      "1": "Go to Google Cloud Console → use the same project as Google Drive (or create a new one)",
+      "2": "Enable the Google Calendar API: click the link below, select your project, then click \"Enable\"",
+      "3": "Go to Credentials → \"+ Create Credentials\" → \"OAuth client ID\" → Application type: \"Desktop app\" → \"Create\". Copy the Client ID and Client Secret",
+      "4": "Paste the Client ID and Client Secret below (you can reuse the same OAuth client as Google Drive if you enabled both APIs in the same project)"
+    },
+    "links": {
+      "1": "Open Console",
+      "2": "Enable Calendar API",
+      "3": "Open Credentials"
+    },
+    "fields": {
+      "email": "Client ID",
+      "password": "Client Secret"
+    }
+  },
+  "gcontacts": {
+    "description": "People and contact info",
+    "steps": {
+      "1": "Go to Google Cloud Console → use the same project as Google Drive (or create a new one)",
+      "2": "Enable the People API: click the link below, select your project, then click \"Enable\"",
+      "3": "Go to Credentials → \"+ Create Credentials\" → \"OAuth client ID\" → Application type: \"Desktop app\" → \"Create\". Copy the Client ID and Client Secret",
+      "4": "Paste the Client ID and Client Secret below"
+    },
+    "links": {
+      "1": "Open Console",
+      "2": "Enable People API",
+      "3": "Open Credentials"
+    },
+    "fields": {
+      "email": "Client ID",
+      "password": "Client Secret"
+    }
+  },
+  "apple_notes": {
+    "description": "macOS Notes app",
+    "steps": {
+      "1": "Open the Apple menu () → System Settings → Privacy & Security (in the left sidebar) → scroll down and click \"Full Disk Access\"",
+      "2": "Click the \"+\" button at the bottom of the list. Navigate to Applications → Utilities → select \"Terminal.app\" (or iTerm2/Warp if you use those). If you're using the desktop app, also add \"Nicx.app\" from Applications",
+      "3": "Toggle the switch ON next to each app you added. Close and reopen your terminal (or restart Nicx). Apple Notes will be detected automatically — no credentials needed"
+    }
+  },
+  "apple_contacts": {
+    "description": "macOS Contacts app",
+    "steps": {
+      "1": "Open the Apple menu () → System Settings → Privacy & Security (in the left sidebar) → scroll down and click \"Full Disk Access\"",
+      "2": "Click the \"+\" button at the bottom of the list. Navigate to Applications → Utilities → select \"Terminal.app\" (or iTerm2/Warp if you use those). If you're using the desktop app, also add \"Nicx.app\" from Applications",
+      "3": "Toggle the switch ON next to each app you added. Close and reopen your terminal (or restart Nicx). Apple Contacts will be detected automatically — no credentials needed"
+    }
+  },
+  "outlook": {
+    "description": "Microsoft email and calendar",
+    "steps": {
+      "1": "Go to the Azure Portal → App Registrations → click \"+ New registration\". Name it \"Nicx\", select \"Accounts in this organizational directory only\", and click Register",
+      "2": "In the left sidebar, click \"API Permissions\" → \"Add a permission\" → \"Microsoft Graph\" → \"Delegated permissions\" → search and check \"Mail.Read\" → click \"Add permissions\"",
+      "3": "In the left sidebar, click \"Certificates & secrets\" → \"New client secret\" → set a description and expiry → click \"Add\" → immediately copy the \"Value\" (you won't see it again)",
+      "4": "Go to \"Overview\" in the left sidebar and copy the \"Application (client) ID\". Paste both the Client ID and the Client Secret below"
+    },
+    "links": {
+      "1": "Open Azure App Registrations"
+    },
+    "fields": {
+      "email": "Application (client) ID",
+      "password": "Client Secret Value"
+    }
+  },
+  "dropbox": {
+    "description": "Cloud file storage",
+    "steps": {
+      "1": "Go to the Dropbox App Console and click \"Create app\". Choose \"Scoped access\" → \"Full Dropbox\" → give it a name (e.g. \"Nicx\") → click \"Create app\"",
+      "2": "Click the \"Permissions\" tab at the top. Check \"files.metadata.read\" and \"files.content.read\" → click \"Submit\" at the bottom to save",
+      "3": "Go back to the \"Settings\" tab. Under \"OAuth 2\", find \"Generated access token\" and click \"Generate\". Copy the token and paste it below"
+    },
+    "links": {
+      "1": "Open Dropbox App Console"
+    },
+    "fields": {
+      "token": "Access token (sl.u...)"
+    }
+  },
+  "whatsapp": {
+    "description": "WhatsApp messages (Meta Cloud API)",
+    "steps": {
+      "1": "Go to Meta for Developers → click \"Create App\" → choose \"Business\" type → fill in your app details and click \"Create App\"",
+      "2": "On the app dashboard, find \"WhatsApp\" and click \"Set up\". Follow the prompts to add a WhatsApp test number. Go to \"API Setup\" and copy the temporary access token",
+      "3": "Copy your \"Phone Number ID\" (shown on the API Setup page) and the access token. Paste them below separated by a colon — e.g. 123456789:EAABx..."
+    },
+    "links": {
+      "1": "Open Meta Developer Portal"
+    },
+    "fields": {
+      "token": "Phone Number ID:Access Token"
+    }
+  }
+}

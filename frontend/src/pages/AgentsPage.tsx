@@ -66,6 +66,7 @@ import {
 } from 'lucide-react';
 import { SOURCE_CATALOG } from '../types/connectors';
 import type { ConnectRequest } from '../types/connectors';
+import { localizeConnector, unitText } from '../i18n/connectors';
 import { listConnectors, connectSource } from '../lib/connectors-api';
 import type { ToolCallInfo } from '../types';
 import { ToolCallCard } from '../components/Chat/ToolCallCard';
@@ -2057,9 +2058,9 @@ function ChannelsTab({ agentId }: { agentId: string }) {
   const connected = connectors.filter((c) => c.connected);
   const notConnected = connectors.filter((c) => !c.connected);
 
-  // Merge with SOURCE_CATALOG for icons/descriptions
+  // Merge with SOURCE_CATALOG for icons/descriptions (texts in the interface language)
   const getMeta = (id: string) =>
-    SOURCE_CATALOG.find((s) => s.connector_id === id);
+    localizeConnector(SOURCE_CATALOG.find((s) => s.connector_id === id));
 
   const iconMap: Record<string, string> = {
     gmail: '\u2709\uFE0F', gmail_imap: '\u2709\uFE0F', slack: '#',
@@ -2086,8 +2087,8 @@ function ChannelsTab({ agentId }: { agentId: string }) {
           gap: 6, marginBottom: 12,
         }}>
           {connected.map((c) => {
-            const meta = SOURCE_CATALOG.find(s => s.connector_id === c.connector_id);
-            const unit = meta?.unitLabel || t('agents.dataSources.items');
+            const meta = getMeta(c.connector_id);
+            const unit = meta?.unitLabel ? unitText(meta.unitLabel) : t('agents.dataSources.items');
             const isReconnecting = expandedId === c.connector_id;
             return (
             <div

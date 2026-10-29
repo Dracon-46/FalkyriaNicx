@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { SOURCE_CATALOG } from '../../types/connectors';
+import { localizeConnector } from '../../i18n/connectors';
 import { connectSource, getConnector } from '../../lib/connectors-api';
 import { getBase } from '../../lib/api';
 import type { ConnectRequest, ConnectorMeta } from '../../types/connectors';
@@ -529,7 +530,7 @@ export function SourceConnectFlow({
 
   const activeEntry = entries[activeIndex];
   const activeCard = activeEntry
-    ? SOURCE_CATALOG.find((c) => c.connector_id === activeEntry.id)
+    ? localizeConnector(SOURCE_CATALOG.find((c) => c.connector_id === activeEntry.id))
     : null;
 
   const allDone = entries.every((e) => e.state === 'connected' || e.state === 'skipped');

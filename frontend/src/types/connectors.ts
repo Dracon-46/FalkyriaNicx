@@ -91,6 +91,10 @@ export type SourceCard = ConnectorMeta;
 
 export type ConnectorCategory = ConnectorMeta['category'];
 
+// Texts here stay in English, as data. Screens show them through
+// localizeConnector (src/i18n/connectors.ts), which reads the translations in
+// src/i18n/locales/<language>/connectors.json. Adding or changing a text here?
+// Update the `connectors` area in every language.
 export const SOURCE_CATALOG: ConnectorMeta[] = [
   // ── Upload / Paste ─────────────────────────────────────────────────
   {

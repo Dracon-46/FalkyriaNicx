@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { SOURCE_CATALOG, type ConnectorMeta, type SourceCard } from '../../types/connectors';
+import { localizeConnector } from '../../i18n/connectors';
 
 // ---------------------------------------------------------------------------
 // Icon map
@@ -152,7 +153,7 @@ export function SourcePicker({ onContinue }: { onContinue: (selectedIds: string[
             key={key}
             category={key}
             label={t(`setup.picker.${key}`)}
-            cards={SOURCE_CATALOG.filter((s) => s.category === key)}
+            cards={SOURCE_CATALOG.filter((s) => s.category === key).map((s) => localizeConnector(s))}
             selected={selected}
             onToggle={toggle}
           />

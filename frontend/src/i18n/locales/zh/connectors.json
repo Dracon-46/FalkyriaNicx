@@ -1,0 +1,214 @@
+{
+  "upload": {
+    "description": "粘贴文本或上传文档",
+    "steps": {
+      "1": "粘贴文本或上传文件（.txt、.md、.pdf、.docx、.csv），把它们加入你的知识库。"
+    }
+  },
+  "gmail_imap": {
+    "description": "邮件和会话",
+    "steps": {
+      "1": "先确认已开启两步验证，然后生成一个 16 位的应用专用密码（Mail / Other / \"Nicx\"）。粘贴到下方即可，空格没关系。请使用应用专用密码，而不是你平时的 Gmail 密码。"
+    },
+    "links": {
+      "1": "如何获取应用专用密码 →"
+    },
+    "troubleshooting": {
+      "1": "看不到 \"App Passwords\"？请先开启两步验证。",
+      "2": "使用 Google Workspace？可能需要管理员为你的组织启用应用专用密码。"
+    },
+    "fields": {
+      "email": "you@gmail.com",
+      "password": "应用专用密码（xxxx xxxx xxxx xxxx）"
+    }
+  },
+  "imap": {
+    "description": "任意 IMAP 邮箱",
+    "steps": {
+      "1": "在你的邮箱服务商处生成应用专用密码（需开启 IMAP），然后填写邮箱地址和该密码。常见服务商会自动识别；其他服务商请使用可选的服务器设置。"
+    },
+    "troubleshooting": {
+      "1": "大多数服务商要求使用应用专用密码，而不是平时的密码。",
+      "2": "隐式 TLS 选 TLS（通常是 993 端口），否则选 STARTTLS（通常是 143 端口）。",
+      "3": "出于安全考虑，私有、回环（loopback）、链路本地（link-local）等非公网服务器地址会被拒绝。"
+    },
+    "fields": {
+      "email": "you@example.com",
+      "password": "应用专用密码",
+      "host": "IMAP 服务器（可选，自动识别）",
+      "port": "端口（可选，993 或 143）",
+      "security": "连接安全"
+    },
+    "options": {
+      "tls": "TLS（通常是 993 端口）",
+      "starttls": "STARTTLS（通常是 143 端口）"
+    }
+  },
+  "slack": {
+    "description": "读取你有权访问的所有频道、私有频道、私信和群组私信中的消息",
+    "steps": {
+      "1": "打开 api.slack.com/apps，点击 \"Create New App\" → 选择 \"From scratch\"。命名为 \"Nicx\" 并选择你的 workspace",
+      "2": "在左侧边栏点击 \"OAuth & Permissions\"。向下滚动到 \"User Token Scopes\"（不是 \"Bot Token Scopes\"）。点击 \"Add an OAuth Scope\"，逐个添加以下每个权限范围：",
+      "3": "channels:history • channels:read • groups:history • groups:read • im:history • im:read • mpim:history • mpim:read • users:read",
+      "4": "在左侧边栏点击 \"Install App\" → \"Install to Workspace\" → \"Allow\"。安装完成后，复制显示的 \"User OAuth Token\"（以 xoxp- 开头，不是 xoxb-）",
+      "5": "把用户令牌粘贴到下方。同步会索引你有权访问的所有频道、私有频道、私信和群组私信，无需把任何东西邀请进频道",
+      "6": "（可选）设置应用图标：在左侧边栏点击 \"Basic Information\" → 滚动到 \"Display Information\" → 上传 Nicx 的标志"
+    },
+    "links": {
+      "1": "打开 Slack Apps",
+      "6": "下载图标"
+    }
+  },
+  "notion": {
+    "description": "页面和数据库",
+    "steps": {
+      "1": "打开 notion.so/profile/integrations → 点击 \"+ New integration\"。命名为 \"Nicx\"，选择你的 workspace，然后点击 \"Submit\"",
+      "2": "复制 \"Internal Integration Secret\"（以 ntn_ 开头），粘贴到下方",
+      "3": "一次共享所有页面：打开任意顶级页面 → 点击右上角的 \"...\" → \"Connections\" → \"Add connections\" → 搜索 \"Nicx\" → 点击它。这样会共享该页面及其所有子页面。对每个顶级页面重复此操作，或在所有根页面上这样做来共享整个 workspace",
+      "4": "提示：如果你有一个包含所有内容的顶级页面，只共享这一个页面就会自动共享其下所有子页面"
+    },
+    "links": {
+      "1": "打开 Notion 集成"
+    }
+  },
+  "granola": {
+    "description": "AI 会议笔记",
+    "steps": {
+      "1": "打开 Granola 桌面应用。点击左下角的齿轮图标（Settings），然后点击 \"API\"",
+      "2": "点击 \"Generate API Key\"（或复制已有的密钥），粘贴到下方"
+    }
+  },
+  "imessage": {
+    "description": "macOS 信息记录",
+    "steps": {
+      "1": "打开苹果菜单（）→ \"System Settings\" → \"Privacy & Security\"（左侧边栏）→ 向下滚动并点击 \"Full Disk Access\"",
+      "2": "点击列表下方的 \"+\" 按钮。前往 \"Applications\" → \"Utilities\" → 选择 \"Terminal.app\"（如果你用 iTerm2/Warp，就选它们）。如果你使用桌面应用，还要从 \"Applications\" 中添加 \"Nicx.app\"",
+      "3": "打开你添加的每个应用旁边的开关。关闭并重新打开终端（或重启 Nicx）。iMessage 数据会被自动识别，无需凭据"
+    }
+  },
+  "obsidian": {
+    "description": "Markdown 笔记仓库",
+    "steps": {
+      "1": "找到你的仓库路径：打开 Obsidian → 点击左下角的仓库名称 → \"Manage Vaults\" → 查看仓库名称下方显示的路径。在 macOS 上通常是 ~/Documents/MyVault 或 ~/Library/Mobile Documents/iCloud~md~obsidian/Documents/MyVault",
+      "2": "也可以打开 Finder → 进入仓库文件夹（里面有一个隐藏的 .obsidian 目录）。右键点击该文件夹 → \"Copy as Pathname\" 以获取完整路径",
+      "3": "把完整路径粘贴到下方。Nicx 会索引仓库中的所有 .md 文件"
+    },
+    "fields": {
+      "path": "/Users/you/Documents/MyVault"
+    }
+  },
+  "gdrive": {
+    "description": "文档、表格和文件",
+    "steps": {
+      "1": "打开 Google Cloud Console → 新建项目（或选择已有项目）。名称随意（例如 \"Nicx\"）",
+      "2": "启用 Google Drive API：点击下方链接，确认顶部已选中你的项目，然后点击 \"Enable\"",
+      "3": "创建 OAuth 凭据：前往 \"Credentials\"（下方链接）→ 点击 \"+ Create Credentials\" → 选择 \"OAuth client ID\" → Application type：\"Web application\"。在 \"Authorized redirect URIs\" 中添加本服务器的回调地址（例如 http://localhost:1313/v1/connectors/gdrive/oauth/callback，主机和端口要与 Nicx 服务器实际绑定的一致）→ 点击 \"Create\"。",
+      "4": "弹窗会显示你的 Client ID 和 Client Secret。复制两者并粘贴到下方，然后点击 \"连接\"，会打开 Google 登录窗口完成授权。（如果错过了弹窗，点击 OAuth 客户端旁边的下载图标即可再次查看。）"
+    },
+    "links": {
+      "1": "创建项目",
+      "2": "启用 Drive API",
+      "3": "打开凭据"
+    },
+    "fields": {
+      "email": "Client ID（例如 123456-abc.apps.googleusercontent.com）",
+      "password": "Client Secret"
+    }
+  },
+  "gcalendar": {
+    "description": "日程和会议",
+    "steps": {
+      "1": "打开 Google Cloud Console → 使用与 Google Drive 相同的项目（或新建一个）",
+      "2": "启用 Google Calendar API：点击下方链接，选择你的项目，然后点击 \"Enable\"",
+      "3": "前往 \"Credentials\" → \"+ Create Credentials\" → \"OAuth client ID\" → Application type：\"Desktop app\" → \"Create\"。复制 Client ID 和 Client Secret",
+      "4": "把 Client ID 和 Client Secret 粘贴到下方（如果两个 API 在同一个项目中启用，可以复用 Google Drive 的 OAuth 客户端）"
+    },
+    "links": {
+      "1": "打开控制台",
+      "2": "启用 Calendar API",
+      "3": "打开凭据"
+    },
+    "fields": {
+      "email": "Client ID",
+      "password": "Client Secret"
+    }
+  },
+  "gcontacts": {
+    "description": "联系人及其信息",
+    "steps": {
+      "1": "打开 Google Cloud Console → 使用与 Google Drive 相同的项目（或新建一个）",
+      "2": "启用 People API：点击下方链接，选择你的项目，然后点击 \"Enable\"",
+      "3": "前往 \"Credentials\" → \"+ Create Credentials\" → \"OAuth client ID\" → Application type：\"Desktop app\" → \"Create\"。复制 Client ID 和 Client Secret",
+      "4": "把 Client ID 和 Client Secret 粘贴到下方"
+    },
+    "links": {
+      "1": "打开控制台",
+      "2": "启用 People API",
+      "3": "打开凭据"
+    },
+    "fields": {
+      "email": "Client ID",
+      "password": "Client Secret"
+    }
+  },
+  "apple_notes": {
+    "description": "macOS 备忘录",
+    "steps": {
+      "1": "打开苹果菜单（）→ \"System Settings\" → \"Privacy & Security\"（左侧边栏）→ 向下滚动并点击 \"Full Disk Access\"",
+      "2": "点击列表下方的 \"+\" 按钮。前往 \"Applications\" → \"Utilities\" → 选择 \"Terminal.app\"（如果你用 iTerm2/Warp，就选它们）。如果你使用桌面应用，还要从 \"Applications\" 中添加 \"Nicx.app\"",
+      "3": "打开你添加的每个应用旁边的开关。关闭并重新打开终端（或重启 Nicx）。Apple Notes 会被自动识别，无需凭据"
+    }
+  },
+  "apple_contacts": {
+    "description": "macOS 通讯录",
+    "steps": {
+      "1": "打开苹果菜单（）→ \"System Settings\" → \"Privacy & Security\"（左侧边栏）→ 向下滚动并点击 \"Full Disk Access\"",
+      "2": "点击列表下方的 \"+\" 按钮。前往 \"Applications\" → \"Utilities\" → 选择 \"Terminal.app\"（如果你用 iTerm2/Warp，就选它们）。如果你使用桌面应用，还要从 \"Applications\" 中添加 \"Nicx.app\"",
+      "3": "打开你添加的每个应用旁边的开关。关闭并重新打开终端（或重启 Nicx）。Apple Contacts 会被自动识别，无需凭据"
+    }
+  },
+  "outlook": {
+    "description": "Microsoft 邮件和日历",
+    "steps": {
+      "1": "打开 Azure Portal → \"App Registrations\" → 点击 \"+ New registration\"。命名为 \"Nicx\"，选择 \"Accounts in this organizational directory only\"，然后点击 \"Register\"",
+      "2": "在左侧边栏点击 \"API Permissions\" → \"Add a permission\" → \"Microsoft Graph\" → \"Delegated permissions\" → 搜索并勾选 \"Mail.Read\" → 点击 \"Add permissions\"",
+      "3": "在左侧边栏点击 \"Certificates & secrets\" → \"New client secret\" → 填写描述和有效期 → 点击 \"Add\" → 立即复制 \"Value\"（之后不会再显示）",
+      "4": "在左侧边栏进入 \"Overview\"，复制 \"Application (client) ID\"。把 Client ID 和 Client Secret 都粘贴到下方"
+    },
+    "links": {
+      "1": "打开 Azure App Registrations"
+    },
+    "fields": {
+      "email": "Application (client) ID",
+      "password": "Client Secret 的值"
+    }
+  },
+  "dropbox": {
+    "description": "云端文件存储",
+    "steps": {
+      "1": "打开 Dropbox App Console，点击 \"Create app\"。选择 \"Scoped access\" → \"Full Dropbox\" → 起个名字（例如 \"Nicx\"）→ 点击 \"Create app\"",
+      "2": "点击顶部的 \"Permissions\" 标签。勾选 \"files.metadata.read\" 和 \"files.content.read\" → 点击底部的 \"Submit\" 保存",
+      "3": "回到 \"Settings\" 标签。在 \"OAuth 2\" 下找到 \"Generated access token\"，点击 \"Generate\"。复制令牌并粘贴到下方"
+    },
+    "links": {
+      "1": "打开 Dropbox App Console"
+    },
+    "fields": {
+      "token": "访问令牌（sl.u...）"
+    }
+  },
+  "whatsapp": {
+    "description": "WhatsApp 消息（Meta Cloud API）",
+    "steps": {
+      "1": "打开 Meta for Developers → 点击 \"Create App\" → 选择 \"Business\" 类型 → 填写应用信息并点击 \"Create App\"",
+      "2": "在应用面板中找到 \"WhatsApp\"，点击 \"Set up\"。按提示添加一个 WhatsApp 测试号码。进入 \"API Setup\" 并复制临时访问令牌",
+      "3": "复制你的 \"Phone Number ID\"（显示在 \"API Setup\" 页面）和访问令牌。用冒号分隔后粘贴到下方，例如 123456789:EAABx..."
+    },
+    "links": {
+      "1": "打开 Meta for Developers"
+    },
+    "fields": {
+      "token": "Phone Number ID:访问令牌"
+    }
+  }
+}
