@@ -205,37 +205,16 @@ def ensure_ollama(status) -> None:
     base = ollama_base()
     if http_status(f"{base}/api/version") == 200:
         return
-    app, exe = find_ollama()
+    _, exe = find_ollama()
     if exe is None:
         raise LaunchError(
             "O Ollama não está instalado. Execute o instalador do Nicx de novo "
             "para instalá-lo."
         )
-    status("Iniciando o Ollama...")
-    if app is not None:
-        subprocess.Popen(
-            [str(app)],
-            cwd=str(app.parent),
-            creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP,
-            close_fds=True,
-        )
-    else:
-        subprocess.Popen(
-            [str(exe), "serve"],
-            cwd=str(exe.parent),
-            creationflags=CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            close_fds=True,
-        )
-    deadline = time.monotonic() + OLLAMA_TIMEOUT
-    while time.monotonic() < deadline:
-        if http_status(f"{base}/api/version") == 200:
-            return
-        time.sleep(1.0)
-    raise LaunchError(
-        "O Ollama não respondeu. Abra o Ollama pelo menu Iniciar e tente de novo."
-    )
+    # Não liga o Ollama aqui: o servidor do Nicx liga o "ollama serve"
+    # escondido quando precisa e o desliga ao sair ("Parar o Nicx"). Ligado
+    # pelo lançador, ele ficaria rodando depois que o Nicx fechasse.
+    status("O Nicx vai ligar o Ollama...")
 
 
 # ---------------------------------------------------------------------------

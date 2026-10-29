@@ -591,13 +591,20 @@ function Stop-AppServer {
 }
 
 function Start-Ollama([string] $exe) {
+    # Só o "ollama serve", escondido: o "ollama app.exe" abre uma janela e,
+    # como processo filho, prenderia o assistente até o usuário fechá-la.
+    # O que a preparação ligar ela mesma desliga no fim (Stop-OllamaFromSetup);
+    # depois, o Nicx liga o Ollama quando precisar.
     $dir = Split-Path -Parent $exe
-    $app = Join-Path $dir 'ollama app.exe'
-    if (Test-Path -LiteralPath $app) {
-        Start-Process -FilePath $app -WorkingDirectory $dir | Out-Null
-    } else {
-        Start-Process -FilePath $exe -ArgumentList 'serve' -WorkingDirectory $dir -WindowStyle Hidden | Out-Null
+    $script:OllamaFromSetup = Start-Process -FilePath $exe -ArgumentList 'serve' -WorkingDirectory $dir -WindowStyle Hidden -PassThru
+}
+
+function Stop-OllamaFromSetup {
+    $proc = $script:OllamaFromSetup
+    if ($proc -and -not $proc.HasExited) {
+        & taskkill.exe /F /T /PID $proc.Id 2>&1 | Out-Null
     }
+    $script:OllamaFromSetup = $null
 }
 
 function Wait-Ollama([int] $seconds) {
@@ -966,5 +973,7 @@ for name in ('config.json', 'kokoro-v1_0.pth', 'voices/pf_dora.pt', 'voices/pm_a
     if ($script:LogPath) { Out-Line "Registro completo: $script:LogPath" }
     Out-Marker 'error' $msg
     $exitCode = 1
+} finally {
+    Stop-OllamaFromSetup
 }
 exit $exitCode
