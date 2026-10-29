@@ -10,7 +10,9 @@ at https://account.microsoft.com/security
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Iterator, Optional
+from typing import Any, Dict, Iterator, Optional
+
+import httpx
 
 from nicx.conectores._stubs import Document
 from nicx.conectores.gmail_imap import GmailIMAPConnector
@@ -18,6 +20,24 @@ from nicx.nucleo.config import DEFAULT_CONFIG_DIR
 from nicx.nucleo.registry import ConnectorRegistry
 
 _DEFAULT_CREDENTIALS_PATH = str(DEFAULT_CONFIG_DIR / "connectors" / "outlook.json")
+
+_GRAPH_API_BASE = "https://graph.microsoft.com/v1.0"
+
+
+def _graph_api_event_create(token: str, body: Dict[str, Any]) -> Dict[str, Any]:
+    """Create an event on the user's calendar (Microsoft Graph ``POST /me/events``).
+
+    Only works with an OAuth token that has ``Calendars.ReadWrite``; the IMAP
+    app password this connector uses for mail cannot do it.
+    """
+    resp = httpx.post(
+        f"{_GRAPH_API_BASE}/me/events",
+        headers={"Authorization": f"Bearer {token}"},
+        json=body,
+        timeout=30.0,
+    )
+    resp.raise_for_status()
+    return resp.json()
 
 
 @ConnectorRegistry.register("outlook")

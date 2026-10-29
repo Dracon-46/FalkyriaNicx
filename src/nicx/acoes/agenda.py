@@ -3,10 +3,13 @@
 "Marca reunião com o João sexta às 15h" vira um compromisso em
 ``~/.nicx/agenda.json`` e um lembrete 15 minutos antes (o despertador dos
 lembretes avisa com notificação e voz). Compromisso sem hora é do dia todo
-e avisa às 8h. ``exportar_ics`` gera um arquivo .ics que o calendário do
+e avisa às 8h. ``export_ics`` gera um arquivo .ics que o calendário do
 Windows (ou Outlook, Google Agenda...) importa com dois cliques.
 
-Tudo local: nada vai para a internet.
+A agenda mora no PC. Só sai dele quando o usuário pede para mandar um
+compromisso ao Google Agenda ou ao Outlook (ver ``calendarios``); o id que
+o serviço devolve fica guardado aqui, para nunca criar o mesmo evento duas
+vezes.
 """
 
 from __future__ import annotations
@@ -40,10 +43,34 @@ class Event:
     all_day: bool
     created: str
     reminder_id: str = ""
+    # Campos opcionais (arquivos antigos não têm): fim, local e detalhes do
+    # compromisso, idioma do pedido e o id do evento criado em cada serviço.
+    end: str = ""
+    location: str = ""
+    details: str = ""
+    idioma: str = ""
+    google_id: str = ""
+    outlook_id: str = ""
 
     @property
     def start_at(self) -> datetime:
         return datetime.fromisoformat(self.start)
+
+    @property
+    def end_at(self) -> datetime:
+        """Fim do compromisso: o guardado ou, sem ele, 1 hora depois (ou o dia
+        seguinte, no de dia todo; fim exclusivo, como nos calendários)."""
+        if self.end:
+            try:
+                end = datetime.fromisoformat(self.end)
+                if end > self.start_at:
+                    return end
+            except ValueError:
+                pass
+        if self.all_day:
+            day = self.start_at.replace(hour=0, minute=0, second=0, microsecond=0)
+            return day + timedelta(days=1)
+        return self.start_at + DEFAULT_DURATION
 
 
 def _path() -> Path:
@@ -97,20 +124,28 @@ def _warning_time(start: datetime, all_day: bool) -> datetime:
 def add(
     title: str, start: datetime, all_day: bool = False, now: Optional[datetime] = None
 ) -> Event:
-    """Marca um compromisso e o aviso antes dele (se ainda der tempo)."""
+    """Marca um compromisso e o aviso antes dele (se ainda der tempo).
+
+    O aviso sai no idioma do pedido (o idioma atual das ações).
+    """
+    from nicx.acoes import textos
+
     now = now or datetime.now()
     title = title.strip() or "compromisso"
+    idioma = textos.codigo()
     event = Event(
         id=uuid.uuid4().hex[:8],
         title=title,
         start=start.replace(second=0, microsecond=0).isoformat(),
         all_day=all_day,
         created=now.isoformat(timespec="seconds"),
+        idioma=idioma,
     )
     warn_at = _warning_time(event.start_at, all_day)
     if warn_at > now:
-        prefix = "Hoje" if all_day else "Daqui a 15 minutos"
-        event.reminder_id = lembretes.add(f"{prefix}: {title}", warn_at).id
+        chave = "aviso_hoje" if all_day else "aviso_daqui_15"
+        aviso = textos.texto(chave, idioma, titulo=title)
+        event.reminder_id = lembretes.add(aviso, warn_at, idioma=idioma).id
     with _LOCK:
         events = _load()
         events.append(event)
@@ -182,6 +217,34 @@ def find(
     return None
 
 
+def last_added(now: Optional[datetime] = None) -> Optional[Event]:
+    """O último compromisso marcado que ainda não passou (a lista do arquivo
+    está na ordem em que foram marcados)."""
+    ahead = {e.id for e in upcoming(now, days=366)}
+    with _LOCK:
+        events = [e for e in _load() if e.id in ahead]
+    return events[-1] if events else None
+
+
+def update(event: Event, **changes: str) -> Optional[Event]:
+    """Grava mudanças num compromisso (ex.: o id remoto); None se ele sumiu."""
+    with _LOCK:
+        events = _load()
+        for i, current in enumerate(events):
+            if current.id == event.id:
+                for key, value in changes.items():
+                    setattr(current, key, value)
+                events[i] = current
+                _save(events)
+                return current
+    return None
+
+
+def get(event_id: str) -> Optional[Event]:
+    with _LOCK:
+        return next((e for e in _load() if e.id == event_id), None)
+
+
 def cancel(event: Event) -> None:
     """Desmarca o compromisso e o aviso dele."""
     with _LOCK:
@@ -224,13 +287,17 @@ def to_ics(events: List[Event]) -> str:
         else:
             lines += [
                 f"DTSTART:{start:%Y%m%dT%H%M%S}",
-                f"DTEND:{start + DEFAULT_DURATION:%Y%m%dT%H%M%S}",
+                f"DTEND:{e.end_at:%Y%m%dT%H%M%S}",
                 "BEGIN:VALARM",
                 "ACTION:DISPLAY",
                 f"DESCRIPTION:{_ics_text(e.title)}",
                 "TRIGGER:-PT15M",
                 "END:VALARM",
             ]
+        if e.location:
+            lines.append(f"LOCATION:{_ics_text(e.location)}")
+        if e.details:
+            lines.append(f"DESCRIPTION:{_ics_text(e.details)}")
         lines += [f"SUMMARY:{_ics_text(e.title)}", "END:VEVENT"]
     lines.append("END:VCALENDAR")
     return "\r\n".join(lines) + "\r\n"
@@ -253,7 +320,10 @@ __all__ = [
     "cancel",
     "export_ics",
     "find",
+    "get",
+    "last_added",
     "on_day",
     "to_ics",
     "upcoming",
+    "update",
 ]

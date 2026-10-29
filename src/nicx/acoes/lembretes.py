@@ -35,6 +35,9 @@ class Reminder:
     text: str
     due: str  # ISO, hora local
     created: str
+    # Idioma do pedido ("en", "es"...): o aviso sai nele. Arquivos antigos não
+    # têm o campo e avisam em português.
+    idioma: str = ""
 
     @property
     def due_at(self) -> datetime:
@@ -84,12 +87,16 @@ def _save(items: List[Reminder]) -> None:
     os.replace(tmp, path)
 
 
-def add(text: str, when: datetime) -> Reminder:
+def add(text: str, when: datetime, idioma: Optional[str] = None) -> Reminder:
+    """Guarda um lembrete. Sem ``idioma``, vale o idioma atual das ações."""
+    from nicx.acoes import textos
+
     reminder = Reminder(
         id=uuid.uuid4().hex[:8],
-        text=text.strip() or "o que você pediu",
+        text=text.strip() or textos.texto("o_que_pediu"),
         due=when.replace(microsecond=0).isoformat(),
         created=datetime.now().replace(microsecond=0).isoformat(),
+        idioma=textos.codigo(idioma),
     )
     with _LOCK:
         items = _load()
@@ -155,10 +162,18 @@ def pop_due(now: Optional[datetime] = None) -> List[Reminder]:
 
 
 def message_for(reminder: Reminder, now: Optional[datetime] = None) -> str:
+    """O aviso, no idioma em que o lembrete foi pedido."""
+    from nicx.acoes import textos
+
     now = now or datetime.now()
-    text = f"Lembrete: {reminder.text}."
+    idioma = reminder.idioma or textos.PADRAO
+    kind = kind_of(reminder)
+    if kind == "lembrete":
+        text = textos.texto("aviso_lembrete", idioma, o_que=reminder.text)
+    else:
+        text = textos.texto(f"aviso_{kind}", idioma)
     if now - reminder.due_at > _LATE:
-        text += f" (era para {reminder.due_at:%H:%M}; o Nicx estava desligado)"
+        text += textos.texto("aviso_atrasado", idioma, hora=f"{reminder.due_at:%H:%M}")
     return text
 
 

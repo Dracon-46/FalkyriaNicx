@@ -155,6 +155,76 @@
       "stopped": "बंद"
     }
   },
+  "shortcut": {
+    "title": "कीबोर्ड शॉर्टकट",
+    "enableLabel": "शॉर्टकट से Nicx को बुलाएँ",
+    "enableDescription": "किसी भी विंडो में यह संयोजन दबाएँ और Nicx आ जाएगा। केवल Windows पर; जब तक आप चालू न करें, बंद रहता है।",
+    "enableToggle": "कीबोर्ड शॉर्टकट चालू करें",
+    "keysLabel": "संयोजन",
+    "keysDescription": "क्लिक करें और कुंजियाँ एक साथ दबाएँ (जैसे Ctrl + Alt + N)। Esc से रद्द करें।",
+    "record": "दूसरा संयोजन रिकॉर्ड करें",
+    "recording": "कुंजियाँ दबाएँ…",
+    "actionLabel": "दबाने पर",
+    "actionDescription": "शॉर्टकट क्या करता है",
+    "actions": {
+      "flutuante": "सुनते हुए मैस्कॉट खोलें",
+      "app": "Nicx ऐप खोलें"
+    },
+    "statusLabel": "स्थिति",
+    "statusDescription": "अगर विंडो पहले से खुली है, तो शॉर्टकट उसे बस सामने ले आता है।",
+    "states": {
+      "registrado": "चालू",
+      "em_uso": "किसी दूसरे प्रोग्राम द्वारा उपयोग में",
+      "desligado": "बंद",
+      "sem_suporte": "केवल Windows पर काम करता है",
+      "invalido": "अमान्य संयोजन",
+      "erro": "चालू नहीं हो सका"
+    },
+    "inUseHint": "कोई दूसरा प्रोग्राम पहले से यह संयोजन उपयोग कर रहा है: दूसरा रिकॉर्ड करें।",
+    "errors": {
+      "needModifier": "कुंजी के साथ Ctrl, Alt या Win का उपयोग करें।",
+      "unsupportedKey": "यह कुंजी शॉर्टकट में उपयोग नहीं की जा सकती।",
+      "reserved": "यह संयोजन सिस्टम का है या आम तौर पर उपयोग होता है; कोई दूसरा चुनें।"
+    },
+    "keyNames": {
+      "space": "स्पेस"
+    },
+    "checking": "जाँच हो रही है...",
+    "serverUnavailable": "Nicx सर्वर उपलब्ध नहीं है",
+    "saveFailed": "शॉर्टकट सहेजा नहीं जा सका",
+    "restartServer": "शॉर्टकट उपयोग करने के लिए Nicx सर्वर फिर से शुरू करें"
+  },
+  "calendar": {
+    "title": "कैलेंडर",
+    "defaultLabel": "डिफ़ॉल्ट कैलेंडर",
+    "defaultDescription": "\"कैलेंडर में भेजो\" कहने पर कार्यक्रम यहाँ जाता है। नाम भी बोल सकते हैं: \"Google कैलेंडर में भेजो\", \"Outlook में भेजो\"।",
+    "options": {
+      "windows": "Windows कैलेंडर (.ics)",
+      "google": "Google कैलेंडर",
+      "outlook": "निजी Outlook (outlook.com)",
+      "outlook_trabalho": "ऑफ़िस या स्कूल का Outlook (Microsoft 365)"
+    },
+    "accountsLabel": "सीधे खाते में बनाएँ",
+    "accounts": {
+      "google": {
+        "none": "Google कैलेंडर: कनेक्ट नहीं है।",
+        "unknown": "Google कैलेंडर: कनेक्ट है (सीधे बनाने की कोशिश करता हूँ)।",
+        "write": "Google कैलेंडर: सीधे बनाता है।",
+        "readOnly": "Google कैलेंडर: सिर्फ़ पढ़ने की अनुमति; सीधे बनाने के लिए फिर से कनेक्ट करें।"
+      },
+      "outlook": {
+        "none": "Outlook: कैलेंडर अनुमति वाला कोई खाता नहीं।",
+        "unknown": "Outlook: कनेक्ट है (सीधे बनाने की कोशिश करता हूँ)।",
+        "write": "Outlook: सीधे बनाता है।",
+        "readOnly": "Outlook: कैलेंडर की अनुमति नहीं; सीधे बनाने के लिए फिर से कनेक्ट करें।"
+      }
+    },
+    "linkHint": "खाता कनेक्ट न हो तो Nicx ब्राउज़र में पहले से भरा कार्यक्रम खोलता है: बस Save पर क्लिक करें।",
+    "checking": "जाँच हो रही है...",
+    "serverUnavailable": "Nicx सर्वर उपलब्ध नहीं है",
+    "saveFailed": "डिफ़ॉल्ट कैलेंडर सेव नहीं हो सका",
+    "restartServer": "कैलेंडर चुनने के लिए Nicx सर्वर फिर से शुरू करें"
+  },
   "data": {
     "conversations": "बातचीत",
     "storedLocally": "इस कंप्यूटर पर सहेजी गईं: {{total}}",

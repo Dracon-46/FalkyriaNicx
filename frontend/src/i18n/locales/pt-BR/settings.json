@@ -155,6 +155,76 @@
       "stopped": "Parada"
     }
   },
+  "shortcut": {
+    "title": "Atalho de teclado",
+    "enableLabel": "Chamar o Nicx com um atalho",
+    "enableDescription": "Aperte a combinação em qualquer janela e o Nicx aparece. Só no Windows; fica desligado até você ligar.",
+    "enableToggle": "Ativar o atalho de teclado",
+    "keysLabel": "Combinação",
+    "keysDescription": "Clique e aperte as teclas juntas (ex.: Ctrl + Alt + N). Esc cancela.",
+    "record": "Gravar outra combinação",
+    "recording": "Aperte as teclas…",
+    "actionLabel": "Ao apertar",
+    "actionDescription": "O que o atalho faz",
+    "actions": {
+      "flutuante": "Abrir o mascote ouvindo",
+      "app": "Abrir o app do Nicx"
+    },
+    "statusLabel": "Estado",
+    "statusDescription": "Se a janela já estiver aberta, o atalho só a traz para a frente.",
+    "states": {
+      "registrado": "Ativo",
+      "em_uso": "Em uso por outro programa",
+      "desligado": "Desligado",
+      "sem_suporte": "Só funciona no Windows",
+      "invalido": "Combinação inválida",
+      "erro": "Não foi possível ativar"
+    },
+    "inUseHint": "Outro programa já usa essa combinação: grave outra.",
+    "errors": {
+      "needModifier": "Use Ctrl, Alt ou Win junto com a tecla.",
+      "unsupportedKey": "Essa tecla não pode ser usada no atalho.",
+      "reserved": "Essa combinação é do sistema ou de uso geral; escolha outra."
+    },
+    "keyNames": {
+      "space": "Espaço"
+    },
+    "checking": "Verificando...",
+    "serverUnavailable": "Servidor do Nicx indisponível",
+    "saveFailed": "Não foi possível salvar o atalho",
+    "restartServer": "Reinicie o servidor do Nicx para usar o atalho"
+  },
+  "calendar": {
+    "title": "Calendário",
+    "defaultLabel": "Calendário padrão",
+    "defaultDescription": "Para onde vai \"manda pro calendário\". Dá também para dizer o nome: \"manda pro Google Agenda\", \"manda pro Outlook\".",
+    "options": {
+      "windows": "Calendário do Windows (.ics)",
+      "google": "Google Agenda",
+      "outlook": "Outlook pessoal (outlook.com)",
+      "outlook_trabalho": "Outlook de trabalho ou escola (Microsoft 365)"
+    },
+    "accountsLabel": "Criar direto na conta",
+    "accounts": {
+      "google": {
+        "none": "Google Agenda: não conectado.",
+        "unknown": "Google Agenda: conectado (tento criar direto).",
+        "write": "Google Agenda: cria direto.",
+        "readOnly": "Google Agenda: só leitura; reconecte para criar direto."
+      },
+      "outlook": {
+        "none": "Outlook: sem conta com permissão de agenda.",
+        "unknown": "Outlook: conectado (tento criar direto).",
+        "write": "Outlook: cria direto.",
+        "readOnly": "Outlook: sem permissão de agenda; reconecte para criar direto."
+      }
+    },
+    "linkHint": "Sem conta conectada, o Nicx abre o evento já preenchido no navegador: é só clicar em Salvar.",
+    "checking": "Verificando...",
+    "serverUnavailable": "Servidor do Nicx indisponível",
+    "saveFailed": "Não foi possível salvar o calendário padrão",
+    "restartServer": "Reinicie o servidor do Nicx para escolher o calendário"
+  },
   "data": {
     "conversations": "Conversas",
     "storedLocally": "Guardadas neste computador: {{total}}",

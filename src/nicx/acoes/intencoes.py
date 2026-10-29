@@ -27,7 +27,9 @@ class Action:
     op: str = ""  # volume: up/down/set/mute; media: toggle/next/prev; power
     value: Optional[int] = None  # volume: passos (up/down) ou nível 0-100 (set)
     target: str = ""  # open/folder/close: chave; search: termo; remind/note: texto
-    site: str = ""  # search: google ou youtube
+    # search: google ou youtube; agenda_add: calendário para onde mandar;
+    # agenda_export: "todos" ou "ultimo" (op = calendário, target = qual)
+    site: str = ""
     when: Optional[datetime] = None  # remind: quando avisar
 
 

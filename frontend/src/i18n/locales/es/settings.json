@@ -155,6 +155,76 @@
       "stopped": "Detenida"
     }
   },
+  "shortcut": {
+    "title": "Atajo de teclado",
+    "enableLabel": "Llamar a Nicx con un atajo",
+    "enableDescription": "Pulsa la combinación en cualquier ventana y Nicx aparece. Solo en Windows; queda desactivado hasta que lo actives.",
+    "enableToggle": "Activar el atajo de teclado",
+    "keysLabel": "Combinación",
+    "keysDescription": "Haz clic y pulsa las teclas juntas (ej.: Ctrl + Alt + N). Esc cancela.",
+    "record": "Grabar otra combinación",
+    "recording": "Pulsa las teclas…",
+    "actionLabel": "Al pulsar",
+    "actionDescription": "Lo que hace el atajo",
+    "actions": {
+      "flutuante": "Abrir la mascota escuchando",
+      "app": "Abrir la app de Nicx"
+    },
+    "statusLabel": "Estado",
+    "statusDescription": "Si la ventana ya está abierta, el atajo solo la trae al frente.",
+    "states": {
+      "registrado": "Activo",
+      "em_uso": "En uso por otro programa",
+      "desligado": "Desactivado",
+      "sem_suporte": "Solo funciona en Windows",
+      "invalido": "Combinación no válida",
+      "erro": "No se pudo activar"
+    },
+    "inUseHint": "Otro programa ya usa esta combinación: graba otra.",
+    "errors": {
+      "needModifier": "Usa Ctrl, Alt o Win junto con la tecla.",
+      "unsupportedKey": "Esta tecla no se puede usar en el atajo.",
+      "reserved": "Esta combinación es del sistema o de uso general; elige otra."
+    },
+    "keyNames": {
+      "space": "Espacio"
+    },
+    "checking": "Comprobando...",
+    "serverUnavailable": "Servidor de Nicx no disponible",
+    "saveFailed": "No se pudo guardar el atajo",
+    "restartServer": "Reinicia el servidor de Nicx para usar el atajo"
+  },
+  "calendar": {
+    "title": "Calendario",
+    "defaultLabel": "Calendario predeterminado",
+    "defaultDescription": "A dónde va \"mándalo al calendario\". También puedes decir el nombre: \"mándalo a Google Calendar\", \"mándalo a Outlook\".",
+    "options": {
+      "windows": "Calendario de Windows (.ics)",
+      "google": "Google Calendar",
+      "outlook": "Outlook personal (outlook.com)",
+      "outlook_trabalho": "Outlook del trabajo o la escuela (Microsoft 365)"
+    },
+    "accountsLabel": "Crear directamente en la cuenta",
+    "accounts": {
+      "google": {
+        "none": "Google Calendar: no conectado.",
+        "unknown": "Google Calendar: conectado (intento crear directamente).",
+        "write": "Google Calendar: crea directamente.",
+        "readOnly": "Google Calendar: solo lectura; vuelve a conectar para crear directamente."
+      },
+      "outlook": {
+        "none": "Outlook: sin cuenta con permiso de calendario.",
+        "unknown": "Outlook: conectado (intento crear directamente).",
+        "write": "Outlook: crea directamente.",
+        "readOnly": "Outlook: sin permiso de calendario; vuelve a conectar para crear directamente."
+      }
+    },
+    "linkHint": "Sin una cuenta conectada, Nicx abre el evento ya rellenado en el navegador: solo haz clic en Guardar.",
+    "checking": "Verificando...",
+    "serverUnavailable": "Servidor de Nicx no disponible",
+    "saveFailed": "No se pudo guardar el calendario predeterminado",
+    "restartServer": "Reinicia el servidor de Nicx para elegir el calendario"
+  },
   "data": {
     "conversations": "Conversaciones",
     "storedLocally": "Guardadas en este equipo: {{total}}",

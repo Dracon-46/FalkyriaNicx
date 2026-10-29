@@ -29,6 +29,28 @@ agentes, conectores e **Configurações** (inclusive Privacidade). Fechar com
 
 Todos aceitam `--help`.
 
+## Atalho de teclado
+
+Uma combinação de teclas chama o Nicx de qualquer janela. Fica **desligado**
+até você ligar em **Configurações → Atalho de teclado** (ou no `config.toml`):
+
+```toml
+[atalho]
+ativo = true
+teclas = "ctrl+alt+n"   # modificadores + uma tecla
+acao = "flutuante"      # "flutuante": mascote já ouvindo; "app": abre o app
+```
+
+- No app, clique no campo da combinação e aperte as teclas juntas; Esc cancela.
+- Precisa de Ctrl, Alt ou Win. Combinações do sistema ou de uso geral
+  (Ctrl+Alt+Del, Win+L, Alt+Tab, Ctrl+C...) são recusadas.
+- Se a janela já estiver aberta, o atalho só a traz para a frente.
+- Se outro programa já usa a combinação, as Configurações mostram "Em uso por
+  outro programa" e o log do servidor avisa: grave outra.
+- O atalho vive no servidor do Nicx (`nicx serve`/`nicx start`): só funciona
+  com ele ligado. Só no Windows; nos outros sistemas o servidor registra no log
+  que não há suporte.
+
 ## Ações rápidas
 
 Frases que o Nicx executa na hora, sem passar pelo modelo (texto ou voz):
@@ -43,6 +65,7 @@ Frases que o Nicx executa na hora, sem passar pelo modelo (texto ou voz):
 | Lembretes | "me lembra de tirar o bolo em 20 minutos", "me lembra amanhã às 8 de pagar a conta", "timer de 5 minutos", "alarme para as 7 da manhã", "quais meus lembretes", "cancela os lembretes" |
 | Anotações | "anota: comprar pão", "lê minhas anotações", "apaga minhas anotações" |
 | Agenda | "marca reunião com o João sexta às 15h", "agenda dentista dia 30", "o que eu tenho amanhã?", "minha agenda da semana", "desmarca a reunião de sexta", "manda pro calendário do Windows" |
+| Google Agenda e Outlook | "manda pro Google Agenda", "manda a reunião de sexta pro Outlook", "coloca isso no Outlook do trabalho", "manda meus compromissos pro Google Agenda", "marca dentista sexta às 10h no Google Agenda", "manda pro calendário" (vai para o calendário padrão) |
 | Arquivos | "procura o arquivo do contrato", "onde está a planilha de gastos", "abre o PDF do contrato", "abre o último download", "o que tem na pasta downloads" |
 | Fotos | "abre a última foto", "mostra o último print", "abre a foto da praia" |
 | Organizar | "organiza a pasta downloads", "arruma minha área de trabalho" (pede "confirmo"); "desfaz a organização" |
@@ -64,8 +87,49 @@ Desligar, reiniciar e suspender só acontecem por comando direto e com
 confirmação: o modelo de linguagem não tem acesso a eles.
 
 A agenda fica em `~/.nicx/agenda.json` e avisa 15 minutos antes de cada
-compromisso (os de dia todo, às 8h). "Manda pro calendário" gera um arquivo
-`.ics` que o calendário do Windows, o Outlook ou o Google Agenda importam.
+compromisso (os de dia todo, às 8h). Lembretes e avisos saem no idioma em
+que foram pedidos ("Reminder: …" para um pedido em inglês), mesmo que a
+interface mude depois.
+
+### Google Agenda e Outlook
+
+"Manda pro calendário" usa o **calendário padrão**, escolhido em
+Configurações → Calendário (ou `[agenda] calendario_padrao` no
+`config.toml`):
+
+| Valor | O que acontece |
+|---|---|
+| `windows` (padrão) | Gera um `.ics` e abre no calendário do Windows. |
+| `google` | Google Agenda. |
+| `outlook` | Outlook pessoal (outlook.live.com). |
+| `outlook_trabalho` | Outlook de trabalho ou escola (outlook.office.com). |
+
+Dizer o nome ("manda pro Google Agenda", "manda pro Outlook do trabalho")
+vale para aquele pedido. Sem dizer qual, vai o **último compromisso marcado**;
+"manda a reunião de sexta…" manda aquele; "manda meus compromissos…" manda
+todos (no navegador, até 5 abas de cada vez).
+
+Dois caminhos, nesta ordem:
+
+1. **Direto na conta**: com o Google Agenda conectado (Fontes de dados) e
+   permissão de escrita, o evento é criado na agenda principal. No Outlook,
+   só se algum conector tiver guardado um token do Microsoft Graph com
+   `Calendars.ReadWrite` (o conector de e-mail do Outlook usa senha de app e
+   não serve para isso). O id do evento criado fica guardado no compromisso,
+   então pedir de novo não duplica.
+2. **Link pré-preenchido**: sem conta, sem permissão ou sem internet, o
+   navegador abre o evento já preenchido (título, data, hora e fuso
+   `America/Sao_Paulo`); é só clicar em Salvar. Sem fim definido, o evento
+   dura 1 hora.
+
+Quem conectou o Google antes desta versão com permissão só de leitura ouve
+o pedido para reconectar o Google Agenda: a conexão nova já pede
+`calendar.events`. Nada muda para quem não reconectar; o link continua
+funcionando.
+
+"O que eu tenho amanhã?" também mostra os eventos do Google Agenda que o
+conector já sincronizou, marcados com "(Google Agenda)" (só leitura, sem ir à
+internet na hora).
 
 Os arquivos são procurados nas pastas do usuário (Área de Trabalho,
 Documentos, Downloads, Imagens, Vídeos, Músicas e OneDrive), sem entrar em

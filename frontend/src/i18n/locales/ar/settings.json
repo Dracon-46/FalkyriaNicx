@@ -155,6 +155,76 @@
       "stopped": "متوقف"
     }
   },
+  "shortcut": {
+    "title": "اختصار لوحة المفاتيح",
+    "enableLabel": "استدعاء Nicx باختصار",
+    "enableDescription": "اضغط المجموعة في أي نافذة وسيظهر Nicx. على Windows فقط؛ يبقى معطلًا حتى تقوم بتفعيله.",
+    "enableToggle": "تفعيل اختصار لوحة المفاتيح",
+    "keysLabel": "المجموعة",
+    "keysDescription": "انقر ثم اضغط المفاتيح معًا (مثل Ctrl + Alt + N). يلغي Esc التسجيل.",
+    "record": "تسجيل مجموعة أخرى",
+    "recording": "اضغط المفاتيح…",
+    "actionLabel": "عند الضغط",
+    "actionDescription": "ما يفعله الاختصار",
+    "actions": {
+      "flutuante": "فتح التميمة وهي تستمع",
+      "app": "فتح تطبيق Nicx"
+    },
+    "statusLabel": "الحالة",
+    "statusDescription": "إذا كانت النافذة مفتوحة بالفعل، فإن الاختصار يجلبها إلى الأمام فقط.",
+    "states": {
+      "registrado": "مفعّل",
+      "em_uso": "مستخدم من برنامج آخر",
+      "desligado": "معطّل",
+      "sem_suporte": "يعمل على Windows فقط",
+      "invalido": "مجموعة غير صالحة",
+      "erro": "تعذّر التفعيل"
+    },
+    "inUseHint": "يستخدم برنامج آخر هذه المجموعة بالفعل: سجّل مجموعة أخرى.",
+    "errors": {
+      "needModifier": "استخدم Ctrl أو Alt أو Win مع المفتاح.",
+      "unsupportedKey": "لا يمكن استخدام هذا المفتاح في الاختصار.",
+      "reserved": "هذه المجموعة خاصة بالنظام أو شائعة الاستخدام؛ اختر غيرها."
+    },
+    "keyNames": {
+      "space": "مسافة"
+    },
+    "checking": "جارٍ التحقق...",
+    "serverUnavailable": "خادم Nicx غير متاح",
+    "saveFailed": "تعذّر حفظ الاختصار",
+    "restartServer": "أعد تشغيل خادم Nicx لاستخدام الاختصار"
+  },
+  "calendar": {
+    "title": "التقويم",
+    "defaultLabel": "التقويم الافتراضي",
+    "defaultDescription": "إلى أين يذهب \"أرسله إلى التقويم\". يمكنك أيضًا قول الاسم: \"أرسله إلى تقويم Google\"، \"أرسله إلى Outlook\".",
+    "options": {
+      "windows": "تقويم Windows ‏(.ics)",
+      "google": "تقويم Google",
+      "outlook": "Outlook الشخصي (outlook.com)",
+      "outlook_trabalho": "Outlook العمل أو المدرسة (Microsoft 365)"
+    },
+    "accountsLabel": "الإنشاء مباشرة في الحساب",
+    "accounts": {
+      "google": {
+        "none": "تقويم Google: غير متصل.",
+        "unknown": "تقويم Google: متصل (أحاول الإنشاء مباشرة).",
+        "write": "تقويم Google: ينشئ مباشرة.",
+        "readOnly": "تقويم Google: للقراءة فقط؛ أعد الربط للإنشاء مباشرة."
+      },
+      "outlook": {
+        "none": "Outlook: لا يوجد حساب بإذن التقويم.",
+        "unknown": "Outlook: متصل (أحاول الإنشاء مباشرة).",
+        "write": "Outlook: ينشئ مباشرة.",
+        "readOnly": "Outlook: بدون إذن التقويم؛ أعد الربط للإنشاء مباشرة."
+      }
+    },
+    "linkHint": "بدون حساب متصل، يفتح Nicx الحدث معبأً مسبقًا في المتصفح: فقط اضغط حفظ.",
+    "checking": "جارٍ التحقق...",
+    "serverUnavailable": "خادم Nicx غير متاح",
+    "saveFailed": "تعذّر حفظ التقويم الافتراضي",
+    "restartServer": "أعد تشغيل خادم Nicx لاختيار التقويم"
+  },
   "data": {
     "conversations": "المحادثات",
     "storedLocally": "محفوظة على هذا الكمبيوتر: {{total}}",

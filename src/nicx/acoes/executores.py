@@ -16,6 +16,7 @@ from typing import Optional
 from nicx.acoes import (
     agenda,
     arquivos,
+    calendarios,
     confirmacao,
     lembretes,
     notas,
@@ -325,39 +326,71 @@ def agenda_add(action: Action) -> Outcome:
     if all_day:
         day = say_day(event.start_at, now, with_time=False)
         aviso = texto("aviso_8h") if event.reminder_id else ""
-        return Outcome(
-            True, texto("marquei_dia_todo", titulo=event.title, dia=day, aviso=aviso)
-        )
-    aviso = texto("aviso_15min") if event.reminder_id else ""
-    return Outcome(
-        True,
-        texto(
+        message = texto("marquei_dia_todo", titulo=event.title, dia=day, aviso=aviso)
+    else:
+        aviso = texto("aviso_15min") if event.reminder_id else ""
+        message = texto(
             "marquei",
             titulo=event.title,
             quando=say_day(event.start_at, now),
             aviso=aviso,
-        ),
+        )
+    # "marca dentista sexta às 10h no Google Agenda": marca e já manda.
+    if action.site in calendarios.DESTINOS and action.site != "windows":
+        sent = _send([event], action.site)
+        message = f"{message} {sent.message}"
+    return Outcome(True, message)
+
+
+def _day_item(title: str, start: datetime, all_day: bool) -> str:
+    if all_day:
+        return texto("item_dia_todo", titulo=title)
+    return texto(
+        "item_hora",
+        titulo=title,
+        hora=textos.hora_curta(start),
+        a_las="a la" if start.hour == 1 else "a las",
     )
+
+
+def _day_items(day: date) -> list[str]:
+    """Compromissos do dia: os da agenda local e os que os conectores já
+    trouxeram do Google Agenda/Outlook (marcados com a origem)."""
+    events = agenda.on_day(day)
+    items = [
+        (e.all_day, e.start_at, _day_item(e.title, e.start_at, e.all_day))
+        for e in events
+    ]
+    sent = {e.google_id for e in events if e.google_id}
+    sent |= {e.outlook_id for e in events if e.outlook_id}
+    local = {(e.title.casefold(), e.start_at) for e in events}
+    try:
+        remote = calendarios.eventos_conectados(day)
+    except Exception:  # noqa: BLE001 - a agenda local responde sozinha
+        remote = []
+    for r in remote:
+        if (r.remote_id and r.remote_id in sent) or (
+            r.title.casefold(),
+            r.start,
+        ) in local:
+            continue  # o mesmo compromisso que o Nicx mandou
+        origem = texto("cal_google" if r.origem == "google" else "cal_outlook")
+        item = _day_item(r.title, r.start, r.all_day)
+        items.append(
+            (r.all_day, r.start, texto("item_origem", item=item, origem=origem))
+        )
+    # Dia todo primeiro, depois por hora.
+    items.sort(key=lambda i: (not i[0], i[1]))
+    return [text for _all_day, _start, text in items]
 
 
 def agenda_list(action: Action) -> Outcome:
     now = datetime.now()
     if action.op == "dia" and action.when is not None:
-        events = agenda.on_day(action.when.date())
+        parts = _day_items(action.when.date())
         label = say_day(action.when, now, with_time=False)
-        if not events:
+        if not parts:
             return Outcome(True, texto("nada_no_dia", dia=label))
-        parts = [
-            texto("item_dia_todo", titulo=e.title)
-            if e.all_day
-            else texto(
-                "item_hora",
-                titulo=e.title,
-                hora=textos.hora_curta(e.start_at),
-                a_las="a la" if e.start_at.hour == 1 else "a las",
-            )
-            for e in events
-        ]
         return Outcome(
             True,
             texto(
@@ -399,10 +432,75 @@ def agenda_cancel(action: Action) -> Outcome:
     return Outcome(True, texto("desmarquei", evento=_event_line(event, now)))
 
 
-def agenda_export() -> Outcome:
-    events = agenda.upcoming(days=366)
+# Links abertos de uma vez (cada um é uma aba do navegador).
+_MAX_LINKS = 5
+
+
+def _pick_events(action: Action, destino: str) -> Optional[list["agenda.Event"]]:
+    """Os compromissos a mandar; None se o citado não foi achado.
+
+    ``action.site``: "todos" (a agenda inteira), "ultimo" ("isso", "o
+    compromisso": o último marcado) ou vazio. ``action.target``: o
+    compromisso citado ("reuniao sexta").
+    """
+    now = datetime.now()
+    if action.target:
+        query, day = _split_day(action.target)
+        event = agenda.find(query, now, day)
+        return [event] if event is not None else None
+    whole = action.site == "todos" or (destino == "windows" and not action.site)
+    if whole:
+        return agenda.upcoming(now, days=366)
+    last = agenda.last_added(now)
+    return [last] if last is not None else []
+
+
+def _send(events: list["agenda.Event"], destino: str) -> Outcome:
+    """Manda para o Google/Outlook: direto pela API ou pelo link preenchido."""
+    cal = texto("cal_google" if destino == "google" else "cal_outlook")
+    results = [(e, calendarios.enviar(e, destino)) for e in events]
+    links = [(e, r) for e, r in results if r.modo == "link"]
+    for _event, result in links[:_MAX_LINKS]:
+        _start(result.url)
+    created = [e for e, r in results if r.modo == "api"]
+    already = [e for e, r in results if r.modo == "ja_estava"]
+    if len(results) == 1:
+        event, result = results[0]
+        key = {"api": "cal_criado", "ja_estava": "cal_ja_estava"}.get(
+            result.modo, "cal_link"
+        )
+        parts = [texto(key, titulo=event.title, cal=cal)]
+    else:
+        parts = []
+        if created:
+            qtd = contar("compromisso", len(created))
+            parts.append(texto("cal_criados", qtd=qtd, cal=cal))
+        if links:
+            qtd = contar("compromisso", min(len(links), _MAX_LINKS))
+            parts.append(texto("cal_links", qtd=qtd, cal=cal))
+        if not parts and already:
+            parts.append(texto("cal_todos_ja_estavam", cal=cal))
+    if any(r.reconectar for _e, r in results):
+        key = (
+            "cal_reconectar_google" if destino == "google" else "cal_reconectar_outlook"
+        )
+        parts.append(texto(key).strip())
+    return Outcome(True, " ".join(parts))
+
+
+def agenda_export(action: Optional[Action] = None) -> Outcome:
+    """Manda compromissos para o calendário: o do Windows (.ics), o Google
+    Agenda ou o Outlook. Sem destino no pedido, vale o padrão da config."""
+    action = action or Action("agenda_export")
+    destino = action.op if action.op in calendarios.DESTINOS else ""
+    destino = destino or calendarios.calendario_padrao()
+    events = _pick_events(action, destino)
+    if events is None:
+        return Outcome(False, texto("compromisso_nao_achei"))
     if not events:
         return Outcome(True, texto("nada_exportar"))
+    if destino != "windows":
+        return _send(events, destino)
     path = agenda.export_ics(events)
     n = contar("compromisso", len(events))
     if sys.platform != "win32":
@@ -567,7 +665,6 @@ def run(action: Action) -> Optional[Outcome]:
         "notes_clear": notes_clear,
         "status": status,
         "screenshot": screenshot,
-        "agenda_export": agenda_export,
         "organize_undo": organize_undo,
         "confirm": confirm,
         "deny": deny,
@@ -579,6 +676,7 @@ def run(action: Action) -> Optional[Outcome]:
         "agenda_add": agenda_add,
         "agenda_list": agenda_list,
         "agenda_cancel": agenda_cancel,
+        "agenda_export": agenda_export,
         "file_latest": file_latest,
         "file_open": file_open,
         "file_find": file_find,

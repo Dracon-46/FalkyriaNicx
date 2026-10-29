@@ -3,7 +3,8 @@
 O português mora em ``intencoes`` e ``rotinas``; aqui ficam só os pedidos
 mais comuns nos outros três idiomas: hora, data, volume, mídia, abrir app ou
 site, pesquisar, bateria, bloquear a tela, timer, alarme, lembrete simples,
-energia (com confirmação) e desfazer a organização de uma pasta. Como no
+energia (com confirmação), desfazer a organização de uma pasta e mandar a
+agenda para o Google Agenda ou o Outlook ("send it to Google Calendar"). Como no
 português, só a frase inteira vira comando; perguntas vão para o modelo.
 
 Chinês, hindi e árabe não são lidos aqui: vão para o modelo, que responde
@@ -1037,6 +1038,98 @@ def _lembrete(text: str, t: str, where: list[int], lingua: _Lingua) -> Optional[
     return Action("remind", target=what, when=when)
 
 
+# ---------------------------------------------------------------------------
+# Mandar a agenda para o Google Agenda / Outlook
+# ---------------------------------------------------------------------------
+
+# idioma -> (verbo, objeto "tudo", objeto "o último", preposição, calendários)
+# Calendários: (padrão, destino); "" = o padrão da config.
+_ENVIO: dict[str, tuple[str, str, str, str, tuple[tuple[str, str], ...]]] = {
+    "en": (
+        r"(?:send|put|add|export|save)",
+        r"(?:everything|all|all of them|my appointments|my schedule|my agenda"
+        r"|my events|all my appointments|them)",
+        r"(?:it|this|that|the appointment|the meeting|the event|the last one)",
+        r"(?:to|in|into|on)",
+        (
+            (r"(?:my |the )?google calendar", "google"),
+            (
+                r"(?:my |the )?(?:work|office|school) outlook"
+                r"|(?:my |the )?outlook (?:for work|at work|365|calendar for work)",
+                "outlook_trabalho",
+            ),
+            (r"(?:my |the )?outlook(?: calendar)?", "outlook"),
+            (r"(?:my |the )?windows calendar", "windows"),
+            (r"(?:my |the )?calendar", ""),
+        ),
+    ),
+    "es": (
+        r"(?:manda|mandalo|mandala|envia|envialo|enviala|pasa|pasalo|agrega|agregalo"
+        r"|anade|anadelo|pon|ponlo|exporta|guarda)",
+        r"(?:todo|todos|mis citas|mis compromisos|mi agenda|mis eventos)",
+        r"(?:eso|esto|la cita|la reunion|el evento|el compromiso|el ultimo)",
+        r"(?:a|al|en|a la)",
+        (
+            (r"(?:mi |el )?(?:google calendar|calendario de google)", "google"),
+            (
+                r"(?:mi |el )?outlook (?:del trabajo|de la empresa|de la escuela|365)",
+                "outlook_trabalho",
+            ),
+            (r"(?:mi |el )?(?:outlook|calendario de outlook)", "outlook"),
+            (r"(?:mi |el )?calendario de windows", "windows"),
+            (r"(?:mi |el )?calendario", ""),
+        ),
+    ),
+    "fr": (
+        r"(?:envoie|envoyer|mets|mettre|ajoute|ajouter|exporte|enregistre)",
+        r"(?:tout|tous|mes rendez[ -]vous|mon agenda|mes evenements)",
+        r"(?:ca|le|la|ce rendez[ -]vous|le rendez[ -]vous|la reunion|l evenement"
+        r"|le dernier)",
+        r"(?:a|dans|sur|vers)",
+        (
+            (r"(?:mon |le )?google (?:agenda|calendar)", "google"),
+            (
+                r"(?:mon |le )?outlook (?:du travail|pro|professionnel|de l ecole|365)",
+                "outlook_trabalho",
+            ),
+            (r"(?:mon |le )?(?:outlook|calendrier outlook)", "outlook"),
+            (r"(?:mon |le )?calendrier (?:de )?windows", "windows"),
+            (r"(?:mon |le )?(?:calendrier|agenda)", ""),
+        ),
+    ),
+}
+
+
+def _agenda_envio(t: str, codigo: str) -> Optional[Action]:
+    """'send it to Google Calendar', 'manda todo a Outlook', 'envoie ça à
+    Google Agenda': manda o último compromisso (ou todos) para o calendário."""
+    regras = _ENVIO.get(codigo)
+    if regras is None:
+        return None
+    verbo, todos, ultimo, prep, calendarios = regras
+    m = re.fullmatch(
+        verbo
+        + r"(?: (?P<obj>"
+        + todos
+        + "|"
+        + ultimo
+        + r"))? "
+        + prep
+        + r" (?P<cal>.+)",
+        t,
+    )
+    if not m:
+        return None
+    for padrao, destino in calendarios:
+        if re.fullmatch(padrao, m.group("cal")):
+            obj = m.group("obj") or ""
+            site = "todos" if obj and re.fullmatch(todos, obj) else ""
+            if obj and not site:
+                site = "ultimo"
+            return Action("agenda_export", op=destino, site=site)
+    return None
+
+
 def parse(text: str, t: str, where: list[int], codigo: str) -> Optional[Action]:
     """Comando em inglês, espanhol ou francês; None se não for um.
 
@@ -1052,6 +1145,9 @@ def parse(text: str, t: str, where: list[int], codigo: str) -> Optional[Action]:
         action = simples(t, lingua)
         if action is not None:
             return action
+    action = _agenda_envio(t, codigo)
+    if action is not None:
+        return action
     action = _lembrete(text, t, where, lingua)
     if action is not None or len(t) > 80:
         return action

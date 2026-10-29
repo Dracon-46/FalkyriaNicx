@@ -61,6 +61,9 @@ GOOGLE_ALL_SCOPES: List[str] = [
     "https://www.googleapis.com/auth/drive.readonly",
     # calendar (not .readonly) so the proactive agent can accept/decline events.
     "https://www.googleapis.com/auth/calendar",
+    # calendar.events: the agenda creates events ("manda pro Google Agenda").
+    # Redundant with "calendar" today, but keeps working if that one is dropped.
+    "https://www.googleapis.com/auth/calendar.events",
     "https://www.googleapis.com/auth/contacts.readonly",
     # gmail.modify (a superset of gmail.readonly) so the proactive agent
     # can trash and label-modify (archive) emails after user approval.
@@ -537,6 +540,8 @@ def run_oauth_flow(
         "expires_in": tokens.get("expires_in", 3600),
         "client_id": client_id,
         "client_secret": client_secret,
+        # Granted scopes (space-separated): tells read-only tokens apart.
+        "scope": tokens.get("scope", ""),
     }
     save_tokens(credentials_path, token_payload)
 
@@ -730,6 +735,7 @@ def run_connector_oauth(
         "expires_in": tokens.get("expires_in", 3600),
         "client_id": client_id,
         "client_secret": client_secret,
+        "scope": tokens.get("scope", ""),
     }
 
     # Save to all credential files for this provider

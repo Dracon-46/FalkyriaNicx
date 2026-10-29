@@ -257,6 +257,42 @@ _IN_AGENDA = r" (?:na|no) (?:minha |meu )?(?:agenda|calendario)"
 _AGENDA_NOUN = r"(?:um |uma |o |a )?(?:compromisso|reuniao|evento|consulta)\b"
 _WEEK = r"(?:(?:essa|esta|nessa|nesta|da|a|na) )?semana|semana que vem|proxima semana"
 
+# Calendários de fora: "Google Agenda", "Outlook do trabalho", "calendário".
+_CAL_GOOGLE = (
+    r"(?:(?:o |meu )?google (?:agenda|calendar|calendario)"
+    r"|(?:a |minha )?agenda do google|(?:o |meu )?calendario do google)"
+)
+_CAL_OUTLOOK_WORK = (
+    r"(?:(?:o |meu )?(?:calendario do |agenda do )?outlook"
+    r" (?:do trabalho|da empresa|corporativo|da escola|da faculdade|365))"
+)
+_CAL_OUTLOOK = r"(?:(?:o |meu )?(?:calendario|agenda) do outlook|(?:o |meu )?outlook)"
+_CAL_WINDOWS = r"(?:(?:o |meu )?calendario do (?:windows|computador|pc))"
+_CAL_ANY = r"(?:(?:o |meu )?calendario)"
+_CAL_PREP = r"(?:pro|pra|para o|para a|pra o|no|na|ao|a|para)"
+
+
+def _calendar_dest(name: str) -> Optional[str]:
+    """'google agenda' -> 'google'; 'calendario' -> '' (o padrão)."""
+    for pattern, dest in (
+        (_CAL_GOOGLE, "google"),
+        (_CAL_OUTLOOK_WORK, "outlook_trabalho"),
+        (_CAL_OUTLOOK, "outlook"),
+        (_CAL_WINDOWS, "windows"),
+        (_CAL_ANY, ""),
+    ):
+        if re.fullmatch(pattern, name):
+            return dest
+    return None
+
+
+# Destinos que dá para pôr no fim de "marca ... sexta às 10h no Google Agenda".
+_ADD_DEST = (
+    r" (?:no|na|pro|pra|para o|ao) (?P<dest>"
+    + "|".join((_CAL_GOOGLE, _CAL_OUTLOOK_WORK, _CAL_OUTLOOK))
+    + r")$"
+)
+
 
 def _agenda_add(text: str, t: str, where: list[int]) -> Optional[Action]:
     """'marca reunião com o João sexta às 15h', 'agenda dentista dia 30'."""
@@ -265,7 +301,13 @@ def _agenda_add(text: str, t: str, where: list[int]) -> Optional[Action]:
         return None
     start, end = m.start("rest"), len(t)
     in_agenda = bool(m.group("inag"))
-    tail = re.search(_IN_AGENDA + r"$", t[start:])
+    dest = ""
+    dm = re.search(_ADD_DEST, t[start:])
+    if dm:
+        dest = _calendar_dest(dm.group("dest")) or ""
+        in_agenda = True
+        end = start + dm.start()
+    tail = re.search(_IN_AGENDA + r"$", t[start:end])
     if tail:
         in_agenda = True
         end = start + tail.start()
@@ -304,7 +346,13 @@ def _agenda_add(text: str, t: str, where: list[int]) -> Optional[Action]:
     title = original_text(text, where, title_start, title_end)
     if not title:
         return None
-    return Action("agenda_add", target=title, when=when, op="" if has_time else "dia")
+    return Action(
+        "agenda_add",
+        target=title,
+        when=when,
+        op="" if has_time else "dia",
+        site=dest,
+    )
 
 
 def _agenda_day(d: str) -> Optional[Action]:
@@ -367,19 +415,63 @@ def _agenda_cancel(t: str) -> Optional[Action]:
     return Action("agenda_cancel", target=target)
 
 
+_EXPORT_VERB = (
+    r"(?:manda|mande|mandar|envia|envie|enviar|coloca|coloque|colocar|passa|passe"
+    r"|adiciona|adicione|adicionar|exporta|exporte|exportar|salva|salve|joga|bota"
+    r"|poe)"
+)
+# Verbos que também marcam compromisso novo ("coloca dentista sexta às 10h no
+# Google Agenda"): com horário no pedido, é para marcar, não para procurar.
+_ADD_LIKE = r"(?:coloca|coloque|colocar|adiciona|adicione|adicionar|bota|poe)"
+# Quem vai: a agenda inteira, o último marcado ou um compromisso citado.
+_ALL_WORDS = (
+    r"(?:a agenda|minha agenda|a minha agenda|os compromissos|meus compromissos"
+    r"|todos os compromissos|todos(?: eles)?|tudo|eles|a agenda toda)"
+)
+_LAST_WORDS = (
+    r"(?:isso|isto|ele|ela|o compromisso|esse compromisso|este compromisso"
+    r"|o ultimo(?: compromisso)?|essa reuniao|esta reuniao|esse evento|o evento)"
+)
+# "manda um e-mail pro Outlook" não é da agenda.
+_NOT_AGENDA = re.compile(
+    r"(?:(?:um|uma|o|a|os|as|esse|essa|este|esta|meu|minha) )?"
+    r"(?:e[ -]?mails?|mensage(?:m|ns)|msg|arquivos?|fotos?|documentos?|pdfs?|links?"
+    r"|contatos?|tarefas?|notas?|anotac(?:ao|oes)|planilhas?|musicas?)\b"
+)
+
+
 def _agenda_export(t: str) -> Optional[Action]:
-    """'manda pro calendário do Windows', 'coloca meus compromissos no Outlook'."""
-    if re.fullmatch(
-        r"(?:manda|mande|envia|envie|coloca|coloque|passa|passe|adiciona|adicione"
-        r"|exporta|exporte|salva|salve|joga)"
-        r"(?: (?:a agenda|minha agenda|os compromissos|meus compromissos|isso|tudo"
-        r"|eles|o compromisso))?"
-        r" (?:pro|para o|no|ao|pra o)"
-        r" (?:calendario(?: do (?:windows|outlook|computador|pc|google))?|outlook)",
+    """'manda pro calendário do Windows', 'manda pro Google Agenda',
+    'manda a reunião de sexta pro Outlook', 'coloca isso no Outlook do trabalho'."""
+    m = re.fullmatch(
+        _EXPORT_VERB
+        + r"(?: (?P<obj>.+?))? "
+        + _CAL_PREP
+        + r" (?P<cal>(?:o |meu |a |minha )?(?:google|outlook|calendario|agenda do).*)",
         t,
-    ):
-        return Action("agenda_export")
-    return None
+    )
+    if not m:
+        return None
+    dest = _calendar_dest(m.group("cal"))
+    if dest is None:
+        return None
+    obj = (m.group("obj") or "").strip()
+    if not obj:
+        return Action("agenda_export", op=dest)
+    if re.fullmatch(_ALL_WORDS, obj):
+        return Action("agenda_export", op=dest, site="todos")
+    if re.fullmatch(_LAST_WORDS, obj):
+        return Action("agenda_export", op=dest, site="ultimo")
+    if _NOT_AGENDA.match(obj):
+        return None
+    if re.match(_ADD_LIKE + r" ", t):
+        words = obj.split()
+        for i in range(1, len(words)):
+            moment = parse_moment(" ".join(words[i:]))
+            if moment is not None and moment[1]:
+                return None  # fica com _agenda_add
+    query = re.sub(r"^(?:o|a|os|as|meu|minha) ", "", obj)
+    return Action("agenda_export", op=dest, target=query)
 
 
 # ---------------------------------------------------------------------------

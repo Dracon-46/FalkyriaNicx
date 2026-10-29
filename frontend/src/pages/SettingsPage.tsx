@@ -22,6 +22,7 @@ import { LANGUAGES, setLanguage } from '../i18n';
 import { useAppStore, type ThemeMode } from '../lib/store';
 import { NicxMascot } from '../components/Mascot/NicxMascot';
 import { PrivacySection } from '../components/Privacy/PrivacySection';
+import { CalendarSettings } from '../components/Settings/CalendarSettings';
 import {
   checkHealth,
   fetchSpeechHealth,
@@ -41,7 +42,19 @@ import {
   type MemoryStats,
   type WakeStatus,
   WakeUnsupportedError,
+  fetchShortcut,
+  updateShortcut,
+  type ShortcutAction,
+  type ShortcutStatus,
+  ShortcutUnsupportedError,
 } from '../lib/api';
+import {
+  comboFromKeyEvent,
+  formatCombo,
+  formatPending,
+  type ComboError,
+  type Modifier,
+} from '../lib/shortcut';
 
 const CLOUD_KEY_STATUS_CHANGED = 'nicx-cloud-key-status-changed';
 
@@ -389,6 +402,217 @@ export function WakeWordSettings({ onSaved }: { onSaved: () => void }) {
         </SettingRow>
       )}
       {error && (status || unsupported) && (
+        <div className="text-xs mt-2 px-1" style={{ color: 'var(--color-error, #d33)' }}>
+          {error}
+        </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * Campo que grava a combinação: clique, aperte as teclas juntas e solte.
+ * Esc sozinho (ou sair do campo) cancela.
+ */
+export function ShortcutRecorder({
+  value,
+  onChange,
+  disabled = false,
+}: {
+  value: string;
+  onChange: (combo: string) => void;
+  disabled?: boolean;
+}) {
+  const { t } = useTranslation();
+  const [recording, setRecording] = useState(false);
+  const [pending, setPending] = useState<Modifier[]>([]);
+  const [error, setError] = useState<ComboError | null>(null);
+  const names = { space: t('settings.shortcut.keyNames.space') };
+
+  const stop = () => {
+    setRecording(false);
+    setPending([]);
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (!recording) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const result = comboFromKeyEvent(e);
+    if (result.kind === 'pending') {
+      setPending(result.modifiers);
+      return;
+    }
+    if (result.kind === 'cancel') {
+      setError(null);
+      stop();
+      return;
+    }
+    if (result.kind === 'error') {
+      setError(result.reason);
+      setPending([]);
+      return;
+    }
+    setError(null);
+    stop();
+    if (result.combo !== value) onChange(result.combo);
+  };
+
+  const label = recording
+    ? formatPending(pending) || t('settings.shortcut.recording')
+    : formatCombo(value, names);
+
+  return (
+    <div className="flex flex-col items-end gap-1">
+      <button
+        type="button"
+        data-testid="shortcut-recorder"
+        aria-label={t('settings.shortcut.record')}
+        title={t('settings.shortcut.record')}
+        disabled={disabled}
+        onClick={() => {
+          setError(null);
+          setPending([]);
+          setRecording(true);
+        }}
+        onKeyDown={onKeyDown}
+        onKeyUp={(e) => {
+          if (!recording) return;
+          e.preventDefault();
+          // Soltou todos os modificadores sem tecla principal: recomeça.
+          if (!e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) setPending([]);
+        }}
+        onBlur={stop}
+        className="min-w-36 px-3 py-1.5 rounded-lg text-xs font-mono cursor-pointer disabled:cursor-default"
+        style={{
+          background: 'var(--color-bg)',
+          color: 'var(--color-text)',
+          border: `1px solid ${recording ? 'var(--color-accent)' : 'var(--color-border)'}`,
+          opacity: disabled ? 0.5 : 1,
+        }}
+      >
+        {label}
+      </button>
+      {error && (
+        <span className="text-[10px]" role="alert" style={{ color: 'var(--color-error, #d33)' }}>
+          {t(`settings.shortcut.errors.${error}`)}
+        </span>
+      )}
+    </div>
+  );
+}
+
+const SHORTCUT_STATES = ['registrado', 'em_uso', 'desligado', 'sem_suporte', 'invalido', 'erro'];
+
+/** Atalho global de teclado (`[atalho]`): chama o Nicx de qualquer janela. */
+export function ShortcutSettings({ onSaved }: { onSaved: () => void }) {
+  const { t } = useTranslation();
+  const [status, setStatus] = useState<ShortcutStatus | null>(null);
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const refresh = () =>
+      fetchShortcut()
+        .then((s) => {
+          if (cancelled) return;
+          setStatus(s);
+          setError('');
+          timer = setTimeout(refresh, 15000);
+        })
+        .catch((e) => {
+          if (cancelled) return;
+          if (e instanceof ShortcutUnsupportedError) {
+            setError(e.message);
+            return;
+          }
+          setError(t('settings.shortcut.serverUnavailable'));
+          timer = setTimeout(refresh, 15000);
+        });
+    void refresh();
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [t]);
+
+  const change = async (update: { ativo?: boolean; teclas?: string; acao?: ShortcutAction }) => {
+    setSaving(true);
+    setError('');
+    try {
+      setStatus(await updateShortcut(update));
+      onSaved();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t('settings.shortcut.saveFailed'));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const ativo = status?.ativo ?? false;
+  const estado = status?.estado ?? '';
+  const stateLabel = !status
+    ? error || t('settings.shortcut.checking')
+    : SHORTCUT_STATES.includes(estado)
+      ? t(`settings.shortcut.states.${estado}`)
+      : estado;
+  const problem = estado === 'em_uso' || estado === 'erro' || estado === 'invalido';
+  const stateDescription = estado === 'em_uso'
+    ? t('settings.shortcut.inUseHint')
+    : problem
+      ? status?.mensagem
+      : t('settings.shortcut.statusDescription');
+
+  return (
+    <>
+      <SettingRow label={t('settings.shortcut.enableLabel')} description={t('settings.shortcut.enableDescription')}>
+        <Toggle
+          on={ativo}
+          disabled={!status || saving}
+          label={t('settings.shortcut.enableToggle')}
+          onClick={() => void change({ ativo: !ativo })}
+        />
+      </SettingRow>
+      <SettingRow label={t('settings.shortcut.keysLabel')} description={t('settings.shortcut.keysDescription')}>
+        <ShortcutRecorder
+          value={status?.teclas ?? ''}
+          disabled={!status || saving}
+          onChange={(teclas) => void change({ teclas })}
+        />
+      </SettingRow>
+      <SettingRow label={t('settings.shortcut.actionLabel')} description={t('settings.shortcut.actionDescription')}>
+        <select
+          value={status?.acao ?? 'flutuante'}
+          disabled={!status || saving}
+          aria-label={t('settings.shortcut.actionLabel')}
+          onChange={(e) => void change({ acao: e.target.value as ShortcutAction })}
+          className="px-2 py-1 rounded text-xs"
+          style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
+        >
+          <option value="flutuante">{t('settings.shortcut.actions.flutuante')}</option>
+          <option value="app">{t('settings.shortcut.actions.app')}</option>
+        </select>
+      </SettingRow>
+      <SettingRow label={t('settings.shortcut.statusLabel')} description={stateDescription}>
+        <div className="flex items-center gap-2">
+          <span
+            className="w-2 h-2 rounded-full"
+            style={{
+              background: estado === 'registrado'
+                ? 'var(--color-success)'
+                : problem
+                  ? 'var(--color-error, #d33)'
+                  : 'var(--color-text-tertiary)',
+            }}
+          />
+          <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }} data-testid="shortcut-state">
+            {stateLabel}
+          </span>
+        </div>
+      </SettingRow>
+      {error && status && (
         <div className="text-xs mt-2 px-1" style={{ color: 'var(--color-error, #d33)' }}>
           {error}
         </div>
@@ -1057,6 +1281,16 @@ export function SettingsPage() {
                 {t('settings.voice.docsBefore')} <a href="https://github.com/Dracon-46/FalkyriaNicx/blob/main/docs/user-guide/tools.md" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)' }}>{t('settings.voice.docsLink')}</a> {t('settings.voice.docsAfter')}
               </div>
             )}
+          </Section>
+
+          {/* Atalho de teclado */}
+          <Section title={t('settings.shortcut.title')}>
+            <ShortcutSettings onSaved={showSaved} />
+          </Section>
+
+          {/* Calendário: Windows, Google Agenda ou Outlook */}
+          <Section title={t('settings.calendar.title')}>
+            <CalendarSettings onSaved={showSaved} />
           </Section>
 
           {/* Data */}

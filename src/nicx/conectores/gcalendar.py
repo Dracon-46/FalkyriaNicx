@@ -81,6 +81,20 @@ def _gcal_api_event_patch(
     return resp.json()
 
 
+def _gcal_api_event_insert(
+    token: str, calendar_id: str, body: Dict[str, Any]
+) -> Dict[str, Any]:
+    """Create an event (``events.insert``); needs a calendar write scope."""
+    resp = httpx.post(
+        f"{_GCAL_API_BASE}/calendars/{calendar_id}/events",
+        headers={"Authorization": f"Bearer {token}"},
+        json=body,
+        timeout=30.0,
+    )
+    resp.raise_for_status()
+    return resp.json()
+
+
 def _gcal_api_calendars_list(token: str) -> Dict[str, Any]:
     """Call the Calendar ``calendarList.list`` endpoint.
 
@@ -274,7 +288,7 @@ class GCalendarConnector(BaseConnector):
         delete_tokens(self._credentials_path)
 
     def auth_url(self) -> str:
-        """Return a Google OAuth consent URL requesting ``calendar.readonly`` scope."""
+        """Return the Google OAuth consent URL (read + ``calendar.events`` write)."""
         tokens = load_tokens(self._credentials_path)
         client_id = ""
         if tokens:

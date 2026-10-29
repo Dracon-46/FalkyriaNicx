@@ -863,6 +863,8 @@ def create_connectors_router():
             "expires_in": tokens.get("expires_in", 3600),
             "client_id": client_id,
             "client_secret": client_secret,
+            # Escopos concedidos: a agenda sabe se pode criar eventos direto.
+            "scope": tokens.get("scope", ""),
         }
 
         for filename in provider.credential_files:

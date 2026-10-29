@@ -155,6 +155,76 @@
       "stopped": "Arrêtée"
     }
   },
+  "shortcut": {
+    "title": "Raccourci clavier",
+    "enableLabel": "Appeler Nicx avec un raccourci",
+    "enableDescription": "Appuyez sur la combinaison dans n'importe quelle fenêtre et Nicx apparaît. Windows uniquement ; désactivé tant que vous ne l'activez pas.",
+    "enableToggle": "Activer le raccourci clavier",
+    "keysLabel": "Combinaison",
+    "keysDescription": "Cliquez puis appuyez sur les touches ensemble (ex. : Ctrl + Alt + N). Échap annule.",
+    "record": "Enregistrer une autre combinaison",
+    "recording": "Appuyez sur les touches…",
+    "actionLabel": "À l'appui",
+    "actionDescription": "Ce que fait le raccourci",
+    "actions": {
+      "flutuante": "Ouvrir la mascotte à l'écoute",
+      "app": "Ouvrir l'app Nicx"
+    },
+    "statusLabel": "État",
+    "statusDescription": "Si la fenêtre est déjà ouverte, le raccourci la ramène simplement au premier plan.",
+    "states": {
+      "registrado": "Actif",
+      "em_uso": "Utilisé par un autre programme",
+      "desligado": "Désactivé",
+      "sem_suporte": "Fonctionne uniquement sous Windows",
+      "invalido": "Combinaison invalide",
+      "erro": "Impossible de l'activer"
+    },
+    "inUseHint": "Un autre programme utilise déjà cette combinaison : enregistrez-en une autre.",
+    "errors": {
+      "needModifier": "Utilisez Ctrl, Alt ou Win avec la touche.",
+      "unsupportedKey": "Cette touche ne peut pas être utilisée dans le raccourci.",
+      "reserved": "Cette combinaison appartient au système ou est d'usage courant ; choisissez-en une autre."
+    },
+    "keyNames": {
+      "space": "Espace"
+    },
+    "checking": "Vérification...",
+    "serverUnavailable": "Serveur Nicx indisponible",
+    "saveFailed": "Impossible d'enregistrer le raccourci",
+    "restartServer": "Redémarrez le serveur Nicx pour utiliser le raccourci"
+  },
+  "calendar": {
+    "title": "Calendrier",
+    "defaultLabel": "Calendrier par défaut",
+    "defaultDescription": "Où va « envoie-le dans mon calendrier ». Tu peux aussi dire le nom : « envoie ça à Google Agenda », « envoie ça à Outlook ».",
+    "options": {
+      "windows": "Calendrier de Windows (.ics)",
+      "google": "Google Agenda",
+      "outlook": "Outlook personnel (outlook.com)",
+      "outlook_trabalho": "Outlook professionnel ou scolaire (Microsoft 365)"
+    },
+    "accountsLabel": "Créer directement dans le compte",
+    "accounts": {
+      "google": {
+        "none": "Google Agenda : non connecté.",
+        "unknown": "Google Agenda : connecté (j’essaie de créer directement).",
+        "write": "Google Agenda : crée directement.",
+        "readOnly": "Google Agenda : lecture seule ; reconnecte-le pour créer directement."
+      },
+      "outlook": {
+        "none": "Outlook : aucun compte avec l’autorisation d’agenda.",
+        "unknown": "Outlook : connecté (j’essaie de créer directement).",
+        "write": "Outlook : crée directement.",
+        "readOnly": "Outlook : sans autorisation d’agenda ; reconnecte-le pour créer directement."
+      }
+    },
+    "linkHint": "Sans compte connecté, Nicx ouvre l’événement déjà rempli dans le navigateur : il suffit de cliquer sur Enregistrer.",
+    "checking": "Vérification...",
+    "serverUnavailable": "Serveur Nicx indisponible",
+    "saveFailed": "Impossible d’enregistrer le calendrier par défaut",
+    "restartServer": "Redémarre le serveur Nicx pour choisir le calendrier"
+  },
   "data": {
     "conversations": "Conversations",
     "storedLocally": "Enregistrées sur cet ordinateur : {{total}}",

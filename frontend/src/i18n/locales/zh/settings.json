@@ -155,6 +155,76 @@
       "stopped": "已停止"
     }
   },
+  "shortcut": {
+    "title": "键盘快捷键",
+    "enableLabel": "用快捷键呼叫 Nicx",
+    "enableDescription": "在任何窗口按下组合键，Nicx 就会出现。仅限 Windows；在你开启之前保持关闭。",
+    "enableToggle": "开启键盘快捷键",
+    "keysLabel": "组合键",
+    "keysDescription": "点击后同时按下这些键（例如 Ctrl + Alt + N）。按 Esc 取消。",
+    "record": "录制其他组合键",
+    "recording": "请按下按键…",
+    "actionLabel": "按下时",
+    "actionDescription": "快捷键的作用",
+    "actions": {
+      "flutuante": "打开吉祥物并开始聆听",
+      "app": "打开 Nicx 应用"
+    },
+    "statusLabel": "状态",
+    "statusDescription": "如果窗口已经打开，快捷键只会把它带到最前面。",
+    "states": {
+      "registrado": "已启用",
+      "em_uso": "已被其他程序占用",
+      "desligado": "已关闭",
+      "sem_suporte": "仅在 Windows 上可用",
+      "invalido": "组合键无效",
+      "erro": "无法启用"
+    },
+    "inUseHint": "其他程序已在使用此组合键：请录制另一个。",
+    "errors": {
+      "needModifier": "请将 Ctrl、Alt 或 Win 与按键一起使用。",
+      "unsupportedKey": "此按键不能用于快捷键。",
+      "reserved": "此组合键属于系统或被广泛使用；请选择其他组合。"
+    },
+    "keyNames": {
+      "space": "空格"
+    },
+    "checking": "正在检查...",
+    "serverUnavailable": "Nicx 服务器不可用",
+    "saveFailed": "无法保存快捷键",
+    "restartServer": "请重启 Nicx 服务器以使用快捷键"
+  },
+  "calendar": {
+    "title": "日历",
+    "defaultLabel": "默认日历",
+    "defaultDescription": "“发送到日历”会发到这里。也可以直接说名字：“发送到 Google 日历”、“发送到 Outlook”。",
+    "options": {
+      "windows": "Windows 日历 (.ics)",
+      "google": "Google 日历",
+      "outlook": "个人 Outlook (outlook.com)",
+      "outlook_trabalho": "工作或学校 Outlook (Microsoft 365)"
+    },
+    "accountsLabel": "直接在账户中创建",
+    "accounts": {
+      "google": {
+        "none": "Google 日历：未连接。",
+        "unknown": "Google 日历：已连接（会尝试直接创建）。",
+        "write": "Google 日历：直接创建。",
+        "readOnly": "Google 日历：只读；重新连接后可直接创建。"
+      },
+      "outlook": {
+        "none": "Outlook：没有带日历权限的账户。",
+        "unknown": "Outlook：已连接（会尝试直接创建）。",
+        "write": "Outlook：直接创建。",
+        "readOnly": "Outlook：没有日历权限；重新连接后可直接创建。"
+      }
+    },
+    "linkHint": "未连接账户时，Nicx 会在浏览器中打开已填好的活动：点击“保存”即可。",
+    "checking": "正在检查...",
+    "serverUnavailable": "Nicx 服务器不可用",
+    "saveFailed": "无法保存默认日历",
+    "restartServer": "请重启 Nicx 服务器以选择日历"
+  },
   "data": {
     "conversations": "对话",
     "storedLocally": "保存在这台电脑上：{{total}}",

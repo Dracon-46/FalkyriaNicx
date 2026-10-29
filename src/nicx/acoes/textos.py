@@ -154,6 +154,31 @@ _PT = {
     "nada_exportar": "Não há compromissos marcados para mandar.",
     "ics_salvo": "Salvei {qtd} em {caminho}. Abra no seu calendário.",
     "ics_aberto": "Abri {qtd} no calendário do Windows: é só confirmar por lá.",
+    # Google Agenda, Outlook e avisos
+    "o_que_pediu": "o que você pediu",
+    "aviso_lembrete": "Lembrete: {o_que}.",
+    "aviso_timer": "Lembrete: o tempo acabou.",
+    "aviso_alarme": "Lembrete: alarme.",
+    "aviso_atrasado": " (era para {hora}; o Nicx estava desligado)",
+    "aviso_daqui_15": "Daqui a 15 minutos: {titulo}",
+    "aviso_hoje": "Hoje: {titulo}",
+    "cal_google": "Google Agenda",
+    "cal_outlook": "Outlook",
+    "cal_criado": "Pronto: {titulo} já está no {cal}.",
+    "cal_criados": "Pronto: mandei {qtd} para o {cal}.",
+    "cal_ja_estava": "{titulo} já estava no {cal}.",
+    "cal_todos_ja_estavam": "Esses compromissos já estavam no {cal}.",
+    "cal_link": "Abri {titulo} no {cal}: é só clicar em Salvar.",
+    "cal_links": (
+        "Abri {qtd} no {cal}, um em cada aba: é só clicar em Salvar em cada um."
+    ),
+    "cal_reconectar_google": (
+        " Para eu criar direto, reconecte o Google Agenda dando permissão de escrita."
+    ),
+    "cal_reconectar_outlook": (
+        " Para eu criar direto, reconecte o Outlook dando permissão de agenda."
+    ),
+    "item_origem": "{item} ({origem})",
     # Arquivos, organização e YouTube
     "nenhum_arquivo": "Não achei nenhum {nome} nas suas pastas.",
     "nao_achei_nome": 'Não achei {nome} com "{q}" no nome.',
@@ -280,6 +305,28 @@ _EN = {
     "nada_exportar": "There are no appointments to send.",
     "ics_salvo": "Saved {qtd} to {caminho}. Open it in your calendar.",
     "ics_aberto": "Opened {qtd} in the Windows calendar: just confirm there.",
+    "o_que_pediu": "what you asked",
+    "aviso_lembrete": "Reminder: {o_que}.",
+    "aviso_timer": "Reminder: time's up.",
+    "aviso_alarme": "Reminder: alarm.",
+    "aviso_atrasado": " (it was due at {hora}; Nicx was off)",
+    "aviso_daqui_15": "In 15 minutes: {titulo}",
+    "aviso_hoje": "Today: {titulo}",
+    "cal_google": "Google Calendar",
+    "cal_outlook": "Outlook",
+    "cal_criado": "Done: {titulo} is now in {cal}.",
+    "cal_criados": "Done: I sent {qtd} to {cal}.",
+    "cal_ja_estava": "{titulo} was already in {cal}.",
+    "cal_todos_ja_estavam": "Those appointments were already in {cal}.",
+    "cal_link": "I opened {titulo} in {cal}: just click Save.",
+    "cal_links": "I opened {qtd} in {cal}, one per tab: just click Save on each.",
+    "cal_reconectar_google": (
+        " To create it directly, reconnect Google Calendar with write permission."
+    ),
+    "cal_reconectar_outlook": (
+        " To create it directly, reconnect Outlook with calendar permission."
+    ),
+    "item_origem": "{item} ({origem})",
     "nenhum_arquivo": "I couldn't find any {nomes} in your folders.",
     "nao_achei_nome": 'I couldn\'t find a {nome} with "{q}" in the name.',
     "outros_parecidos": "{msg} I also found {n} similar ones.",
@@ -404,6 +451,32 @@ _ES = {
     "nada_exportar": "No hay compromisos para enviar.",
     "ics_salvo": "Guardé {qtd} en {caminho}. Ábrelo en tu calendario.",
     "ics_aberto": "Abrí {qtd} en el calendario de Windows: solo confirma allí.",
+    "o_que_pediu": "lo que pediste",
+    "aviso_lembrete": "Recordatorio: {o_que}.",
+    "aviso_timer": "Recordatorio: se acabó el tiempo.",
+    "aviso_alarme": "Recordatorio: alarma.",
+    "aviso_atrasado": " (era para las {hora}; Nicx estaba apagado)",
+    "aviso_daqui_15": "En 15 minutos: {titulo}",
+    "aviso_hoje": "Hoy: {titulo}",
+    "cal_google": "Google Calendar",
+    "cal_outlook": "Outlook",
+    "cal_criado": "Listo: {titulo} ya está en {cal}.",
+    "cal_criados": "Listo: envié {qtd} a {cal}.",
+    "cal_ja_estava": "{titulo} ya estaba en {cal}.",
+    "cal_todos_ja_estavam": "Esos compromisos ya estaban en {cal}.",
+    "cal_link": "Abrí {titulo} en {cal}: solo haz clic en Guardar.",
+    "cal_links": (
+        "Abrí {qtd} en {cal}, uno por pestaña: solo haz clic en Guardar en cada uno."
+    ),
+    "cal_reconectar_google": (
+        " Para crearlo directamente, vuelve a conectar Google Calendar con permiso de "
+        "escritura."
+    ),
+    "cal_reconectar_outlook": (
+        " Para crearlo directamente, vuelve a conectar Outlook con permiso de "
+        "calendario."
+    ),
+    "item_origem": "{item} ({origem})",
     "nenhum_arquivo": "No encontré {nomes} en tus carpetas.",
     "nao_achei_nome": 'No encontré {nomes} con "{q}" en el nombre.',
     "outros_parecidos": "{msg} Encontré otros {n} parecidos.",
@@ -533,6 +606,34 @@ _FR = {
         "J'ai ouvert {qtd} dans le calendrier de Windows : il suffit de confirmer"
         " là-bas."
     ),
+    "o_que_pediu": "ce que tu as demandé",
+    "aviso_lembrete": "Rappel : {o_que}.",
+    "aviso_timer": "Rappel : le temps est écoulé.",
+    "aviso_alarme": "Rappel : alarme.",
+    "aviso_atrasado": " (c'était prévu à {hora} ; Nicx était éteint)",
+    "aviso_daqui_15": "Dans 15 minutes : {titulo}",
+    "aviso_hoje": "Aujourd'hui : {titulo}",
+    "cal_google": "Google Agenda",
+    "cal_outlook": "Outlook",
+    "cal_criado": "C'est fait : {titulo} est dans {cal}.",
+    "cal_criados": "C'est fait : j'ai envoyé {qtd} dans {cal}.",
+    "cal_ja_estava": "{titulo} était déjà dans {cal}.",
+    "cal_todos_ja_estavam": "Ces rendez-vous étaient déjà dans {cal}.",
+    "cal_link": (
+        "J'ai ouvert {titulo} dans {cal} : il suffit de cliquer sur Enregistrer."
+    ),
+    "cal_links": (
+        "J'ai ouvert {qtd} dans {cal}, un par onglet : il suffit de cliquer sur "
+        "Enregistrer pour chacun."
+    ),
+    "cal_reconectar_google": (
+        " Pour le créer directement, reconnecte Google Agenda avec l'autorisation "
+        "d'écriture."
+    ),
+    "cal_reconectar_outlook": (
+        " Pour le créer directement, reconnecte Outlook avec l'autorisation d'agenda."
+    ),
+    "item_origem": "{item} ({origem})",
     "nenhum_arquivo": "Je n'ai pas trouvé de {nomes} dans tes dossiers.",
     "nao_achei_nome": "Je n'ai pas trouvé de {nomes} avec « {q} » dans le nom.",
     "outros_parecidos": "{msg} J'en ai trouvé {n} autres similaires.",
@@ -654,6 +755,24 @@ _ZH = {
     "nada_exportar": "没有可发送的日程。",
     "ics_salvo": "已把{qtd}保存到 {caminho}。请在你的日历中打开。",
     "ics_aberto": "已在 Windows 日历中打开{qtd}：在那里确认即可。",
+    "o_que_pediu": "你要求的事",
+    "aviso_lembrete": "提醒：{o_que}。",
+    "aviso_timer": "提醒：时间到了。",
+    "aviso_alarme": "提醒：闹钟。",
+    "aviso_atrasado": "（原定 {hora}；当时 Nicx 未运行）",
+    "aviso_daqui_15": "15 分钟后：{titulo}",
+    "aviso_hoje": "今天：{titulo}",
+    "cal_google": "Google 日历",
+    "cal_outlook": "Outlook",
+    "cal_criado": "好了：{titulo} 已添加到 {cal}。",
+    "cal_criados": "好了：已将{qtd}发送到 {cal}。",
+    "cal_ja_estava": "{titulo} 已经在 {cal} 中了。",
+    "cal_todos_ja_estavam": "这些日程已经在 {cal} 中了。",
+    "cal_link": "已在 {cal} 中打开 {titulo}：点击“保存”即可。",
+    "cal_links": "已在 {cal} 中打开{qtd}，每个一个标签页：逐个点击“保存”即可。",
+    "cal_reconectar_google": "如需直接创建，请重新连接 Google 日历并授予写入权限。",
+    "cal_reconectar_outlook": "如需直接创建，请重新连接 Outlook 并授予日历权限。",
+    "item_origem": "{item}（{origem}）",
     "nenhum_arquivo": "在你的文件夹里没找到{nome}。",
     "nao_achei_nome": "没找到名称包含“{q}”的{nome}。",
     "outros_parecidos": "{msg} 另外还找到 {n} 个相似的。",
@@ -772,6 +891,30 @@ _HI = {
     "nada_exportar": "भेजने के लिए कोई कार्यक्रम नहीं है।",
     "ics_salvo": "{qtd} को {caminho} में सेव कर दिया। इसे अपने कैलेंडर में खोलें।",
     "ics_aberto": "{qtd} Windows कैलेंडर में खोल दिए: वहाँ बस पुष्टि करें।",
+    "o_que_pediu": "जो आपने कहा था",
+    "aviso_lembrete": "रिमाइंडर: {o_que}।",
+    "aviso_timer": "रिमाइंडर: समय पूरा हुआ।",
+    "aviso_alarme": "रिमाइंडर: अलार्म।",
+    "aviso_atrasado": " ({hora} बजे का था; Nicx बंद था)",
+    "aviso_daqui_15": "15 मिनट में: {titulo}",
+    "aviso_hoje": "आज: {titulo}",
+    "cal_google": "Google कैलेंडर",
+    "cal_outlook": "Outlook",
+    "cal_criado": "हो गया: {titulo} अब {cal} में है।",
+    "cal_criados": "हो गया: {qtd} {cal} में भेज दिए।",
+    "cal_ja_estava": "{titulo} पहले से {cal} में था।",
+    "cal_todos_ja_estavam": "ये कार्यक्रम पहले से {cal} में थे।",
+    "cal_link": "{titulo} को {cal} में खोल दिया: बस Save पर क्लिक करें।",
+    "cal_links": (
+        "{qtd} को {cal} में खोल दिया, हर एक अलग टैब में: हर एक में Save पर क्लिक करें।"
+    ),
+    "cal_reconectar_google": (
+        " सीधे बनाने के लिए, Google कैलेंडर को लिखने की अनुमति के साथ फिर से कनेक्ट करें।"
+    ),
+    "cal_reconectar_outlook": (
+        " सीधे बनाने के लिए, Outlook को कैलेंडर की अनुमति के साथ फिर से कनेक्ट करें।"
+    ),
+    "item_origem": "{item} ({origem})",
     "nenhum_arquivo": "आपके फ़ोल्डरों में कोई {nome} नहीं मिला।",
     "nao_achei_nome": 'नाम में "{q}" वाला कोई {nome} नहीं मिला।',
     "outros_parecidos": "{msg} {n} और मिलते-जुलते मिले।",
@@ -892,6 +1035,26 @@ _AR = {
     "nada_exportar": "لا توجد مواعيد لإرسالها.",
     "ics_salvo": "حفظت {qtd} في {caminho}. افتحه في تقويمك.",
     "ics_aberto": "فتحت {qtd} في تقويم Windows: فقط أكّد هناك.",
+    "o_que_pediu": "ما طلبته",
+    "aviso_lembrete": "تذكير: {o_que}.",
+    "aviso_timer": "تذكير: انتهى الوقت.",
+    "aviso_alarme": "تذكير: المنبه.",
+    "aviso_atrasado": " (كان موعده {hora}؛ كان Nicx مطفأً)",
+    "aviso_daqui_15": "بعد 15 دقيقة: {titulo}",
+    "aviso_hoje": "اليوم: {titulo}",
+    "cal_google": "تقويم Google",
+    "cal_outlook": "Outlook",
+    "cal_criado": "تم: أصبح {titulo} في {cal}.",
+    "cal_criados": "تم: أرسلت {qtd} إلى {cal}.",
+    "cal_ja_estava": "{titulo} موجود بالفعل في {cal}.",
+    "cal_todos_ja_estavam": "هذه المواعيد موجودة بالفعل في {cal}.",
+    "cal_link": "فتحت {titulo} في {cal}: فقط اضغط حفظ.",
+    "cal_links": (
+        "فتحت {qtd} في {cal}، كل واحد في علامة تبويب: فقط اضغط حفظ في كل منها."
+    ),
+    "cal_reconectar_google": " لإنشائه مباشرة، أعد ربط تقويم Google مع إذن الكتابة.",
+    "cal_reconectar_outlook": " لإنشائه مباشرة، أعد ربط Outlook مع إذن التقويم.",
+    "item_origem": "{item} ({origem})",
     "nenhum_arquivo": "لم أجد أي {nome} في مجلداتك.",
     "nao_achei_nome": 'لم أجد {nome} باسم يحتوي على "{q}".',
     "outros_parecidos": "{msg} وجدت {n} أخرى مشابهة.",

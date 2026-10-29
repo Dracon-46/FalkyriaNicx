@@ -155,6 +155,76 @@
       "stopped": "Stopped"
     }
   },
+  "shortcut": {
+    "title": "Keyboard shortcut",
+    "enableLabel": "Call Nicx with a shortcut",
+    "enableDescription": "Press the combination in any window and Nicx shows up. Windows only; off until you turn it on.",
+    "enableToggle": "Turn on the keyboard shortcut",
+    "keysLabel": "Combination",
+    "keysDescription": "Click and press the keys together (e.g. Ctrl + Alt + N). Esc cancels.",
+    "record": "Record another combination",
+    "recording": "Press the keys…",
+    "actionLabel": "When pressed",
+    "actionDescription": "What the shortcut does",
+    "actions": {
+      "flutuante": "Open the mascot, listening",
+      "app": "Open the Nicx app"
+    },
+    "statusLabel": "Status",
+    "statusDescription": "If the window is already open, the shortcut just brings it to the front.",
+    "states": {
+      "registrado": "Active",
+      "em_uso": "In use by another program",
+      "desligado": "Off",
+      "sem_suporte": "Only works on Windows",
+      "invalido": "Invalid combination",
+      "erro": "Could not turn it on"
+    },
+    "inUseHint": "Another program already uses this combination: record a different one.",
+    "errors": {
+      "needModifier": "Use Ctrl, Alt or Win together with the key.",
+      "unsupportedKey": "This key cannot be used in the shortcut.",
+      "reserved": "This combination belongs to the system or is widely used; choose another."
+    },
+    "keyNames": {
+      "space": "Space"
+    },
+    "checking": "Checking...",
+    "serverUnavailable": "Nicx server unavailable",
+    "saveFailed": "Could not save the shortcut",
+    "restartServer": "Restart the Nicx server to use the shortcut"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "defaultLabel": "Default calendar",
+    "defaultDescription": "Where \"send it to my calendar\" goes. You can also say the name: \"send it to Google Calendar\", \"send it to Outlook\".",
+    "options": {
+      "windows": "Windows calendar (.ics)",
+      "google": "Google Calendar",
+      "outlook": "Personal Outlook (outlook.com)",
+      "outlook_trabalho": "Work or school Outlook (Microsoft 365)"
+    },
+    "accountsLabel": "Create directly in the account",
+    "accounts": {
+      "google": {
+        "none": "Google Calendar: not connected.",
+        "unknown": "Google Calendar: connected (I try to create directly).",
+        "write": "Google Calendar: creates directly.",
+        "readOnly": "Google Calendar: read-only; reconnect to create directly."
+      },
+      "outlook": {
+        "none": "Outlook: no account with calendar permission.",
+        "unknown": "Outlook: connected (I try to create directly).",
+        "write": "Outlook: creates directly.",
+        "readOnly": "Outlook: no calendar permission; reconnect to create directly."
+      }
+    },
+    "linkHint": "Without a connected account, Nicx opens the event already filled in your browser: just click Save.",
+    "checking": "Checking...",
+    "serverUnavailable": "Nicx server unavailable",
+    "saveFailed": "Could not save the default calendar",
+    "restartServer": "Restart the Nicx server to choose the calendar"
+  },
   "data": {
     "conversations": "Conversations",
     "storedLocally": "Stored on this computer: {{total}}",

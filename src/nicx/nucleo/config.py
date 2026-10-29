@@ -1690,6 +1690,38 @@ class SpeechConfig:
 
 
 @dataclass(slots=True)
+class AtalhoConfig:
+    """Atalho global de teclado que chama o Nicx de qualquer janela.
+
+    Desligado por padrão: só o usuário liga (Configurações do app ou
+    ``[atalho] ativo = true``). Funciona só no Windows; a combinação é validada
+    em :mod:`nicx.atalho.teclas` quando o servidor sobe ou o app salva.
+    """
+
+    ativo: bool = False
+    # Modificadores + uma tecla, em minúsculas: "ctrl+alt+n", "ctrl+shift+space".
+    teclas: str = "ctrl+alt+n"
+    # "flutuante": mascote flutuante já ouvindo; "app": abre/foca o app.
+    acao: str = "flutuante"
+
+
+@dataclass(slots=True)
+class AgendaConfig:
+    """Para onde "manda pro calendário" leva os compromissos da agenda.
+
+    ``"windows"`` (padrão) gera um .ics e abre no calendário do PC;
+    ``"google"`` abre o Google Agenda; ``"outlook"`` o Outlook pessoal
+    (outlook.live.com) e ``"outlook_trabalho"`` o de trabalho/escola
+    (outlook.office.com). Com a conta conectada e permissão de escrita, o
+    evento é criado direto; senão abre no navegador já preenchido.
+    """
+
+    calendario_padrao: str = "windows"
+    # Fuso dos horários enviados ao Google/Outlook (os da agenda são locais).
+    fuso: str = "America/Sao_Paulo"
+
+
+@dataclass(slots=True)
 class OptimizeConfig:
     """Configuration optimization settings."""
 
@@ -1843,6 +1875,8 @@ class NicxConfig:
     a2a: A2AConfig = field(default_factory=A2AConfig)
     operators: OperatorsConfig = field(default_factory=OperatorsConfig)
     speech: SpeechConfig = field(default_factory=SpeechConfig)
+    atalho: AtalhoConfig = field(default_factory=AtalhoConfig)
+    agenda: AgendaConfig = field(default_factory=AgendaConfig)
     optimize: OptimizeConfig = field(default_factory=OptimizeConfig)
     agent_manager: AgentManagerConfig = field(default_factory=AgentManagerConfig)
     memory_files: MemoryFilesConfig = field(default_factory=MemoryFilesConfig)
@@ -2130,6 +2164,8 @@ def load_config(path: Optional[Path] = None) -> NicxConfig:
             "a2a",
             "operators",
             "speech",
+            "atalho",
+            "agenda",
             "optimize",
             "agent_manager",
             "digest",
@@ -2466,6 +2502,7 @@ __all__ = [
     "AgentManagerConfig",
     "OperatorsConfig",
     "AgentLearningConfig",
+    "AtalhoConfig",
     "BlueBubblesChannelConfig",
     "BrowserConfig",
     "CapabilitiesConfig",

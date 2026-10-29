@@ -12,7 +12,9 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from nicx.servidor.rotas.agenda import router as agenda_router
 from nicx.servidor.rotas.api import include_all_routes
+from nicx.servidor.rotas.atalho import router as atalho_router
 from nicx.servidor.rotas.briefing import create_digest_router
 from nicx.servidor.rotas.chat import router
 from nicx.servidor.rotas.comparacao import comparison_router
@@ -484,7 +486,29 @@ def create_app(
     app.include_router(research_router)
     app.include_router(analytics_router)
     app.include_router(wake_router)
+    app.include_router(atalho_router)
+    app.include_router(agenda_router)
     include_all_routes(app)
+
+    # Atalho global de teclado ([atalho]): sobe e desce com o servidor. Só faz
+    # algo se o usuário ligou; um problema vira estado na API, nunca um erro.
+    from nicx.atalho.servico import GerenciadorAtalho
+
+    app.state.atalho = GerenciadorAtalho()
+
+    @app.on_event("startup")
+    async def _iniciar_atalho() -> None:
+        cfg = getattr(app.state, "config", None)
+        atalho_cfg = getattr(cfg, "atalho", None)
+        if atalho_cfg is None or not getattr(atalho_cfg, "ativo", False):
+            return
+        import asyncio
+
+        await asyncio.to_thread(app.state.atalho.aplicar, atalho_cfg)
+
+    @app.on_event("shutdown")
+    async def _parar_atalho() -> None:
+        app.state.atalho.parar()
 
     # Restore SendBlue channel bindings from database on startup
     _restore_sendblue_bindings(app)

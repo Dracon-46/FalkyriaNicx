@@ -167,18 +167,29 @@ class AgendaTool(BaseTool):
             name="agenda",
             description=(
                 "Agenda do usuário neste PC: marcar compromisso (avisa 15 min antes),"
-                " ver o que tem num dia, desmarcar, mandar para o calendário."
+                " ver o que tem num dia, desmarcar, mandar para o calendário"
+                " (Windows, Google Agenda ou Outlook)."
             ),
             parameters={
                 "type": "object",
                 "properties": {
                     "acao": {
                         "type": "string",
-                        "enum": ["marcar", "ver", "desmarcar", "exportar"],
+                        "enum": [
+                            "marcar",
+                            "ver",
+                            "desmarcar",
+                            "exportar",
+                            "mandar_google",
+                            "mandar_outlook",
+                        ],
                     },
                     "titulo": {
                         "type": "string",
-                        "description": "marcar: o compromisso; desmarcar: como achar",
+                        "description": (
+                            "marcar: o compromisso; desmarcar/mandar_*: como achar"
+                            " (vazio = o último marcado)"
+                        ),
                     },
                     "quando": {
                         "type": "string",
@@ -221,6 +232,16 @@ class AgendaTool(BaseTool):
             action = Action("agenda_cancel", target=normalize(f"{titulo} {quando}"))
         elif acao == "exportar":
             action = Action("agenda_export")
+        elif acao in ("mandar_google", "mandar_outlook"):
+            # Com título: aquele compromisso; sem: o último marcado.
+            dest = "google" if acao == "mandar_google" else "outlook"
+            if dest == "outlook":
+                from nicx.acoes.calendarios import calendario_padrao
+
+                if calendario_padrao() == "outlook_trabalho":
+                    dest = "outlook_trabalho"
+            target = normalize(f"{titulo} {quando}")
+            action = Action("agenda_export", op=dest, target=target, site="ultimo")
         else:
             return ToolResult(self.tool_id, f"Ação desconhecida: {acao}", False)
         outcome = run(action)

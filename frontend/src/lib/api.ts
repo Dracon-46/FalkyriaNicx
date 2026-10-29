@@ -547,6 +547,109 @@ export function __resetWakeSupportForTests(): void {
 }
 
 // ---------------------------------------------------------------------------
+// Atalho global de teclado ([atalho] no config.toml)
+// ---------------------------------------------------------------------------
+
+export type ShortcutAction = 'flutuante' | 'app';
+
+export interface ShortcutStatus {
+  ativo: boolean;
+  /** Forma gravada: "ctrl+alt+n". */
+  teclas: string;
+  /** Forma mostrada: "Ctrl + Alt + N". */
+  rotulo: string;
+  acao: ShortcutAction;
+  /** "registrado", "em_uso", "desligado", "sem_suporte", "invalido" ou "erro". */
+  estado: string;
+  mensagem: string;
+  suportado: boolean;
+}
+
+/** The running server has no `/v1/atalho` (it needs a restart). */
+export class ShortcutUnsupportedError extends Error {
+  constructor() {
+    super(i18n.t('settings.shortcut.restartServer'));
+    this.name = 'ShortcutUnsupportedError';
+  }
+}
+
+async function shortcutResponse(res: Response): Promise<ShortcutStatus> {
+  if (res.status === 404 || res.status === 405) throw new ShortcutUnsupportedError();
+  if (!res.ok) {
+    let detail = '';
+    try {
+      detail = (await res.json())?.detail ?? '';
+    } catch {
+      // Status-only message below.
+    }
+    throw new Error(detail || i18n.t('settings.shortcut.saveFailed'));
+  }
+  return res.json();
+}
+
+export async function fetchShortcut(): Promise<ShortcutStatus> {
+  return shortcutResponse(await apiFetch(`/v1/atalho`));
+}
+
+export async function updateShortcut(change: {
+  ativo?: boolean;
+  teclas?: string;
+  acao?: ShortcutAction;
+}): Promise<ShortcutStatus> {
+  return shortcutResponse(
+    await apiFetch(`/v1/atalho`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(change),
+    }),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Agenda: calendário padrão de "manda pro calendário" ([agenda] no config.toml)
+// ---------------------------------------------------------------------------
+
+export type CalendarTarget = 'windows' | 'google' | 'outlook' | 'outlook_trabalho';
+
+export interface CalendarConfig {
+  calendario_padrao: CalendarTarget;
+  opcoes: CalendarTarget[];
+  google_conectado: boolean;
+  /** null: connected, but the granted scopes are unknown until it tries. */
+  google_escrita: boolean | null;
+  outlook_conectado: boolean;
+  outlook_escrita: boolean | null;
+}
+
+/** The running server has no `/v1/agenda` (it needs a restart). */
+export class CalendarUnsupportedError extends Error {
+  constructor() {
+    super(i18n.t('settings.calendar.restartServer'));
+    this.name = 'CalendarUnsupportedError';
+  }
+}
+
+async function calendarResponse(res: Response): Promise<CalendarConfig> {
+  if (res.status === 404 || res.status === 405) throw new CalendarUnsupportedError();
+  if (!res.ok) throw new Error(i18n.t('settings.calendar.saveFailed'));
+  return res.json();
+}
+
+export async function fetchCalendarConfig(): Promise<CalendarConfig> {
+  return calendarResponse(await apiFetch(`/v1/agenda/config`));
+}
+
+export async function updateCalendarConfig(target: CalendarTarget): Promise<CalendarConfig> {
+  return calendarResponse(
+    await apiFetch(`/v1/agenda/config`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ calendario_padrao: target }),
+    }),
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Agent Manager
 // ---------------------------------------------------------------------------
 

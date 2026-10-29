@@ -15,6 +15,13 @@ NOW = datetime(2026, 10, 28, 9, 0)  # uma quarta-feira
 @pytest.fixture(autouse=True)
 def nicx_home(tmp_path, monkeypatch):
     monkeypatch.setenv("NICX_HOME", str(tmp_path / "home"))
+    # "manda pro calendário" segue o padrão da config: aqui, o do Windows.
+    from types import SimpleNamespace
+
+    from nicx.acoes import calendarios
+
+    cfg = SimpleNamespace(calendario_padrao="windows", fuso="America/Sao_Paulo")
+    monkeypatch.setattr(calendarios, "_config_agenda", lambda: cfg)
     return tmp_path / "home"
 
 
