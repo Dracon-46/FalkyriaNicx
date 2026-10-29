@@ -1,7 +1,7 @@
 """ABC for inference engine backends.
 
-Adapted from IPW's ``InferenceClient`` at ``src/ipw/clients/base.py``.
-Phase 1 will provide concrete implementations (vLLM, Ollama, etc.).
+Concrete implementations live in this package (Ollama, OpenAI-compatible,
+cloud and others).
 """
 
 from __future__ import annotations

@@ -4,8 +4,6 @@
 async-only APIs — Apple's Foundation Models SDK is one. This bridges the two
 without an ``asyncio.run`` per call, which would tear down and rebuild a loop
 for every request and break SDKs holding loop-bound state.
-
-Ported from IPW's ``ipw/clients/_async_loop.py``.
 """
 
 from __future__ import annotations

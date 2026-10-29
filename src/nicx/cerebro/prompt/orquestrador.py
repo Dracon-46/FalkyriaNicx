@@ -1,6 +1,6 @@
 """Prompt registry for orchestrator structured mode.
 
-Adapted from IPW's ``prompt_registry.py``.  Provides the canonical system
+Provides the canonical system
 prompt template and tool descriptions used by the structured-mode
 ``OrchestratorAgent`` and by the SFT/GRPO training pipelines.
 """

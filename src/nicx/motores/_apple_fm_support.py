@@ -3,8 +3,6 @@
 Deliberately free of any ``apple_fm_sdk`` import so this logic stays testable
 on CI runners that cannot install the SDK — it builds Swift bindings and needs
 a full Xcode on an Apple Silicon Mac, and Nicx has no macOS runner.
-
-Ported from IPW's ``ipw/clients/_afm_support.py``.
 """
 
 from __future__ import annotations

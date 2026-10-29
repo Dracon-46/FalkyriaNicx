@@ -1,6 +1,6 @@
 """Thread-safe pub/sub event bus for inter-primitive telemetry.
 
-Extends IPW's ``EventRecorder`` into a full publish/subscribe system so that
+A full publish/subscribe system so that
 any primitive can emit events (e.g. ``INFERENCE_END``) and any other primitive can
 react without direct coupling.
 """

@@ -1,6 +1,6 @@
 """Decorator-based registry for runtime discovery of pluggable components.
 
-Adapted from IPW's ``src/ipw/core/registry.py``.  Each typed subclass gets its
+Each typed subclass gets its
 own isolated storage so registrations in one registry never leak into another.
 """
 
