@@ -217,11 +217,11 @@ temperature = 0.7
         result = CliRunner().invoke(cli, ["config", "show", "invalid_subcommand_xyz"])
         # Should show error about unknown command
         assert result.exit_code != 0
-        assert "no such" in result.output.lower() or "unknown" in result.output.lower()
+        assert "existe o comando" in result.output.lower()
 
     def test_config_subcommands_not_available_standalone(self) -> None:
         """Test that config subcommands are not available directly under config."""
         # These should not be available as direct children of config
         result = CliRunner().invoke(cli, ["config", "loaded"])
         assert result.exit_code != 0
-        assert "no such" in result.output.lower() or "unknown" in result.output.lower()
+        assert "existe o comando" in result.output.lower()

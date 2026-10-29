@@ -7,6 +7,7 @@ import sys
 import click
 
 import nicx
+import nicx.comandos._click_pt  # noqa: F401  (textos do Click em PT; antes dos decoradores)
 from nicx.comandos.instalacao.scan import scan
 
 

@@ -90,9 +90,9 @@ def test_memory_index_rejects_non_progress_chunk_values(tmp_path: Path):
     )
 
     assert zero_size.exit_code != 0
-    assert "0 is not in the range x>=1" in zero_size.output
+    assert "0 est" in zero_size.output and "fora do intervalo x>=1" in zero_size.output
     assert negative_overlap.exit_code != 0
-    assert "-1 is not in the range x>=0" in negative_overlap.output
+    assert "fora do intervalo x>=0" in negative_overlap.output
 
 
 def test_memory_search_returns_results(tmp_path: Path, monkeypatch):
