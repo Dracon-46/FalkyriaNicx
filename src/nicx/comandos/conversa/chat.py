@@ -43,15 +43,15 @@ def _read_input(prompt: str = "You> ") -> Optional[str]:
 
 
 @click.command()
-@click.option("-e", "--engine", "engine_key", default=None, help="Engine backend.")
+@click.option("-e", "--engine", "engine_key", default=None, help="Motor de inferência.")
 @click.option(
     "-m",
     "--model",
     "model_name",
     default=None,
     help=(
-        "Model id. Omit or use ``smart`` for preset: [intelligence] model_chat / "
-        "model_short / model_long / model_code, then default_model."
+        'ID do modelo. Omita ou use "smart" para o padrão: [intelligence] model_chat '
+        "/ model_short / model_long / model_code e, por fim, default_model."
     ),
 )
 @click.option(
@@ -60,20 +60,24 @@ def _read_input(prompt: str = "You> ") -> Optional[str]:
     is_flag=True,
     default=False,
     help=(
-        "Show the model list before chat. Bare ``nicx`` already does this on a TTY "
-        "unless NICX_SKIP_MODEL_PICK=1."
+        'Mostra a lista de modelos antes da conversa. O "nicx" sozinho já faz isso '
+        "no terminal, a menos que NICX_SKIP_MODEL_PICK=1."
     ),
 )
-@click.option("-a", "--agent", "agent_name", default=None, help="Agent type.")
-@click.option("--tools", default=None, help="Comma-separated tool names.")
-@click.option("--system", "system_prompt", default=None, help="Custom system prompt.")
+@click.option("-a", "--agent", "agent_name", default=None, help="Tipo de agente.")
+@click.option(
+    "--tools", default=None, help="Nomes das ferramentas, separados por vírgula."
+)
+@click.option(
+    "--system", "system_prompt", default=None, help="Prompt de sistema personalizado."
+)
 @click.option(
     "--persona",
     "persona_name",
     default=None,
     help=(
-        "Named persona dir under ~/.nicx/personas/<name>/ "
-        "(overrides config). Pass 'none' to disable all persona files."
+        "Persona salva em ~/.nicx/personas/<nome>/ (vale mais que a configuração). Use "
+        "'none' para desligar os arquivos de persona."
     ),
 )
 @click.option(
@@ -81,7 +85,7 @@ def _read_input(prompt: str = "You> ") -> Optional[str]:
     "voice_mode",
     is_flag=True,
     default=False,
-    help="Enable voice I/O: mic input with silence detection + TTS response playback.",
+    help="Liga a voz: você fala pelo microfone e ouve as respostas.",
 )
 @runtime_cli_options
 def chat(
@@ -97,23 +101,24 @@ def chat(
     num_gpu: int | None,
     skip_runtime_panel: bool,
 ) -> None:
-    """Start an interactive multi-turn chat session.
+    """Abre uma conversa com o Nicx no terminal.
 
-    Model: omit ``-m`` to use ``[intelligence] model_chat`` if set, else
-    ``default_model``; ``-m smart`` is the same. Use ``--pick-model`` to open the
-    engine list first (bare ``nicx`` does this on a TTY unless
-    ``NICX_SKIP_MODEL_PICK=1``).
+    Modelo: sem -m, usa o [intelligence] model_chat, se existir, ou o
+    default_model; -m smart faz o mesmo. --pick-model mostra antes a lista
+    de modelos (o "nicx" sozinho já faz isso no terminal, a menos que
+    NICX_SKIP_MODEL_PICK=1).
 
-    Commands during chat:
-      /quit, /exit  — end session
-      /clear        — clear conversation history
-      /model        — show current model
-      /runtime      — Ollama context + GPU offload for this session
-      /help         — show available commands
-      /history      — show conversation history
+    \b
+    Comandos durante a conversa:
+      /quit, /exit  — encerra a conversa
+      /clear        — apaga o histórico da conversa
+      /model        — mostra o modelo atual
+      /runtime      — contexto do Ollama e uso da GPU nesta sessão
+      /help         — mostra os comandos
+      /history      — mostra o histórico da conversa
 
-    Pass --voice to use microphone input (silence-detection) and hear responses
-    read back via text-to-speech (kokoro local or OpenAI TTS).
+    Com --voice você fala pelo microfone (ele percebe quando você para de
+    falar) e ouve as respostas em voz.
     """
     console = Console(stderr=True)
 
@@ -181,7 +186,7 @@ def chat(
 
     if engine_name != "ollama" and (num_ctx is not None or num_gpu is not None):
         raise click.UsageError(
-            "--num-ctx and --num-gpu are supported only with --engine ollama"
+            "--num-ctx e --num-gpu só funcionam com --engine ollama."
         )
     if engine_name == "ollama" and tty_wants_runtime_panel(skip_runtime_panel):
         runtime_opts = interactive_pick_runtime_options(

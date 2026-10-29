@@ -9,7 +9,7 @@ from rich.console import Console
 from rich.table import Table
 
 _CHANNEL_TYPE_HELP = (
-    "Channel type (sendblue, telegram, discord, slack, webhook, email, "
+    "Tipo de canal (sendblue, telegram, discord, slack, webhook, email, "
     "whatsapp, whatsapp_baileys, signal, google_chat, irc, webchat, teams, "
     "matrix, mattermost, feishu, bluebubbles)."
 )
@@ -30,8 +30,8 @@ def _get_channel(
     key = channel_type or config.channel.default_channel
     if not key:
         raise click.ClickException(
-            "No channel type specified. Use --channel-type or set "
-            "default_channel in [channel] config."
+            "Nenhum tipo de canal informado. Use --channel-type ou defina "
+            "default_channel na seção [channel] da configuração."
         )
 
     kwargs: Dict[str, Any] = {}
@@ -150,14 +150,14 @@ def _get_channel(
                 kwargs["from_number"] = sbc.from_number
 
     if not ChannelRegistry.contains(key):
-        raise click.ClickException(f"Unknown channel type: {key}")
+        raise click.ClickException(f"Tipo de canal desconhecido: {key}")
 
     return ChannelRegistry.create(key, **kwargs)
 
 
 @click.group()
 def channel() -> None:
-    """Manage messaging channels."""
+    """Gerencia os canais de mensagens."""
 
 
 @channel.command("list")
@@ -169,7 +169,7 @@ def channel() -> None:
 def channel_list(
     channel_type: Optional[str],
 ) -> None:
-    """List available channels."""
+    """Lista os canais disponíveis."""
     console = Console()
     from nicx.nucleo.config import load_config
 
@@ -211,7 +211,7 @@ def channel_send(
     message: str,
     channel_type: Optional[str],
 ) -> None:
-    """Send a message to a channel."""
+    """Envia uma mensagem para um canal."""
     console = Console()
     from nicx.nucleo.config import load_config
 
@@ -241,7 +241,7 @@ def channel_send(
 def channel_status(
     channel_type: Optional[str],
 ) -> None:
-    """Show channel connection status."""
+    """Mostra o estado da conexão dos canais."""
     console = Console()
     from nicx.nucleo.config import load_config
 

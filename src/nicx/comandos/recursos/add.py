@@ -68,31 +68,32 @@ _MCP_TEMPLATES = {
 
 @click.command()
 @click.argument("server_name")
-@click.option("--key", default=None, help="API key or token for the server.")
+@click.option("--key", default=None, help="Chave de API ou token do servidor.")
 @click.option(
     "--args",
     "extra_args",
     default=None,
-    help="Additional arguments (comma-separated).",
+    help="Argumentos extras (separados por vírgula).",
 )
 def add(server_name: str, key: str | None, extra_args: str | None) -> None:
-    """Add an MCP server configuration.
+    """Adiciona a configuração de um servidor MCP.
 
-    Quick setup for common MCP servers:
+    Atalhos para os servidores MCP mais comuns:
 
+    \b
       nicx add github --key TOKEN
       nicx add filesystem
       nicx add slack --key TOKEN
 
-    Known servers: github, filesystem, slack, postgres, brave-search,
-    memory, puppeteer, google-maps
+    Servidores conhecidos: github, filesystem, slack, postgres, brave-search,
+    memory, puppeteer, google-maps.
     """
     console = Console(stderr=True)
 
     template = _MCP_TEMPLATES.get(server_name)
     if template is None:
-        console.print(f"[red]Unknown MCP server: {server_name}[/red]")
-        console.print("[dim]Known servers:[/dim]")
+        console.print(f"[red]Servidor MCP desconhecido: {server_name}[/red]")
+        console.print("[dim]Servidores conhecidos:[/dim]")
         for name, tmpl in _MCP_TEMPLATES.items():
             console.print(f"  [cyan]{name}[/cyan] — {tmpl['description']}")
         sys.exit(1)

@@ -69,4 +69,4 @@ class TestVaultCmd:
         ):
             result = CliRunner().invoke(vault, ["remove", "nonexistent"])
             assert result.exit_code == 0
-            assert "not found" in result.output.lower()
+            assert "não encontrada" in result.output.lower()

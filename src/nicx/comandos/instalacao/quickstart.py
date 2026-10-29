@@ -81,9 +81,11 @@ def _test_query(engine_key: str) -> str:
 
 
 @click.command()
-@click.option("--force", is_flag=True, help="Redo all steps even if already done.")
+@click.option(
+    "--force", is_flag=True, help="Refaz todos os passos, mesmo os já feitos."
+)
 def quickstart(force: bool) -> None:
-    """Guided 5-step setup for new users."""
+    """Configuração guiada em 5 passos para quem está começando."""
     console = Console()
 
     # Step 1: Detect hardware

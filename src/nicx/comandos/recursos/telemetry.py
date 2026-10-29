@@ -22,7 +22,7 @@ def _get_aggregator() -> TelemetryAggregator:
 
 @click.group()
 def telemetry() -> None:
-    """Query and manage inference telemetry data."""
+    """Consulta e gerencia a telemetria das inferências."""
 
 
 @telemetry.command()
@@ -32,10 +32,10 @@ def telemetry() -> None:
     "top_n",
     default=10,
     type=int,
-    help="Number of top models to show.",
+    help="Quantos modelos mostrar no ranking.",
 )
 def stats(top_n: int) -> None:
-    """Show aggregated telemetry statistics."""
+    """Mostra estatísticas agregadas da telemetria."""
     console = Console()
     agg = _get_aggregator()
     try:
@@ -172,7 +172,7 @@ def stats(top_n: int) -> None:
     "fmt",
     default="json",
     type=click.Choice(["json", "csv"]),
-    help="Output format.",
+    help="Formato de saída.",
 )
 @click.option(
     "-o",
@@ -180,10 +180,10 @@ def stats(top_n: int) -> None:
     "output_path",
     default=None,
     type=click.Path(),
-    help="Output file path (default: stdout).",
+    help="Arquivo de saída (padrão: mostra na tela).",
 )
 def export(fmt: str, output_path: str | None) -> None:
-    """Export telemetry records."""
+    """Exporta os registros de telemetria."""
     agg = _get_aggregator()
     try:
         records = agg.export_records()
@@ -215,10 +215,10 @@ def export(fmt: str, output_path: str | None) -> None:
     "--yes",
     "confirmed",
     is_flag=True,
-    help="Skip confirmation prompt.",
+    help="Não pede confirmação.",
 )
 def clear(confirmed: bool) -> None:
-    """Delete all telemetry records."""
+    """Apaga todos os registros de telemetria."""
     if not confirmed:
         if not click.confirm("Delete all telemetry records?"):
             click.echo("Aborted.")

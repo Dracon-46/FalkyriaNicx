@@ -10,17 +10,17 @@ import click
 
 @click.group()
 def gateway() -> None:
-    """Manage the Nicx multi-channel gateway."""
+    """Gerencia o gateway multicanal do Nicx."""
 
 
 @gateway.command()
 @click.option(
     "--install",
     is_flag=True,
-    help="Generate and enable systemd/launchd service",
+    help="Gera e ativa o serviço do systemd/launchd.",
 )
 def start(install: bool) -> None:
-    """Start the gateway daemon."""
+    """Inicia o gateway em segundo plano."""
     if install:
         import platform as plat
 
@@ -56,7 +56,7 @@ def start(install: bool) -> None:
 
 @gateway.command()
 def stop() -> None:
-    """Stop the gateway daemon."""
+    """Para o gateway."""
     import platform as plat
 
     if plat.system() == "Darwin":
@@ -74,7 +74,7 @@ def stop() -> None:
 
 @gateway.command()
 def status() -> None:
-    """Check gateway status."""
+    """Mostra o estado do gateway."""
     import platform as plat
 
     if plat.system() == "Darwin":
@@ -91,7 +91,7 @@ def status() -> None:
 
 @gateway.command()
 def logs() -> None:
-    """View gateway logs."""
+    """Mostra os logs do gateway."""
     import platform as plat
 
     if plat.system() == "Darwin":

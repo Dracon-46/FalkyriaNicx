@@ -15,12 +15,12 @@ class TestAddCmd:
     def test_add_help(self) -> None:
         result = CliRunner().invoke(add, ["--help"])
         assert result.exit_code == 0
-        assert "MCP server" in result.output
+        assert "servidor MCP" in result.output
 
     def test_add_unknown_server(self) -> None:
         result = CliRunner().invoke(add, ["unknown_server"])
         assert result.exit_code != 0
-        assert "Unknown MCP server" in result.output
+        assert "Servidor MCP desconhecido" in result.output
         # Should list known servers
         assert "github" in result.output
         assert "filesystem" in result.output

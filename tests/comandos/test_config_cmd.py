@@ -191,7 +191,7 @@ temperature = 0.7
 
         # Should exit 0 and show a message about missing config
         assert result.exit_code == 0
-        assert "not found" in result.output.lower() or "config" in result.output.lower()
+        assert "não encontrado" in result.output.lower()
 
     def test_config_show_path_option(self, tmp_path: Path) -> None:
         """Test that the --path option works for all subcommands."""

@@ -140,19 +140,22 @@ def runtime_cli_options(command: Any) -> Any:
         "--num-ctx",
         type=int,
         default=None,
-        help="Context window (tokens, max 200k). Skips runtime panel when set.",
+        help="Janela de contexto (tokens, até 200k). Pula o painel de execução.",
     )(command)
     command = click.option(
         "--num-gpu",
         type=int,
         default=None,
-        help="Ollama GPU layers (-1=all, 0=CPU). Skips runtime panel when set.",
+        help=(
+            "Camadas do Ollama na GPU (-1 = todas, 0 = só CPU). Pula o painel de "
+            "execução."
+        ),
     )(command)
     command = click.option(
         "--skip-runtime-panel",
         is_flag=True,
         default=False,
-        help="Do not prompt for context/GPU after model pick.",
+        help="Não pergunta sobre contexto/GPU depois de escolher o modelo.",
     )(command)
     return command
 

@@ -197,12 +197,12 @@ class TestSkillInstallCommand:
     def test_install_help(self) -> None:
         result = CliRunner().invoke(cli, ["skill", "install", "--help"])
         assert result.exit_code == 0
-        assert "source" in result.output.lower()
+        assert "fonte" in result.output.lower()
 
     def test_install_invalid_source_format(self) -> None:
         result = CliRunner().invoke(cli, ["skill", "install", "invalid"])
         assert result.exit_code != 0
-        assert "format" in result.output.lower() or "source" in result.output.lower()
+        assert "formato esperado" in result.output.lower()
 
 
 class TestSkillSyncCommand:

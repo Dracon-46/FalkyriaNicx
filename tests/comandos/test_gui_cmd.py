@@ -108,7 +108,7 @@ def test_gui_rejects_occupied_frontend_port_before_launch(tmp_path: Path) -> Non
             )
 
     assert result.exit_code != 0
-    assert f"Frontend port {port} is unavailable" in result.output
+    assert f"A porta {port} do frontend está ocupada" in result.output
     ensure_deps.assert_not_called()
     run.assert_not_called()
     popen.assert_not_called()

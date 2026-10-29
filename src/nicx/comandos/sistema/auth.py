@@ -17,12 +17,12 @@ from nicx.servidor.auth_middleware import generate_api_key
 
 @click.group("auth")
 def auth() -> None:
-    """Manage API authentication keys."""
+    """Gerencia as chaves de acesso à API."""
 
 
 @auth.command("create-key")
 def create_key() -> None:
-    """Generate a new API key and store it in config."""
+    """Gera uma nova chave de API e a guarda na configuração."""
     key = generate_api_key()
     config_path = DEFAULT_CONFIG_PATH
 
@@ -55,7 +55,7 @@ def create_key() -> None:
 
 @auth.command("revoke-key")
 def revoke_key() -> None:
-    """Revoke the current API key."""
+    """Revoga a chave de API atual."""
     config_path = DEFAULT_CONFIG_PATH
     if not config_path.exists():
         click.echo("No config file found.")

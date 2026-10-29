@@ -37,18 +37,18 @@ def _resolve_agent_id(manager, agent_id_or_name: str) -> str:
         if a["name"] == agent_id_or_name:
             return a["id"]
 
-    click.echo(f"Agent not found: {agent_id_or_name}", err=True)
+    click.echo(f"Agente não encontrado: {agent_id_or_name}", err=True)
     raise SystemExit(1)
 
 
 @click.group("agents")
 def agent() -> None:
-    """Manage persistent agents — create, inspect, chat, bind channels."""
+    """Gerencia agentes persistentes: criar, inspecionar, conversar, ligar canais."""
 
 
 @agent.command("list")
 def list_agents() -> None:
-    """List all managed agents."""
+    """Lista todos os agentes."""
     console = Console(stderr=True)
     try:
         mgr = _get_manager()
@@ -91,15 +91,17 @@ def list_agents() -> None:
         # "Error:" label styled; render the message literally.
         from rich.markup import escape
 
-        console.print(f"[red]Error:[/red] {escape(str(exc))}")
+        console.print(f"[red]Erro:[/red] {escape(str(exc))}")
 
 
 @agent.command("create")
-@click.option("--name", "-n", required=True, help="Agent name")
-@click.option("--template", "-t", default=None, help="Template ID to use")
-@click.option("--type", "agent_type", default="monitor_operative", help="Agent type")
+@click.option("--name", "-n", required=True, help="Nome do agente.")
+@click.option("--template", "-t", default=None, help="ID do template a usar.")
+@click.option(
+    "--type", "agent_type", default="monitor_operative", help="Tipo de agente."
+)
 def create_agent(name: str, template: Optional[str], agent_type: str) -> None:
-    """Create a new persistent agent."""
+    """Cria um agente persistente."""
     console = Console(stderr=True)
     try:
         mgr = _get_manager()
@@ -111,19 +113,19 @@ def create_agent(name: str, template: Optional[str], agent_type: str) -> None:
             f"[green]Created agent:[/green] {result['id']} ({result['name']})"
         )
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @agent.command("info")
 @click.argument("agent_id")
 def info(agent_id: str) -> None:
-    """Show detailed info about a managed agent."""
+    """Mostra os detalhes de um agente."""
     console = Console(stderr=True)
     try:
         mgr = _get_manager()
         a = mgr.get_agent(agent_id)
         if not a:
-            console.print(f"[red]Agent not found: {agent_id}[/red]")
+            console.print(f"[red]Agente não encontrado: {agent_id}[/red]")
             return
         console.print(f"[bold]{a['name']}[/bold] ({a['id']})")
         console.print(f"  Type:   {a['agent_type']}")
@@ -141,13 +143,13 @@ def info(agent_id: str) -> None:
             for b in bindings:
                 console.print(f"    {b['channel_type']}: {b['config']}")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @agent.command("tasks")
 @click.argument("agent_id")
 def tasks(agent_id: str) -> None:
-    """List tasks for an agent."""
+    """Lista as tarefas de um agente."""
     console = Console(stderr=True)
     try:
         mgr = _get_manager()
@@ -163,60 +165,60 @@ def tasks(agent_id: str) -> None:
             table.add_row(t["id"], t["description"][:60], t["status"])
         console.print(table)
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @agent.command("pause")
 @click.argument("agent_id")
 def pause(agent_id: str) -> None:
-    """Pause an agent."""
+    """Pausa um agente."""
     console = Console(stderr=True)
     try:
         mgr = _get_manager()
         mgr.pause_agent(agent_id)
         console.print(f"[yellow]Paused agent {agent_id}[/yellow]")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @agent.command("resume")
 @click.argument("agent_id")
 def resume(agent_id: str) -> None:
-    """Resume a paused agent."""
+    """Retoma um agente pausado."""
     console = Console(stderr=True)
     try:
         mgr = _get_manager()
         mgr.resume_agent(agent_id)
         console.print(f"[green]Resumed agent {agent_id}[/green]")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @agent.command("delete")
 @click.argument("agent_id")
 def delete(agent_id: str) -> None:
-    """Archive (soft-delete) an agent."""
+    """Arquiva um agente (dá para recuperar)."""
     console = Console(stderr=True)
     try:
         mgr = _get_manager()
         mgr.delete_agent(agent_id)
         console.print(f"[dim]Archived agent {agent_id}[/dim]")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @agent.command("bind")
 @click.argument("agent_id")
-@click.option("--slack", default=None, help="Slack channel (e.g. #research)")
-@click.option("--telegram", default=None, help="Telegram chat ID")
-@click.option("--whatsapp", default=None, help="WhatsApp phone number")
+@click.option("--slack", default=None, help="Canal do Slack (ex.: #pesquisa).")
+@click.option("--telegram", default=None, help="ID do chat no Telegram.")
+@click.option("--whatsapp", default=None, help="Número do WhatsApp.")
 def bind(
     agent_id: str,
     slack: Optional[str],
     telegram: Optional[str],
     whatsapp: Optional[str],
 ) -> None:
-    """Bind a channel to an agent."""
+    """Liga um canal a um agente."""
     console = Console(stderr=True)
     try:
         mgr = _get_manager()
@@ -233,13 +235,13 @@ def bind(
             return
         console.print(f"[green]Bound channel:[/green] {b['id']} ({b['channel_type']})")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @agent.command("channels")
 @click.argument("agent_id")
 def channels(agent_id: str) -> None:
-    """List channel bindings for an agent."""
+    """Lista os canais ligados a um agente."""
     console = Console(stderr=True)
     try:
         mgr = _get_manager()
@@ -258,15 +260,15 @@ def channels(agent_id: str) -> None:
             )
         console.print(table)
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @agent.command("search")
 @click.argument("agent_id")
 @click.argument("query")
-@click.option("--limit", "-l", default=10, help="Max results")
+@click.option("--limit", "-l", default=10, help="Máximo de resultados.")
 def search(agent_id: str, query: str, limit: int) -> None:
-    """Cross-session search across agent traces."""
+    """Busca nos rastros de todas as sessões do agente."""
     console = Console(stderr=True)
     try:
         from nicx.nucleo.config import load_config
@@ -277,7 +279,7 @@ def search(agent_id: str, query: str, limit: int) -> None:
         mgr = _get_manager()
         agent = mgr.get_agent(agent_id)
         if not agent:
-            console.print(f"[red]Agent not found: {agent_id}[/red]")
+            console.print(f"[red]Agente não encontrado: {agent_id}[/red]")
             return
         store = TraceStore(config.traces.db_path or str(get_config_dir() / "traces.db"))
         results = store.search(query, agent=agent["name"], limit=limit)
@@ -292,12 +294,12 @@ def search(agent_id: str, query: str, limit: int) -> None:
             table.add_row(r["trace_id"][:12], r["query"][:40], r["result"][:40])
         console.print(table)
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @agent.command("templates")
 def templates() -> None:
-    """List available agent templates."""
+    """Lista os templates de agente disponíveis."""
     console = Console(stderr=True)
     try:
         from nicx.cerebro.agentes.gestao.manager import AgentManager
@@ -320,7 +322,7 @@ def templates() -> None:
             )
         console.print(table)
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 def _get_system():
@@ -330,7 +332,7 @@ def _get_system():
     try:
         return SystemBuilder().build()
     except RuntimeError as exc:
-        click.echo(f"Error: {exc}", err=True)
+        click.echo(f"Erro: {exc}", err=True)
         raise SystemExit(1)
 
 
@@ -404,7 +406,7 @@ def _run_tick_with_live_trace(executor, agent_id: str, console: Console) -> None
 
 @agent.command()
 def launch():
-    """Interactive agent launcher."""
+    """Abre o assistente interativo de agentes."""
     from nicx.cerebro.agentes.gestao.manager import AgentManager as _AM
 
     templates = _AM.list_templates()
@@ -473,11 +475,11 @@ def launch():
 @agent.command("start")
 @click.argument("agent_id")
 def start_agent(agent_id):
-    """Start scheduling an agent."""
+    """Começa a agendar um agente."""
     manager = _get_manager()
     agent_data = manager.get_agent(agent_id)
     if not agent_data:
-        click.echo(f"Agent {agent_id} not found", err=True)
+        click.echo(f"Agente {agent_id} não encontrado", err=True)
         raise SystemExit(1)
     scheduler, _, _ = _get_scheduler_and_executor()
     if scheduler is None:
@@ -490,11 +492,11 @@ def start_agent(agent_id):
 @agent.command("stop")
 @click.argument("agent_id")
 def stop_agent(agent_id):
-    """Stop scheduling an agent."""
+    """Para de agendar um agente."""
     manager = _get_manager()
     agent_data = manager.get_agent(agent_id)
     if not agent_data:
-        click.echo(f"Agent {agent_id} not found", err=True)
+        click.echo(f"Agente {agent_id} não encontrado", err=True)
         raise SystemExit(1)
     scheduler, _, _ = _get_scheduler_and_executor()
     if scheduler is None:
@@ -507,11 +509,11 @@ def stop_agent(agent_id):
 @agent.command("run")
 @click.argument("agent_id")
 def run_agent(agent_id):
-    """Run one tick immediately for testing."""
+    """Roda um ciclo agora, para teste."""
     manager = _get_manager()
     agent_data = manager.get_agent(agent_id)
     if not agent_data:
-        click.echo(f"Agent {agent_id} not found", err=True)
+        click.echo(f"Agente {agent_id} não encontrado", err=True)
         raise SystemExit(1)
     if agent_data["status"] == "archived":
         click.echo(f"Agent {agent_id} is archived and cannot be run", err=True)
@@ -561,7 +563,7 @@ def run_agent(agent_id):
 
 @agent.command("status")
 def status():
-    """Show all agents with schedule and run info."""
+    """Mostra todos os agentes, com agenda e execuções."""
     import time as _time
 
     manager = _get_manager()
@@ -610,15 +612,20 @@ def status():
 
 @agent.command("learning")
 @click.argument("agent_id")
-@click.option("--run", "trigger_run", is_flag=True, help="Trigger manual learning run")
+@click.option(
+    "--run",
+    "trigger_run",
+    is_flag=True,
+    help="Dispara uma rodada manual de aprendizado.",
+)
 def learning(agent_id, trigger_run):
-    """Show learning history or trigger a manual run."""
+    """Mostra o histórico de aprendizado ou dispara uma rodada manual."""
     import datetime
 
     manager = _get_manager()
     agent_data = manager.get_agent(agent_id)
     if not agent_data:
-        click.echo(f"Agent {agent_id} not found", err=True)
+        click.echo(f"Agente {agent_id} não encontrado", err=True)
         raise SystemExit(1)
 
     if trigger_run:
@@ -651,11 +658,11 @@ def learning(agent_id, trigger_run):
     "run_number",
     default=None,
     type=int,
-    help="Specific run number",
+    help="Número de uma execução específica.",
 )
-@click.option("--limit", "-n", default=10, help="Number of traces to show")
+@click.option("--limit", "-n", default=10, help="Quantos rastros mostrar.")
 def trace(agent_id, run_number, limit):
-    """Show step-by-step trace of agent ticks."""
+    """Mostra, passo a passo, os ciclos do agente."""
     import datetime
 
     from nicx.nucleo.config import load_config
@@ -665,7 +672,7 @@ def trace(agent_id, run_number, limit):
     manager = _get_manager()
     agent_data = manager.get_agent(agent_id)
     if not agent_data:
-        click.echo(f"Agent {agent_id} not found", err=True)
+        click.echo(f"Agente {agent_id} não encontrado", err=True)
         raise SystemExit(1)
 
     config = load_config()
@@ -704,15 +711,15 @@ def trace(agent_id, run_number, limit):
 
 @agent.command("logs")
 @click.argument("agent_id")
-@click.option("--limit", "-n", default=10, help="Number of recent traces to show")
+@click.option("--limit", "-n", default=10, help="Quantos rastros recentes mostrar.")
 def logs(agent_id, limit):
-    """Show recent execution traces for an agent."""
+    """Mostra os rastros de execução recentes de um agente."""
     import datetime
 
     manager = _get_manager()
     agent_data = manager.get_agent(agent_id)
     if not agent_data:
-        click.echo(f"Agent {agent_id} not found", err=True)
+        click.echo(f"Agente {agent_id} não encontrado", err=True)
         raise SystemExit(1)
     checkpoints = manager.list_checkpoints(agent_id)
     if not checkpoints:
@@ -728,7 +735,7 @@ def logs(agent_id, limit):
 
 @agent.command("daemon")
 def daemon():
-    """Run the agent scheduler as a standalone daemon."""
+    """Roda o agendador de agentes como serviço independente."""
     import signal
 
     click.echo("Starting agent scheduler daemon...")
@@ -757,7 +764,7 @@ def daemon():
 @agent.command("watch")
 @click.argument("agent_id", required=False)
 def watch(agent_id):
-    """Live feed of agent activity."""
+    """Acompanha ao vivo a atividade do agente."""
     import signal
 
     from nicx.nucleo.events import EventType, get_event_bus
@@ -788,7 +795,7 @@ def watch(agent_id):
 @agent.command("recover")
 @click.argument("agent_id")
 def recover(agent_id):
-    """Recover an agent from its last checkpoint."""
+    """Recupera um agente a partir do último checkpoint."""
     manager = _get_manager()
     checkpoint = manager.recover_agent(agent_id)
     if checkpoint:
@@ -799,7 +806,7 @@ def recover(agent_id):
 
 @agent.command("errors")
 def errors():
-    """Show all agents in error or needs_attention state."""
+    """Mostra os agentes com erro ou que precisam de atenção."""
     manager = _get_manager()
     agents = manager.list_agents()
     error_agents = [a for a in agents if a["status"] in ("error", "needs_attention")]
@@ -817,12 +824,14 @@ def errors():
     "--yes/--no-yes",
     "auto_approve",
     default=True,
-    help="Auto-approve tool execution that would otherwise need confirmation. "
-    "Default: on (suits non-interactive CLI use). Pass --no-yes to require a "
-    "TTY prompt for tools whose ToolSpec sets requires_confirmation=True.",
+    help=(
+        "Aprova sozinho as ferramentas que pediriam confirmação. Padrão: ligado (bom "
+        "para uso sem interação). Com --no-yes, as ferramentas com "
+        "requires_confirmation=True pedem confirmação no terminal."
+    ),
 )
 def ask(agent_id, message, auto_approve):
-    """Ask an agent a question (immediate response)."""
+    """Faz uma pergunta a um agente (resposta na hora)."""
     manager = _get_manager()
     agent_id = _resolve_agent_id(manager, agent_id)
     manager.send_message(agent_id, message, mode="immediate")
@@ -859,7 +868,7 @@ def ask(agent_id, message, auto_approve):
 @click.argument("agent_id")
 @click.argument("message")
 def instruct(agent_id, message):
-    """Queue an instruction for the agent's next tick."""
+    """Deixa uma instrução para o próximo ciclo do agente."""
     manager = _get_manager()
     agent_id = _resolve_agent_id(manager, agent_id)
     msg = manager.send_message(agent_id, message, mode="queued")
@@ -869,7 +878,7 @@ def instruct(agent_id, message):
 @agent.command("messages")
 @click.argument("agent_id")
 def messages(agent_id):
-    """Show message history with an agent."""
+    """Mostra o histórico de mensagens com um agente."""
     manager = _get_manager()
     msgs = manager.list_messages(agent_id)
     if not msgs:

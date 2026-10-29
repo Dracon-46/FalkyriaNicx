@@ -12,7 +12,7 @@ from rich.console import Console
 
 @click.group("feedback")
 def feedback_group() -> None:
-    """Trace feedback management."""
+    """Gerencia as avaliações dos rastros."""
 
 
 @feedback_group.command("score")
@@ -22,10 +22,10 @@ def feedback_group() -> None:
     "--score",
     type=float,
     required=True,
-    help="Feedback score (0.0-1.0).",
+    help="Nota (0.0-1.0).",
 )
 def feedback_score(trace_id: str, score: float) -> None:
-    """Record explicit feedback for a trace."""
+    """Registra uma nota para um rastro."""
     console = Console()
 
     if not 0.0 <= score <= 1.0:
@@ -48,9 +48,9 @@ def feedback_score(trace_id: str, score: float) -> None:
         if updated:
             console.print(f"[green]Recorded score {score} for trace {trace_id}[/green]")
         else:
-            console.print(f"[yellow]Trace '{trace_id}' not found.[/yellow]")
+            console.print(f"[yellow]Rastro '{trace_id}' não encontrado.[/yellow]")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
         sys.exit(1)
 
 
@@ -59,13 +59,13 @@ def feedback_score(trace_id: str, score: float) -> None:
     "--last",
     is_flag=True,
     default=False,
-    help="Rate the last interaction.",
+    help="Avalia a última interação.",
 )
 @click.option(
     "--up/--down",
     "thumbs_up",
     default=True,
-    help="Thumbs up or down.",
+    help="Positivo (--up) ou negativo (--down).",
 )
 @click.argument("trace_id", required=False)
 def feedback_thumbs(
@@ -73,7 +73,7 @@ def feedback_thumbs(
     thumbs_up: bool,
     trace_id: Optional[str],
 ) -> None:
-    """Rate a trace with thumbs up/down."""
+    """Avalia um rastro como positivo ou negativo."""
     console = Console()
     score = 1.0 if thumbs_up else 0.0
 
@@ -104,9 +104,9 @@ def feedback_thumbs(
         if updated:
             console.print(f"[green]Recorded {label} for trace {trace_id}[/green]")
         else:
-            console.print(f"[yellow]Trace '{trace_id}' not found.[/yellow]")
+            console.print(f"[yellow]Rastro '{trace_id}' não encontrado.[/yellow]")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
         sys.exit(1)
 
 
@@ -115,10 +115,10 @@ def feedback_thumbs(
     "--since",
     type=str,
     default="7d",
-    help="Evaluate traces since (e.g. 7d, 24h).",
+    help="Avalia os rastros desde (ex.: 7d, 24h).",
 )
 def feedback_evaluate(since: str) -> None:
-    """Run LLM judge on recent traces."""
+    """Avalia os rastros recentes com um modelo juiz."""
     console = Console()
 
     # Parse the time duration
@@ -155,13 +155,13 @@ def feedback_evaluate(since: str) -> None:
             "[yellow]LLM judge evaluation is not yet fully implemented.[/yellow]"
         )
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
         sys.exit(1)
 
 
 @feedback_group.command("stats")
 def feedback_stats() -> None:
-    """Show feedback statistics."""
+    """Mostra estatísticas das avaliações."""
     console = Console()
 
     try:
@@ -192,7 +192,7 @@ def feedback_stats() -> None:
         console.print(f"  Positive (>=0.5): {positive}")
         console.print(f"  Negative (<0.5):  {scored_count - positive}")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 __all__ = ["feedback_group"]

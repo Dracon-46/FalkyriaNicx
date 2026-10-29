@@ -27,12 +27,12 @@ from nicx.nucleo.registry import ModelRegistry
 
 @click.group()
 def model() -> None:
-    """Manage language models."""
+    """Gerencia os modelos de linguagem."""
 
 
 @model.command("list")
 def list_models() -> None:
-    """List available models from running engines."""
+    """Lista os modelos disponíveis nos motores ligados."""
     console = Console()
     config = load_config()
     register_builtin_models()
@@ -85,7 +85,7 @@ def list_models() -> None:
 @model.command()
 @click.argument("model_name")
 def info(model_name: str) -> None:
-    """Show details for a model."""
+    """Mostra os detalhes de um modelo."""
     console = Console()
     register_builtin_models()
 
@@ -97,7 +97,7 @@ def info(model_name: str) -> None:
         merge_discovered_models(ek, model_ids)
 
     if not ModelRegistry.contains(model_name):
-        console.print(f"[red]Model not found:[/red] {model_name}")
+        console.print(f"[red]Modelo não encontrado:[/red] {model_name}")
         sys.exit(1)
 
     spec = ModelRegistry.get(model_name)
@@ -225,9 +225,9 @@ def hf_download(repo: str, filename: str | None, console: Console) -> bool:
 
 @model.command()
 @click.argument("model_name")
-@click.option("--engine", default=None, help="Engine to download for.")
+@click.option("--engine", default=None, help="Motor para o qual baixar.")
 def pull(model_name: str, engine: str | None) -> None:
-    """Download a model."""
+    """Baixa um modelo."""
     console = Console()
     config = load_config()
     engine = engine or config.engine.default or "ollama"
@@ -580,29 +580,29 @@ def _import_ollama(
 
 @model.command()
 @click.argument("hf_repo")
-@click.option("--engine", default=None, help="Engine to convert for.")
+@click.option("--engine", default=None, help="Motor de destino da conversão.")
 @click.option(
     "--quantize",
     default=None,
-    help="GGUF quantization type (e.g., q4_k_m, q8_0).",
+    help="Tipo de quantização GGUF (ex.: q4_k_m, q8_0).",
 )
 @click.option(
     "-q",
     "--mlx-4bit",
     is_flag=True,
     default=False,
-    help="Enable 4-bit quantization for MLX.",
+    help="Liga a quantização de 4 bits no MLX.",
 )
 @click.option(
     "--output",
     default=None,
-    help="Output directory for converted artifact.",
+    help="Pasta de saída do modelo convertido.",
 )
 @click.option(
     "--force",
     is_flag=True,
     default=False,
-    help="Replace existing output only after conversion succeeds.",
+    help="Substitui a saída existente (só depois que a conversão der certo).",
 )
 def convert(
     hf_repo: str,
@@ -612,7 +612,7 @@ def convert(
     output: str | None,
     force: bool,
 ) -> None:
-    """Convert a Hugging Face model to a local engine format."""
+    """Converte um modelo do Hugging Face para o formato de um motor local."""
     console = Console()
     config = load_config()
 

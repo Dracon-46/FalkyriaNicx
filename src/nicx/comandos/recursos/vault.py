@@ -65,14 +65,14 @@ def _save_vault(data: dict) -> None:
 
 @click.group()
 def vault() -> None:
-    """Manage encrypted credentials."""
+    """Gerencia as credenciais criptografadas."""
 
 
 @vault.command("set")
 @click.argument("key")
 @click.argument("value")
 def vault_set(key: str, value: str) -> None:
-    """Store a credential in the vault."""
+    """Guarda uma credencial no cofre."""
     console = Console(stderr=True)
     try:
         data = _load_vault()
@@ -87,14 +87,14 @@ def vault_set(key: str, value: str) -> None:
 @vault.command("get")
 @click.argument("key")
 def vault_get(key: str) -> None:
-    """Retrieve a credential from the vault."""
+    """Lê uma credencial do cofre."""
     console = Console(stderr=True)
     try:
         data = _load_vault()
         if key in data:
             console.print(data[key])
         else:
-            console.print(f"[yellow]Key not found: {key}[/yellow]")
+            console.print(f"[yellow]Chave não encontrada: {key}[/yellow]")
     except ImportError as exc:
         console.print(f"[red]{exc}[/red]")
         sys.exit(1)
@@ -102,7 +102,7 @@ def vault_get(key: str) -> None:
 
 @vault.command("list")
 def vault_list() -> None:
-    """List all stored credential keys."""
+    """Lista as chaves das credenciais guardadas."""
     console = Console(stderr=True)
     try:
         data = _load_vault()
@@ -123,7 +123,7 @@ def vault_list() -> None:
 @vault.command("remove")
 @click.argument("key")
 def vault_remove(key: str) -> None:
-    """Remove a credential from the vault."""
+    """Remove uma credencial do cofre."""
     console = Console(stderr=True)
     try:
         data = _load_vault()
@@ -132,7 +132,7 @@ def vault_remove(key: str) -> None:
             _save_vault(data)
             console.print(f"[green]Removed: {key}[/green]")
         else:
-            console.print(f"[yellow]Key not found: {key}[/yellow]")
+            console.print(f"[yellow]Chave não encontrada: {key}[/yellow]")
     except ImportError as exc:
         console.print(f"[red]{exc}[/red]")
 

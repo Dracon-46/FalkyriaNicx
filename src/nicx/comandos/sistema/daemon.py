@@ -423,11 +423,11 @@ def daemon() -> None:
 
 
 @daemon.command()
-@click.option("--host", default=None, help="Bind address.")
-@click.option("--port", default=None, type=int, help="Port number.")
-@click.option("-e", "--engine", "engine_key", default=None, help="Engine backend.")
-@click.option("-m", "--model", "model_name", default=None, help="Default model.")
-@click.option("-a", "--agent", "agent_name", default=None, help="Agent type.")
+@click.option("--host", default=None, help="Endereço de escuta.")
+@click.option("--port", default=None, type=int, help="Porta.")
+@click.option("-e", "--engine", "engine_key", default=None, help="Motor de inferência.")
+@click.option("-m", "--model", "model_name", default=None, help="Modelo padrão.")
+@click.option("-a", "--agent", "agent_name", default=None, help="Tipo de agente.")
 def start(
     host: str | None,
     port: int | None,
@@ -435,7 +435,7 @@ def start(
     model_name: str | None,
     agent_name: str | None,
 ) -> None:
-    """Start the Nicx server as a background daemon."""
+    """Inicia o servidor do Nicx em segundo plano."""
     console = Console(stderr=True)
 
     existing = _read_pid()
@@ -528,7 +528,7 @@ def start(
 
 @daemon.command()
 def stop() -> None:
-    """Stop the running Nicx server daemon."""
+    """Para o servidor do Nicx que está em segundo plano."""
     console = Console(stderr=True)
     # Stop the graphical frontend too. It is a sibling process, not a child of
     # the daemon, so it otherwise outlives `stop` and keeps holding its port —
@@ -562,7 +562,7 @@ def stop() -> None:
 @daemon.command()
 @click.pass_context
 def restart(ctx: click.Context) -> None:
-    """Restart the Nicx server daemon."""
+    """Reinicia o servidor do Nicx em segundo plano."""
     console = Console(stderr=True)
     pid = _read_pid()
     previous = _read_state() if pid is not None else {}
@@ -582,7 +582,7 @@ def restart(ctx: click.Context) -> None:
 
 @daemon.command()
 def status() -> None:
-    """Show status of the Nicx server daemon."""
+    """Mostra o estado do servidor do Nicx em segundo plano."""
     console = Console(stderr=True)
     pid = _read_pid()
     if pid is None:

@@ -229,49 +229,52 @@ def _do_download(engine: str, model: str, spec, console: Console) -> None:
 @click.option(
     "--analytics/--no-analytics",
     default=None,
-    help="Consent to or decline external usage analytics without prompting.",
+    help="Aceita (ou recusa) as estatísticas de uso sem perguntar.",
 )
 @click.option(
-    "--force", is_flag=True, help="Overwrite existing config without prompting."
+    "--force", is_flag=True, help="Sobrescreve a configuração existente sem perguntar."
 )
 @click.option(
     "--config",
     type=click.Path(exists=True, dir_okay=False, path_type=Path),
-    help="Path to config file to use.",
+    help="Caminho do arquivo de configuração.",
 )
 @click.option(
     "--full",
     "full_config",
     is_flag=True,
-    help="Generate full reference config with all sections",
+    help="Gera a configuração de referência completa, com todas as seções.",
 )
 @click.option(
     "--engine",
     type=click.Choice(_SUPPORTED_ENGINES, case_sensitive=False),
     default=None,
-    help="Inference engine to use (skips interactive selection).",
+    help="Motor de inferência (pula a escolha interativa).",
 )
 @click.option(
-    "--no-download", is_flag=True, default=False, help="Skip the model download prompt."
+    "--no-download",
+    is_flag=True,
+    default=False,
+    help="Não pergunta se deve baixar o modelo.",
 )
 @click.option(
     "--no-scan",
     "skip_scan",
     is_flag=True,
     default=False,
-    help="Skip the post-init security environment audit.",
+    help="Pula a verificação de segurança feita depois do init.",
 )
 @click.option(
     "--host",
     default=None,
-    help="Remote engine host URL (e.g. http://192.168.1.50:11434).",
+    help="URL de um motor remoto (ex.: http://192.168.1.50:11434).",
 )
 @click.option(
     "--digest",
     "enable_digest",
     is_flag=True,
     default=False,
-    help="Include Morning Digest config section.",
+    help="Inclui a seção do resumo da manhã (digest).",
 )
 @click.option(
     "--preset",
@@ -288,14 +291,14 @@ def _do_download(engine: str, model: str, spec, console: Console) -> None:
         case_sensitive=False,
     ),
     default=None,
-    help="Use a pre-built starter config instead of generating one.",
+    help="Usa uma configuração inicial pronta em vez de gerar uma.",
 )
 @click.option(
     "--from-bare-nicx",
     is_flag=True,
     default=False,
     hidden=True,
-    help="Run init non-interactively; called by the bare-nicx first-run guard.",
+    help='Roda o init sem perguntas; usado na primeira execução do "nicx" sozinho.',
 )
 @click.pass_context
 def init(
@@ -312,7 +315,7 @@ def init(
     from_bare_nicx: bool = False,
     analytics: bool | None = None,
 ) -> None:
-    """Detect hardware and generate ~/.nicx/config.toml."""
+    """Detecta o hardware e gera o ~/.nicx/config.toml."""
     print_banner(quiet=(ctx.obj or {}).get("quiet", False))
     console = Console()
 
@@ -350,7 +353,7 @@ def init(
             )
         preset_path = examples_dir / f"{preset}.toml"
         if not preset_path.exists():
-            console.print(f"[red]Preset '{preset}' not found.[/red]")
+            console.print(f"[red]Preset '{preset}' não encontrado.[/red]")
             console.print(f"  Looked in: {examples_dir}")
             raise SystemExit(1)
         DEFAULT_CONFIG_DIR.mkdir(parents=True, exist_ok=True)

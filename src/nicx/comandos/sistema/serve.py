@@ -129,21 +129,23 @@ def _resolve_server_model(
 
 
 @click.command()
-@click.option("--host", default=None, help="Bind address (default: config).")
+@click.option(
+    "--host", default=None, help="Endereço de escuta (padrão: o da configuração)."
+)
 @click.option(
     "--port",
     default=None,
     type=int,
-    help="Port number (default: config).",
+    help="Porta (padrão: a da configuração).",
 )
-@click.option("-e", "--engine", "engine_key", default=None, help="Engine backend.")
-@click.option("-m", "--model", "model_name", default=None, help="Default model.")
+@click.option("-e", "--engine", "engine_key", default=None, help="Motor de inferência.")
+@click.option("-m", "--model", "model_name", default=None, help="Modelo padrão.")
 @click.option(
     "-a",
     "--agent",
     "agent_name",
     default=None,
-    help="Agent for chat requests (simple, orchestrator, react, codeact).",
+    help="Agente dos pedidos de chat (simple, orchestrator, react, codeact).",
 )
 @click.pass_context
 def serve(
@@ -154,7 +156,7 @@ def serve(
     model_name: str | None,
     agent_name: str | None,
 ) -> None:
-    """Start the OpenAI-compatible API server."""
+    """Inicia o servidor de API (compatível com o formato da OpenAI)."""
     started = time.monotonic()
     print_banner(quiet=(ctx.obj or {}).get("quiet", False))
     console = Console(stderr=True)

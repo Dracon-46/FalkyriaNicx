@@ -41,9 +41,7 @@ class TestRegistryCmd:
         """Test that showing an unknown registry shows an error."""
         result = CliRunner().invoke(cli, ["registry", "show", "unknown_registry_xyz"])
         assert result.exit_code == 0  # CLI still exits 0, just shows error message
-        assert (
-            "unknown" in result.output.lower() or "not found" in result.output.lower()
-        )
+        assert "desconhecido" in result.output.lower()
 
     def test_registry_show_tool_registry(self) -> None:
         """Test that showing the tool registry displays entries."""
@@ -95,9 +93,7 @@ class TestRegistryCmd:
         """Test that showing a nonexistent key in a registry is handled."""
         result = CliRunner().invoke(cli, ["registry", "show", "nonexistent"])
         assert result.exit_code == 0
-        assert (
-            "unknown" in result.output.lower() or "not found" in result.output.lower()
-        )
+        assert "desconhecido" in result.output.lower()
 
     def test_registry_list_handles_import_error(self) -> None:
         """Test that registry list handles import errors gracefully."""

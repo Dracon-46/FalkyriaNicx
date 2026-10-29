@@ -102,20 +102,20 @@ def _update_git_checkout(repo_root: Path) -> int:
 @click.command(
     "self-update",
     help=(
-        "Upgrade Nicx from its Git checkout: fast-forward and rebuild. "
-        "Use --check to only print the upgrade plan without running it."
+        "Atualiza o Nicx pelo repositório Git: avança o branch e recompila. Com "
+        "--check, só mostra o plano, sem executar."
     ),
 )
 @click.option(
     "--check",
     is_flag=True,
-    help="Print the upgrade command that would run, without executing it.",
+    help="Mostra o comando de atualização que rodaria, sem executar.",
 )
 @click.option(
     "--yes",
     "-y",
     is_flag=True,
-    help="Skip the interactive confirmation prompt.",
+    help="Não pede confirmação.",
 )
 def self_update(check: bool, yes: bool) -> None:
     info = detect_install()
@@ -150,7 +150,7 @@ def self_update(check: bool, yes: bool) -> None:
     try:
         returncode = _update_git_checkout(info.repo_root)
     except OSError as exc:
-        raise click.ClickException(f"Could not run the upgrade: {exc}") from exc
+        raise click.ClickException(f"Não consegui rodar a atualização: {exc}") from exc
 
     if returncode != 0:
         click.echo(

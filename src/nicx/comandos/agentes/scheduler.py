@@ -32,7 +32,7 @@ def _get_scheduler(store: "SchedulerStore") -> "TaskScheduler":  # noqa: F821
 
 @click.group()
 def scheduler() -> None:
-    """Manage scheduled tasks."""
+    """Gerencia as tarefas agendadas."""
 
 
 @scheduler.command("create")
@@ -42,16 +42,18 @@ def scheduler() -> None:
     "schedule_type",
     required=True,
     type=click.Choice(["cron", "interval", "once"]),
-    help="Schedule type.",
+    help="Tipo de agendamento.",
 )
 @click.option(
     "--value",
     "schedule_value",
     required=True,
-    help="Schedule value (cron expr, seconds, or ISO datetime).",
+    help="Valor do agendamento (expressão cron, segundos ou data/hora ISO).",
 )
-@click.option("--agent", default="simple", help="Agent to use for execution.")
-@click.option("--tools", default="", help="Comma-separated tool names.")
+@click.option("--agent", default="simple", help="Agente que executa a tarefa.")
+@click.option(
+    "--tools", default="", help="Nomes das ferramentas, separados por vírgula."
+)
 def scheduler_create(
     prompt: str,
     schedule_type: str,
@@ -59,7 +61,7 @@ def scheduler_create(
     agent: str,
     tools: str,
 ) -> None:
-    """Create a new scheduled task."""
+    """Cria uma tarefa agendada."""
     console = Console()
     store = _get_store()
     try:
@@ -87,10 +89,10 @@ def scheduler_create(
     "--status",
     default=None,
     type=click.Choice(["active", "paused", "completed", "cancelled"]),
-    help="Filter by status.",
+    help="Filtra pelo estado.",
 )
 def scheduler_list(status: Optional[str]) -> None:
-    """List scheduled tasks."""
+    """Lista as tarefas agendadas."""
     console = Console()
     store = _get_store()
     try:
@@ -133,7 +135,7 @@ def scheduler_list(status: Optional[str]) -> None:
 @scheduler.command("pause")
 @click.argument("task_id")
 def scheduler_pause(task_id: str) -> None:
-    """Pause a scheduled task."""
+    """Pausa uma tarefa agendada."""
     console = Console()
     store = _get_store()
     try:
@@ -141,7 +143,7 @@ def scheduler_pause(task_id: str) -> None:
         sched.pause_task(task_id)
         console.print(f"[yellow]Task {task_id} paused[/yellow]")
     except KeyError:
-        console.print(f"[red]Task not found: {task_id}[/red]")
+        console.print(f"[red]Tarefa não encontrada: {task_id}[/red]")
     finally:
         store.close()
 
@@ -149,7 +151,7 @@ def scheduler_pause(task_id: str) -> None:
 @scheduler.command("resume")
 @click.argument("task_id")
 def scheduler_resume(task_id: str) -> None:
-    """Resume a paused task."""
+    """Retoma uma tarefa pausada."""
     console = Console()
     store = _get_store()
     try:
@@ -157,7 +159,7 @@ def scheduler_resume(task_id: str) -> None:
         sched.resume_task(task_id)
         console.print(f"[green]Task {task_id} resumed[/green]")
     except KeyError:
-        console.print(f"[red]Task not found: {task_id}[/red]")
+        console.print(f"[red]Tarefa não encontrada: {task_id}[/red]")
     finally:
         store.close()
 
@@ -165,7 +167,7 @@ def scheduler_resume(task_id: str) -> None:
 @scheduler.command("cancel")
 @click.argument("task_id")
 def scheduler_cancel(task_id: str) -> None:
-    """Cancel a scheduled task."""
+    """Cancela uma tarefa agendada."""
     console = Console()
     store = _get_store()
     try:
@@ -173,16 +175,16 @@ def scheduler_cancel(task_id: str) -> None:
         sched.cancel_task(task_id)
         console.print(f"[red]Task {task_id} cancelled[/red]")
     except KeyError:
-        console.print(f"[red]Task not found: {task_id}[/red]")
+        console.print(f"[red]Tarefa não encontrada: {task_id}[/red]")
     finally:
         store.close()
 
 
 @scheduler.command("logs")
 @click.argument("task_id")
-@click.option("-n", "--limit", default=10, type=int, help="Number of logs to show.")
+@click.option("-n", "--limit", default=10, type=int, help="Quantos registros mostrar.")
 def scheduler_logs(task_id: str, limit: int) -> None:
-    """Show run logs for a scheduled task."""
+    """Mostra o histórico de execuções de uma tarefa agendada."""
     console = Console()
     store = _get_store()
     try:
@@ -224,16 +226,17 @@ def scheduler_logs(task_id: str, limit: int) -> None:
     "--dry-run",
     is_flag=True,
     default=False,
-    help="Print what would run without executing.",
+    help="Mostra o que rodaria, sem executar.",
 )
 def scheduler_run_task(agent_name: str, dry_run: bool) -> None:
-    """Immediately execute the active task for AGENT_NAME.
+    """Executa agora a tarefa ativa de AGENT_NAME.
 
-    Finds the first active scheduled task whose agent matches AGENT_NAME
-    and runs it right now — useful for testing and for launchd invocation
-    when Nicx is not running as a persistent daemon.
+    Pega a primeira tarefa agendada ativa do agente AGENT_NAME e a roda na
+    hora. Serve para testes e para o launchd, quando o Nicx não está
+    rodando como serviço.
 
-    Example (launchd plist ProgramArguments):
+    \b
+    Exemplo (ProgramArguments do plist do launchd):
         nicx scheduler run-task proactive
     """
     console = Console()
@@ -289,7 +292,7 @@ def scheduler_run_task(agent_name: str, dry_run: bool) -> None:
         if result:
             console.print(result)
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
         raise SystemExit(1)
     finally:
         store.close()
@@ -300,10 +303,10 @@ def scheduler_run_task(agent_name: str, dry_run: bool) -> None:
     "--poll-interval",
     default=60,
     type=int,
-    help="Seconds between poll cycles.",
+    help="Segundos entre cada verificação.",
 )
 def scheduler_start(poll_interval: int) -> None:
-    """Start the scheduler daemon (foreground)."""
+    """Inicia o agendador (em primeiro plano)."""
     console = Console()
     store = _get_store()
 

@@ -434,9 +434,9 @@ def _results_to_dicts(checks: List[CheckResult]) -> List[Dict[str, Any]]:
 
 
 @click.command()
-@click.option("--json", "as_json", is_flag=True, help="Output results as JSON.")
+@click.option("--json", "as_json", is_flag=True, help="Mostra o resultado em JSON.")
 def doctor(as_json: bool) -> None:
-    """Run diagnostic checks on your Nicx installation."""
+    """Diagnostica a sua instalação do Nicx."""
     checks = _run_all_checks()
 
     if as_json:

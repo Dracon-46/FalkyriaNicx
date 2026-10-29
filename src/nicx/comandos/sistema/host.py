@@ -315,20 +315,20 @@ def _build_serve_command(backend: str, model: str, port: int) -> list[str]:
     "--backend",
     type=click.Choice(list(_BACKENDS.keys()), case_sensitive=False),
     default=None,
-    help="Inference backend to use. Auto-detected if omitted.",
+    help="Backend de inferência. Se omitido, é detectado sozinho.",
 )
 @click.option(
     "-p",
     "--port",
     type=int,
     default=None,
-    help="Port to serve on (default depends on backend).",
+    help="Porta (o padrão depende do backend).",
 )
 @click.option(
     "--trust-remote-code",
     is_flag=True,
     default=False,
-    help="Pass --trust-remote-code to the backend.",
+    help="Repassa --trust-remote-code ao backend.",
 )
 def host(
     model: str,
@@ -336,9 +336,9 @@ def host(
     port: Optional[int],
     trust_remote_code: bool,
 ) -> None:
-    """Download (if needed) and serve a model locally.
+    """Baixa (se preciso) e serve um modelo neste computador.
 
-    Examples:
+    Exemplos:
 
     \b
       nicx host mlx-community/Qwen2.5-7B-4bit --backend mlx

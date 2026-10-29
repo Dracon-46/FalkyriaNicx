@@ -212,7 +212,7 @@ class TestChatPickerIntegration:
             )
 
         assert result.exit_code == 2
-        assert "supported only with --engine ollama" in result.output
+        assert "só funcionam com --engine ollama" in result.output
         engine.generate.assert_not_called()
 
     def test_rich_markup_in_runtime_labels_is_rendered_literally(self) -> None:

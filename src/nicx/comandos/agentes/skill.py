@@ -56,12 +56,12 @@ def _get_manager(bus: EventBus | None = None) -> SkillManager:
 
 @click.group()
 def skill():
-    """Manage reusable skills."""
+    """Gerencia as habilidades reutilizáveis."""
 
 
 @skill.command("list")
 def list_skills():
-    """List installed skills."""
+    """Lista as habilidades instaladas."""
     console = Console()
     mgr = _get_manager()
     names = mgr.skill_names()
@@ -84,13 +84,13 @@ def list_skills():
 @skill.command("info")
 @click.argument("skill_name")
 def info(skill_name: str):
-    """Show detailed information about a skill."""
+    """Mostra os detalhes de uma habilidade."""
     console = Console()
     mgr = _get_manager()
     try:
         m = mgr.resolve(skill_name)
     except KeyError:
-        console.print(f"[red]Skill '{skill_name}' not found.[/red]")
+        console.print(f"[red]Habilidade '{skill_name}' não encontrada.[/red]")
         raise SystemExit(1)
     console.print(f"[bold]{m.name}[/bold] v{m.version}")
     if m.author:
@@ -125,11 +125,12 @@ def _skill_tool_names(mgr: SkillManager, skill_name: str) -> list[str]:
         try:
             manifest = mgr.resolve(name)
         except KeyError:
-            raise click.ClickException(f"Skill '{name}' not found.") from None
+            raise click.ClickException(f"Habilidade '{name}' não encontrada.") from None
         if not manifest.steps:
             raise click.ClickException(
-                f"Skill '{name}' has no executable steps. Instruction-only skills "
-                "can be used by an agent, but cannot be run as a tool pipeline."
+                f"A habilidade '{name}' não tem etapas executáveis. Habilidades só "
+                "de instruções servem para agentes, mas não rodam como "
+                "sequência de ferramentas."
             )
         for step in manifest.steps:
             if step.skill_name:
@@ -143,9 +144,9 @@ def _skill_tool_names(mgr: SkillManager, skill_name: str) -> list[str]:
 
 @skill.command("run")
 @click.argument("skill_name")
-@click.option("--arg", "-a", multiple=True, help="Arguments as key=value pairs.")
+@click.option("--arg", "-a", multiple=True, help="Argumentos no formato chave=valor.")
 def run(skill_name: str, arg: tuple):
-    """Execute a stepped skill using configured security and tool permissions."""
+    """Executa uma habilidade em etapas, com as permissões configuradas."""
     import nicx.ferramentas  # noqa: F401
     from nicx.comandos._tool_names import resolve_tool_names
     from nicx.comandos.conversa.ask import _build_tools
@@ -166,7 +167,8 @@ def run(skill_name: str, arg: tuple):
     ]
     if unavailable:
         raise click.ClickException(
-            "Skill requires unavailable or disabled tools: " + ", ".join(unavailable)
+            "A habilidade precisa de ferramentas indisponíveis ou desligadas: "
+            + ", ".join(unavailable)
         )
     context = {}
     for a in arg:
@@ -208,13 +210,13 @@ def _parse_source_query(query: str) -> tuple[str, str]:
     """
     if ":" not in query:
         raise click.BadParameter(
-            f"Expected '<source>:<name>' (e.g. 'github:apple-notes' with --url), "
-            f"got: {query!r}"
+            f"Formato esperado: '<fonte>:<nome>' (ex.: 'github:apple-notes' com "
+            f"--url); recebi: {query!r}"
         )
     source, _, name = query.partition(":")
     if not source or not name:
         raise click.BadParameter(
-            f"Both source and name are required: got source={source!r}, name={name!r}"
+            f"Informe a fonte e o nome: recebi fonte={source!r}, nome={name!r}"
         )
     return source, name
 
@@ -223,7 +225,7 @@ def _get_resolver(source: str, url: str = ""):
     """Return a resolver instance for the given source name."""
     if source == "github":
         if not url:
-            raise click.BadParameter("github source requires --url")
+            raise click.BadParameter("a fonte github precisa de --url")
         from pathlib import Path as _Path
 
         from nicx.cerebro.habilidades.sources.github import GitHubResolver
@@ -234,7 +236,7 @@ def _get_resolver(source: str, url: str = ""):
             + url.rstrip("/").rsplit("/", 1)[-1]
         )
         return GitHubResolver(cache_root=cache, repo_url=url)
-    raise click.BadParameter(f"Unknown source: {source!r}")
+    raise click.BadParameter(f"Fonte desconhecida: {source!r}")
 
 
 def _sync_resolver(resolver, console: Console) -> None:
@@ -250,29 +252,29 @@ def _sync_resolver(resolver, console: Console) -> None:
     "--with-scripts",
     is_flag=True,
     default=False,
-    help="Import the skill's scripts/ directory (security-sensitive).",
+    help="Importa a pasta scripts/ da habilidade (atenção à segurança).",
 )
 @click.option(
-    "--force", is_flag=True, default=False, help="Overwrite existing install."
+    "--force", is_flag=True, default=False, help="Sobrescreve a instalação existente."
 )
 @click.option(
     "--url",
     default="",
-    help="Repo URL (required when source is 'github').",
+    help="URL do repositório (obrigatória quando a fonte é 'github').",
 )
 @click.option(
     "--yes-dangerous",
     is_flag=True,
     default=False,
     help=(
-        "Confirm installing an unreviewed skill that requests dangerous "
-        "capabilities (shell/network-listen/filesystem-write)."
+        "Confirma a instalação de uma habilidade não revisada que pede permissões "
+        "perigosas (shell/network-listen/filesystem-write)."
     ),
 )
 def install(query: str, with_scripts: bool, force: bool, url: str, yes_dangerous: bool):
-    """Install a skill from a source.
+    """Instala uma habilidade a partir de uma fonte.
 
-    Example: ``nicx skill install github:apple-notes --url <repositório>``
+    Exemplo: nicx skill install github:apple-notes --url <repositório>
     """
     console = Console()
     source, name = _parse_source_query(query)
@@ -335,23 +337,28 @@ def install(query: str, with_scripts: bool, force: bool, url: str, yes_dangerous
 
 @skill.command("sync")
 @click.argument("source", required=False)
-@click.option("--category", default="", help="Filter by category.")
-@click.option("--tag", default="", help="Filter by tag.")
-@click.option("--search", default="", help="Substring search across name+description.")
+@click.option("--category", default="", help="Filtra pela categoria.")
+@click.option("--tag", default="", help="Filtra pela tag.")
+@click.option("--search", default="", help="Busca um trecho no nome e na descrição.")
 @click.option(
     "--with-scripts",
     is_flag=True,
     default=False,
-    help="Import scripts/ directories.",
+    help="Importa as pastas scripts/.",
 )
-@click.option("--force", is_flag=True, default=False, help="Re-import existing skills.")
+@click.option(
+    "--force",
+    is_flag=True,
+    default=False,
+    help="Importa de novo as habilidades já existentes.",
+)
 @click.option(
     "--yes-dangerous",
     is_flag=True,
     default=False,
     help=(
-        "Confirm installing unreviewed skills that request dangerous "
-        "capabilities (shell/network-listen/filesystem-write)."
+        "Confirma a instalação de habilidades não revisadas que pedem permissões "
+        "perigosas (shell/network-listen/filesystem-write)."
     ),
 )
 def sync(
@@ -363,7 +370,7 @@ def sync(
     force: bool,
     yes_dangerous: bool,
 ):
-    """Bulk install + update from a source (or all configured sources)."""
+    """Instala e atualiza em lote de uma fonte (ou de todas as configuradas)."""
     console = Console()
 
     cfg = load_config()
@@ -450,7 +457,7 @@ def sync(
 
 @skill.command("sources")
 def sources():
-    """List configured skill sources."""
+    """Lista as fontes de habilidades configuradas."""
     console = Console()
 
     cfg = load_config()
@@ -485,13 +492,13 @@ def sources():
     "-y",
     is_flag=True,
     default=False,
-    help="Skip confirmation prompt.",
+    help="Não pede confirmação.",
 )
 def remove(skill_name: str, yes: bool):
-    """Remove an installed skill by name.
+    """Remove uma habilidade instalada pelo nome.
 
-    Searches ``~/.nicx/skills/`` and ``./skills`` for a directory whose
-    name (or parsed manifest name) matches ``skill_name`` and deletes it.
+    Procura em ~/.nicx/skills/ e em ./skills uma pasta cujo nome (ou o nome
+    no manifesto) seja SKILL_NAME e a apaga.
     """
     console = Console()
     mgr = SkillManager(bus=EventBus())
@@ -524,13 +531,13 @@ def remove(skill_name: str, yes: bool):
     "--source",
     "-s",
     default="",
-    help="Restrict search to a single configured source.",
+    help="Busca só em uma das fontes configuradas.",
 )
 def search(query: str, source: str):
-    """Search available skills across configured sources.
+    """Busca habilidades nas fontes configuradas.
 
-    Matches ``query`` (case-insensitive substring) against skill name,
-    description, and tags.
+    Procura o trecho QUERY (sem diferenciar maiúsculas) no nome, na
+    descrição e nas tags.
     """
     console = Console()
     cfg = load_config()
@@ -597,7 +604,7 @@ def search(query: str, source: str):
 
 @skill.command("update")
 def update():
-    """Pull latest commits for all installed skill sources."""
+    """Baixa as atualizações de todas as fontes de habilidades instaladas."""
     console = Console()
 
     cfg = load_config()
@@ -623,7 +630,7 @@ def update():
     default=3,
     show_default=True,
     type=int,
-    help="Minimum recurrence count to surface a tool sequence as a skill.",
+    help="Mínimo de repetições para uma sequência virar habilidade.",
 )
 @click.option(
     "--min-outcome",
@@ -631,17 +638,18 @@ def update():
     default=0.5,
     show_default=True,
     type=float,
-    help="Minimum average outcome score (0.0-1.0) to qualify.",
+    help="Nota média mínima do resultado (0.0-1.0).",
 )
 @click.option(
     "--dry-run",
     is_flag=True,
     default=False,
-    help="Print discovered patterns without writing manifests.",
+    help="Mostra os padrões encontrados sem gravar os manifestos.",
 )
 def discover(min_frequency: int, min_outcome: float, dry_run: bool) -> None:
-    """Mine the trace store for recurring tool sequences and write them as
-    discovered skill manifests under ~/.nicx/skills/discovered/."""
+    """Procura nos rastros sequências de ferramentas que se repetem e as
+    grava como habilidades descobertas em ~/.nicx/skills/discovered/.
+    """
     console = Console()
     store = _get_trace_store()
     if store is None:
@@ -698,7 +706,7 @@ def discover(min_frequency: int, min_outcome: float, dry_run: bool) -> None:
 @skill.command("show-overlay")
 @click.argument("skill_name")
 def show_overlay(skill_name: str) -> None:
-    """Show the optimization overlay for a skill, if one exists."""
+    """Mostra o ajuste de otimização de uma habilidade, se houver."""
     console = Console()
     from nicx.cerebro.habilidades.overlay import SkillOverlayLoader
 

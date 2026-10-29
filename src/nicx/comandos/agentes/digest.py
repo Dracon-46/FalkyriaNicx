@@ -130,20 +130,22 @@ def _cancel_scheduler_tasks() -> int:
         return 0
 
 
-@click.command("digest", help="Display and play the morning digest.")
-@click.option("--text-only", is_flag=True, help="Print text without audio playback.")
-@click.option("--fresh", is_flag=True, help="Re-generate the digest (skip cache).")
-@click.option("--history", is_flag=True, help="Show past digests.")
-@click.option("--section", type=str, default="", help="Show only a specific section.")
-@click.option("--db-path", type=str, default="", help="Path to digest database.")
+@click.command("digest", help="Mostra e lê em voz alta o resumo da manhã.")
+@click.option("--text-only", is_flag=True, help="Só mostra o texto, sem áudio.")
+@click.option("--fresh", is_flag=True, help="Gera o resumo de novo (ignora o cache).")
+@click.option("--history", is_flag=True, help="Mostra os resumos anteriores.")
+@click.option("--section", type=str, default="", help="Mostra só uma seção.")
+@click.option(
+    "--db-path", type=str, default="", help="Caminho do banco de dados dos resumos."
+)
 @click.option(
     "--schedule",
     type=str,
     default=None,
     is_eager=True,
     help=(
-        'Set cron schedule (e.g. "0 6 * * *"), '
-        '"off" to disable, or empty to show status.'
+        'Define o horário em formato cron (ex.: "0 6 * * *"), "off" para desligar, '
+        "ou vazio para ver o estado."
     ),
 )
 def digest(

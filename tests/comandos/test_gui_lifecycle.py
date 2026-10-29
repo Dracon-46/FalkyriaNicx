@@ -79,7 +79,7 @@ def test_unreadable_identity_preserves_state_without_signaling(
         else lambda p: None,
     )
 
-    with pytest.raises(click.ClickException, match="saved state was kept"):
+    with pytest.raises(click.ClickException, match="estado salvo foi mantido"):
         gui_cmd.stop_frontend()
     process.terminate.assert_not_called()
     assert frontend_state.read_text() == saved
@@ -165,7 +165,7 @@ def test_stop_preserves_record_if_identity_becomes_unknown_after_signaling(
     monkeypatch.setattr(gui_cmd.psutil, "wait_procs", lambda *args, **kwargs: ([], []))
     monkeypatch.setattr(gui_cmd.os, "getpgid", lambda pid: 9999, raising=False)
 
-    with pytest.raises(click.ClickException, match="saved state was kept"):
+    with pytest.raises(click.ClickException, match="estado salvo foi mantido"):
         gui_cmd.stop_frontend()
 
     assert frontend_state.read_text() == saved
@@ -198,7 +198,7 @@ def test_register_cannot_replace_another_live_or_unverifiable_owner(
     child.poll.return_value = None
     owner = gui_cmd._FrontendOwner(child, 5180)
 
-    with pytest.raises(click.ClickException, match="Another frontend"):
+    with pytest.raises(click.ClickException, match="Outro frontend"):
         owner.register()
 
     assert not owner.registered
@@ -431,11 +431,11 @@ def test_automatic_api_reuse_requires_verified_daemon_ownership(
     run.assert_not_called()
     if registered:
         assert result.exit_code == 0
-        assert "Reusing the API server" in result.output
+        assert "Usando o servidor da API" in result.output
         owner.register.assert_called_once()
     else:
         assert result.exit_code == 1
-        assert "unregistered service" in result.output
+        assert "já está com outro serviço" in result.output
         owner.register.assert_not_called()
 
 

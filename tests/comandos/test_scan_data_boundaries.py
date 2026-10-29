@@ -211,14 +211,14 @@ def test_scan_data_boundaries_rejects_quick(monkeypatch, tmp_path):
     result = CliRunner().invoke(scan, ["--quick", "--data-boundaries"])
 
     assert result.exit_code != 0
-    assert "cannot be combined" in result.output
+    assert "não pode ser usado junto" in result.output
 
 
 def test_scan_rejects_strict_without_data_boundaries():
     result = CliRunner().invoke(scan, ["--strict"])
 
     assert result.exit_code != 0
-    assert "only supported with --data-boundaries" in result.output
+    assert "só funcionam com --data-boundaries" in result.output
 
 
 def test_existing_scan_json_still_works(monkeypatch):

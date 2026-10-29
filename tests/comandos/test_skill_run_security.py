@@ -93,7 +93,7 @@ def test_prose_skill_is_not_reported_as_success(skill_cli, nested):
         name = "parent"
     result = CliRunner().invoke(cli, ["skill", "run", name])
     assert result.exit_code != 0
-    assert "no executable steps" in result.output
+    assert "não tem etapas executáveis" in result.output
     assert "Success" not in result.output
 
 
@@ -107,7 +107,7 @@ def test_respects_configured_tool_selection(skill_cli):
     )
     result = CliRunner().invoke(cli, ["skill", "run", "calc"])
     assert result.exit_code != 0
-    assert "disabled tools: calculator" in result.output
+    assert "indisponíveis ou desligadas: calculator" in result.output
 
 
 def test_default_deny_blocks_real_shell_before_dispatch(skill_cli):

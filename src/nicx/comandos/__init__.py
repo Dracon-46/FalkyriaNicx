@@ -35,20 +35,20 @@ def _should_skip_update_check(ctx: click.Context, argv: list[str]) -> bool:
 
 
 @click.group(
-    help="Nicx — modular AI assistant backend",
+    help="Nicx — a IA da Falkyria que roda no seu computador.",
     invoke_without_command=True,
 )
 @click.version_option(version=nicx.__version__, prog_name="nicx")
-@click.option("--verbose", is_flag=True, default=False, help="Enable debug logging")
-@click.option("--quiet", is_flag=True, default=False, help="Suppress non-error output")
+@click.option(
+    "--verbose", is_flag=True, default=False, help="Mostra mensagens de depuração."
+)
+@click.option("--quiet", is_flag=True, default=False, help="Mostra só os erros.")
 @click.option(
     "--pick-model",
     "pick_model_bare",
     is_flag=True,
     default=False,
-    help=(
-        "Bare ``nicx``: force interactive model list (overrides NICX_SKIP_MODEL_PICK)."
-    ),
+    help='Com "nicx" sozinho: abre a lista de modelos (ignora NICX_SKIP_MODEL_PICK).',
 )
 @click.pass_context
 def cli(ctx: click.Context, verbose: bool, quiet: bool, pick_model_bare: bool) -> None:

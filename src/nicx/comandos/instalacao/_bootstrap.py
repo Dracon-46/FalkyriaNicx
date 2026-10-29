@@ -220,23 +220,29 @@ _CLOUD_PROVIDER_DEFAULT_MODELS: dict[str, str] = {
     "--write-config",
     is_flag=True,
     default=False,
-    help="Render config.toml from detected hardware + provided engine/model.",
+    help=(
+        "Gera o config.toml a partir do hardware detectado e do motor/modelo "
+        "informados."
+    ),
 )
 @click.option(
     "--engine",
     default="",
-    help="Inference engine slug (e.g. ollama). Empty = auto-recommend.",
+    help="Motor de inferência (ex.: ollama). Vazio = recomendação automática.",
 )
 @click.option(
     "--model",
     default="",
-    help="Model id (e.g. qwen3.5:2b). Empty = auto-recommend.",
+    help="ID do modelo (ex.: qwen3.5:2b). Vazio = recomendação automática.",
 )
 @click.option(
     "--prefer-cloud-when-available",
     is_flag=True,
     default=False,
-    help="If a known cloud-API key is in env, override engine/model to cloud.",
+    help=(
+        "Se houver uma chave de API de nuvem conhecida no ambiente, usa motor e modelo "
+        "de nuvem."
+    ),
 )
 def bootstrap_cmd(
     write_config: bool,
@@ -244,9 +250,9 @@ def bootstrap_cmd(
     model: str,
     prefer_cloud_when_available: bool,
 ) -> None:
-    """Internal helper used by install.sh — not for direct user invocation."""
+    """Uso interno do install.sh: não é para chamar direto."""
     if not write_config:
-        raise click.UsageError("--write-config is required")
+        raise click.UsageError("--write-config é obrigatório.")
 
     hw = detect_hardware()
     chosen_engine = engine or recommend_engine(hw)

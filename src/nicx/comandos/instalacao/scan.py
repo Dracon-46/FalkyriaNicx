@@ -662,25 +662,27 @@ def _emit_data_boundary_json(
 
 
 @click.command()
-@click.option("--quick", is_flag=True, default=False, help="Run only critical checks.")
-@click.option("--json", "as_json", is_flag=True, default=False, help="Output as JSON.")
+@click.option(
+    "--quick", is_flag=True, default=False, help="Roda só as verificações críticas."
+)
+@click.option("--json", "as_json", is_flag=True, default=False, help="Saída em JSON.")
 @click.option(
     "--data-boundaries",
     is_flag=True,
     default=False,
-    help="Run application data-boundary checks instead of host checks.",
+    help="Confere os limites dos dados do aplicativo em vez da máquina.",
 )
 @click.option(
     "--strict",
     is_flag=True,
     default=False,
-    help="Exit non-zero if data-boundary fail or warn findings are present.",
+    help="Sai com erro se houver falhas ou avisos nos limites de dados.",
 )
 @click.option(
     "--show-paths",
     is_flag=True,
     default=False,
-    help="Show absolute paths in data-boundary output.",
+    help="Mostra caminhos absolutos no resultado dos limites de dados.",
 )
 def scan(
     quick: bool,
@@ -689,10 +691,12 @@ def scan(
     strict: bool,
     show_paths: bool,
 ) -> None:
-    """Audit your environment for privacy and security risks."""
+    """Procura riscos de privacidade e segurança no seu ambiente."""
     if data_boundaries:
         if quick:
-            raise click.UsageError("--quick cannot be combined with --data-boundaries.")
+            raise click.UsageError(
+                "--quick não pode ser usado junto com --data-boundaries."
+            )
         config, root, config_loaded, config_error, root_error = (
             _load_data_boundary_config()
         )
@@ -714,7 +718,7 @@ def scan(
 
     if strict or show_paths:
         raise click.UsageError(
-            "--strict and --show-paths are only supported with --data-boundaries."
+            "--strict e --show-paths só funcionam com --data-boundaries."
         )
 
     scanner = PrivacyScanner()

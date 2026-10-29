@@ -12,25 +12,25 @@ from nicx.nucleo.config import DEFAULT_CONFIG_PATH
 
 
 @click.group("tunnel", invoke_without_command=True)
-@click.option("--port", default=8000, help="Local port to tunnel.")
+@click.option("--port", default=8000, help="Porta local a expor pelo túnel.")
 @click.pass_context
 def tunnel(ctx: click.Context, port: int) -> None:
-    """Start a Cloudflare tunnel or manage config."""
+    """Inicia um túnel do Cloudflare ou gerencia a configuração dele."""
     if ctx.invoked_subcommand is not None:
         return
     # Default behavior: start the tunnel
     if not shutil.which("cloudflared"):
-        click.echo("Error: cloudflared is not installed.")
+        click.echo("Erro: o cloudflared não está instalado.")
         click.echo(
-            "Install it from: "
+            "Instale em: "
             "https://developers.cloudflare.com/"
             "cloudflare-one/connections/"
             "connect-networks/downloads/"
         )
         sys.exit(1)
 
-    click.echo(f"Starting Cloudflare tunnel to localhost:{port}...")
-    click.echo("Press Ctrl+C to stop.\n")
+    click.echo(f"Abrindo o túnel do Cloudflare para localhost:{port}...")
+    click.echo("Aperte Ctrl+C para parar.\n")
 
     try:
         subprocess.run(
@@ -51,7 +51,7 @@ def tunnel(ctx: click.Context, port: int) -> None:
 
 @tunnel.command("status")
 def status() -> None:
-    """Show current tunnel configuration."""
+    """Mostra a configuração atual do túnel."""
     config_path = DEFAULT_CONFIG_PATH
     if not config_path.exists():
         click.echo("No config file found.")

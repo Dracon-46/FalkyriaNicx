@@ -11,12 +11,12 @@ from rich.table import Table
 
 @click.group("channels")
 def channels() -> None:
-    """Manage messaging channels (iMessage/SMS via SendBlue, Slack)."""
+    """Gerencia canais de mensagens (iMessage/SMS pelo SendBlue, Slack)."""
 
 
 @channels.command("status")
 def channels_status() -> None:
-    """Show status of all configured channels."""
+    """Mostra o estado de todos os canais configurados."""
     from nicx.canais.imessage_daemon import is_running
 
     console = Console()
@@ -46,15 +46,15 @@ def channels_status() -> None:
 @click.option(
     "--background/--foreground",
     default=True,
-    help="Run in background.",
+    help="Roda em segundo plano.",
 )
 def imessage_start(
     chat_identifier: str,
     background: bool,
 ) -> None:
-    """Start the iMessage daemon for CHAT_IDENTIFIER.
+    """Inicia o serviço do iMessage para CHAT_IDENTIFIER.
 
-    CHAT_IDENTIFIER is the phone number or email to monitor.
+    CHAT_IDENTIFIER é o telefone ou o e-mail a acompanhar.
     """
     from nicx.canais.imessage_daemon import (
         is_running,
@@ -153,7 +153,7 @@ def imessage_start(
 
 @channels.command("imessage-stop")
 def imessage_stop() -> None:
-    """Stop the iMessage daemon."""
+    """Para o serviço do iMessage."""
     from nicx.canais.imessage_daemon import stop_daemon
 
     console = Console()

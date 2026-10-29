@@ -42,7 +42,7 @@ class TestToolCmd:
         """Test that inspecting an unknown tool shows an error."""
         result = CliRunner().invoke(cli, ["tool", "inspect", "nonexistent_tool_xyz"])
         assert result.exit_code == 0  # CLI still exits 0, just shows error message
-        assert "not found" in result.output.lower() or "error" in result.output.lower()
+        assert "não encontrada" in result.output.lower()
 
     def test_tool_inspect_known_tool(self) -> None:
         """Test that inspecting a known tool shows details."""

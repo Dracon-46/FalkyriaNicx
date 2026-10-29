@@ -26,8 +26,8 @@ def _get_backend(backend_key: str | None = None):
 
     if not MemoryRegistry.contains(key):
         raise click.ClickException(
-            f"Memory backend '{key}' not found. "
-            f"Available: {', '.join(MemoryRegistry.keys())}"
+            f"Backend de memória '{key}' não encontrado. "
+            f"Disponíveis: {', '.join(MemoryRegistry.keys())}"
         )
 
     if key == "sqlite":
@@ -37,7 +37,7 @@ def _get_backend(backend_key: str | None = None):
 
 @click.group()
 def memory() -> None:
-    """Manage the memory store."""
+    """Gerencia a memória."""
 
 
 @memory.command()
@@ -46,19 +46,19 @@ def memory() -> None:
     "--backend",
     "-b",
     default=None,
-    help="Override the default memory backend.",
+    help="Usa outro backend de memória.",
 )
 @click.option(
     "--chunk-size",
     default=512,
     type=click.IntRange(min=1),
-    help="Chunk size in tokens.",
+    help="Tamanho de cada trecho, em tokens.",
 )
 @click.option(
     "--chunk-overlap",
     default=64,
     type=click.IntRange(min=0),
-    help="Overlap between chunks in tokens.",
+    help="Sobreposição entre trechos, em tokens.",
 )
 def index(
     path: str,
@@ -66,12 +66,12 @@ def index(
     chunk_size: int,
     chunk_overlap: int,
 ) -> None:
-    """Index documents from a file or directory."""
+    """Indexa os documentos de um arquivo ou pasta."""
     console = Console(stderr=True)
     target = Path(path)
 
     if not target.exists():
-        console.print(f"[red]Path not found:[/red] {path}")
+        console.print(f"[red]Caminho não encontrado:[/red] {path}")
         raise SystemExit(1)
 
     t0 = time.time()
@@ -142,20 +142,20 @@ def index(
     "-k",
     default=5,
     type=int,
-    help="Number of results to return.",
+    help="Quantidade de resultados.",
 )
 @click.option(
     "--backend",
     "-b",
     default=None,
-    help="Override the default memory backend.",
+    help="Usa outro backend de memória.",
 )
 def search(
     query: tuple[str, ...],
     top_k: int,
     backend: str | None,
 ) -> None:
-    """Search the memory store."""
+    """Busca na memória."""
     console = Console()
     query_text = " ".join(query)
 
@@ -206,7 +206,7 @@ def _get_fact_store():
 
 @memory.command(name="list")
 def list_facts() -> None:
-    """List durable facts captured by the automatic memory service."""
+    """Lista os fatos guardados pela memória automática."""
     console = Console()
 
     store = _get_fact_store()
@@ -242,10 +242,12 @@ def list_facts() -> None:
 @memory.command(name="trust")
 @click.argument("index", type=int)
 def trust_fact(index: int) -> None:
-    """Promote quarantined fact INDEX (as shown by `memory list`) to trusted.
+    """Marca como confiável o fato em quarentena INDEX (o número do
+    "nicx memory list").
 
-    Only do this after reading the fact: a quarantined fact matched an
-    injection pattern, and promoting it puts its text into future prompts.
+    Só faça isso depois de ler o fato: ele foi para a quarentena porque
+    parece uma injeção de prompt, e confiar nele põe o texto dele nos
+    próximos prompts.
     """
     console = Console()
 
@@ -275,10 +277,10 @@ def trust_fact(index: int) -> None:
     "-y",
     is_flag=True,
     default=False,
-    help="Skip the confirmation prompt.",
+    help="Não pede confirmação.",
 )
 def clear(yes: bool) -> None:
-    """Remove all durable facts captured by the automatic memory service."""
+    """Apaga todos os fatos guardados pela memória automática."""
     console = Console()
 
     store = _get_fact_store()
@@ -301,10 +303,10 @@ def clear(yes: bool) -> None:
     "--backend",
     "-b",
     default=None,
-    help="Override the default memory backend.",
+    help="Usa outro backend de memória.",
 )
 def stats(backend: str | None) -> None:
-    """Show memory store statistics."""
+    """Mostra estatísticas da memória."""
     console = Console()
 
     mem = _get_backend(backend)

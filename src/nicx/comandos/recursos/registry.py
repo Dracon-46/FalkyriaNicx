@@ -64,12 +64,12 @@ def _load_registry_map() -> tuple[dict[str, object], dict[str, object]]:
 
 @click.group()
 def registry() -> None:
-    """Inspect registered components — list registries, show entries."""
+    """Inspeciona os componentes registrados: lista registros e mostra entradas."""
 
 
 @registry.command("list")
 def list_registries() -> None:
-    """List all available registries."""
+    """Lista todos os registros disponíveis."""
     console = Console(stderr=True)
 
     table = Table(title="Available Registries")
@@ -80,7 +80,7 @@ def list_registries() -> None:
     try:
         by_name, _ = _load_registry_map()
     except Exception as exc:
-        console.print(f"[red]Error loading registries: {exc}[/red]")
+        console.print(f"[red]Erro ao carregar os registros: {exc}[/red]")
         return
 
     module_path = "nicx.nucleo.registry"
@@ -89,7 +89,7 @@ def list_registries() -> None:
             count = len(registry_cls.keys())
             table.add_row(reg_name, module_path, str(count))
         except Exception as exc:
-            table.add_row(reg_name, module_path, f"[red]Error: {exc}[/red]")
+            table.add_row(reg_name, module_path, f"[red]Erro: {exc}[/red]")
 
     console.print(table)
 
@@ -97,10 +97,14 @@ def list_registries() -> None:
 @registry.command()
 @click.argument("registry_name")
 @click.option(
-    "--verbose", "-v", is_flag=True, default=False, help="Show full entry details"
+    "--verbose",
+    "-v",
+    is_flag=True,
+    default=False,
+    help="Mostra todos os detalhes de cada entrada.",
 )
 def show(registry_name: str, verbose: bool) -> None:
-    """Show entries in a specific registry."""
+    """Mostra as entradas de um registro."""
     console = Console(stderr=True)
 
     try:
@@ -108,7 +112,7 @@ def show(registry_name: str, verbose: bool) -> None:
 
         registry_cls = aliases.get(registry_name)
         if registry_cls is None:
-            console.print(f"[red]Unknown registry: {registry_name}[/red]")
+            console.print(f"[red]Registro desconhecido: {registry_name}[/red]")
             console.print(
                 "[dim]Run 'nicx registry list' to see available registries.[/dim]"
             )
@@ -140,7 +144,7 @@ def show(registry_name: str, verbose: bool) -> None:
             console.print(table)
 
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 __all__ = ["registry"]

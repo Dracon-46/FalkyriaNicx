@@ -17,12 +17,12 @@ def _builtin_operators_dir() -> Path:
 
 @click.group()
 def operators() -> None:
-    """Manage operators — persistent, scheduled autonomous agents."""
+    """Gerencia os operadores: agentes autônomos, persistentes e agendados."""
 
 
 @operators.command("list")
 def list_operators() -> None:
-    """List all discovered operators and their status."""
+    """Lista os operadores encontrados e o estado de cada um."""
     console = Console(stderr=True)
     try:
         from nicx.cerebro.operadores.loader import load_operator
@@ -75,18 +75,18 @@ def list_operators() -> None:
 
         console.print(table)
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @operators.command()
 @click.argument("operator_id")
 def info(operator_id: str) -> None:
-    """Show detailed info about an operator."""
+    """Mostra os detalhes de um operador."""
     console = Console(stderr=True)
     try:
         manifest = _find_manifest(operator_id)
         if manifest is None:
-            console.print(f"[red]Operator not found: {operator_id}[/red]")
+            console.print(f"[red]Operador não encontrado: {operator_id}[/red]")
             return
 
         console.print(f"[bold cyan]{manifest.name}[/bold cyan] ({manifest.id})")
@@ -104,13 +104,13 @@ def info(operator_id: str) -> None:
             preview = manifest.system_prompt[:200].replace("\n", " ")
             console.print(f"  System prompt: {preview}...")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @operators.command()
 @click.argument("operator_id")
 def activate(operator_id: str) -> None:
-    """Activate an operator (creates a scheduler task)."""
+    """Ativa um operador (cria uma tarefa no agendador)."""
     console = Console(stderr=True)
     try:
         system, manager = _build_system_with_operators()
@@ -118,52 +118,52 @@ def activate(operator_id: str) -> None:
         msg = f"Activated operator {operator_id} (task: {task_id})"
         console.print(f"[green]{msg}[/green]")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @operators.command()
 @click.argument("operator_id")
 def deactivate(operator_id: str) -> None:
-    """Deactivate an operator (cancels its scheduler task)."""
+    """Desativa um operador (cancela a tarefa dele no agendador)."""
     console = Console(stderr=True)
     try:
         system, manager = _build_system_with_operators()
         manager.deactivate(operator_id)
         console.print(f"[yellow]Deactivated operator {operator_id}[/yellow]")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @operators.command()
 @click.argument("operator_id")
 def pause(operator_id: str) -> None:
-    """Pause an active operator."""
+    """Pausa um operador ativo."""
     console = Console(stderr=True)
     try:
         system, manager = _build_system_with_operators()
         manager.pause(operator_id)
         console.print(f"[yellow]Paused operator {operator_id}[/yellow]")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @operators.command()
 @click.argument("operator_id")
 def resume(operator_id: str) -> None:
-    """Resume a paused operator."""
+    """Retoma um operador pausado."""
     console = Console(stderr=True)
     try:
         system, manager = _build_system_with_operators()
         manager.resume(operator_id)
         console.print(f"[green]Resumed operator {operator_id}[/green]")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @operators.command("run")
 @click.argument("operator_id")
 def run_once(operator_id: str) -> None:
-    """Execute a single tick of an operator immediately (for testing)."""
+    """Roda agora um ciclo do operador (para teste)."""
     console = Console(stderr=True)
     try:
         system, manager = _build_system_with_operators()
@@ -171,14 +171,14 @@ def run_once(operator_id: str) -> None:
         result = manager.run_once(operator_id)
         console.print(f"\n[bold]Result:[/bold]\n{result}")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @operators.command()
 @click.argument("operator_id")
-@click.option("-n", "--lines", default=10, help="Number of log entries to show.")
+@click.option("-n", "--lines", default=10, help="Quantos registros mostrar.")
 def logs(operator_id: str, lines: int) -> None:
-    """Show execution logs for an operator."""
+    """Mostra o histórico de execuções de um operador."""
     console = Console(stderr=True)
     try:
         from nicx.agenda.store import SchedulerStore
@@ -216,20 +216,20 @@ def logs(operator_id: str, lines: int) -> None:
             )
         console.print(table)
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @operators.command()
 @click.argument("path")
 def install(path: str) -> None:
-    """Install an operator TOML manifest to the manifests directory."""
+    """Instala o manifesto TOML de um operador na pasta de manifestos."""
     console = Console(stderr=True)
     try:
         from nicx.nucleo.config import DEFAULT_CONFIG_DIR
 
         src = Path(path)
         if not src.exists():
-            console.print(f"[red]File not found: {path}[/red]")
+            console.print(f"[red]Arquivo não encontrado: {path}[/red]")
             return
 
         dest_dir = DEFAULT_CONFIG_DIR / "operators"
@@ -238,7 +238,7 @@ def install(path: str) -> None:
         shutil.copy2(src, dest)
         console.print(f"[green]Installed operator to {dest}[/green]")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 # -- Helpers -----------------------------------------------------------------

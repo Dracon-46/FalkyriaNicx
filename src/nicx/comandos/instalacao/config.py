@@ -17,7 +17,7 @@ from rich.table import Table
 
 @click.group()
 def config() -> None:
-    """Inspect configuration — show loaded settings, hardware, and config files."""
+    """Inspeciona a configuração: valores carregados, hardware e arquivos."""
 
 
 def _get_config_path(path: str | None) -> Path:
@@ -73,7 +73,9 @@ def _show_config_template(console: Console, config_path: Path) -> None:
         generate_default_toml,
     )
 
-    console.print(f"[yellow]Config file not found: {config_path}[/yellow]")
+    console.print(
+        f"[yellow]Arquivo de configuração não encontrado: {config_path}[/yellow]"
+    )
     config_location = str(DEFAULT_CONFIG_DIR / "config.toml")
     msg = f"Create one at {config_location} or use --path to specify a location."
     console.print(f"[dim]{msg}[/dim]")
@@ -210,11 +212,11 @@ def _show_hardware(console: Console) -> None:
 
 # Nested group for show sub-commands
 @click.group(invoke_without_command=True)
-@click.option("--path", "-p", default=None, help="Explicit config file path")
-@click.option("--json", "as_json", is_flag=True, default=False, help="Output as JSON")
+@click.option("--path", "-p", default=None, help="Caminho do arquivo de configuração.")
+@click.option("--json", "as_json", is_flag=True, default=False, help="Saída em JSON.")
 @click.pass_context
 def show_group(ctx: click.Context, path: str | None, as_json: bool) -> None:
-    """Show configuration details."""
+    """Mostra os detalhes da configuração."""
     # Default to 'loaded' if no subcommand is invoked
     if ctx.invoked_subcommand is None:
         console = Console(stderr=True)
@@ -222,54 +224,54 @@ def show_group(ctx: click.Context, path: str | None, as_json: bool) -> None:
             config_path = _get_config_path(path)
             _show_loaded_config(console, config_path, as_json)
         except Exception as exc:
-            console.print(f"[red]Error: {exc}[/red]")
+            console.print(f"[red]Erro: {exc}[/red]")
 
 
 @show_group.command()
-@click.option("--path", "-p", default=None, help="Explicit config file path")
-@click.option("--json", "as_json", is_flag=True, default=False, help="Output as JSON")
+@click.option("--path", "-p", default=None, help="Caminho do arquivo de configuração.")
+@click.option("--json", "as_json", is_flag=True, default=False, help="Saída em JSON.")
 def loaded(path: str | None, as_json: bool) -> None:
-    """Show the loaded effective configuration from config.toml."""
+    """Mostra a configuração em vigor, carregada do config.toml."""
     console = Console(stderr=True)
     try:
         config_path = _get_config_path(path)
         _show_loaded_config(console, config_path, as_json)
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @show_group.command()
-@click.option("--path", "-p", default=None, help="Explicit config file path")
+@click.option("--path", "-p", default=None, help="Caminho do arquivo de configuração.")
 def toml(path: str | None) -> None:
-    """Show the raw TOML configuration file content with syntax highlighting."""
+    """Mostra o arquivo TOML como está, com cores."""
     console = Console(stderr=True)
     try:
         config_path = _get_config_path(path)
         _show_toml_config(console, config_path)
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @show_group.command("json")
-@click.option("--path", "-p", default=None, help="Explicit config file path")
+@click.option("--path", "-p", default=None, help="Caminho do arquivo de configuração.")
 def as_json(path: str | None) -> None:
-    """Show the parsed TOML configuration as JSON."""
+    """Mostra a configuração TOML lida, em JSON."""
     console = Console(stderr=True)
     try:
         config_path = _get_config_path(path)
         _show_json_config(console, config_path)
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @show_group.command()
 def hardware() -> None:
-    """Show detected hardware information with recommended engine and model."""
+    """Mostra o hardware detectado e o motor e o modelo recomendados."""
     console = Console(stderr=True)
     try:
         _show_hardware(console)
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 # Register the show group under config
@@ -278,12 +280,11 @@ config.add_command(show_group, "show")
 
 @config.command("path")
 def show_path() -> None:
-    """Print the resolved Nicx directories (home, config, cache).
+    """Mostra as pastas do Nicx (home, config, cache).
 
-    All Nicx state lives under a single root, resolved in priority
-    order: ``$NICX_HOME`` > ``$XDG_DATA_HOME/nicx`` >
-    ``~/.nicx``. Use this to confirm where your data is stored after
-    setting an override.
+    Tudo do Nicx fica numa pasta raiz, escolhida nesta ordem:
+    $NICX_HOME > $XDG_DATA_HOME/nicx > ~/.nicx. Use para conferir onde
+    os seus dados estão depois de mudar essa pasta.
     """
     from nicx.nucleo.paths import get_cache_dir, get_config_dir, get_config_path
 
@@ -333,7 +334,7 @@ def _coerce_value(value: str, target_type: type) -> object:
         if low in ("false", "0", "no"):
             return False
         raise ValueError(
-            f"Invalid boolean value: {value!r} (expected: true/false, yes/no, 1/0)"
+            f"Valor booleano inválido: {value!r} (use true/false, yes/no ou 1/0)"
         )
     if target_type is int:
         return int(value)
@@ -346,7 +347,7 @@ def _coerce_value(value: str, target_type: type) -> object:
 @click.argument("key")
 @click.argument("value")
 def set_config(key: str, value: str) -> None:
-    """Set a configuration value (e.g. nicx config set engine.ollama.host URL)."""
+    """Altera um valor da configuração (ex.: nicx config set engine.ollama.host URL)."""
     import tomlkit
 
     from nicx.nucleo.config import DEFAULT_CONFIG_DIR, validate_config_key
@@ -357,7 +358,7 @@ def set_config(key: str, value: str) -> None:
     try:
         target_type = validate_config_key(key)
     except ValueError as exc:
-        console.print(f"[red]Error:[/red] {exc}")
+        console.print(f"[red]Erro:[/red] {exc}")
         raise SystemExit(1)
 
     # Coerce value
@@ -365,7 +366,7 @@ def set_config(key: str, value: str) -> None:
         typed_value = _coerce_value(value, target_type)
     except (ValueError, TypeError) as exc:
         console.print(
-            f"[red]Error:[/red] Cannot convert {value!r} to "
+            f"[red]Erro:[/red] Não dá para converter {value!r} em "
             f"{target_type.__name__}: {exc}"
         )
         raise SystemExit(1)

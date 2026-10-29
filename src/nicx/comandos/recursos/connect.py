@@ -42,7 +42,7 @@ def _disconnect_source(registry: object, source: str) -> None:
     console = Console()
 
     if not registry.contains(source):  # type: ignore[attr-defined]
-        console.print(f"[red]Unknown source: {source}[/red]")
+        console.print(f"[red]Fonte desconhecida: {source}[/red]")
         return
 
     connector_cls = registry.get(source)  # type: ignore[attr-defined]
@@ -59,7 +59,7 @@ def _connect_source(registry: object, source: str, path: str = "") -> None:
     console = Console()
 
     if not registry.contains(source):  # type: ignore[attr-defined]
-        console.print(f"[red]Unknown source: {source}[/red]")
+        console.print(f"[red]Fonte desconhecida: {source}[/red]")
         console.print(
             "[yellow]Available sources: "
             + ", ".join(registry.keys())  # type: ignore[attr-defined]
@@ -174,24 +174,24 @@ def _connect_source(registry: object, source: str, path: str = "") -> None:
     "--list",
     "list_sources",
     is_flag=True,
-    help="List connected sources and sync status.",
+    help="Lista as fontes conectadas e o estado da sincronização.",
 )
 @click.option(
     "--sync",
     "trigger_sync",
     is_flag=True,
-    help="Trigger incremental sync for all sources.",
+    help="Sincroniza as novidades de todas as fontes.",
 )
 @click.option(
     "--disconnect",
     "disconnect_source",
     default="",
-    help="Disconnect a source.",
+    help="Desconecta uma fonte.",
 )
 @click.option(
     "--path",
     default="",
-    help="Path for filesystem connectors (e.g., Obsidian vault).",
+    help="Caminho para conectores de arquivos (ex.: cofre do Obsidian).",
 )
 @click.pass_context
 def connect(
@@ -202,7 +202,7 @@ def connect(
     disconnect_source: str,
     path: str,
 ) -> None:
-    """Manage data source connections (Gmail, Obsidian, etc.)."""
+    """Gerencia as conexões com fontes de dados (Gmail, Obsidian etc.)."""
     # Lazy imports to avoid top-level side effects
     import nicx.conectores  # noqa: F401 — registers all connectors
     from nicx.nucleo.registry import ConnectorRegistry

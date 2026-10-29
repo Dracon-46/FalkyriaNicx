@@ -405,7 +405,8 @@ def _run_agent(
 
     if not AgentRegistry.contains(agent_name):
         raise click.ClickException(
-            f"Unknown agent: {agent_name}. Available: {', '.join(AgentRegistry.keys())}"
+            f"Agente desconhecido: {agent_name}. "
+            f"Disponíveis: {', '.join(AgentRegistry.keys())}"
         )
 
     agent_cls = AgentRegistry.get(agent_name)
@@ -720,27 +721,33 @@ def _print_profile(
 
 @click.command()
 @click.argument("query", nargs=-1, required=True)
-@click.option("-m", "--model", "model_name", default=None, help="Model to use.")
-@click.option("-e", "--engine", "engine_key", default=None, help="Engine backend.")
+@click.option("-m", "--model", "model_name", default=None, help="Modelo a usar.")
+@click.option("-e", "--engine", "engine_key", default=None, help="Motor de inferência.")
 @click.option(
     "-t",
     "--temperature",
     default=None,
     type=float,
-    help="Sampling temperature (default: from config).",
+    help="Temperatura de amostragem (padrão: a da configuração).",
 )
 @click.option(
     "--max-tokens",
     default=None,
     type=int,
-    help="Max tokens to generate (default: from config).",
+    help="Máximo de tokens na resposta (padrão: o da configuração).",
 )
-@click.option("--json", "output_json", is_flag=True, help="Output raw JSON result.")
-@click.option("--no-stream", is_flag=True, help="Disable streaming (sync mode).")
+@click.option(
+    "--json", "output_json", is_flag=True, help="Mostra o resultado bruto em JSON."
+)
+@click.option(
+    "--no-stream",
+    is_flag=True,
+    help="Desliga o streaming (espera a resposta inteira).",
+)
 @click.option(
     "--no-context",
     is_flag=True,
-    help="Disable memory context injection.",
+    help="Não usa o contexto da memória.",
 )
 @click.option(
     "-a",
@@ -748,30 +755,30 @@ def _print_profile(
     "agent_name",
     default=None,
     help=(
-        "Agent to use (simple, orchestrator, ...). "
-        "When omitted, falls back to ``agent.default_agent`` from config. "
-        "Pass ``--agent ''`` to force direct-to-engine mode (no agent)."
+        "Agente a usar (simple, orchestrator...). Se omitido, usa o "
+        "agent.default_agent da configuração. Com --agent '' fala direto com o motor, "
+        "sem agente."
     ),
 )
 @click.option(
     "--tools",
     "tool_names",
     default=None,
-    help="Comma-separated tool names to enable (e.g. calculator,think).",
+    help="Ferramentas a ligar, separadas por vírgula (ex.: calculator,think).",
 )
 @click.option(
     "--profile",
     "enable_profile",
     is_flag=True,
-    help="Print inference telemetry profile (latency, tokens, energy, IPW).",
+    help="Mostra a telemetria da inferência (latência, tokens, energia, IPW).",
 )
 @click.option(
     "--research",
     "research_mode",
     is_flag=True,
     help=(
-        "Route the query through the hybrid-search research agent over the "
-        "personal knowledge store (BM25 + dense embeddings, max 5 tool calls)."
+        "Responde com o agente de pesquisa sobre a sua base de conhecimento pessoal "
+        "(busca híbrida BM25 + embeddings, até 5 chamadas de ferramenta)."
     ),
 )
 @click.option(
@@ -779,8 +786,8 @@ def _print_profile(
     "knowledge_db",
     default=None,
     help=(
-        "Override the KnowledgeStore path used by --research "
-        "(default: ~/.nicx/knowledge.db)."
+        "Outro caminho para a base de conhecimento do --research (padrão: "
+        "~/.nicx/knowledge.db)."
     ),
 )
 @click.option(
@@ -789,22 +796,22 @@ def _print_profile(
     "image_paths",
     multiple=True,
     type=click.Path(exists=True, dir_okay=False),
-    help="Image file for a vision model (e.g. gemma3). Repeatable.",
+    help="Imagem para um modelo de visão (ex.: gemma3). Pode repetir.",
 )
 @click.option(
     "-S",
     "--screen",
     "capture_screen",
     is_flag=True,
-    help="Capture the current screen and send it to the vision model.",
+    help="Captura a tela atual e envia ao modelo de visão.",
 )
 @click.option(
     "--persona",
     "persona_name",
     default=None,
     help=(
-        "Named persona dir under ~/.nicx/personas/<name>/ "
-        "(overrides config). Pass 'none' to disable all persona files."
+        "Persona salva em ~/.nicx/personas/<nome>/ (vale mais que a configuração). Use "
+        "'none' para desligar os arquivos de persona."
     ),
 )
 @click.option(
@@ -813,7 +820,8 @@ def _print_profile(
     "router_policy",
     default=None,
     help=(
-        "Routing policy to select model (e.g. heuristic, learned). Overrides config."
+        "Política de roteamento que escolhe o modelo (ex.: heuristic, learned). Vale "
+        "mais que a configuração."
     ),
 )
 @click.pass_context
@@ -837,7 +845,7 @@ def ask(
     capture_screen: bool = False,
     router_policy: str | None = None,
 ) -> None:
-    """Ask Nicx a question."""
+    """Faz uma pergunta ao Nicx."""
     quiet = (ctx.obj or {}).get("quiet", False) or output_json
     print_banner(quiet=quiet)
     console = Console(stderr=True)

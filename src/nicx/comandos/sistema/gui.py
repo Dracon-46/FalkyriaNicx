@@ -169,8 +169,9 @@ def _terminate_frontend(
     owned, unknown = _inspect_frontend_processes(state)
     if unknown:
         raise click.ClickException(
-            "Could not verify frontend process ownership; saved state was kept. "
-            "Retry when process information is accessible."
+            "Não consegui confirmar de quem são os processos do frontend; o estado "
+            "salvo foi mantido. Tente de novo quando os processos estiverem "
+            "acessíveis."
         )
     processes = _frontend_processes(state, live_process, verified=owned)
     # POSIX launchers have a dedicated session. A verified surviving member
@@ -193,7 +194,7 @@ def _terminate_frontend(
             process.kill()
     _, remaining = psutil.wait_procs(alive, timeout=1.0)
     if remaining:
-        raise click.ClickException("Could not stop every owned frontend process.")
+        raise click.ClickException("Não consegui parar todos os processos do frontend.")
     if live_process is not None and live_process.poll() is None:
         live_process.terminate()
         try:
@@ -204,7 +205,7 @@ def _terminate_frontend(
     remaining_owned, unknown = _inspect_frontend_processes(state)
     if remaining_owned or unknown:
         raise click.ClickException(
-            "Frontend ownership could not be cleared safely; saved state was kept."
+            "Não deu para liberar o frontend com segurança; o estado salvo foi mantido."
         )
     return bool(processes)
 
@@ -271,7 +272,7 @@ class _FrontendOwner:
             record["pid"] == self.process.pid for record in self.state["processes"]
         ):
             raise click.ClickException(
-                "Could not verify the frontend process identity."
+                "Não consegui confirmar a identidade do processo do frontend."
             )
         with _frontend_state_lock():
             current = _read_frontend_state()
@@ -279,8 +280,8 @@ class _FrontendOwner:
                 owned, unknown = _inspect_frontend_processes(current)
                 if owned or unknown:
                     raise click.ClickException(
-                        "Another frontend is still registered. Stop that graphical "
-                        "session before starting a new one."
+                        "Outro frontend ainda está registrado. Feche essa sessão "
+                        "gráfica antes de abrir uma nova."
                     )
             secure_write_json(_FRONTEND_STATE_FILE, self.state)
         self.registered = True
@@ -374,10 +375,10 @@ def _check_frontend_port(port: int) -> None:
     if _reclaim_port(port):
         return
     owner = _port_owner_pid(port)
-    held_by = f" It is held by PID {owner}." if owner else ""
+    held_by = f" Ela está com o PID {owner}." if owner else ""
     raise click.ClickException(
-        f"Frontend port {port} is unavailable and was not started by "
-        f"Nicx.{held_by} Stop it, or choose another port with "
+        f"A porta {port} do frontend está ocupada e não foi aberta pelo "
+        f"Nicx.{held_by} Libere a porta ou escolha outra com "
         f"--frontend-port."
     )
 
@@ -455,38 +456,46 @@ def _ensure_frontend_dependencies(frontend: Path, npm: str) -> None:
     )
     if result.returncode != 0:
         raise click.ClickException(
-            "Could not install frontend dependencies. "
-            "Run `npm install` in the frontend directory."
+            "Não consegui instalar as dependências do frontend. "
+            "Rode `npm install` na pasta frontend."
         )
 
 
 @click.command()
 @click.option(
-    "--frontend-port", default=5173, show_default=True, type=click.IntRange(1, 65535)
+    "--frontend-port",
+    default=5173,
+    show_default=True,
+    type=click.IntRange(1, 65535),
+    help="Porta do frontend.",
 )
 @click.option(
-    "--api-port", default=8000, show_default=True, type=click.IntRange(1, 65535)
+    "--api-port",
+    default=8000,
+    show_default=True,
+    type=click.IntRange(1, 65535),
+    help="Porta do servidor da API.",
 )
-@click.option("--no-server", is_flag=True, help="Do not start the API server.")
-@click.option("--no-browser", is_flag=True, help="Only start the frontend.")
+@click.option("--no-server", is_flag=True, help="Não inicia o servidor da API.")
+@click.option("--no-browser", is_flag=True, help="Só inicia o frontend.")
 def gui(frontend_port: int, api_port: int, no_server: bool, no_browser: bool) -> None:
-    """Start the browser-based graphical mode in the default browser.
+    """Abre o modo gráfico no navegador padrão.
 
-    This command is intended for source checkouts. For an installed desktop
-    application, launch Nicx from the operating system menu instead.
+    Feito para quem roda o Nicx a partir do código-fonte. Com o aplicativo
+    instalado, abra o Nicx pelo menu do sistema.
     """
     console = Console(stderr=True)
     frontend = _frontend_dir()
     if frontend is None:
         raise click.ClickException(
-            "The graphical frontend is not available in this installation. "
-            "Download the Nicx desktop app or run this command "
-            "from a source checkout."
+            "O modo gráfico não está disponível nesta instalação. "
+            "Use o aplicativo do Nicx ou rode este comando "
+            "a partir do código-fonte."
         )
     npm = shutil.which("npm") or shutil.which("npm.cmd")
     if npm is None:
         raise click.ClickException(
-            "Node.js/npm is required for graphical mode. Install Node.js 22 or newer."
+            "O modo gráfico precisa do Node.js/npm. Instale o Node.js 22 ou mais novo."
         )
     _check_frontend_port(frontend_port)
     _ensure_frontend_dependencies(frontend, npm)
@@ -497,12 +506,12 @@ def gui(frontend_port: int, api_port: int, no_server: bool, no_browser: bool) ->
     if not no_server and _api_healthy(api_port):
         if not _daemon_pid_alive(api_port, require_ready=True):
             raise click.ClickException(
-                f"API port {api_port} is already serving an unregistered service. "
-                "Stop it or choose another port. Use --no-server only when you "
-                "intend to use an externally managed Nicx backend."
+                f"A porta {api_port} da API já está com outro serviço. "
+                "Pare esse serviço ou escolha outra porta. Use --no-server só "
+                "se o servidor do Nicx for gerenciado por fora."
             )
         console.print(
-            f"[green]Reusing the API server already running on port {api_port}.[/green]"
+            f"[green]Usando o servidor da API que já roda na porta {api_port}.[/green]"
         )
         no_server = True
 
@@ -511,8 +520,8 @@ def gui(frontend_port: int, api_port: int, no_server: bool, no_browser: bool) ->
         uv = shutil.which("uv")
         if uv is None:
             raise click.ClickException(
-                "uv is required to start the API with desktop dependencies. "
-                "Install uv or use --no-server with an already-running API."
+                "Para iniciar a API com as dependências do app, é preciso o uv. "
+                "Instale o uv ou use --no-server com uma API já ligada."
             )
         server = subprocess.run(
             [
@@ -529,7 +538,9 @@ def gui(frontend_port: int, api_port: int, no_server: bool, no_browser: bool) ->
             check=False,
         )
         if server.returncode != 0:
-            raise click.ClickException("Could not start the Nicx API server.")
+            raise click.ClickException(
+                "Não consegui iniciar o servidor da API do Nicx."
+            )
 
     env = os.environ.copy()
     # Let browser requests use Vite's same-origin proxy at any frontend port.
@@ -572,9 +583,7 @@ def gui(frontend_port: int, api_port: int, no_server: bool, no_browser: bool) ->
         if not _wait_for_port(
             process, "127.0.0.1", frontend_port, on_poll=owner.refresh
         ):
-            raise click.ClickException(
-                "The graphical frontend did not start on the requested port."
-            )
+            raise click.ClickException("O modo gráfico não abriu na porta pedida.")
         owner.refresh()
         if not no_server:
             # Opening the page before the API answers makes the app cache a

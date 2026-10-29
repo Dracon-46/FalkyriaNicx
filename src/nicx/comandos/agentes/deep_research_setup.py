@@ -241,7 +241,7 @@ def _instantiate_connector(connector_id: str, config: Dict[str, Any]) -> Any:
 
         return GranolaConnector()
     else:
-        msg = f"Unknown connector: {connector_id}"
+        msg = f"Conector desconhecido: {connector_id}"
         raise ValueError(msg)
 
 
@@ -361,7 +361,7 @@ def _launch_chat(store: KnowledgeStore, console: Console) -> None:
                     console.print(f"  [dim]- {s}[/dim]")
                 console.print()
         except Exception as exc:  # noqa: BLE001
-            console.print(f"[red]Error: {exc}[/red]\n")
+            console.print(f"[red]Erro: {exc}[/red]\n")
 
 
 # ---------------------------------------------------------------------------
@@ -374,11 +374,11 @@ def _launch_chat(store: KnowledgeStore, console: Console) -> None:
     "--obsidian-vault",
     type=click.Path(exists=True, file_okay=False),
     default=None,
-    help="Path to an Obsidian vault directory.",
+    help="Pasta de um cofre do Obsidian.",
 )
-@click.option("--skip-chat", is_flag=True, help="Ingest only, don't launch chat.")
+@click.option("--skip-chat", is_flag=True, help="Só indexa, sem abrir a conversa.")
 def deep_research_setup(obsidian_vault: Optional[str], skip_chat: bool) -> None:
-    """Auto-detect local data sources, ingest, and launch Deep Research chat."""
+    """Acha as fontes de dados locais, indexa e abre a conversa de pesquisa."""
     console = Console()
     console.print("\n[bold]Deep Research Setup[/bold]\n")
 

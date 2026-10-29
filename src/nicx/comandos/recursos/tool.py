@@ -9,12 +9,12 @@ from rich.table import Table
 
 @click.group()
 def tool() -> None:
-    """Manage tools — list, inspect."""
+    """Gerencia as ferramentas: listar e inspecionar."""
 
 
 @tool.command("list")
 def list_tools() -> None:
-    """List all registered tools with their descriptions."""
+    """Lista todas as ferramentas registradas, com descrição."""
     console = Console(stderr=True)
     try:
         # Trigger tool registration by importing the tools module
@@ -53,13 +53,13 @@ def list_tools() -> None:
         console.print(table)
         console.print(f"\n[dim]Total: {len(keys)} tool(s)[/dim]")
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 @tool.command()
 @click.argument("tool_name")
 def inspect(tool_name: str) -> None:
-    """Show detailed information about a specific tool."""
+    """Mostra os detalhes de uma ferramenta."""
     console = Console(stderr=True)
     try:
         # Trigger tool registration by importing the tools module
@@ -67,7 +67,7 @@ def inspect(tool_name: str) -> None:
         from nicx.nucleo.registry import ToolRegistry
 
         if not ToolRegistry.contains(tool_name):
-            console.print(f"[red]Tool not found: {tool_name}[/red]")
+            console.print(f"[red]Ferramenta não encontrada: {tool_name}[/red]")
             console.print("[dim]Run 'nicx tool list' to see available tools.[/dim]")
             return
 
@@ -101,7 +101,7 @@ def inspect(tool_name: str) -> None:
             console.print(f"[yellow]Note: Could not instantiate tool: {e}[/yellow]")
 
     except Exception as exc:
-        console.print(f"[red]Error: {exc}[/red]")
+        console.print(f"[red]Erro: {exc}[/red]")
 
 
 __all__ = ["tool"]
