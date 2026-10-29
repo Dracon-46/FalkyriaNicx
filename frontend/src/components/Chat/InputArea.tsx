@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { Send, Square, Paperclip, Search, AudioLines } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppStore, generateId } from '../../lib/store';
+import { useTtsStore } from '../../lib/tts';
 import { streamChat, streamResearch } from '../../lib/sse';
 import { fetchSavings, getBase } from '../../lib/api';
 import { listConnectors, getSyncStatus } from '../../lib/connectors-api';
@@ -121,7 +122,12 @@ export function InputArea() {
   } = speech;
   // Hands-free mode sends through sendMessage, which is defined further down.
   const sendSpokenRef = useRef<(text: string) => Promise<SendOutcome>>(async () => 'not-sent');
-  const conversation = useVoiceConversation(speech, (text) => sendSpokenRef.current(text));
+  // Stopping the conversation mid-reply also stops the reply being generated.
+  const conversation = useVoiceConversation(
+    speech,
+    (text) => sendSpokenRef.current(text),
+    () => abortRef.current?.abort(),
+  );
 
   // "Nicx, ligar" without a window of its own opens the interface with
   // ?voz=1: start the hands-free conversation as soon as the voice is ready.
@@ -213,6 +219,8 @@ export function InputArea() {
     }
 
     if (spoken === undefined) setInput('');
+    // A new question silences whatever Nicx is still saying.
+    useTtsStore.getState().stop();
     let stopped = false;
 
     let convId = activeId;

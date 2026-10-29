@@ -1,5 +1,5 @@
 import { useAppStore } from './store';
-import { useTtsStore } from './tts';
+import { useTtsStore, type SpeechStream } from './tts';
 import { stripThinkTags } from './message-text';
 import type { SilenceOptions } from './audio-level';
 import i18n from '../i18n';
@@ -29,6 +29,8 @@ export interface ConversationDeps {
   send: (text: string) => Promise<SendOutcome>;
   onPhase: (phase: ConversationPhase) => void;
   notify: (message: string) => void;
+  /** Abort the reply being generated (stopping mid-reply cancels the stream too). */
+  cancel?: () => void;
 }
 
 /** Quiet time that ends an utterance, and how long one listening round lasts. */
@@ -96,10 +98,14 @@ export class VoiceConversation {
   stop(notice?: string): void {
     if (this.current === 'off') return;
     this.session += 1;
-    const wasSpeaking = this.current === 'speaking';
+    // The reply may already be speaking while it is still being written.
+    const busy = this.current === 'thinking' || this.current === 'speaking';
     this.setPhase('off');
     this.deps.speech().cancelRecording();
-    if (wasSpeaking) useTtsStore.getState().stop();
+    if (busy) {
+      useTtsStore.getState().stop();
+      this.deps.cancel?.();
+    }
     if (notice) this.deps.notify(notice);
   }
 
@@ -154,34 +160,109 @@ export class VoiceConversation {
     }
 
     this.setPhase('thinking');
-    const before = lastAssistant()?.id;
-    const outcome = await this.deps.send(text);
+    // Probe the voice first, so the reply can be spoken while it streams.
+    await useTtsStore.getState().ensureHealth();
     if (!this.alive(session)) return;
+    const before = lastAssistant()?.id;
+    const live = this.speakWhileStreaming(session, before);
+    let outcome: SendOutcome;
+    try {
+      outcome = await this.deps.send(text);
+    } finally {
+      live.detach();
+    }
+    if (!this.alive(session)) {
+      live.cancel();
+      return;
+    }
     if (outcome === 'not-sent') {
+      live.cancel();
       this.stop();
       return;
     }
 
     const reply = lastAssistant();
-    const spoken =
-      reply && reply.id !== before && outcome === 'done' ? stripThinkTags(reply.content) : '';
-    if (reply && spoken) {
-      await useTtsStore.getState().ensureHealth();
-      if (!this.alive(session)) return;
-      const tts = useTtsStore.getState();
-      if (tts.available === true) {
-        this.setPhase('speaking');
-        // Autoplay (Settings) may have picked this reply up already; never
-        // read it twice.
-        if (tts.speakingId !== reply.id && tts.autoSpokenId !== reply.id) {
-          tts.markAutoSpoken(reply.id);
-          void tts.speak(reply.id, spoken);
+    const fresh = reply && reply.id !== before && outcome === 'done' ? reply : undefined;
+    if (!fresh) live.cancel();
+    const tts = useTtsStore.getState();
+    if (fresh && tts.available === true) {
+      let speaking = false;
+      const stream = live.stream();
+      if (stream) {
+        // The final text may hold a last sentence with no full stop.
+        speaking = true;
+        stream.end(fresh.content);
+      } else {
+        // Nothing streamed (or autoplay got there first): speak the whole reply.
+        const spoken = stripThinkTags(fresh.content);
+        if (spoken) {
+          speaking = true;
+          // Autoplay (Settings) may have picked this reply up already; never
+          // read it twice.
+          if (tts.speakingId !== fresh.id && tts.autoSpokenId !== fresh.id) {
+            tts.markAutoSpoken(fresh.id);
+            void tts.speak(fresh.id, spoken);
+          }
         }
-        await waitForSpeechToEnd(reply.id);
+      }
+      if (speaking) {
+        this.setPhase('speaking');
+        await waitForSpeechToEnd(fresh.id);
+        if (!this.alive(session)) return;
         await new Promise((resolve) => setTimeout(resolve, ECHO_SETTLE_MS));
       }
     }
 
     await this.listen(session, 0);
+  }
+
+  /**
+   * While the reply streams, speak each sentence as soon as it is complete
+   * (see SpeechStream): the voice starts on the first sentence instead of
+   * after the whole reply. The phase turns to `speaking` when the voice does.
+   */
+  private speakWhileStreaming(session: number, before: string | undefined) {
+    let stream: SpeechStream | null = null;
+    let replyId: string | null = null;
+    const handle = {
+      stream: () => stream,
+      detach: () => {},
+      cancel: () => stream?.cancel(),
+    };
+    if (useTtsStore.getState().available !== true) return handle;
+
+    const onText = (content: string) => {
+      if (!this.alive(session) || !content) return;
+      if (!stream) {
+        const reply = lastAssistant();
+        if (!reply || reply.id === before) return;
+        const tts = useTtsStore.getState();
+        if (tts.speakingId === reply.id || tts.autoSpokenId === reply.id) return;
+        tts.markAutoSpoken(reply.id);
+        replyId = reply.id;
+        stream = tts.beginStream(reply.id);
+      }
+      stream.update(content);
+    };
+    const offText = useAppStore.subscribe((state, prev) => {
+      const content = state.streamState.content;
+      if (content !== prev.streamState.content) onText(content);
+    });
+    const offVoice = useTtsStore.subscribe((state) => {
+      if (
+        replyId !== null
+        && state.speakingId === replyId
+        && state.state === 'speaking'
+        && this.alive(session)
+        && this.current === 'thinking'
+      ) {
+        this.setPhase('speaking');
+      }
+    });
+    handle.detach = () => {
+      offText();
+      offVoice();
+    };
+    return handle;
   }
 }

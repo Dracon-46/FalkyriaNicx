@@ -75,19 +75,29 @@ export default function FloatingPage() {
   const streamText = useAppStore((s) => s.streamState.content);
 
   const goodbyeRef = useRef<() => void>(() => {});
+  const replyAbort = useRef<AbortController | null>(null);
   const send = useCallback(async (text: string): Promise<SendOutcome> => {
     if (isFarewell(text)) {
       goodbyeRef.current();
       return 'stopped';
     }
-    return sendSpokenMessage(text, {
-      conversationId: conversationId.current,
-      onConversation: (id) => {
-        conversationId.current = id;
-      },
-    });
+    const controller = new AbortController();
+    replyAbort.current = controller;
+    try {
+      return await sendSpokenMessage(text, {
+        conversationId: conversationId.current,
+        onConversation: (id) => {
+          conversationId.current = id;
+        },
+        signal: controller.signal,
+      });
+    } finally {
+      if (replyAbort.current === controller) replyAbort.current = null;
+    }
   }, []);
-  const conversation = useVoiceConversation(speech, send);
+  // Ending the conversation mid-reply also stops the reply being generated.
+  const cancelReply = useCallback(() => replyAbort.current?.abort(), []);
+  const conversation = useVoiceConversation(speech, send, cancelReply);
   const conversationRef = useRef(conversation);
   conversationRef.current = conversation;
 

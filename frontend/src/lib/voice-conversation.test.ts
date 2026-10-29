@@ -3,11 +3,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const h = vi.hoisted(() => ({
   messages: [] as Array<{ id: string; role: string; content: string }>,
   spoken: [] as Array<[string, string]>,
+  /** Calls made on streamed replies: [id, 'update' | 'end' | 'cancel', text]. */
+  streamed: [] as Array<[string, string, string]>,
 }));
 
-vi.mock('./store', () => ({
-  useAppStore: { getState: () => ({ messages: h.messages }) },
-}));
+vi.mock('./store', async () => {
+  const { create } = await import('zustand');
+  const useAppStore = create(() => ({
+    messages: h.messages,
+    streamState: { content: '' },
+  }));
+  return { useAppStore };
+});
 
 vi.mock('./tts', async () => {
   const { create } = await import('zustand');
@@ -19,6 +26,11 @@ vi.mock('./tts', async () => {
     ensureHealth: () => Promise<void>;
     markAutoSpoken: (id: string) => void;
     speak: (id: string, text: string) => Promise<void>;
+    beginStream: (id: string) => {
+      update: (text: string) => void;
+      end: (text?: string) => void;
+      cancel: () => void;
+    };
     stop: () => void;
   }
   const useTtsStore = create<FakeTts>((set) => ({
@@ -32,12 +44,27 @@ vi.mock('./tts', async () => {
       h.spoken.push([id, text]);
       set({ state: 'speaking', speakingId: id });
     },
+    beginStream: (id) => {
+      set({ state: 'loading', speakingId: id });
+      return {
+        update: (text) => {
+          h.streamed.push([id, 'update', text]);
+          set({ state: 'speaking' });
+        },
+        end: (text) => h.streamed.push([id, 'end', text ?? '']),
+        cancel: () => {
+          h.streamed.push([id, 'cancel', '']);
+          set({ state: 'idle', speakingId: null });
+        },
+      };
+    },
     stop: () => set({ state: 'idle', speakingId: null }),
   }));
   return { useTtsStore };
 });
 
 import { useTtsStore } from './tts';
+import { useAppStore } from './store';
 import {
   MAX_IDLE_ROUNDS,
   VoiceConversation,
@@ -46,6 +73,11 @@ import {
 } from './voice-conversation';
 
 type OnSilence = (heard: boolean) => void;
+
+/** The fake store only carries what the conversation reads: the streamed text. */
+function setStreamContent(content: string): void {
+  (useAppStore as unknown as { setState: (s: object) => void }).setState({ streamState: { content } });
+}
 
 function setup(opts: { transcript?: string; outcome?: SendOutcome; startOk?: boolean } = {}) {
   const phases: ConversationPhase[] = [];
@@ -80,6 +112,8 @@ function setup(opts: { transcript?: string; outcome?: SendOutcome; startOk?: boo
 beforeEach(() => {
   h.messages.length = 0;
   h.spoken.length = 0;
+  h.streamed.length = 0;
+  setStreamContent('');
   useTtsStore.setState({ state: 'idle', speakingId: null, available: true, autoSpokenId: null });
 });
 
@@ -176,6 +210,75 @@ describe('hands-free voice conversation', () => {
 
     expect(t.speech.startRecording).toHaveBeenCalledTimes(1);
     expect(h.spoken).toEqual([]);
+  });
+
+  it('speaks the reply while it is still streaming, then hands it the final text', async () => {
+    const t = setup();
+    let release!: (o: SendOutcome) => void;
+    t.send.mockImplementationOnce((text: string) => {
+      h.messages.push({ id: 'u', role: 'user', content: text });
+      h.messages.push({ id: 'live', role: 'assistant', content: '' });
+      return new Promise<SendOutcome>((r) => (release = r));
+    });
+    t.convo.start();
+    await vi.waitFor(() => expect(t.silences).toHaveLength(1));
+    t.lastSilence()(true);
+    await vi.waitFor(() => expect(t.send).toHaveBeenCalled());
+
+    // Tokens arrive: the voice starts before the reply is finished.
+    setStreamContent('São dez horas. E');
+    setStreamContent('São dez horas. E vinte.');
+    expect(h.streamed.map(([id, op]) => [id, op])).toEqual([
+      ['live', 'update'],
+      ['live', 'update'],
+    ]);
+    expect(t.convo.phase).toBe('speaking');
+    expect(useTtsStore.getState().autoSpokenId).toBe('live');
+
+    h.messages[h.messages.length - 1].content = 'São dez horas. E vinte';
+    release('done');
+    await vi.waitFor(() => expect(h.streamed[h.streamed.length - 1]).toEqual(['live', 'end', 'São dez horas. E vinte']));
+    // No second, whole-text read of the same reply.
+    expect(h.spoken).toEqual([]);
+
+    useTtsStore.setState({ state: 'idle', speakingId: null });
+    await vi.waitFor(() => expect(t.silences).toHaveLength(2));
+  });
+
+  it('stopping mid-reply silences the voice and cancels the reply', async () => {
+    const cancel = vi.fn();
+    const t = setup();
+    let release!: (o: SendOutcome) => void;
+    t.send.mockImplementationOnce((text: string) => {
+      h.messages.push({ id: 'u', role: 'user', content: text });
+      h.messages.push({ id: 'live', role: 'assistant', content: '' });
+      return new Promise<SendOutcome>((r) => (release = r));
+    });
+    const convo = new VoiceConversation({
+      speech: () => t.speech,
+      send: t.send,
+      onPhase: () => {},
+      notify: () => {},
+      cancel,
+    });
+    convo.start();
+    await vi.waitFor(() => expect(t.silences).toHaveLength(1));
+    t.lastSilence()(true);
+    await vi.waitFor(() => expect(t.send).toHaveBeenCalled());
+    setStreamContent('Primeira frase pronta. Segu');
+    expect(useTtsStore.getState().speakingId).toBe('live');
+
+    convo.stop();
+    expect(cancel).toHaveBeenCalledTimes(1);
+    expect(useTtsStore.getState().state).toBe('idle');
+
+    // Late tokens and the end of the request are ignored.
+    setStreamContent('Primeira frase pronta. Segunda.');
+    release('stopped');
+    await new Promise((r) => setTimeout(r, 0));
+    expect(h.streamed.filter(([, op]) => op === 'update')).toHaveLength(1);
+    expect(h.streamed.some(([, op]) => op === 'end')).toBe(false);
+    expect(t.speech.startRecording).toHaveBeenCalledTimes(1);
   });
 
   it('ends at once if the microphone cannot start', async () => {

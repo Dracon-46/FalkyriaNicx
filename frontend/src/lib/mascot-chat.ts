@@ -18,7 +18,8 @@ export const ERROR_MS = 3200;
  * `thinking` while a reply streams, `happy` for a moment when it finishes,
  * `error` when it fails, then back to `idle`. A reply the user stopped just
  * returns to `idle`. Moods set elsewhere meanwhile (voice: `listening`,
- * `speaking`) are never overwritten when the timers expire.
+ * `speaking`) are never overwritten when the timers expire, and a reply that
+ * is already being spoken when it finishes keeps the `speaking` mood.
  *
  * Failures are detected from the chat error log entries the send flow already
  * writes (`category: 'chat'`, `level: 'error'`), so no stream code changes.
@@ -76,6 +77,9 @@ export function bindMascotToChat(
     if (stopped) {
       clearTimer();
       if (mascot.getState().mood === 'thinking') mascot.getState().setMood('idle');
+    } else if (mascot.getState().mood === 'speaking') {
+      // The voice started on the first sentence and is still talking: let it.
+      clearTimer();
     } else {
       showFor('happy', HAPPY_MS);
     }

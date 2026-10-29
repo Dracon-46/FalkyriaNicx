@@ -112,4 +112,17 @@ describe('bindMascotToChat', () => {
     expect(mood()).toBe('speaking');
     unbind();
   });
+
+  it('keeps speaking when the reply finishes while its first sentences are spoken', () => {
+    const { unbind, start, reply, end } = setup();
+
+    start();
+    useMascot.getState().setMood('speaking');
+    reply(true);
+    end();
+    expect(mood()).toBe('speaking');
+    vi.advanceTimersByTime(HAPPY_MS);
+    expect(mood()).toBe('speaking');
+    unbind();
+  });
 });

@@ -133,7 +133,8 @@ describe('shared voice output', () => {
     expect(useMascot.getState().mood).toBe('speaking');
 
     FakeAudio.instances[0].onended?.();
-    expect(useMascot.getState().mood).toBe('idle');
+    await vi.waitFor(() => expect(useMascot.getState().mood).toBe('idle'));
+    expect(useTtsStore.getState().state).toBe('idle');
   });
 
   it('does not clobber a mood the chat flow set meanwhile', async () => {
@@ -169,8 +170,8 @@ describe('shared voice output', () => {
     // Clearing src fires a media error; the handler must already be detached.
     el.onerror?.();
 
+    await vi.waitFor(() => expect(useTtsStore.getState().state).toBe('idle'));
     expect(useTtsStore.getState().error).toBeNull();
-    expect(useTtsStore.getState().state).toBe('idle');
     expect(revoked).toEqual(created);
   });
 

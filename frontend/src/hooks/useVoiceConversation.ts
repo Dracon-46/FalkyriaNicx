@@ -13,17 +13,22 @@ export type { ConversationPhase, SendOutcome } from '../lib/voice-conversation';
 
 /**
  * Hands-free voice conversation for the chat composer (see VoiceConversation):
- * listen, send on silence, read the reply aloud, listen again.
+ * listen, send on silence, read the reply aloud (sentence by sentence, while it
+ * is still being written), listen again.
  */
 export function useVoiceConversation(
   speech: SpeechControls,
   send: (text: string) => Promise<SendOutcome>,
+  /** Abort the reply being generated when the conversation is stopped mid-reply. */
+  cancel?: () => void,
 ) {
   const [phase, setPhase] = useState<ConversationPhase>('off');
   const speechRef = useRef(speech);
   speechRef.current = speech;
   const sendRef = useRef(send);
   sendRef.current = send;
+  const cancelRef = useRef(cancel);
+  cancelRef.current = cancel;
 
   const controllerRef = useRef<VoiceConversation | null>(null);
   if (controllerRef.current === null) {
@@ -32,6 +37,7 @@ export function useVoiceConversation(
       send: (text) => sendRef.current(text),
       onPhase: setPhase,
       notify: (message) => toast(message, { duration: 6000 }),
+      cancel: () => cancelRef.current?.(),
     });
   }
   const controller = controllerRef.current;
