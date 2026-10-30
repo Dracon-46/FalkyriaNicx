@@ -158,7 +158,70 @@ def pop_due(now: Optional[datetime] = None) -> List[Reminder]:
         due = [r for r in items if r.due_at <= now]
         if due:
             _save([r for r in items if r.due_at > now])
+            _record_fired(due, now)
     return due
+
+
+# ---------------------------------------------------------------------------
+# Histórico dos que já dispararam (para o resumo do dia)
+# ---------------------------------------------------------------------------
+
+# Quantos dias de histórico ficam guardados.
+_HISTORY_DAYS = 14
+
+
+def _history_path() -> Path:
+    from nicx.nucleo.paths import get_config_dir
+
+    return get_config_dir() / "lembretes_disparados.json"
+
+
+def _load_history() -> List[dict]:
+    path = _history_path()
+    if not path.exists():
+        return []
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    return (
+        [item for item in raw if isinstance(item, dict)]
+        if isinstance(raw, list)
+        else []
+    )
+
+
+def _record_fired(due: List[Reminder], now: datetime) -> None:
+    """Guarda os que dispararam agora. Melhor esforço: nunca para o aviso."""
+    try:
+        cutoff = (now - timedelta(days=_HISTORY_DAYS)).isoformat()
+        kept = [h for h in _load_history() if str(h.get("fired", "")) >= cutoff]
+        fired = now.replace(microsecond=0).isoformat()
+        kept += [{**asdict(r), "fired": fired} for r in due]
+        path = _history_path()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(kept, ensure_ascii=False, indent=2), encoding="utf-8")
+        os.replace(tmp, path)
+    except Exception as exc:  # noqa: BLE001
+        logger.info("Histórico de lembretes não gravado: %s", exc)
+
+
+def fired_on(day) -> List[Reminder]:
+    """Lembretes que dispararam no dia ``day`` (``datetime.date``), na ordem."""
+    found: List[tuple[str, Reminder]] = []
+    for item in _load_history():
+        fired = str(item.get("fired", ""))
+        try:
+            if datetime.fromisoformat(fired).date() != day:
+                continue
+            fields = {k: v for k, v in item.items() if k != "fired"}
+            reminder = Reminder(**fields)
+            reminder.due_at
+        except (TypeError, ValueError):
+            continue
+        found.append((fired, reminder))
+    return [r for _fired, r in sorted(found, key=lambda pair: pair[0])]
 
 
 def message_for(reminder: Reminder, now: Optional[datetime] = None) -> str:
@@ -250,8 +313,11 @@ def _voice(preferred: str):
         return _VOICE
 
 
-def speak(message: str) -> None:
-    """Fala o aviso com a voz local, se instalada. Silencioso se não houver."""
+def speak(message: str, voice_id: str = "") -> None:
+    """Fala o aviso com a voz local, se instalada. Silencioso se não houver.
+
+    ``voice_id`` troca a voz configurada (ex.: a do idioma do texto).
+    """
     try:
         import io
 
@@ -266,7 +332,7 @@ def speak(message: str) -> None:
             return
         result = backend.synthesize(
             message,
-            voice_id=getattr(speech, "voice_id", "") or "pf_dora",
+            voice_id=voice_id or getattr(speech, "voice_id", "") or "pf_dora",
             speed=getattr(speech, "voice_speed", 1.0) or 1.0,
             output_format="wav",
         )
@@ -284,6 +350,21 @@ def notify(reminder: Reminder) -> None:
     speak(message)
 
 
+# Outras tarefas que o despertador confere a cada volta (ex.: o resumo do dia).
+_TASKS: List[Callable[[], None]] = []
+
+
+def add_task(task: Callable[[], None]) -> None:
+    """Pede ao despertador para chamar ``task`` a cada volta (uma vez só)."""
+    if task not in _TASKS:
+        _TASKS.append(task)
+
+
+def remove_task(task: Callable[[], None]) -> None:
+    if task in _TASKS:
+        _TASKS.remove(task)
+
+
 def _loop(interval: float, on_due: Callable[[Reminder], None]) -> None:
     while not _STOP.wait(interval):
         try:
@@ -291,6 +372,11 @@ def _loop(interval: float, on_due: Callable[[Reminder], None]) -> None:
                 on_due(reminder)
         except Exception:  # noqa: BLE001 - o despertador nunca pode morrer
             logger.exception("Falha no despertador de lembretes")
+        for task in list(_TASKS):
+            try:
+                task()
+            except Exception:  # noqa: BLE001
+                logger.exception("Falha numa tarefa do despertador")
 
 
 def start_alarm(

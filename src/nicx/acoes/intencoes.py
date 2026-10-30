@@ -324,7 +324,10 @@ def parse(text: str, idioma: Optional[str] = None) -> Optional[Action]:
     t, where = clean_with_map(text)
     if not t or len(t) > 200:
         return None
-    action = rotinas.parse(text, t, where)
+    from nicx.resumo import pedidos as pedidos_resumo
+
+    # "Resumo do dia", "como foi meu dia?" (pt, en, es, fr).
+    action = pedidos_resumo.parse(t) or rotinas.parse(text, t, where)
     if action is None and len(t) <= 80:
         for matcher in (_volume, _media, _open, _search, _info):
             action = matcher(t)

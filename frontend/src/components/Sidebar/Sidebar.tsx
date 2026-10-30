@@ -18,6 +18,7 @@ import {
   Loader2,
   ScrollText,
   Database,
+  FolderKanban,
 } from 'lucide-react';
 import { ConversationList } from './ConversationList';
 import { useAppStore } from '../../lib/store';
@@ -57,6 +58,7 @@ export function Sidebar() {
 
   const navItems = [
     { path: '/', icon: MessageSquare, label: t('nav.chat') },
+    { path: '/projetos', icon: FolderKanban, label: t('nav.projects') },
     { path: '/dashboard', icon: BarChart3, label: t('nav.dashboard') },
     { path: '/painel', icon: ChartSpline, label: t('nav.painel') },
     { path: '/data-sources', icon: Database, label: t('nav.dataSources') },

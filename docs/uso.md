@@ -133,6 +133,48 @@ ou atalho) e só se a área de transferência tinha texto (imagens e arquivos
 copiados nunca são trocados). O modelo também tem a ferramenta `contexto`,
 que entra no prompt só quando a mensagem fala da tela. Só no Windows.
 
+## Projetos e continuar de onde parei
+
+O Nicx guarda os seus projetos: objetivo, estado (onde você parou, em uma
+frase), pastas e arquivos, decisões, pendências e próximos passos. Página
+**Projetos** no menu, ou pelo chat e pela voz:
+
+| Pedido | O que faz |
+|---|---|
+| "cria o projeto Site Novo na pasta C:\dev\site" | Cria (a pasta pode ser o caminho ou o nome de uma pasta aberta no VS Code) |
+| "quais meus projetos?", "como está o projeto Lumen?", "o que falta no projeto Lumen?" | Responde na hora |
+| "anota no projeto Lumen que decidimos usar Postgres", "decisão no projeto Lumen: …" | Registra a decisão |
+| "adiciona pendência no projeto Lumen: comprar o domínio", "conclui a pendência comprar o domínio do projeto Lumen" | Pendências |
+| "atualiza o estado do projeto Lumen: API pronta", "arquiva o projeto Lumen", "renomeia o projeto Lumen para …" | Estado, arquivar, renomear |
+| "continue de onde parei", "o que eu estava fazendo?", "vamos continuar" | Resumo + sugestão do próximo passo (pelo modelo) |
+
+Também em inglês ("pick up where I left off", "what's left in project X?"),
+espanhol ("continúa donde lo dejé", "¿cómo va el proyecto X?") e francês
+("reprends où j'en étais", "où en est le projet X ?"). As respostas diretas
+saem na hora, sem modelo, nos 7 idiomas. "Vamos continuar" sozinho só vale
+na primeira mensagem da conversa.
+
+"Continue de onde parei" escolhe o projeto aberto na janela em uso (pasta do
+VS Code ou arquivo dentro de uma pasta do projeto) ou o de atividade mais
+recente, e manda ao modelo local um resumo curto (até ~3.000 caracteres):
+estado, pendências abertas, últimas decisões, últimos commits e arquivos
+alterados (`git` local, sem rede), arquivos mexidos por último e lembretes ou
+compromissos que citam o projeto. O modelo diz onde você parou, o que falta,
+sugere o próximo passo e pergunta se quer seguir por ali. Com um modelo da
+nuvem escolhido, o Nicx se recusa.
+
+A atividade é marcada quando você fala do projeto ou trabalha numa pasta dele
+(o Nicx olha a janela a cada 2 minutos e grava no máximo a cada 5, só com a
+leitura da tela ligada). Quando a conversa cita "o projeto X" (um que já
+existe) com "decidimos…" ou "falta…/preciso…", a memória automática anota a
+decisão ou a pendência como **sugerida**; nunca cria projeto sozinha.
+
+Tudo fica em `~/.nicx/projetos.json` (gravação atômica; a versão anterior em
+`projetos.json.bak`; um arquivo estragado é guardado como
+`projetos.json.corrompido` e os projetos voltam do `.bak`). Nada vai para
+logs nem analytics. O modelo também tem a ferramenta `projetos`, que entra no
+prompt só quando a mensagem fala de projeto.
+
 ## Ações rápidas
 
 Frases que o Nicx executa na hora, sem passar pelo modelo (texto ou voz):
@@ -158,6 +200,7 @@ Frases que o Nicx executa na hora, sem passar pelo modelo (texto ou voz):
 | Fechar apps | "fecha o Chrome" (como clicar no X: o app pode pedir para salvar) |
 | Energia | "desliga o PC", "reinicia o PC", "suspende o PC" (sempre pede "confirmo"); "cancela o desligamento" |
 | Sistema | "bloqueia o computador" |
+| Resumo do dia | "resumo do dia", "como foi meu dia?", "o que eu fiz hoje?", "o que ficou pendente hoje?", "resumo de ontem" |
 
 Os lembretes ficam em `~/.nicx/lembretes.json` e as anotações em
 `~/.nicx/notas.md`. Na hora marcada, o Nicx mostra uma notificação do Windows
@@ -230,3 +273,45 @@ que usa a ferramenta `controle_pc`.
 
 Volume e mídia usam as teclas multimídia do Windows; em outros sistemas
 funcionam abrir sites, hora, data e bateria.
+
+## Resumo do dia
+
+"Resumo do dia", "como foi meu dia?", "o que eu fiz hoje?", "o que ficou
+pendente hoje?" e "resumo de ontem" (também em inglês, espanhol e francês)
+respondem na hora, sem o modelo. O resumo junta, só do dia:
+
+- compromissos que já passaram e os que ainda vêm (agenda do Nicx e eventos
+  que o conector do Google Agenda/Outlook já trouxe);
+- lembretes que tocaram e os que ainda vêm (timers, alarmes e avisos de
+  compromisso ficam de fora);
+- quantas anotações foram feitas e as 3 últimas;
+- pastas organizadas (organizações desfeitas não contam);
+- projetos mexidos, pendências concluídas e as que ficaram abertas.
+
+Seções vazias somem, e a última frase diz o que tem amanhã. "O que ficou
+pendente" mostra só o que falta. Os lembretes que já tocaram ficam
+registrados por 14 dias em `~/.nicx/lembretes_disparados.json`.
+
+**Resumo automático** (desligado por padrão): em Configurações → Resumo do
+dia, ou no `config.toml`:
+
+```toml
+[resumo]
+ativo = true
+hora = "18:00"
+falar = true       # com a voz local, se instalada
+notificar = true   # notificação do Windows
+dias = ["seg", "ter", "qua", "qui", "sex"]
+```
+
+Com o `nicx serve` ligado, no horário (e nos dias marcados) o Nicx mostra a
+notificação e fala o resumo, uma vez por dia. Se o servidor só ligar depois
+do horário, o resumo sai assim que ele subir, no mesmo dia. A data do último
+envio fica em `~/.nicx/resumo_estado.json`. O idioma é o da voz
+(`[speech] language`).
+
+Na tela, "Ver resumo de hoje" mostra o texto; "Deixar mais natural" pede ao
+modelo local para reescrevê-lo (leva uns segundos a mais; modelo da nuvem
+nunca é usado). API: `GET /v1/resumo?dia=AAAA-MM-DD&idioma=pt-BR`
+(`&refinar=true` para o modelo) e `GET/PUT /v1/resumo/config`. Nada do
+resumo vai para analytics nem para os logs.

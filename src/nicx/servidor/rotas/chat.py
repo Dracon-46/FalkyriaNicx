@@ -206,6 +206,49 @@ async def _quick_action_reply(req: ChatCompletionRequest, config: Any) -> str | 
     return outcome.message if outcome is not None else None
 
 
+async def _project_turn(req: ChatCompletionRequest, config: Any, model: str):
+    """Project requests: "cria o projeto X", "continue de onde parei"...
+
+    Returns ``None`` for other messages, or a ``nicx.projetos`` ``Preparo``
+    with a ready reply (create, list, notes, open tasks) or, for "continue
+    where I left off", the project summary to append to the user turn. The
+    summary only goes to local models.
+    """
+    agent_cfg = getattr(config, "agent", None)
+    if req.tools or not getattr(agent_cfg, "quick_actions", True):
+        return None
+    last = req.messages[-1] if req.messages else None
+    if last is None or last.role != "user" or not isinstance(last.content, str):
+        return None
+    from nicx.contexto.montagem import orcamento_caracteres
+    from nicx.projetos import servico as projetos
+    from nicx.projetos.continuar import MAX_PADRAO
+
+    first = bool(req.voice) or not any(m.role == "assistant" for m in req.messages)
+    history = [m.content for m in req.messages if isinstance(m.content, str)]
+    budget = orcamento_caracteres(_num_ctx(config), history, req.max_tokens)
+    try:
+        prepared = await asyncio.to_thread(
+            projetos.preparar,
+            last.content,
+            idioma=req.language,
+            primeira=first,
+            max_resumo=min(MAX_PADRAO, budget),
+        )
+    except Exception:  # noqa: BLE001 — a broken projects file never blocks chat
+        logging.getLogger("nicx.servidor").debug("Projects failed", exc_info=True)
+        return None
+    if prepared is not None and prepared.resumo is not None:
+        from nicx.servidor.rotas.nuvem import is_cloud_model
+
+        if model and is_cloud_model(model):
+            from nicx.projetos.textos import texto
+
+            reply = texto("nuvem", req.language)
+            return projetos.Preparo(prepared.tipo, resposta=reply)
+    return prepared
+
+
 async def _screen_context(req: ChatCompletionRequest, config: Any, model: str):
     """What the user is looking at, for "resume o que eu copiei" and friends.
 
@@ -318,8 +361,24 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
         and _turn_needs_agent_tools(request_body, agent, config)
     )
 
+    # Projects first: "anota no projeto X que..." would otherwise become a
+    # plain note. "O que falta no projeto X" answers right away; "continue de
+    # onde parei" sends a compact project summary to the model, without the
+    # tool list (the summary already has what the answer needs).
+    project = await _project_turn(request_body, config, model)
+    if project is not None and project.resposta is not None:
+        return _immediate_response(project.resposta, model, stream=request_body.stream)
+    project_summary = project.resumo if project is not None else None
+    if project_summary is not None and use_server_agent:
+        if getattr(getattr(config, "agent", None), "tools_on_demand", True):
+            use_server_agent = False
+
     # "Aumenta o volume", "que horas são": executa na hora, sem o modelo.
-    quick_reply = await _quick_action_reply(request_body, config)
+    quick_reply = (
+        None
+        if project_summary is not None
+        else await _quick_action_reply(request_body, config)
+    )
     if quick_reply is not None:
         return _immediate_response(quick_reply, model, stream=request_body.stream)
 
@@ -332,7 +391,11 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
 
     # "Resume o que eu copiei", "explica isso aqui": the clipboard or the
     # window the user is looking at goes to the model with the request.
-    screen = await _screen_context(request_body, config, model)
+    screen = (
+        None
+        if project_summary is not None
+        else await _screen_context(request_body, config, model)
+    )
     if screen is not None and screen.resposta is not None:
         return _immediate_response(screen.resposta, model, stream=request_body.stream)
     screen_capture = screen.captura if screen is not None else None
@@ -472,6 +535,13 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
                 com_ferramentas=use_server_agent,
             )
             last.content = anexar(last.content, screen_capture, budget)
+            screen_attached = True
+    # The project summary goes the same way (same markers: it stays out of
+    # the automatic memory, traces and logs).
+    if project_summary is not None and request_body.messages:
+        last = request_body.messages[-1]
+        if last.role == "user" and isinstance(last.content, str):
+            last.content = f"{last.content}{project_summary}"
             screen_attached = True
 
     # Idioma escolhido na interface: pedido no fim da mensagem (e não no

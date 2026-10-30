@@ -31,6 +31,8 @@ from nicx.servidor.rotas.privacidade import (
 from nicx.servidor.rotas.privacidade import (
     router as analytics_router,
 )
+from nicx.servidor.rotas.projetos import router as projetos_router
+from nicx.servidor.rotas.resumo import router as resumo_router
 from nicx.servidor.rotas.upload import router as upload_router
 
 logger = logging.getLogger(__name__)
@@ -492,6 +494,8 @@ def create_app(
     app.include_router(ditado_router)
     app.include_router(agenda_router)
     app.include_router(contexto_router)
+    app.include_router(projetos_router)
+    app.include_router(resumo_router)
     include_all_routes(app)
 
     # Atalho global de teclado ([atalho]): sobe e desce com o servidor. Só faz
@@ -550,6 +554,24 @@ def create_app(
         from nicx.contexto import janela as _janela
 
         _janela.parar_rastreador()
+
+    # Projetos: a cada poucos minutos, se a janela em uso é de um projeto
+    # (pasta do VS Code, arquivo aberto), marca atividade nele. Depende da
+    # leitura da tela ([contexto] ativo); só no Windows.
+    @app.on_event("startup")
+    async def _iniciar_projetos() -> None:
+        cfg = getattr(app.state, "config", None)
+        if not getattr(getattr(cfg, "contexto", None), "ativo", False):
+            return
+        from nicx.projetos import deteccao as _deteccao
+
+        _deteccao.iniciar_observador()
+
+    @app.on_event("shutdown")
+    async def _parar_projetos() -> None:
+        from nicx.projetos import deteccao as _deteccao
+
+        _deteccao.parar_observador()
 
     # Restore SendBlue channel bindings from database on startup
     _restore_sendblue_bindings(app)

@@ -294,6 +294,39 @@
     "saveFailed": "No se pudo guardar el contexto de la pantalla",
     "restartServer": "Reinicia el servidor de Nicx para usar el contexto de la pantalla"
   },
+  "dailySummary": {
+    "title": "Resumen del día",
+    "enabledLabel": "Resumen automático",
+    "enabledDescription": "A la hora elegida, con Nicx abierto, muestra una notificación y lee el resumen: compromisos, recordatorios, notas, carpetas organizadas y proyectos. Una vez al día.",
+    "timeLabel": "Hora",
+    "timeDescription": "Si Nicx se abre después de esa hora, el resumen sale en cuanto arranca (el mismo día).",
+    "daysLabel": "Días",
+    "daysDescription": "Qué días de la semana sale el resumen.",
+    "days": {
+      "seg": "Lun",
+      "ter": "Mar",
+      "qua": "Mié",
+      "qui": "Jue",
+      "sex": "Vie",
+      "sab": "Sáb",
+      "dom": "Dom"
+    },
+    "speakLabel": "Leer el resumen en voz alta",
+    "speakDescription": "Usa la voz local, si está instalada.",
+    "notifyLabel": "Mostrar notificación",
+    "notifyDescription": "Notificación del sistema con el texto del resumen.",
+    "showToday": "Ver el resumen de hoy",
+    "loading": "Preparando el resumen…",
+    "refine": "Hacerlo más natural",
+    "refining": "El modelo está reescribiendo… (puede tardar un minuto)",
+    "refineHint": "Pide al modelo local que reescriba el texto. Es más lento.",
+    "hint": "También puedes pedirlo en el chat o por voz: \"resumen del día\", \"¿cómo fue mi día?\", \"¿qué quedó pendiente hoy?\". Todo se queda en tu PC.",
+    "lastSent": "Último resumen automático: {{date}}.",
+    "serverUnavailable": "Servidor de Nicx no disponible",
+    "saveFailed": "No se pudo guardar el resumen del día",
+    "loadFailed": "No se pudo preparar el resumen",
+    "restartServer": "Reinicia el servidor de Nicx para usar el resumen del día"
+  },
   "about": {
     "tagline": "la inteligencia artificial de Falkyria.",
     "repository": "Repositorio"

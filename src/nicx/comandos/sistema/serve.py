@@ -83,6 +83,8 @@ def _server_tools(config: object) -> tuple[set[str], bool]:
     allowed, explicit = _resolve_allowed_tools(config)
     if getattr(getattr(config, "contexto", None), "ativo", False):
         allowed = {*allowed, "contexto"}
+    # Projetos: local, e só entra no prompt quando a mensagem fala de projeto.
+    allowed = {*allowed, "projetos"}
     return allowed, explicit
 
 
@@ -856,6 +858,11 @@ def serve(
     from nicx.acoes import lembretes
 
     lembretes.start_alarm()
+    # Resumo do dia automático ([resumo], desligado por padrão): o mesmo
+    # despertador confere o horário.
+    from nicx.resumo import agendador as resumo_agendador
+
+    resumo_agendador.ligar()
     _report_server_started(app, config, model_name, speech_backend, started)
     try:
         run_server(app, host=bind_host, port=bind_port, log_level="info")

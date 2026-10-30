@@ -18,7 +18,7 @@ from __future__ import annotations
 import logging
 import queue
 import threading
-from typing import Any, List, Optional
+from typing import Any, Callable, List, Optional
 
 from nicx.memoria.extractor import FactExtractor
 from nicx.memoria.store import (
@@ -50,8 +50,12 @@ class MemoryService:
         event_bus: EventBus | None = None,
         scanner: Any = None,
         max_queue: int = 256,
+        project_hook: Optional[Callable[[str], Any]] = None,
     ) -> None:
         self._store = store
+        # Notes decisions/open tasks said in passing about an existing project
+        # (nicx.projetos.memoria). Rule-based, no model call; never raises.
+        self._project_hook = project_hook
         self._extractor = extractor
         self._event_bus = event_bus
         self._scanner = scanner
@@ -218,6 +222,11 @@ class MemoryService:
             # from "nothing to extract" in the logs.
             logger.info("Memory extraction skipped: injection detected in exchange")
             return
+        if self._project_hook is not None:
+            try:
+                self._project_hook(user_text)
+            except Exception:  # noqa: BLE001 — never block fact extraction
+                logger.debug("Project suggestion failed", exc_info=True)
         facts = self._extractor.extract(user_text, assistant_text)
         if not facts:
             return
@@ -289,8 +298,14 @@ def build_memory_service(
         max_facts=getattr(mem, "max_facts", 1000),
     )
     extractor = FactExtractor(engine, model)
+    from nicx.projetos.memoria import sugerir_seguro
+
     return MemoryService(
-        store, extractor, event_bus=event_bus, scanner=_build_scanner()
+        store,
+        extractor,
+        event_bus=event_bus,
+        scanner=_build_scanner(),
+        project_hook=sugerir_seguro,
     )
 
 

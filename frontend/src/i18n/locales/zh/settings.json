@@ -294,6 +294,39 @@
     "saveFailed": "无法保存屏幕上下文设置",
     "restartServer": "请重启 Nicx 服务器以使用屏幕上下文"
   },
+  "dailySummary": {
+    "title": "每日总结",
+    "enabledLabel": "自动总结",
+    "enabledDescription": "在选定时间、Nicx 打开时，显示通知并朗读总结：日程、提醒、笔记、整理过的文件夹和项目。每天一次。",
+    "timeLabel": "时间",
+    "timeDescription": "如果 Nicx 在这个时间之后才打开，启动后会立即发送总结（当天）。",
+    "daysLabel": "日期",
+    "daysDescription": "每周哪几天发送总结。",
+    "days": {
+      "seg": "周一",
+      "ter": "周二",
+      "qua": "周三",
+      "qui": "周四",
+      "sex": "周五",
+      "sab": "周六",
+      "dom": "周日"
+    },
+    "speakLabel": "朗读总结",
+    "speakDescription": "使用本地语音（如已安装）。",
+    "notifyLabel": "显示通知",
+    "notifyDescription": "带有总结内容的系统通知。",
+    "showToday": "查看今天的总结",
+    "loading": "正在生成总结…",
+    "refine": "让它更自然",
+    "refining": "模型正在改写…（可能需要一分钟）",
+    "refineHint": "让本地模型改写文本，速度较慢。",
+    "hint": "总结只使用你电脑上的数据。",
+    "lastSent": "上次自动总结：{{date}}。",
+    "serverUnavailable": "Nicx 服务器不可用",
+    "saveFailed": "无法保存每日总结",
+    "loadFailed": "无法生成总结",
+    "restartServer": "请重启 Nicx 服务器以使用每日总结"
+  },
   "about": {
     "tagline": "Falkyria 的人工智能。",
     "repository": "代码仓库"

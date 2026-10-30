@@ -42,6 +42,9 @@ _PATTERNS = [
     r"\b(?:agenda\w*|compromisso\w*|reuniao|reunioes|calendar\w*|outlook|marca\w*"
     r"|desmarc\w*"
     r"|consulta|organiz\w*|arruma\w*|fotos?|imagens?|video\w*|youtube|toca\w*)\b",
+    # Projetos (ferramenta ``projetos``).
+    r"\b(?:projetos?|projects?|proyectos?|projets?|pendencias?|continuar"
+    r"|onde (?:eu )?parei|left off|donde lo deje|ou j en etais)\b",
 ]
 _REGEX = re.compile("|".join(f"(?:{p})" for p in _PATTERNS))
 

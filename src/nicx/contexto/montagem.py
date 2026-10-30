@@ -40,9 +40,9 @@ _BLOCO = re.compile(
     + re.escape(INICIO)
     + r".*?"
     + re.escape(FIM)
-    + r"\n*(?:"
-    + re.escape(AVISO)
-    + r")?",
+    # O aviso depois do bloco: o deste módulo ou o de outro anexo que usa os
+    # mesmos marcadores (o resumo de projeto, em nicx.projetos.continuar).
+    + r"\n*(?:\(O bloco acima[^\n]*\))?",
     re.S,
 )
 

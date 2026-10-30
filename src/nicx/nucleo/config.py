@@ -1764,6 +1764,23 @@ class ContextoConfig:
 
 
 @dataclass(slots=True)
+class ResumoConfig:
+    """Resumo do dia automático (:mod:`nicx.resumo`).
+
+    Desligado por padrão: só o usuário liga. Com o ``nicx serve`` aberto, no
+    horário de ``hora`` (e nos ``dias`` da semana), o Nicx mostra o resumo numa
+    notificação e o fala com a voz local, uma vez por dia. Tudo fica no PC.
+    """
+
+    ativo: bool = False
+    hora: str = "18:00"  # "HH:MM", hora local
+    falar: bool = True
+    notificar: bool = True
+    # seg, ter, qua, qui, sex, sab, dom
+    dias: list[str] = field(default_factory=lambda: ["seg", "ter", "qua", "qui", "sex"])
+
+
+@dataclass(slots=True)
 class OptimizeConfig:
     """Configuration optimization settings."""
 
@@ -1921,6 +1938,7 @@ class NicxConfig:
     ditado: DitadoConfig = field(default_factory=DitadoConfig)
     agenda: AgendaConfig = field(default_factory=AgendaConfig)
     contexto: ContextoConfig = field(default_factory=ContextoConfig)
+    resumo: ResumoConfig = field(default_factory=ResumoConfig)
     optimize: OptimizeConfig = field(default_factory=OptimizeConfig)
     agent_manager: AgentManagerConfig = field(default_factory=AgentManagerConfig)
     memory_files: MemoryFilesConfig = field(default_factory=MemoryFilesConfig)
@@ -2212,6 +2230,7 @@ def load_config(path: Optional[Path] = None) -> NicxConfig:
             "ditado",
             "agenda",
             "contexto",
+            "resumo",
             "optimize",
             "agent_manager",
             "digest",
@@ -2551,6 +2570,7 @@ __all__ = [
     "AtalhoConfig",
     "DitadoConfig",
     "ContextoConfig",
+    "ResumoConfig",
     "BlueBubblesChannelConfig",
     "BrowserConfig",
     "CapabilitiesConfig",

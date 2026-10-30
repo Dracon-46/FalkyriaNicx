@@ -184,4 +184,7 @@ import nicx.acoes.ferramenta  # noqa: E402, F401
 # Área de transferência e janela aberta: vive em nicx.contexto.
 import nicx.contexto.ferramenta  # noqa: E402, F401
 
+# Projetos do usuário (estado, decisões, pendências): vive em nicx.projetos.
+import nicx.projetos.ferramenta  # noqa: E402, F401
+
 __all__ = ["NOT_TOOL_MODULES", "BaseTool", "ToolExecutor", "ToolSpec"]

@@ -190,6 +190,10 @@ def _run(action: Action) -> Outcome:
             return _battery()
         if action.kind == "lock":
             return _lock()
+        if action.kind == "resumo":
+            from nicx.resumo import responder
+
+            return responder(action)
         from nicx.acoes import executores
 
         outcome = executores.run(action)

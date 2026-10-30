@@ -294,6 +294,39 @@
     "saveFailed": "Impossible d'enregistrer le contexte de l'écran",
     "restartServer": "Redémarre le serveur Nicx pour utiliser le contexte de l'écran"
   },
+  "dailySummary": {
+    "title": "Résumé du jour",
+    "enabledLabel": "Résumé automatique",
+    "enabledDescription": "À l'heure choisie, avec Nicx ouvert, affiche une notification et lit le résumé : rendez-vous, rappels, notes, dossiers rangés et projets. Une fois par jour.",
+    "timeLabel": "Heure",
+    "timeDescription": "Si Nicx s'ouvre après cette heure, le résumé arrive dès son démarrage (le même jour).",
+    "daysLabel": "Jours",
+    "daysDescription": "Les jours de la semaine où le résumé arrive.",
+    "days": {
+      "seg": "Lun",
+      "ter": "Mar",
+      "qua": "Mer",
+      "qui": "Jeu",
+      "sex": "Ven",
+      "sab": "Sam",
+      "dom": "Dim"
+    },
+    "speakLabel": "Lire le résumé à voix haute",
+    "speakDescription": "Utilise la voix locale, si elle est installée.",
+    "notifyLabel": "Afficher une notification",
+    "notifyDescription": "Notification système avec le texte du résumé.",
+    "showToday": "Voir le résumé d'aujourd'hui",
+    "loading": "Préparation du résumé…",
+    "refine": "Rendre plus naturel",
+    "refining": "Le modèle réécrit… (cela peut prendre une minute)",
+    "refineHint": "Demande au modèle local de réécrire le texte. C'est plus lent.",
+    "hint": "Tu peux aussi demander dans le chat ou à voix haute : « résumé du jour », « comment s'est passée ma journée ? », « qu'est-ce qui reste à faire aujourd'hui ? ». Tout reste sur ton PC.",
+    "lastSent": "Dernier résumé automatique : {{date}}.",
+    "serverUnavailable": "Serveur Nicx indisponible",
+    "saveFailed": "Impossible d'enregistrer le résumé du jour",
+    "loadFailed": "Impossible de préparer le résumé",
+    "restartServer": "Redémarre le serveur Nicx pour utiliser le résumé du jour"
+  },
   "about": {
     "tagline": "l’intelligence artificielle de Falkyria.",
     "repository": "Dépôt"

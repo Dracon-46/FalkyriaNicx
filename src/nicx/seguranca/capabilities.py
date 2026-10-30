@@ -283,6 +283,8 @@ DEFAULT_TOOL_CAPABILITIES: Dict[str, List[str]] = {
     "arquivos": [Capability.TOOL_INVOKE, Capability.FILE_READ, Capability.FILE_WRITE],
     # Lê a área de transferência e a janela aberta (só leitura, nunca grava).
     "contexto": [Capability.TOOL_INVOKE, Capability.FILE_READ],
+    # Projetos: só lê e grava ~/.nicx/projetos.json.
+    "projetos": [Capability.TOOL_INVOKE],
 }
 
 _SAFE_BUILTIN_PROVENANCE = {

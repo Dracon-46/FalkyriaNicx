@@ -294,6 +294,39 @@
     "saveFailed": "Could not save the screen context settings",
     "restartServer": "Restart the Nicx server to use screen context"
   },
+  "dailySummary": {
+    "title": "Daily summary",
+    "enabledLabel": "Automatic summary",
+    "enabledDescription": "At the chosen time, with Nicx open, shows a notification and reads the summary aloud: appointments, reminders, notes, organized folders and projects. Once a day.",
+    "timeLabel": "Time",
+    "timeDescription": "If Nicx only opens after this time, the summary comes as soon as it starts (same day).",
+    "daysLabel": "Days",
+    "daysDescription": "Which days of the week the summary comes.",
+    "days": {
+      "seg": "Mon",
+      "ter": "Tue",
+      "qua": "Wed",
+      "qui": "Thu",
+      "sex": "Fri",
+      "sab": "Sat",
+      "dom": "Sun"
+    },
+    "speakLabel": "Read the summary aloud",
+    "speakDescription": "Uses the local voice, if installed.",
+    "notifyLabel": "Show notification",
+    "notifyDescription": "System notification with the summary text.",
+    "showToday": "See today's summary",
+    "loading": "Building the summary…",
+    "refine": "Make it more natural",
+    "refining": "The model is rewriting… (may take a minute)",
+    "refineHint": "Asks the local model to rewrite the text. It's slower.",
+    "hint": "You can also ask in the chat or by voice: \"daily summary\", \"how was my day?\", \"what's still pending today?\". Everything stays on your PC.",
+    "lastSent": "Last automatic summary: {{date}}.",
+    "serverUnavailable": "Nicx server unavailable",
+    "saveFailed": "Couldn't save the daily summary",
+    "loadFailed": "Couldn't build the summary",
+    "restartServer": "Restart the Nicx server to use the daily summary"
+  },
   "about": {
     "tagline": "the artificial intelligence of Falkyria.",
     "repository": "Repository"

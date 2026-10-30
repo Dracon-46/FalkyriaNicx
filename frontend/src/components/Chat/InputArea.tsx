@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Send, Square, Paperclip, Search, AudioLines } from 'lucide-react';
 import { toast } from 'sonner';
+import { useLocation, useNavigate } from 'react-router';
 import { useAppStore, generateId } from '../../lib/store';
 import { useTtsStore } from '../../lib/tts';
 import { streamChat, streamResearch } from '../../lib/sse';
@@ -608,6 +609,25 @@ export function InputArea() {
   ]);
 
   sendSpokenRef.current = sendMessage;
+
+  // "Continuar de onde parei" (página Projetos): o pedido chega pela
+  // navegação e sai como se tivesse sido digitado, assim que houver modelo.
+  const location = useLocation();
+  const navigate = useNavigate();
+  const pendingPromptRef = useRef<string | null>(null);
+  useEffect(() => {
+    const prompt = (location.state as { nicxPrompt?: unknown } | null)?.nicxPrompt;
+    if (typeof prompt !== 'string' || !prompt.trim()) return;
+    pendingPromptRef.current = prompt;
+    setInput(prompt);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.state, location.pathname, navigate]);
+  useEffect(() => {
+    const pending = pendingPromptRef.current;
+    if (!pending || input !== pending || !selectedModel || streamState.isStreaming) return;
+    pendingPromptRef.current = null;
+    void sendMessage();
+  }, [input, selectedModel, streamState.isStreaming, sendMessage]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {

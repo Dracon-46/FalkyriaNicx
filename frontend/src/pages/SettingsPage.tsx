@@ -24,6 +24,7 @@ import { NicxMascot } from '../components/Mascot/NicxMascot';
 import { PrivacySection } from '../components/Privacy/PrivacySection';
 import { CalendarSettings } from '../components/Settings/CalendarSettings';
 import { ContextSettings } from '../components/Settings/ContextSettings';
+import { DailySummarySettings } from '../components/Settings/DailySummarySettings';
 import {
   checkHealth,
   fetchSpeechHealth,
@@ -1208,6 +1209,11 @@ export function SettingsPage() {
           {/* Contexto da tela: o que foi copiado e a janela aberta */}
           <Section title={t('settings.context.title')}>
             <ContextSettings onSaved={showSaved} />
+          </Section>
+
+          {/* Resumo do dia: o que aconteceu hoje, e o resumo automático */}
+          <Section title={t('settings.dailySummary.title')}>
+            <DailySummarySettings onSaved={showSaved} />
           </Section>
 
           {/* Data */}
