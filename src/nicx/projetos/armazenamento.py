@@ -23,6 +23,7 @@ from typing import Any, Callable, Iterable, Optional, TypeVar
 
 from nicx.memoria.store import _cross_process_lock, _replace_with_retry
 from nicx.projetos import busca
+from nicx.projetos.caminhos import chave as chave_caminho
 from nicx.projetos.modelo import (
     MAX_CAMINHOS,
     MAX_DECISOES,
@@ -410,7 +411,7 @@ def _caminhos(caminhos: Iterable[str]) -> list[str]:
     saida: list[str] = []
     for caminho in caminhos:
         caminho = str(caminho or "").strip().strip('"').rstrip("\\/") or ""
-        chave = os.path.normcase(caminho)
+        chave = chave_caminho(caminho)
         if caminho and chave not in vistos:
             vistos.add(chave)
             saida.append(caminho)

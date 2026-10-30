@@ -244,6 +244,12 @@ class TestWebSearchTool:
             return original_import(name, *args, **kwargs)
 
         monkeypatch.setattr(builtins, "__import__", _mock_import)
+        # Sem internet de verdade no teste: o DuckDuckGo é simulado.
+        monkeypatch.setattr(
+            WebSearchTool,
+            "_duckduckgo_search",
+            lambda self, query, max_results: "**Resultado**\nhttps://example.com",
+        )
 
         tool = WebSearchTool(api_key="test-key")
         result = tool.execute(query="test query")

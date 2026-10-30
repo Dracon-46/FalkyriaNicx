@@ -477,6 +477,20 @@ def _trecho(texto: str, where: list[int], m: re.Match[str], base: str) -> str:
     return original_text(texto, where, m.start(grupo), m.end(grupo))
 
 
+_PASTA_ORIGINAL = re.compile(
+    r"\b(?:pasta|folder|carpeta|dossier)\s+(?P<caminho>(?:[A-Za-z]:[\\/]|[\\/~.]).+)$",
+    re.IGNORECASE,
+)
+
+
+def _pasta_original(texto: str) -> str:
+    """Caminho como o usuário escreveu: a normalização perde o "/" inicial."""
+    m = _PASTA_ORIGINAL.search(texto.strip())
+    if m is None:
+        return ""
+    return m.group("caminho").strip().strip("\"'“”").rstrip(".!?)")
+
+
 def _nome(bruto: str) -> str:
     nome = bruto.strip(" \"'“”«»")
     if normalize(nome) in _ATUAL:
@@ -528,7 +542,8 @@ def detectar(texto: str, *, primeira: bool = True) -> Optional[Pedido]:
         if tipo == CRIAR:
             if not nome:
                 continue
-            return Pedido(CRIAR, nome=nome, pasta=_trecho(texto, where, m, "pasta"))
+            pasta = _trecho(texto, where, m, "pasta")
+            return Pedido(CRIAR, nome=nome, pasta=_pasta_original(texto) or pasta)
         if tipo == RENOMEAR:
             return Pedido(
                 RENOMEAR, nome=nome, novo_nome=_nome(_trecho(texto, where, m, "novo"))

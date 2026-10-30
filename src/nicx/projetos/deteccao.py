@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Iterable, Optional
 
-from nicx.projetos import busca
+from nicx.projetos import busca, caminhos
 from nicx.projetos.armazenamento import Projetos
 from nicx.projetos.modelo import Projeto
 
@@ -49,7 +49,7 @@ _PULAR = frozenset(
 
 
 def _normcase(caminho: str) -> str:
-    return os.path.normcase(os.path.normpath(caminho)).rstrip("\\/")
+    return caminhos.chave(caminho)
 
 
 def projeto_do_caminho(caminho: str, projetos: Iterable[Projeto]) -> Optional[Projeto]:
@@ -61,7 +61,9 @@ def projeto_do_caminho(caminho: str, projetos: Iterable[Projeto]) -> Optional[Pr
     for projeto in projetos:
         for pasta in projeto.pastas:
             base = _normcase(pasta)
-            if base and (alvo == base or alvo.startswith(base + os.sep)):
+            if base and (
+                alvo == base or alvo.startswith(base + caminhos.separador(base))
+            ):
                 if len(base) > melhor[0]:
                     melhor = (len(base), projeto)
     return melhor[1]
@@ -74,10 +76,9 @@ def projeto_da_pasta_aberta(
     if not nome_pasta:
         return None
     lista = list(projetos)
-    alvo = os.path.normcase(nome_pasta.strip())
     for projeto in lista:
         for pasta in projeto.pastas:
-            if os.path.normcase(Path(pasta).name) == alvo:
+            if caminhos.mesmo_nome(caminhos.nome(pasta), nome_pasta):
                 return projeto
     chave = busca.normalizar(nome_pasta).replace(" ", "")
     for projeto in lista:
@@ -135,7 +136,7 @@ def pasta_do_vscode(nome_pasta: str) -> Optional[str]:
         from nicx.contexto.arquivo_aberto import pastas_vscode
 
         for pasta in pastas_vscode():
-            if os.path.normcase(pasta.name) == os.path.normcase(nome_pasta):
+            if caminhos.mesmo_nome(pasta.name, nome_pasta):
                 return str(pasta)
     except Exception:  # noqa: BLE001
         logger.debug("Pastas do VS Code indisponíveis", exc_info=True)

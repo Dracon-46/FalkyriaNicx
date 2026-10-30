@@ -20,7 +20,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from nicx.projetos import busca
+from nicx.projetos import busca, caminhos
 from nicx.projetos.deteccao import ArquivoRecente, InfoGit, arquivos_recentes, info_git
 from nicx.projetos.modelo import Projeto
 
@@ -176,7 +176,9 @@ def montar(
     git = sinais.git
     if git is not None:
         linhas = [
-            _linha(f"Git (pasta {Path(git.pasta).name}, branch {git.branch or '?'}):")
+            _linha(
+                f"Git (pasta {caminhos.nome(git.pasta)}, branch {git.branch or '?'}):"
+            )
         ]
         for commit in git.commits[:3]:
             quando = ""
