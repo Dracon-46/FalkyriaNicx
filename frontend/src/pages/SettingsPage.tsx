@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { LANGUAGES, setLanguage } from '../i18n';
 import { useAppStore, type ThemeMode } from '../lib/store';
 import { NicxMascot } from '../components/Mascot/NicxMascot';
+import { FalkyriaLogo, FALKYRIA_URL } from '../components/brand/FalkyriaLogo';
 import { PrivacySection } from '../components/Privacy/PrivacySection';
 import { CalendarSettings } from '../components/Settings/CalendarSettings';
 import { ContextSettings } from '../components/Settings/ContextSettings';
@@ -1272,6 +1273,20 @@ export function SettingsPage() {
                     {t('settings.about.repository')}
                   </a>
                 </div>
+                <a
+                  href={FALKYRIA_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex items-center gap-2 text-xs transition-opacity hover:opacity-80"
+                >
+                  <span style={{ color: 'var(--color-text)' }}>
+                    <FalkyriaLogo className="block h-5 w-auto" />
+                  </span>
+                  <span>{t('settings.about.product')}</span>
+                </a>
+                <p className="mt-1 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+                  {t('settings.about.copyright')}
+                </p>
               </div>
             </div>
           </Section>

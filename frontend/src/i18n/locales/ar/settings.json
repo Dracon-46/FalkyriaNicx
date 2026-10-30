@@ -296,6 +296,8 @@
   },
   "about": {
     "tagline": "الذكاء الاصطناعي من Falkyria.",
-    "repository": "المستودع"
+    "repository": "المستودع",
+    "product": "أحد منتجات Falkyria",
+    "copyright": "© 2026 Falkyria. جميع الحقوق محفوظة."
   }
 }

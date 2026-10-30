@@ -296,6 +296,8 @@
   },
   "about": {
     "tagline": "la inteligencia artificial de Falkyria.",
-    "repository": "Repositorio"
+    "repository": "Repositorio",
+    "product": "Un producto Falkyria",
+    "copyright": "© 2026 Falkyria. Todos los derechos reservados."
   }
 }

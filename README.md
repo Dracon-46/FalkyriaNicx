@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/marca/falkyria-marca-branca.svg">
+    <img src=".github/marca/falkyria-marca.svg" alt="Falkyria" width="220">
+  </picture>
+</p>
+
 <div align="center">
   <img alt="Nicx, o slime ciano com um núcleo azul" src="assets/nicx-mascot.svg" width="180">
   <br>
@@ -69,5 +76,5 @@ a memória (`MEMORY.md`) e o perfil (`USER.md`).
 
 ## Licença
 
-Software proprietário. Copyright © 2026 Falkyria. Todos os direitos reservados.
-Veja [LICENSE](LICENSE).
+O Nicx é software proprietário da Falkyria. Todos os direitos reservados. O código está
+visível apenas para consulta; veja [LICENSE](LICENSE).

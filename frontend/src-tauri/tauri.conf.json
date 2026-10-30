@@ -40,6 +40,8 @@
       "icons/icon.png"
     ],
     "category": "Productivity",
+    "publisher": "Falkyria",
+    "copyright": "Copyright © 2026 Falkyria. Todos os direitos reservados.",
     "shortDescription": "Nicx — a inteligência artificial da Falkyria",
     "longDescription": "Nicx Desktop: a IA da Falkyria em um app nativo, com modelos locais (Ollama) ou na nuvem, ferramentas, memória e monitoramento de energia e custo.",
     "macOS": {

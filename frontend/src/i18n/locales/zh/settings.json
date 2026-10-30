@@ -296,6 +296,8 @@
   },
   "about": {
     "tagline": "Falkyria 的人工智能。",
-    "repository": "代码仓库"
+    "repository": "代码仓库",
+    "product": "Falkyria 出品",
+    "copyright": "© 2026 Falkyria。保留所有权利。"
   }
 }
