@@ -722,9 +722,26 @@ def _confirmation(t: str) -> Optional[Action]:
     return None
 
 
+def _undo_and_history(t: str) -> Optional[Action]:
+    """'desfaz', 'desfaz isso', 'o que você fez?'."""
+    if re.fullmatch(
+        r"(?:desfaz|desfaca|desfazer|desfaça|volta atras|voltar atras)"
+        r"(?: isso| isso ai| isso por favor| o que voce fez| o ultimo"
+        r"| a ultima(?: coisa| mudanca| acao)?)?",
+        t,
+    ):
+        return Action("undo")
+    if re.fullmatch(
+        r"o que (?:voce|vc) (?:fez|mudou)(?: hoje| por ultimo| agora| ai)?", t
+    ):
+        return Action("historico")
+    return None
+
+
 def parse(text: str, t: str, where: list[int]) -> Optional[Action]:
     for simple in (
         _confirmation,
+        _undo_and_history,
         _timer,
         _reminder_admin,
         _notes_admin,

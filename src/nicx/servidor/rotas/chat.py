@@ -186,6 +186,26 @@ def _turn_needs_agent_tools(
     return conversation_needs_tools(user_texts)
 
 
+def _registrar_pedido(req: ChatCompletionRequest, model: str) -> None:
+    """Histórico local (nicx.historico): o pedido e o que ele mudar ficam anotados.
+
+    Só o começo da mensagem do usuário, e só no PC. As ações que o pedido
+    disparar herdam a origem ("chat" ou "voz").
+    """
+    from nicx.historico.registro import anotar, definir_origem
+
+    definir_origem("voz" if getattr(req, "voice", False) else "chat")
+    last = req.messages[-1] if req.messages else None
+    if (
+        last is None
+        or last.role != "user"
+        or not isinstance(last.content, str)
+        or req.tools
+    ):
+        return
+    anotar("conversa", last.content[:200], detalhe={"modelo": model})
+
+
 async def _quick_action_reply(req: ChatCompletionRequest, config: Any) -> str | None:
     """Run a direct command from the latest user message, if it is one.
 
@@ -354,6 +374,7 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
     agent = getattr(request.app.state, "agent", None)
     model = request_body.model
     config = getattr(request.app.state, "config", None)
+    _registrar_pedido(request_body, model)
     use_server_agent = (
         agent is not None
         and not request_body.tools

@@ -22,6 +22,7 @@ from nicx.servidor.rotas.conectores import create_connectors_router
 from nicx.servidor.rotas.contexto import router as contexto_router
 from nicx.servidor.rotas.ditado import router as ditado_router
 from nicx.servidor.rotas.escuta import router as wake_router
+from nicx.servidor.rotas.historico import router as historico_router
 from nicx.servidor.rotas.painel_economia import dashboard_router
 from nicx.servidor.rotas.pesquisa import router as research_router
 from nicx.servidor.rotas.privacidade import (
@@ -496,6 +497,7 @@ def create_app(
     app.include_router(contexto_router)
     app.include_router(projetos_router)
     app.include_router(resumo_router)
+    app.include_router(historico_router)
     include_all_routes(app)
 
     # Atalho global de teclado ([atalho]): sobe e desce com o servidor. Só faz
@@ -517,6 +519,25 @@ def create_app(
     @app.on_event("shutdown")
     async def _parar_atalho() -> None:
         app.state.atalho.parar()
+
+    # Histórico ([historico]): tira o que passou do prazo e as cópias velhas
+    # do desfazer.
+    @app.on_event("startup")
+    async def _limpar_historico() -> None:
+        import asyncio
+
+        def _limpar() -> None:
+            from nicx.historico import config as historico_cfg
+            from nicx.historico.desfazer import limpar_copias
+            from nicx.historico.registro import registro
+
+            registro().limpar_antigas(historico_cfg.dias())
+            limpar_copias()
+
+        try:
+            await asyncio.to_thread(_limpar)
+        except Exception:  # noqa: BLE001 - não impede o servidor de subir
+            logger.debug("Limpeza do histórico falhou", exc_info=True)
 
     # Ditado universal ([ditado]): outro atalho no mesmo laço do Windows.
     from nicx.servidor.rotas.ditado import criar_servico as _criar_ditado

@@ -294,6 +294,14 @@ def organize(folder: Path, groups: dict[str, List[Path]]) -> tuple[int, Path]:
         ),
         encoding="utf-8",
     )
+    from nicx.historico import anotar, textos
+
+    anotar(
+        "organizacao",
+        textos.texto("organizacao", pasta=folder.name, n=len(moves)),
+        detalhe={"pasta": str(folder), "arquivos": len(moves)},
+        desfazer={"tipo": "organizacao", "log": str(log)} if moves else None,
+    )
     return len(moves), log
 
 
@@ -303,7 +311,13 @@ def undo_last() -> Optional[tuple[int, str]]:
     logs = sorted(log_dir.glob("*.json")) if log_dir.is_dir() else []
     if not logs:
         return None
-    log = logs[-1]
+    return undo_log(logs[-1])
+
+
+def undo_log(log: Path) -> Optional[tuple[int, str]]:
+    """Desfaz a organização de um registro. Devolve (voltaram, pasta) ou None."""
+    if not log.exists():
+        return None
     data = json.loads(log.read_text(encoding="utf-8"))
     restored = 0
     for move in reversed(data.get("moves", [])):

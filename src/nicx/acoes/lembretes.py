@@ -76,7 +76,16 @@ def _load() -> List[Reminder]:
     return items
 
 
-def _save(items: List[Reminder]) -> None:
+def _save(items: List[Reminder], registrar: bool = True) -> None:
+    """Grava a lista. Com ``registrar``, a mudança vai para o histórico
+    (com desfazer)."""
+    from nicx.historico import mudancas
+
+    antes = (
+        [asdict(r) for r in _load()]
+        if registrar and not mudancas.silenciado()
+        else None
+    )
     path = _path()
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
@@ -85,6 +94,13 @@ def _save(items: List[Reminder]) -> None:
         encoding="utf-8",
     )
     os.replace(tmp, path)
+    if antes is not None:
+        mudancas.registrar(
+            "lembretes",
+            antes,
+            [asdict(r) for r in items],
+            lambda d: str(d.get("text", "")),
+        )
 
 
 def add(text: str, when: datetime, idioma: Optional[str] = None) -> Reminder:
@@ -157,7 +173,9 @@ def pop_due(now: Optional[datetime] = None) -> List[Reminder]:
         items = _load()
         due = [r for r in items if r.due_at <= now]
         if due:
-            _save([r for r in items if r.due_at > now])
+            _save(
+                [r for r in items if r.due_at > now], registrar=False
+            )  # tocou: não é desfazível
             _record_fired(due, now)
     return due
 

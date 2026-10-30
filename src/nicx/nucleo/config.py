@@ -1781,6 +1781,32 @@ class ResumoConfig:
 
 
 @dataclass(slots=True)
+class HistoricoConfig:
+    """Histórico universal e auditoria (:mod:`nicx.historico`).
+
+    Tudo fica no PC, em ``~/.nicx/historico.db``. ``dias`` = 0 guarda para sempre.
+    """
+
+    ligado: bool = True
+    guardar_conversas: bool = True  # guarda o começo de cada pedido feito no chat
+    dias: int = 180
+
+
+@dataclass(slots=True)
+class AutonomiaConfig:
+    """Quanto o Nicx faz sozinho (:mod:`nicx.historico.autonomia`).
+
+    ``observador``: só lê e responde; qualquer mudança pede "confirmo".
+    ``assistido`` (padrão): faz sozinho o que é leve e fácil de desfazer
+    (lembretes, notas, abrir apps); mexer em arquivos ou projetos pede "confirmo".
+    ``autonomo``: também mexe em arquivos e projetos sozinho, sempre com desfazer.
+    Desligar, reiniciar e rodar comandos no terminal pedem "confirmo" em qualquer nível.
+    """
+
+    nivel: str = "assistido"
+
+
+@dataclass(slots=True)
 class OptimizeConfig:
     """Configuration optimization settings."""
 
@@ -1939,6 +1965,8 @@ class NicxConfig:
     agenda: AgendaConfig = field(default_factory=AgendaConfig)
     contexto: ContextoConfig = field(default_factory=ContextoConfig)
     resumo: ResumoConfig = field(default_factory=ResumoConfig)
+    historico: HistoricoConfig = field(default_factory=HistoricoConfig)
+    autonomia: AutonomiaConfig = field(default_factory=AutonomiaConfig)
     optimize: OptimizeConfig = field(default_factory=OptimizeConfig)
     agent_manager: AgentManagerConfig = field(default_factory=AgentManagerConfig)
     memory_files: MemoryFilesConfig = field(default_factory=MemoryFilesConfig)
@@ -2231,6 +2259,8 @@ def load_config(path: Optional[Path] = None) -> NicxConfig:
             "agenda",
             "contexto",
             "resumo",
+            "historico",
+            "autonomia",
             "optimize",
             "agent_manager",
             "digest",

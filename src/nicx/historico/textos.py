@@ -1,0 +1,287 @@
+# ruff: noqa: E501  (tabela de frases: uma por linha fica mais legível)
+"""Frases do histórico, do desfazer e da autonomia no idioma da interface.
+
+O português é a referência: se faltar uma chave em outro idioma, sai em
+português. Os códigos são os de :mod:`nicx.nucleo.idiomas`.
+"""
+
+from __future__ import annotations
+
+from typing import Optional
+
+from nicx.nucleo.idiomas import PADRAO
+from nicx.nucleo.idiomas import idioma as _idioma
+
+_PT = {
+    "lembrete_criado": "Lembrete criado: {texto}",
+    "lembrete_cancelado": "Lembrete cancelado: {texto}",
+    "lembrete_alterado": "Lembrete alterado: {texto}",
+    "agenda_criado": "Compromisso marcado: {texto}",
+    "agenda_cancelado": "Compromisso desmarcado: {texto}",
+    "agenda_alterado": "Compromisso alterado: {texto}",
+    "projeto_criado": "Projeto criado: {texto}",
+    "projeto_cancelado": "Projeto apagado: {texto}",
+    "projeto_alterado": "Projeto atualizado: {texto}",
+    "nota_add": "Anotação: {texto}",
+    "notas_limpas": "Anotações apagadas ({n})",
+    "organizacao": "Pasta organizada: {pasta} ({n} arquivos)",
+    "arquivo_alterado": "Arquivo alterado: {caminho}",
+    "arquivo_criado": "Arquivo criado: {caminho}",
+    "ferramenta": "{ferramenta}: {resumo}",
+    "desfeito_titulo": "Desfeito: {texto}",
+    "desfeito": "Desfeito: {texto}.",
+    "nada_desfazer": "Não há nada para desfazer.",
+    "ja_desfeito": "Isso já foi desfeito.",
+    "nao_desfazivel": "Isso não dá para desfazer.",
+    "nao_deu_desfazer": "Não consegui desfazer: {motivo}.",
+    "confirmar_acao": 'No nível {nivel} eu confirmo antes de mudar algo. Diga "confirmo" para seguir ou "cancela".',
+    "ferramenta_pendente": 'Esta ação ({ferramenta}: {resumo}) precisa da confirmação do usuário no nível {nivel}. Diga a ele que, para seguir, basta responder "confirmo".',
+    "ferramenta_feita": "Feito ({ferramenta}). {resultado}",
+    "ferramenta_falhou": "Não deu certo ({ferramenta}): {resultado}",
+    "nivel_observador": "observador",
+    "nivel_assistido": "assistido",
+    "nivel_autonomo": "autônomo",
+    "recentes": "O que fiz por último: {lista}.",
+    "recentes_vazio": "Ainda não fiz nada que valha anotar.",
+    "nivel_atual": "Estou no nível {nivel}.",
+    "nivel_mudou": "Pronto: agora estou no nível {nivel}.",
+}
+
+_EN = {
+    "lembrete_criado": "Reminder created: {texto}",
+    "lembrete_cancelado": "Reminder canceled: {texto}",
+    "lembrete_alterado": "Reminder changed: {texto}",
+    "agenda_criado": "Event scheduled: {texto}",
+    "agenda_cancelado": "Event canceled: {texto}",
+    "agenda_alterado": "Event changed: {texto}",
+    "projeto_criado": "Project created: {texto}",
+    "projeto_cancelado": "Project deleted: {texto}",
+    "projeto_alterado": "Project updated: {texto}",
+    "nota_add": "Note: {texto}",
+    "notas_limpas": "Notes deleted ({n})",
+    "organizacao": "Folder organized: {pasta} ({n} files)",
+    "arquivo_alterado": "File changed: {caminho}",
+    "arquivo_criado": "File created: {caminho}",
+    "ferramenta": "{ferramenta}: {resumo}",
+    "desfeito_titulo": "Undone: {texto}",
+    "desfeito": "Undone: {texto}.",
+    "nada_desfazer": "There is nothing to undo.",
+    "ja_desfeito": "That was already undone.",
+    "nao_desfazivel": "That can't be undone.",
+    "nao_deu_desfazer": "I couldn't undo it: {motivo}.",
+    "confirmar_acao": 'At the {nivel} level I check before changing anything. Say "confirm" to go ahead or "cancel".',
+    "ferramenta_pendente": 'This action ({ferramenta}: {resumo}) needs the user\'s confirmation at the {nivel} level. Tell them to reply "confirm" to go ahead.',
+    "ferramenta_feita": "Done ({ferramenta}). {resultado}",
+    "ferramenta_falhou": "It didn't work ({ferramenta}): {resultado}",
+    "nivel_observador": "observer",
+    "nivel_assistido": "assisted",
+    "nivel_autonomo": "autonomous",
+    "recentes": "What I did last: {lista}.",
+    "recentes_vazio": "I haven't done anything worth noting yet.",
+    "nivel_atual": "I'm at the {nivel} level.",
+    "nivel_mudou": "Done: I'm now at the {nivel} level.",
+}
+
+_ES = {
+    "lembrete_criado": "Recordatorio creado: {texto}",
+    "lembrete_cancelado": "Recordatorio cancelado: {texto}",
+    "lembrete_alterado": "Recordatorio cambiado: {texto}",
+    "agenda_criado": "Cita agendada: {texto}",
+    "agenda_cancelado": "Cita cancelada: {texto}",
+    "agenda_alterado": "Cita cambiada: {texto}",
+    "projeto_criado": "Proyecto creado: {texto}",
+    "projeto_cancelado": "Proyecto eliminado: {texto}",
+    "projeto_alterado": "Proyecto actualizado: {texto}",
+    "nota_add": "Nota: {texto}",
+    "notas_limpas": "Notas borradas ({n})",
+    "organizacao": "Carpeta organizada: {pasta} ({n} archivos)",
+    "arquivo_alterado": "Archivo modificado: {caminho}",
+    "arquivo_criado": "Archivo creado: {caminho}",
+    "ferramenta": "{ferramenta}: {resumo}",
+    "desfeito_titulo": "Deshecho: {texto}",
+    "desfeito": "Deshecho: {texto}.",
+    "nada_desfazer": "No hay nada que deshacer.",
+    "ja_desfeito": "Eso ya se deshizo.",
+    "nao_desfazivel": "Eso no se puede deshacer.",
+    "nao_deu_desfazer": "No pude deshacerlo: {motivo}.",
+    "confirmar_acao": 'En el nivel {nivel} confirmo antes de cambiar algo. Di "confirmo" para seguir o "cancela".',
+    "ferramenta_pendente": 'Esta acción ({ferramenta}: {resumo}) necesita la confirmación del usuario en el nivel {nivel}. Dile que responda "confirmo" para seguir.',
+    "ferramenta_feita": "Hecho ({ferramenta}). {resultado}",
+    "ferramenta_falhou": "No funcionó ({ferramenta}): {resultado}",
+    "nivel_observador": "observador",
+    "nivel_assistido": "asistido",
+    "nivel_autonomo": "autónomo",
+    "recentes": "Lo último que hice: {lista}.",
+    "recentes_vazio": "Todavía no hice nada que valga anotar.",
+    "nivel_atual": "Estoy en el nivel {nivel}.",
+    "nivel_mudou": "Listo: ahora estoy en el nivel {nivel}.",
+}
+
+_FR = {
+    "lembrete_criado": "Rappel créé : {texto}",
+    "lembrete_cancelado": "Rappel annulé : {texto}",
+    "lembrete_alterado": "Rappel modifié : {texto}",
+    "agenda_criado": "Rendez-vous ajouté : {texto}",
+    "agenda_cancelado": "Rendez-vous annulé : {texto}",
+    "agenda_alterado": "Rendez-vous modifié : {texto}",
+    "projeto_criado": "Projet créé : {texto}",
+    "projeto_cancelado": "Projet supprimé : {texto}",
+    "projeto_alterado": "Projet mis à jour : {texto}",
+    "nota_add": "Note : {texto}",
+    "notas_limpas": "Notes effacées ({n})",
+    "organizacao": "Dossier rangé : {pasta} ({n} fichiers)",
+    "arquivo_alterado": "Fichier modifié : {caminho}",
+    "arquivo_criado": "Fichier créé : {caminho}",
+    "ferramenta": "{ferramenta} : {resumo}",
+    "desfeito_titulo": "Annulé : {texto}",
+    "desfeito": "Annulé : {texto}.",
+    "nada_desfazer": "Il n'y a rien à annuler.",
+    "ja_desfeito": "C'est déjà annulé.",
+    "nao_desfazivel": "Cela ne peut pas être annulé.",
+    "nao_deu_desfazer": "Je n'ai pas pu annuler : {motivo}.",
+    "confirmar_acao": "Au niveau {nivel}, je vérifie avant de modifier quoi que ce soit. Dites « je confirme » pour continuer ou « annule ».",
+    "ferramenta_pendente": "Cette action ({ferramenta} : {resumo}) demande la confirmation de l'utilisateur au niveau {nivel}. Dites-lui de répondre « je confirme » pour continuer.",
+    "ferramenta_feita": "C'est fait ({ferramenta}). {resultado}",
+    "ferramenta_falhou": "Ça n'a pas marché ({ferramenta}) : {resultado}",
+    "nivel_observador": "observateur",
+    "nivel_assistido": "assisté",
+    "nivel_autonomo": "autonome",
+    "recentes": "Ce que j'ai fait en dernier : {lista}.",
+    "recentes_vazio": "Je n'ai encore rien fait qui mérite d'être noté.",
+    "nivel_atual": "Je suis au niveau {nivel}.",
+    "nivel_mudou": "C'est fait : je suis maintenant au niveau {nivel}.",
+}
+
+_ZH = {
+    "lembrete_criado": "已创建提醒：{texto}",
+    "lembrete_cancelado": "已取消提醒：{texto}",
+    "lembrete_alterado": "已修改提醒：{texto}",
+    "agenda_criado": "已安排日程：{texto}",
+    "agenda_cancelado": "已取消日程：{texto}",
+    "agenda_alterado": "已修改日程：{texto}",
+    "projeto_criado": "已创建项目：{texto}",
+    "projeto_cancelado": "已删除项目：{texto}",
+    "projeto_alterado": "已更新项目：{texto}",
+    "nota_add": "笔记：{texto}",
+    "notas_limpas": "已删除笔记（{n}）",
+    "organizacao": "已整理文件夹：{pasta}（{n} 个文件）",
+    "arquivo_alterado": "已修改文件：{caminho}",
+    "arquivo_criado": "已创建文件：{caminho}",
+    "ferramenta": "{ferramenta}：{resumo}",
+    "desfeito_titulo": "已撤销：{texto}",
+    "desfeito": "已撤销：{texto}。",
+    "nada_desfazer": "没有可以撤销的操作。",
+    "ja_desfeito": "这已经撤销过了。",
+    "nao_desfazivel": "这无法撤销。",
+    "nao_deu_desfazer": "无法撤销：{motivo}。",
+    "confirmar_acao": "在{nivel}级别下，我会在更改任何内容前先确认。说“确认”继续，或说“取消”。",
+    "ferramenta_pendente": "此操作（{ferramenta}：{resumo}）在{nivel}级别下需要用户确认。请告诉用户回复“确认”即可继续。",
+    "ferramenta_feita": "已完成（{ferramenta}）。{resultado}",
+    "ferramenta_falhou": "没有成功（{ferramenta}）：{resultado}",
+    "nivel_observador": "观察",
+    "nivel_assistido": "辅助",
+    "nivel_autonomo": "自主",
+    "recentes": "我最近做的：{lista}。",
+    "recentes_vazio": "我还没有做过值得记录的事。",
+    "nivel_atual": "我现在处于{nivel}级别。",
+    "nivel_mudou": "好了：我现在处于{nivel}级别。",
+}
+
+_HI = {
+    "lembrete_criado": "रिमाइंडर बनाया: {texto}",
+    "lembrete_cancelado": "रिमाइंडर रद्द किया: {texto}",
+    "lembrete_alterado": "रिमाइंडर बदला: {texto}",
+    "agenda_criado": "कार्यक्रम तय किया: {texto}",
+    "agenda_cancelado": "कार्यक्रम रद्द किया: {texto}",
+    "agenda_alterado": "कार्यक्रम बदला: {texto}",
+    "projeto_criado": "प्रोजेक्ट बनाया: {texto}",
+    "projeto_cancelado": "प्रोजेक्ट हटाया: {texto}",
+    "projeto_alterado": "प्रोजेक्ट अपडेट किया: {texto}",
+    "nota_add": "नोट: {texto}",
+    "notas_limpas": "नोट हटाए ({n})",
+    "organizacao": "फ़ोल्डर व्यवस्थित किया: {pasta} ({n} फ़ाइलें)",
+    "arquivo_alterado": "फ़ाइल बदली: {caminho}",
+    "arquivo_criado": "फ़ाइल बनाई: {caminho}",
+    "ferramenta": "{ferramenta}: {resumo}",
+    "desfeito_titulo": "पूर्ववत किया: {texto}",
+    "desfeito": "पूर्ववत किया: {texto}।",
+    "nada_desfazer": "पूर्ववत करने के लिए कुछ नहीं है।",
+    "ja_desfeito": "यह पहले ही पूर्ववत हो चुका है।",
+    "nao_desfazivel": "इसे पूर्ववत नहीं किया जा सकता।",
+    "nao_deu_desfazer": "मैं इसे पूर्ववत नहीं कर सका: {motivo}।",
+    "confirmar_acao": '{nivel} स्तर पर मैं कुछ भी बदलने से पहले पूछता हूँ। आगे बढ़ने के लिए "पुष्टि करें" कहें या "रद्द करो"।',
+    "ferramenta_pendente": 'इस काम ({ferramenta}: {resumo}) के लिए {nivel} स्तर पर उपयोगकर्ता की पुष्टि चाहिए। उन्हें बताइए कि आगे बढ़ने के लिए "पुष्टि करें" कहें।',
+    "ferramenta_feita": "हो गया ({ferramenta})। {resultado}",
+    "ferramenta_falhou": "यह नहीं हुआ ({ferramenta}): {resultado}",
+    "nivel_observador": "पर्यवेक्षक",
+    "nivel_assistido": "सहायक",
+    "nivel_autonomo": "स्वायत्त",
+    "recentes": "मैंने आख़िर में यह किया: {lista}।",
+    "recentes_vazio": "मैंने अभी तक कुछ भी दर्ज करने लायक नहीं किया।",
+    "nivel_atual": "मैं {nivel} स्तर पर हूँ।",
+    "nivel_mudou": "हो गया: अब मैं {nivel} स्तर पर हूँ।",
+}
+
+_AR = {
+    "lembrete_criado": "تم إنشاء تذكير: {texto}",
+    "lembrete_cancelado": "تم إلغاء التذكير: {texto}",
+    "lembrete_alterado": "تم تعديل التذكير: {texto}",
+    "agenda_criado": "تمت جدولة موعد: {texto}",
+    "agenda_cancelado": "تم إلغاء الموعد: {texto}",
+    "agenda_alterado": "تم تعديل الموعد: {texto}",
+    "projeto_criado": "تم إنشاء مشروع: {texto}",
+    "projeto_cancelado": "تم حذف المشروع: {texto}",
+    "projeto_alterado": "تم تحديث المشروع: {texto}",
+    "nota_add": "ملاحظة: {texto}",
+    "notas_limpas": "تم حذف الملاحظات ({n})",
+    "organizacao": "تم ترتيب المجلد: {pasta} ({n} ملفات)",
+    "arquivo_alterado": "تم تعديل الملف: {caminho}",
+    "arquivo_criado": "تم إنشاء الملف: {caminho}",
+    "ferramenta": "{ferramenta}: {resumo}",
+    "desfeito_titulo": "تم التراجع: {texto}",
+    "desfeito": "تم التراجع: {texto}.",
+    "nada_desfazer": "لا يوجد شيء للتراجع عنه.",
+    "ja_desfeito": "تم التراجع عن ذلك بالفعل.",
+    "nao_desfazivel": "لا يمكن التراجع عن ذلك.",
+    "nao_deu_desfazer": "لم أتمكن من التراجع: {motivo}.",
+    "confirmar_acao": 'في مستوى {nivel} أتأكد قبل تغيير أي شيء. قل "أؤكد" للمتابعة أو "إلغاء".',
+    "ferramenta_pendente": 'هذا الإجراء ({ferramenta}: {resumo}) يحتاج إلى تأكيد المستخدم في مستوى {nivel}. أخبره أن يرد بكلمة "أؤكد" للمتابعة.',
+    "ferramenta_feita": "تم ({ferramenta}). {resultado}",
+    "ferramenta_falhou": "لم ينجح ذلك ({ferramenta}): {resultado}",
+    "nivel_observador": "المراقب",
+    "nivel_assistido": "المساعد",
+    "nivel_autonomo": "المستقل",
+    "recentes": "آخر ما فعلته: {lista}.",
+    "recentes_vazio": "لم أفعل بعد شيئًا يستحق التسجيل.",
+    "nivel_atual": "أنا في مستوى {nivel}.",
+    "nivel_mudou": "تم: أنا الآن في مستوى {nivel}.",
+}
+
+_TABELAS = {
+    PADRAO: _PT,
+    "en": _EN,
+    "es": _ES,
+    "fr": _FR,
+    "zh": _ZH,
+    "hi": _HI,
+    "ar": _AR,
+}
+
+
+def texto(chave: str, idioma: Optional[str] = None, **valores: object) -> str:
+    """A frase *chave* no idioma (português se faltar). Sem idioma, o atual das ações."""
+    if idioma is None:
+        from nicx.acoes.textos import codigo
+
+        idioma = codigo()
+    tabela = _TABELAS.get(_idioma(idioma).codigo, _PT)
+    modelo = tabela.get(chave) or _TABELAS[PADRAO][chave]
+    return modelo.format(**valores) if valores else modelo
+
+
+def chaves() -> dict[str, set[str]]:
+    """Chaves por idioma (para o teste que confere as tabelas)."""
+    return {codigo: set(tabela) for codigo, tabela in _TABELAS.items()}
+
+
+__all__ = ["chaves", "texto"]

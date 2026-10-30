@@ -97,6 +97,8 @@ class _Lingua:
     timer_antes: str = ""  # "set a 10 minute timer"
     minutos_palavra: dict[str, int] = field(default_factory=dict)
     dia_noite: frozenset[str] = frozenset()  # "tonight": sem período, é à noite
+    desfazer_geral: str = ""  # "undo", "undo that": a última mudança do histórico
+    o_que_fez: str = ""  # "what did you do?"
 
 
 _CN = STEP_NORMAL
@@ -229,6 +231,8 @@ _EN = _Lingua(
         r"|no thanks|no thank you|don t do it"
     ),
     desfazer=r"undo (?:the )?(?:organization|organizing|sorting|cleanup)",
+    desfazer_geral=r"undo(?: that| it| this| the last(?: thing| change| action)?| what you did)?",  # noqa: E501
+    o_que_fez=r"what (?:did you|have you) (?:do|done|change|changed)(?: today| last| just now)?",  # noqa: E501
     timer=(
         r"(?:(?:set|start|put on|create|make|run) )?(?:a |an )?(?:timer|countdown)"
         r"(?: for| of)? (?P<d>.+)"
@@ -442,6 +446,8 @@ _ES = _Lingua(
     ),
     negar=r"no|cancela|cancelar|olvidalo|dejalo|mejor no|no gracias|no lo hagas",
     desfazer=r"(?:deshaz|deshacer|deshaga) (?:la )?(?:organizacion|ordenacion)",
+    desfazer_geral=r"(?:deshaz|deshacer|deshaga)(?: eso| esto| lo ultimo| el ultimo cambio| lo que hiciste)?",  # noqa: E501
+    o_que_fez=r"que (?:hiciste|has hecho|cambiaste|has cambiado)(?: hoy| ultimamente)?",
     timer=(
         r"(?:(?:pon|ponme|pone|crea|inicia|programa|activa) )?(?:un )?"
         r"(?:temporizador|timer|cronometro)(?: de| para| por)? (?P<d>.+)"
@@ -665,6 +671,8 @@ _FR = _Lingua(
     ),
     negar=r"non|annule|annuler|laisse tomber|oublie|non merci|surtout pas|ne fais rien",
     desfazer=r"(?:annule|annuler|defais|defaire) (?:le )?rangement",
+    desfazer_geral=r"(?:defais|defaire) (?:ca|cela|ce que tu as fait)|annule (?:ce que tu as fait|la derniere action|le dernier changement)",  # noqa: E501
+    o_que_fez=r"qu est ce que tu as (?:fait|change)(?: aujourd hui)?|tu as fait quoi(?: aujourd hui)?",  # noqa: E501
     timer=(
         r"(?:(?:mets|met|lance|demarre|cree|regle|programme) )?(?:un )?"
         r"(?:minuteur|timer|chrono|chronometre|compte a rebours)"
@@ -959,6 +967,10 @@ def _energia(t: str, lingua: _Lingua) -> Optional[Action]:
             return Action("power", op=op)
     if re.fullmatch(lingua.desfazer, t):
         return Action("organize_undo")
+    if lingua.desfazer_geral and re.fullmatch(lingua.desfazer_geral, t):
+        return Action("undo")
+    if lingua.o_que_fez and re.fullmatch(lingua.o_que_fez, t):
+        return Action("historico")
     return None
 
 
@@ -1167,6 +1179,7 @@ _EXATAS: dict[str, dict[str, frozenset[str]]] = {
         "confirm": frozenset({"确认", "我确认", "确定"}),
         "deny": frozenset({"取消", "不", "不要", "算了", "不用了"}),
         "abort": frozenset({"取消关机", "取消重启"}),
+        "undo": frozenset({"撤销", "撤销上一步", "撤销刚才的操作"}),
     },
     "hi": {
         "confirm": frozenset(
@@ -1176,6 +1189,7 @@ _EXATAS: dict[str, dict[str, frozenset[str]]] = {
         "abort": frozenset(
             {"शटडाउन रद्द करो", "शटडाउन रद्द करें", "रीस्टार्ट रद्द करो", "रीस्टार्ट रद्द करें"}
         ),
+        "undo": frozenset({"पूर्ववत करो", "पूर्ववत करें", "पिछला बदलाव वापस लो"}),
     },
     "ar": {
         "confirm": frozenset({"أؤكد", "اؤكد", "تأكيد", "نعم", "نعم أؤكد"}),
@@ -1188,6 +1202,7 @@ _EXATAS: dict[str, dict[str, frozenset[str]]] = {
                 "الغاء اعادة التشغيل",
             }
         ),
+        "undo": frozenset({"تراجع", "تراجع عن ذلك", "تراجع عن آخر تغيير"}),
     },
 }
 _PONTUACAO = re.compile(r"[\s.,!?;:。！？，、…\"'“”«»।؟،]+")
@@ -1201,6 +1216,8 @@ def parse_exato(text: str, codigo: str) -> Optional[Action]:
     frase = _PONTUACAO.sub(" ", text).strip()
     if frase in tabela["abort"]:
         return Action("power", op="abort")
+    if frase in tabela.get("undo", frozenset()):
+        return Action("undo")
     if confirmacao.pending() is None:
         return None
     if frase in tabela["confirm"]:

@@ -397,25 +397,41 @@ class ToolExecutor:
         if isinstance(params, dict):
             params.pop("_taint", None)
 
-        # Confirmation check for sensitive tools
-        if tool.spec.requires_confirmation:
-            if not self._interactive or self._confirm_callback is None:
-                return ToolResult(
-                    tool_name=tool_call.name,
-                    content=(
-                        f"Tool '{tool_call.name}' requires"
-                        " confirmation but no confirmation"
-                        " callback is available."
-                    ),
-                    success=False,
-                )
-            prompt = f"Allow execution of tool '{tool_call.name}' with args {params}?"
-            if not self._confirm_callback(prompt):
-                return ToolResult(
-                    tool_name=tool_call.name,
-                    content=f"Tool '{tool_call.name}' execution denied by user.",
-                    success=False,
-                )
+        # Nível de autonomia e confirmação (nicx.historico.autonomia): a regra
+        # fica aqui, no código. Sem quem confirme na hora, a chamada espera o
+        # usuário dizer "confirmo" (ferramentas sensíveis pedem em todo nível).
+        from nicx.historico import autonomia as _autonomia
+        from nicx.historico import ferramentas as _hist
+
+        _nivel = _autonomia.nivel_atual()
+
+        def _executar_confirmada() -> ToolResult:
+            planos_ok = _hist.copia_antes(tool_call.name, params)
+            res = tool.execute(**params)
+            _hist.anotar_chamada(
+                tool_call.name,
+                params,
+                res.success,
+                str(res.content),
+                nivel=_nivel,
+                planos=planos_ok,
+            )
+            return res
+
+        parada = _hist.portao(
+            tool_call.name,
+            params,
+            pede_confirmacao=bool(tool.spec.requires_confirmation),
+            interativo=bool(self._interactive),
+            confirmar=self._confirm_callback,
+            executar=_executar_confirmada,
+            fazer_resultado=lambda texto, ok, meta: ToolResult(
+                tool_name=tool_call.name, content=texto, success=ok, metadata=meta
+            ),
+        )
+        if parada is not None:
+            return parada
+        _planos = _hist.copia_antes(tool_call.name, params)
 
         # Emit start event. ``agent`` carries the managed-agent UUID so the
         # AgentExecutor's trace subscriber (which filters by agent_id) can
@@ -524,6 +540,15 @@ class ToolExecutor:
                         result.metadata["injection_flagged"] = level
             except Exception:
                 logger.debug("Tool-output injection scan failed", exc_info=True)
+
+        _hist.anotar_chamada(
+            tool_call.name,
+            params,
+            result.success,
+            str(result.content),
+            nivel=_nivel,
+            planos=_planos,
+        )
 
         # Emit end event
         if self._bus:

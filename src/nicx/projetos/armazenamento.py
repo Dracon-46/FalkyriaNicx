@@ -139,14 +139,23 @@ class Projetos:
             ensure_ascii=False,
             indent=1,
         )
+        antes: list[Any] = []
         if self.caminho.exists():
             try:
                 atual = self.caminho.read_text(encoding="utf-8")
-                _ler_lista(atual)  # só copia para o .bak se estiver bom
+                antes = _ler_lista(atual)  # só copia para o .bak se estiver bom
                 self._escrever(self._bak, atual)
             except (OSError, ValueError, TypeError):
                 pass
         self._escrever(self.caminho, conteudo)
+        from nicx.historico import mudancas
+
+        mudancas.registrar(
+            "projetos",
+            [d for d in antes if isinstance(d, dict)],
+            [p.para_dict() for p in projetos],
+            lambda d: str(d.get("nome", "")),
+        )
 
     @staticmethod
     def _escrever(destino: Path, conteudo: str) -> None:

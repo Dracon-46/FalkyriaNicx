@@ -259,11 +259,17 @@ def power(action: Action) -> Outcome:
 
 
 def confirm() -> Outcome:
-    action = confirmacao.take()
+    action, fn = confirmacao.take_all()
     if action is None:
         return Outcome(False, texto("nada_confirmar"))
+    if fn is not None:  # ferramenta do modelo esperando confirmação
+        return Outcome(True, fn())
     if action.kind == "organize":
         return _organize_now(action)
+    if action.kind != "power":  # pedida pelo nível de autonomia
+        from nicx.acoes import sistema
+
+        return sistema.run_confirmado(action)
     if sys.platform != "win32":
         return _windows_only()
     if action.op == "shutdown":
@@ -617,6 +623,12 @@ def organize(action: Action) -> Outcome:
     if total == 0:
         return Outcome(True, texto("ja_organizada", pasta=label))
     resumo = ", ".join(f"{name} {len(files)}" for name, files in sorted(groups.items()))
+    from nicx.historico import autonomia
+
+    if not autonomia.precisa_confirmar(
+        "moderado"
+    ):  # nível autônomo: organiza direto (tem desfazer)
+        return _organize_now(action)
     confirmacao.ask(action)
     return Outcome(
         True,
@@ -637,7 +649,46 @@ def _organize_now(action: Action) -> Outcome:
     )
 
 
+def undo() -> Outcome:
+    """'desfaz': volta a última mudança do histórico."""
+    from nicx.historico.desfazer import desfazer
+
+    ok, frase = desfazer()
+    return Outcome(ok, frase)
+
+
+def historico() -> Outcome:
+    """'o que você fez?': as últimas coisas que o Nicx mudou."""
+    from nicx.historico import textos as htextos
+    from nicx.historico.registro import registro
+    from nicx.projetos.textos import quando
+
+    tipos = [
+        "acao",
+        "nota",
+        "lembrete",
+        "agenda",
+        "projeto",
+        "arquivo",
+        "organizacao",
+        "desfazer",
+    ]
+    itens = registro().listar(tipos=tipos, limite=5)
+    if not itens:
+        return Outcome(True, htextos.texto("recentes_vazio"))
+    lista = "; ".join(
+        f"{a.titulo} ({quando(a.quando, textos.codigo())})" for a in itens
+    )
+    return Outcome(True, htextos.texto("recentes", lista=lista))
+
+
 def organize_undo() -> Outcome:
+    from nicx.historico.desfazer import desfazer
+
+    ok, frase = desfazer(tipos=["organizacao"])
+    if ok:
+        return Outcome(True, frase)
+    # organizações de antes do histórico existir
     result = arquivos.undo_last()
     if result is None:
         return Outcome(True, texto("nada_desfazer"))
@@ -666,6 +717,8 @@ def run(action: Action) -> Optional[Outcome]:
         "status": status,
         "screenshot": screenshot,
         "organize_undo": organize_undo,
+        "undo": undo,
+        "historico": historico,
         "confirm": confirm,
         "deny": deny,
     }

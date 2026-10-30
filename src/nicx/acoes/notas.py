@@ -24,10 +24,18 @@ def add(text: str) -> None:
     file = path()
     file.parent.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now().strftime("%d/%m %H:%M")
+    linha = f"- [{stamp}] {text.strip()}"
     with file.open("a", encoding="utf-8") as fh:
         if fh.tell() == 0:
             fh.write("# Anotações do Nicx\n\n")
-        fh.write(f"- [{stamp}] {text.strip()}\n")
+        fh.write(linha + "\n")
+    from nicx.historico import anotar, textos
+
+    anotar(
+        "nota",
+        textos.texto("nota_add", texto=text.strip()),
+        desfazer={"tipo": "nota", "linha": linha},
+    )
 
 
 def all_notes() -> List[str]:
@@ -50,6 +58,15 @@ def clear() -> int:
     if file.exists() and count:
         text = file.read_text(encoding="utf-8")
         file.with_suffix(".md.bak").write_text(text, encoding="utf-8")
+        from nicx.historico import anotar, textos
+        from nicx.historico.desfazer import guardar_copia
+
+        copia = guardar_copia(file, "notas-")
+        anotar(
+            "nota",
+            textos.texto("notas_limpas", n=count),
+            desfazer={"tipo": "notas", "copia": str(copia)} if copia else None,
+        )
         kept = [line for line in text.splitlines() if not line.startswith("- [")]
         file.write_text("\n".join(kept).rstrip() + "\n\n", encoding="utf-8")
     return count

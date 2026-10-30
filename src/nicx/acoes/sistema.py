@@ -169,7 +169,94 @@ def run(action: Action, idioma: Optional[str] = None) -> Outcome:
     ele, no idioma atual das ações (português, se ninguém mudou).
     """
     with textos.usando(idioma):
-        return _run(action)
+        pedido = _autonomia(action)
+        if pedido is not None:
+            return pedido
+        outcome = _run(action)
+        _anotar(action, outcome)
+        return outcome
+
+
+def run_confirmado(action: Action) -> Outcome:
+    """Executa uma ação que o usuário acabou de confirmar ("confirmo")."""
+    outcome = _run(action)
+    _anotar(action, outcome)
+    return outcome
+
+
+# ações com confirmação própria (mostram o plano antes) ou que anotam sozinhas
+_CONFIRMACAO_PROPRIA = frozenset({"power", "organize"})
+_ANOTAM_SOZINHAS = frozenset(
+    {
+        "remind",
+        "remind_cancel",
+        "remind_clear",
+        "note_add",
+        "notes_clear",
+        "agenda_add",
+        "agenda_cancel",
+        "organize",
+        "organize_undo",
+        "undo",
+        "confirm",
+        "deny",
+    }
+)
+
+
+def _autonomia(action: Action) -> Optional[Outcome]:
+    """No nível escolhido, ações que mudam algo podem pedir "confirmo" antes."""
+    if action.kind in _CONFIRMACAO_PROPRIA:
+        return None
+    from nicx.historico import autonomia
+    from nicx.historico import textos as htextos
+    from nicx.historico.registro import PENDENTE, anotar
+
+    risco = autonomia.risco_acao(action.kind, action.op)
+    nivel = autonomia.nivel_atual()
+    if not autonomia.precisa_confirmar(risco, nivel):
+        return None
+    from nicx.acoes import confirmacao
+
+    confirmacao.ask(action)
+    anotar(
+        "acao",
+        f"{action.kind} {action.target}".strip(),
+        detalhe={
+            "acao": action.kind,
+            "op": action.op,
+            "alvo": action.target,
+            "risco": risco,
+        },
+        resultado=PENDENTE,
+        nivel=nivel,
+    )
+    return Outcome(
+        True, htextos.texto("confirmar_acao", nivel=htextos.texto(f"nivel_{nivel}"))
+    )
+
+
+def _anotar(action: Action, outcome: Outcome) -> None:
+    """Ações que mexem no PC vão para o histórico (as de leitura, não)."""
+    from nicx.historico import autonomia
+
+    risco = autonomia.risco_acao(action.kind, action.op)
+    if risco == "leitura" or action.kind in _ANOTAM_SOZINHAS:
+        return
+    from nicx.historico.registro import FALHOU, OK, anotar
+
+    anotar(
+        "acao",
+        outcome.message,
+        detalhe={
+            "acao": action.kind,
+            "op": action.op,
+            "alvo": action.target,
+            "risco": risco,
+        },
+        resultado=OK if outcome.ok else FALHOU,
+        nivel=autonomia.nivel_atual(),
+    )
 
 
 def _run(action: Action) -> Outcome:

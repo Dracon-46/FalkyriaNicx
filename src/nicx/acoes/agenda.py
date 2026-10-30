@@ -104,7 +104,19 @@ def _load() -> List[Event]:
     return events
 
 
-def _save(events: List[Event]) -> None:
+def _save(
+    events: List[Event], registrar: bool = True, junto: Optional[list] = None
+) -> None:
+    """Grava a lista. Com ``registrar``, a mudança vai para o histórico; ``junto``
+    leva as mudanças feitas ao mesmo tempo (o aviso do compromisso), desfeitas
+    com ela."""
+    from nicx.historico import mudancas
+
+    antes = (
+        [asdict(e) for e in _load()]
+        if registrar and not mudancas.silenciado()
+        else None
+    )
     path = _path()
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
@@ -113,6 +125,14 @@ def _save(events: List[Event]) -> None:
         encoding="utf-8",
     )
     os.replace(tmp, path)
+    if antes is not None:
+        mudancas.registrar(
+            "agenda",
+            antes,
+            [asdict(e) for e in events],
+            lambda d: str(d.get("title", "")),
+            junto=junto,
+        )
 
 
 def _warning_time(start: datetime, all_day: bool) -> datetime:
@@ -141,15 +161,18 @@ def add(
         created=now.isoformat(timespec="seconds"),
         idioma=idioma,
     )
+    from nicx.historico import mudancas
+
     warn_at = _warning_time(event.start_at, all_day)
-    if warn_at > now:
-        chave = "aviso_hoje" if all_day else "aviso_daqui_15"
-        aviso = textos.texto(chave, idioma, titulo=title)
-        event.reminder_id = lembretes.add(aviso, warn_at, idioma=idioma).id
+    with mudancas.capturar() as junto:
+        if warn_at > now:
+            chave = "aviso_hoje" if all_day else "aviso_daqui_15"
+            aviso = textos.texto(chave, idioma, titulo=title)
+            event.reminder_id = lembretes.add(aviso, warn_at, idioma=idioma).id
     with _LOCK:
         events = _load()
         events.append(event)
-        _save(events)
+        _save(events, junto=junto)
     return event
 
 
@@ -235,7 +258,9 @@ def update(event: Event, **changes: str) -> Optional[Event]:
                 for key, value in changes.items():
                     setattr(current, key, value)
                 events[i] = current
-                _save(events)
+                _save(
+                    events, registrar=False
+                )  # sincronização (id remoto), não é do usuário
                 return current
     return None
 
@@ -247,10 +272,13 @@ def get(event_id: str) -> Optional[Event]:
 
 def cancel(event: Event) -> None:
     """Desmarca o compromisso e o aviso dele."""
+    from nicx.historico import mudancas
+
+    with mudancas.capturar() as junto:
+        if event.reminder_id:
+            lembretes.cancel_id(event.reminder_id)
     with _LOCK:
-        _save([e for e in _load() if e.id != event.id])
-    if event.reminder_id:
-        lembretes.cancel_id(event.reminder_id)
+        _save([e for e in _load() if e.id != event.id], junto=junto)
 
 
 # ---------------------------------------------------------------------------
