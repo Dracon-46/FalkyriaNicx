@@ -11,19 +11,23 @@ logotipos, identidade visual, interface e demais materiais deste repositório
    derivadas do Software, no todo ou em parte, sem autorização prévia e por
    escrito da Falkyria.
 
-2. Quem receber autorização da Falkyria pode usar e modificar o Software
+2. Este repositório pode estar público apenas para consulta. A visibilidade do
+   código-fonte não concede nenhuma licença de uso, cópia, modificação ou
+   distribuição.
+
+3. Quem receber autorização da Falkyria pode usar e modificar o Software
    somente para os fins, pelo prazo e nas condições definidos nessa
    autorização.
 
-3. O Software utiliza bibliotecas de terceiros, instaladas como dependências e
+4. O Software utiliza bibliotecas de terceiros, instaladas como dependências e
    regidas por suas próprias licenças, que prevalecem sobre este documento no
    que diz respeito a esses componentes.
 
-4. O SOFTWARE É FORNECIDO "NO ESTADO EM QUE SE ENCONTRA", SEM GARANTIAS DE
+5. O SOFTWARE É FORNECIDO "NO ESTADO EM QUE SE ENCONTRA", SEM GARANTIAS DE
    QUALQUER TIPO, EXPRESSAS OU IMPLÍCITAS, INCLUSIVE DE COMERCIALIZAÇÃO,
    ADEQUAÇÃO A UMA FINALIDADE ESPECÍFICA E NÃO VIOLAÇÃO. EM NENHUMA HIPÓTESE A
    FALKYRIA SERÁ RESPONSÁVEL POR QUALQUER RECLAMAÇÃO, DANO OU OUTRA
    RESPONSABILIDADE DECORRENTE DO SOFTWARE OU DO SEU USO.
 
-5. O nome "Nicx", o nome "Falkyria" e seus logotipos são sinais distintivos da
+6. O nome "Nicx", o nome "Falkyria" e seus logotipos são sinais distintivos da
    Falkyria e não podem ser usados sem autorização.
