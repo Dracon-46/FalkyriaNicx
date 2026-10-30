@@ -181,4 +181,7 @@ except ImportError:
 # Controle do PC (volume, mídia, abrir apps): vive em nicx.acoes.
 import nicx.acoes.ferramenta  # noqa: E402, F401
 
+# Área de transferência e janela aberta: vive em nicx.contexto.
+import nicx.contexto.ferramenta  # noqa: E402, F401
+
 __all__ = ["NOT_TOOL_MODULES", "BaseTool", "ToolExecutor", "ToolSpec"]

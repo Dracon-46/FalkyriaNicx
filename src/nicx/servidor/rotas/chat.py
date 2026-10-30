@@ -206,6 +206,74 @@ async def _quick_action_reply(req: ChatCompletionRequest, config: Any) -> str | 
     return outcome.message if outcome is not None else None
 
 
+async def _screen_context(req: ChatCompletionRequest, config: Any, model: str):
+    """What the user is looking at, for "resume o que eu copiei" and friends.
+
+    Returns ``None`` for ordinary messages, or a ``nicx.contexto`` ``Preparo``
+    with either a ready reply ("onde eu tô?", empty clipboard, password
+    window) or the captured text to append to the user turn. The clipboard and
+    window text only go to local models.
+    """
+    if req.tools:
+        return None
+    last = req.messages[-1] if req.messages else None
+    if last is None or last.role != "user" or not isinstance(last.content, str):
+        return None
+    from nicx.contexto import pedidos, servico
+
+    if not servico.ativo(config):
+        return None
+    # "Traduz isso" alone only counts when it opens the conversation (or by
+    # voice); later on, "isso" is usually Nicx's previous answer.
+    first = bool(req.voice) or not any(m.role == "assistant" for m in req.messages)
+    request = pedidos.detectar(last.content, primeira=first)
+    if request is None:
+        return None
+    if request.fonte != pedidos.ONDE:
+        from nicx.servidor.rotas.nuvem import is_cloud_model
+
+        if is_cloud_model(model):
+            from nicx.contexto.textos import texto
+
+            return servico.Preparo(request.fonte, resposta=texto("nuvem", req.language))
+    return await asyncio.to_thread(
+        servico.preparar,
+        last.content,
+        idioma=req.language,
+        config=config,
+        primeira=first,
+    )
+
+
+def _num_ctx(config: Any) -> int:
+    ollama = getattr(getattr(config, "engine", None), "ollama", None)
+    try:
+        return int(getattr(ollama, "num_ctx", 8192) or 8192)
+    except (TypeError, ValueError):
+        return 8192
+
+
+# Agent responses whose run read the screen through the ``contexto`` tool:
+# the exchange stays out of the automatic memory.
+_SCREEN_TOOL_RESPONSES: set[int] = set()
+
+
+def _mark_screen_tool(result: Any, response: Any) -> None:
+    if any(
+        getattr(tool_result, "tool_name", "") == "contexto"
+        for tool_result in (getattr(result, "tool_results", None) or [])
+    ):
+        _SCREEN_TOOL_RESPONSES.add(id(response))
+
+
+def _used_screen_tool(response: Any) -> bool:
+    try:
+        _SCREEN_TOOL_RESPONSES.remove(id(response))
+        return True
+    except KeyError:
+        return False
+
+
 def _immediate_response(text: str, model: str, *, stream: bool):
     """Answer with ready text, in the same shape as a model reply."""
     if not stream:
@@ -254,6 +322,30 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
     quick_reply = await _quick_action_reply(request_body, config)
     if quick_reply is not None:
         return _immediate_response(quick_reply, model, stream=request_body.stream)
+
+    # The ``contexto`` tool refuses to read the screen for cloud models; the
+    # flag follows this request into the agent thread (contextvars).
+    from nicx.contexto.servico import MODELO_NA_NUVEM
+    from nicx.servidor.rotas.nuvem import is_cloud_model
+
+    MODELO_NA_NUVEM.set(bool(model) and is_cloud_model(model))
+
+    # "Resume o que eu copiei", "explica isso aqui": the clipboard or the
+    # window the user is looking at goes to the model with the request.
+    screen = await _screen_context(request_body, config, model)
+    if screen is not None and screen.resposta is not None:
+        return _immediate_response(screen.resposta, model, stream=request_body.stream)
+    screen_capture = screen.captura if screen is not None else None
+    if screen_capture is not None and use_server_agent:
+        # The text is already in the message: skip the ~600-token tool list
+        # unless the request also wants something else ("anota o que eu copiei").
+        from nicx.acoes.roteamento import needs_other_tools
+
+        agent_cfg = getattr(config, "agent", None)
+        if getattr(agent_cfg, "tools_on_demand", True) and not needs_other_tools(
+            screen.resto
+        ):
+            use_server_agent = False
 
     # Inject memory context into messages before dispatching
     memory_backend = getattr(request.app.state, "memory_backend", None)
@@ -362,6 +454,26 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
                 exc_info=True,
             )
 
+    # Texto da tela no fim da última mensagem do usuário (o começo do prompt
+    # continua igual), cortado para caber no num_ctx com folga para a resposta.
+    screen_attached = False
+    if screen_capture is not None and request_body.messages:
+        last = request_body.messages[-1]
+        if last.role == "user" and isinstance(last.content, str):
+            from nicx.contexto.montagem import anexar, orcamento_caracteres
+
+            history = [
+                m.content for m in request_body.messages if isinstance(m.content, str)
+            ]
+            budget = orcamento_caracteres(
+                _num_ctx(config),
+                history,
+                request_body.max_tokens,
+                com_ferramentas=use_server_agent,
+            )
+            last.content = anexar(last.content, screen_capture, budget)
+            screen_attached = True
+
     # Idioma escolhido na interface: pedido no fim da mensagem (e não no
     # prompt de sistema) para o começo do prompt continuar igual.
     language_hint = instrucao_resposta(request_body.language)
@@ -462,14 +574,18 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
             app_config=config,
         )
 
-    # Hand the completed exchange to the background memory service.
-    _remember_exchange(
-        getattr(request.app.state, "memory_service", None),
-        query_text_for_complexity,
-        response,
-        bus=getattr(request.app.state, "bus", None),
-        source="server.chat",
-    )
+    # Hand the completed exchange to the background memory service. What was
+    # on the user's screen never goes there.
+    if not screen_attached:
+        _remember_exchange(
+            getattr(request.app.state, "memory_service", None),
+            query_text_for_complexity,
+            response,
+            bus=getattr(request.app.state, "bus", None),
+            source="server.chat",
+        )
+    else:
+        _used_screen_tool(response)
     return response
 
 
@@ -493,6 +609,10 @@ def _record_completed_exchange(
     """Publish or submit a completed exchange without blocking a reply."""
     if not user_text:
         return
+    from nicx.contexto.montagem import tem_contexto
+
+    if tem_contexto(user_text):
+        return  # the clipboard/window text stays out of the automatic memory
     try:
         if bus is not None:
             from nicx.memoria import publish_completed_exchange
@@ -521,6 +641,8 @@ def _remember_exchange(
     source: str = "server.chat",
 ) -> None:
     """Record a completed non-streaming exchange."""
+    if _used_screen_tool(response):
+        return
     _record_completed_exchange(
         memory_service,
         user_text,
@@ -766,7 +888,7 @@ def _handle_agent(
         if Path(audio_path).exists():
             audio_meta = AudioMeta(url="/api/digest/audio")
 
-    return ChatCompletionResponse(
+    response = ChatCompletionResponse(
         model=model,
         choices=[
             Choice(
@@ -781,6 +903,8 @@ def _handle_agent(
         usage=usage,
         complexity=complexity_info,
     )
+    _mark_screen_tool(result, response)
+    return response
 
 
 async def _handle_agent_stream(
@@ -875,13 +999,14 @@ async def _handle_agent_stream(
             finish_data["complexity"] = complexity_info.model_dump()
         yield f"data: {_json.dumps(finish_data)}\n\n"
 
-        _record_completed_exchange(
-            memory_service,
-            query_text,
-            content,
-            bus=bus,
-            source="server.chat.stream",
-        )
+        if not _used_screen_tool(response):
+            _record_completed_exchange(
+                memory_service,
+                query_text,
+                content,
+                bus=bus,
+                source="server.chat.stream",
+            )
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(

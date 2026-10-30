@@ -194,6 +194,50 @@
     "saveFailed": "Não foi possível salvar o atalho",
     "restartServer": "Reinicie o servidor do Nicx para usar o atalho"
   },
+  "dictation": {
+    "title": "Ditado",
+    "enableLabel": "Ditar em qualquer programa",
+    "enableDescription": "Aperte o atalho, fale, e o texto é digitado onde está o cursor. Tudo no seu PC; nenhum áudio é guardado. Só no Windows; fica desligado até você ligar.",
+    "enableToggle": "Ativar o ditado",
+    "keysLabel": "Combinação",
+    "keysDescription": "Clique e aperte as teclas juntas (ex.: Ctrl + Alt + D). Precisa ser diferente do atalho do Nicx.",
+    "modeLabel": "Modo",
+    "modes": {
+      "alternar": "Apertar para começar e parar",
+      "segurar": "Segurar enquanto fala"
+    },
+    "modeDescriptions": {
+      "alternar": "Aperte para começar e de novo para parar; para sozinho após 1,5 s de silêncio (máximo de 60 s).",
+      "segurar": "Grava enquanto a tecla estiver apertada (máximo de 60 s)."
+    },
+    "languageLabel": "Idioma",
+    "languageDescription": "Em que idioma você vai falar",
+    "languageAuto": "Igual à conversa por voz",
+    "soundLabel": "Som de aviso",
+    "soundDescription": "Um bipe curto ao começar e ao terminar de ouvir",
+    "statusLabel": "Estado",
+    "statusDescription": "O texto entra na janela que estava em foco quando você apertou {{keys}}.",
+    "states": {
+      "desligado": "Desligado",
+      "pronto": "Pronto",
+      "ouvindo": "Ouvindo…",
+      "transcrevendo": "Transcrevendo…",
+      "em_uso": "Em uso por outro programa",
+      "sem_suporte": "Só funciona no Windows",
+      "invalido": "Configuração inválida",
+      "erro": "Não funcionou"
+    },
+    "inUseHint": "Outro programa já usa essa combinação: grave outra.",
+    "commandsHint": "Comandos de voz: \"nova linha\", \"novo parágrafo\", \"ponto final\" e \"vírgula\" (em português e no idioma escolhido).",
+    "checking": "Verificando...",
+    "serverUnavailable": "Servidor do Nicx indisponível",
+    "saveFailed": "Não foi possível salvar o ditado",
+    "restartServer": "Reinicie o servidor do Nicx para usar o ditado",
+    "indicator": {
+      "listening": "Ditado: ouvindo…",
+      "transcribing": "Ditado: transcrevendo…"
+    }
+  },
   "calendar": {
     "title": "Calendário",
     "defaultLabel": "Calendário padrão",
@@ -234,6 +278,21 @@
     "clearAllDescription": "Apaga todas as conversas de vez",
     "confirm": "Clique de novo para confirmar",
     "clear": "Apagar"
+  },
+  "context": {
+    "title": "Contexto da tela",
+    "enabledLabel": "Ler o que eu copiei e a janela aberta",
+    "enabledDescription": "Para pedidos como \"resume o que eu copiei\", \"explica isso aqui\", \"o que é esse erro?\" e \"onde eu tô?\". O texto vai só para o modelo local e não entra na memória.",
+    "copyLabel": "Copiar a seleção quando preciso",
+    "copyDescription": "Se o app não mostrar o texto selecionado, o Nicx aperta Ctrl+C na janela (só quando ela está na frente) e depois devolve o que estava copiado antes.",
+    "limitLabel": "Tamanho máximo do texto",
+    "limitDescription": "Textos maiores são cortados no meio; o limite do modelo também conta.",
+    "limitOption": "{{formatted}} caracteres",
+    "privacyHint": "Janelas de senha e de banco não são lidas. Nada sai do seu PC.",
+    "windowsOnly": "Por enquanto, a área de transferência e a janela aberta só são lidas no Windows.",
+    "serverUnavailable": "Servidor do Nicx indisponível",
+    "saveFailed": "Não foi possível salvar o contexto da tela",
+    "restartServer": "Reinicie o servidor do Nicx para usar o contexto da tela"
   },
   "about": {
     "tagline": "a inteligência artificial da Falkyria.",

@@ -194,6 +194,50 @@
     "saveFailed": "Could not save the shortcut",
     "restartServer": "Restart the Nicx server to use the shortcut"
   },
+  "dictation": {
+    "title": "Dictation",
+    "enableLabel": "Dictate in any app",
+    "enableDescription": "Press the shortcut, speak, and the text is typed where the cursor is. Everything stays on your PC; no audio is kept. Windows only; off until you turn it on.",
+    "enableToggle": "Turn on dictation",
+    "keysLabel": "Key combination",
+    "keysDescription": "Click and press the keys together (e.g. Ctrl + Alt + D). It must differ from the Nicx shortcut.",
+    "modeLabel": "Mode",
+    "modes": {
+      "alternar": "Press to start and stop",
+      "segurar": "Hold while speaking"
+    },
+    "modeDescriptions": {
+      "alternar": "Press to start and again to stop; stops by itself after 1.5 s of silence (60 s at most).",
+      "segurar": "Records while the key is held down (60 s at most)."
+    },
+    "languageLabel": "Language",
+    "languageDescription": "The language you will speak",
+    "languageAuto": "Same as voice conversation",
+    "soundLabel": "Sound cue",
+    "soundDescription": "A short beep when listening starts and ends",
+    "statusLabel": "Status",
+    "statusDescription": "The text goes into the window that had focus when you pressed {{keys}}.",
+    "states": {
+      "desligado": "Off",
+      "pronto": "Ready",
+      "ouvindo": "Listening…",
+      "transcrevendo": "Transcribing…",
+      "em_uso": "In use by another app",
+      "sem_suporte": "Windows only",
+      "invalido": "Invalid settings",
+      "erro": "Did not work"
+    },
+    "inUseHint": "Another app already uses this combination: record a different one.",
+    "commandsHint": "Voice commands: \"new line\", \"new paragraph\", \"full stop\" and \"comma\" (also in Portuguese).",
+    "checking": "Checking...",
+    "serverUnavailable": "Nicx server unavailable",
+    "saveFailed": "Could not save dictation",
+    "restartServer": "Restart the Nicx server to use dictation",
+    "indicator": {
+      "listening": "Dictation: listening…",
+      "transcribing": "Dictation: transcribing…"
+    }
+  },
   "calendar": {
     "title": "Calendar",
     "defaultLabel": "Default calendar",
@@ -234,6 +278,21 @@
     "clearAllDescription": "Permanently deletes all conversations",
     "confirm": "Click again to confirm",
     "clear": "Clear"
+  },
+  "context": {
+    "title": "Screen context",
+    "enabledLabel": "Read what I copied and the open window",
+    "enabledDescription": "For requests like \"summarize what I copied\", \"explain this here\", \"what is this error?\" and \"where am I?\". The text only goes to the local model and never into memory.",
+    "copyLabel": "Copy the selection when needed",
+    "copyDescription": "If the app doesn't expose the selected text, Nicx presses Ctrl+C in that window (only while it's in front) and then restores what you had copied.",
+    "limitLabel": "Maximum text size",
+    "limitDescription": "Longer texts are cut in the middle; the model's limit also applies.",
+    "limitOption": "{{formatted}} characters",
+    "privacyHint": "Password and banking windows are never read. Nothing leaves your PC.",
+    "windowsOnly": "For now, the clipboard and the open window can only be read on Windows.",
+    "serverUnavailable": "Nicx server unavailable",
+    "saveFailed": "Could not save the screen context settings",
+    "restartServer": "Restart the Nicx server to use screen context"
   },
   "about": {
     "tagline": "the artificial intelligence of Falkyria.",

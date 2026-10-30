@@ -502,3 +502,20 @@ def test_load_configured_facts_skips_disabled_memory():
     config = SimpleNamespace(memory=SimpleNamespace(enabled=False))
 
     assert load_configured_facts(config) == []
+
+
+def test_replace_tenta_de_novo_quando_o_windows_nega_o_acesso(monkeypatch, tmp_path):
+    from nicx.memoria import store
+
+    chamadas = []
+
+    def replace(src, dst):
+        chamadas.append(src)
+        if len(chamadas) < 3:
+            raise PermissionError(13, "Acesso negado")
+
+    monkeypatch.setattr(store.sys, "platform", "win32")
+    monkeypatch.setattr(store.os, "replace", replace)
+    monkeypatch.setattr(store.time, "sleep", lambda s: None)
+    store._replace_with_retry("a.tmp", tmp_path / "f.jsonl")
+    assert len(chamadas) == 3

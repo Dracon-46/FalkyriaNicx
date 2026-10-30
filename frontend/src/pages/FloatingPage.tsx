@@ -14,6 +14,8 @@ import { bindMascotToChat } from '../lib/mascot-chat';
 import { startVoiceBusyReporter } from '../lib/voice-busy';
 import { stripThinkTags } from '../lib/message-text';
 import { ensureModels, sendSpokenMessage } from '../lib/spoken-chat';
+import { isDictating, useDictationState } from '../lib/dictation';
+import { useMascot } from '../lib/mascot';
 import {
   closeFloatingWindow,
   isFarewell,
@@ -127,6 +129,33 @@ export default function FloatingPage() {
     conversationRef.current.start();
   }, []);
 
+  // Ditado universal (atalho em outro programa): o servidor ouve pelo mesmo
+  // microfone, então a conversa daqui pausa e o mascote mostra o ditado.
+  const dictationState = useDictationState();
+  const dictating = isDictating(dictationState);
+  const pausedForDictation = useRef(false);
+  const moodFromDictation = useRef(false);
+  useEffect(() => {
+    if (dictating) {
+      moodFromDictation.current = true;
+      useMascot.getState().setMood(dictationState === 'ouvindo' ? 'listening' : 'thinking');
+      if (conversationRef.current.active) {
+        pausedForDictation.current = true;
+        closing.current = true; // parar por isso não fecha a janela
+        conversationRef.current.stop();
+      }
+      return;
+    }
+    if (moodFromDictation.current) {
+      moodFromDictation.current = false;
+      useMascot.getState().setMood('idle');
+    }
+    if (pausedForDictation.current) {
+      pausedForDictation.current = false;
+      listen();
+    }
+  }, [dictating, dictationState, listen]);
+
   useEffect(() => {
     if (!speech.error) return;
     toast.error(speech.error, { duration: 8000 });
@@ -203,10 +232,17 @@ export default function FloatingPage() {
         <NicxMascot size={140} />
         <div
           className="text-sm font-medium"
-          style={{ color: conversation.active ? 'var(--color-accent)' : 'var(--color-text-secondary)' }}
+          style={{ color: conversation.active || dictating ? 'var(--color-accent)' : 'var(--color-text-secondary)' }}
           aria-live="polite"
+          data-testid="floating-status"
         >
-          {ended ? t('chat.floating.ended') : conversation.active ? conversation.label : t('chat.floating.preparing')}
+          {dictating
+            ? t(`settings.dictation.indicator.${dictationState === 'ouvindo' ? 'listening' : 'transcribing'}`)
+            : ended
+              ? t('chat.floating.ended')
+              : conversation.active
+                ? conversation.label
+                : t('chat.floating.preparing')}
         </div>
 
         <div

@@ -97,6 +97,7 @@ class TraceCollector:
             trace.total_latency_seconds += step.duration_seconds
             trace.total_tokens += step.output.get("tokens", 0)
 
+        _omit_screen_content(trace)
         self._last_trace = trace
 
         if self._store is not None:
@@ -225,6 +226,30 @@ class TraceCollector:
         )
 
 
+_SCREEN_OMITTED = "[conteúdo da tela omitido]"
+
+
+def _omit_screen_content(trace: Trace) -> None:
+    """Keep what the user copied or had on screen out of ``traces.db``.
+
+    The request keeps only the user's own words (the ``nicx.contexto`` block
+    is cut) and the ``contexto`` tool's output is replaced by a placeholder.
+    """
+    from nicx.contexto.montagem import sem_contexto, tem_contexto
+
+    trace.query = sem_contexto(trace.query)
+    for step in trace.steps:
+        if step.step_type == StepType.TOOL_CALL and (
+            (step.input or {}).get("tool") == "contexto"
+        ):
+            step.output = {**(step.output or {}), "result": _SCREEN_OMITTED}
+    for message in trace.messages or []:
+        if isinstance(message, dict):
+            content = message.get("content")
+            if isinstance(content, str) and tem_contexto(content):
+                message["content"] = sem_contexto(content) or _SCREEN_OMITTED
+
+
 def record_response_trace(
     store: Optional[TraceStore],
     *,
@@ -250,9 +275,11 @@ def record_response_trace(
     if store is None:
         return None
     try:
+        from nicx.contexto.montagem import sem_contexto
+
         duration = max(0.0, ended_at - started_at)
         trace = Trace(
-            query=query,
+            query=sem_contexto(query),
             agent=agent,
             model=model,
             engine=engine,

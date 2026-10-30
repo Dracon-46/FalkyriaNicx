@@ -73,6 +73,19 @@ def _resolve_allowed_tools(config: object) -> tuple[set[str], bool]:
     return allowed, True
 
 
+def _server_tools(config: object) -> tuple[set[str], bool]:
+    """``_resolve_allowed_tools`` plus ``contexto`` when ``[contexto] ativo``.
+
+    The screen tool has its own switch in Settings, so it does not depend on
+    the user's ``tools.enabled`` list (it only enters the prompt when the
+    message talks about the screen).
+    """
+    allowed, explicit = _resolve_allowed_tools(config)
+    if getattr(getattr(config, "contexto", None), "ativo", False):
+        allowed = {*allowed, "contexto"}
+    return allowed, explicit
+
+
 def _unique_model_ids(model_ids: list[str]) -> list[str]:
     """Return model ids in first-seen order without duplicates."""
     unique: list[str] = []
@@ -362,7 +375,7 @@ def serve(
                     from nicx.ferramentas._stubs import BaseTool
                     from nicx.nucleo.registry import ToolRegistry
 
-                    allowed, tools_configured = _resolve_allowed_tools(config)
+                    allowed, tools_configured = _server_tools(config)
 
                     tools = []
                     for name in ToolRegistry.keys():
@@ -492,7 +505,7 @@ def serve(
                         from nicx.ferramentas._stubs import BaseTool
                         from nicx.nucleo.registry import ToolRegistry
 
-                        _allowed, _tools_configured = _resolve_allowed_tools(config)
+                        _allowed, _tools_configured = _server_tools(config)
 
                         for _tname in ToolRegistry.keys():
                             if _tname not in _allowed:

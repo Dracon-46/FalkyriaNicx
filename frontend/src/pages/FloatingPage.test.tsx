@@ -13,6 +13,12 @@ const mocks = vi.hoisted(() => ({
   recording: false,
   reportVoiceBusy: vi.fn(),
   onSilence: null as null | ((heard: boolean) => void),
+  dictation: 'desligado' as string | null,
+}));
+
+vi.mock('../lib/dictation', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../lib/dictation')>()),
+  useDictationState: () => mocks.dictation,
 }));
 
 vi.mock('../hooks/useSpeech', () => ({
@@ -52,6 +58,7 @@ describe('FloatingPage (/flutuante)', () => {
   beforeEach(() => {
     mocks.onSilence = null;
     mocks.recording = false;
+    mocks.dictation = 'desligado';
     mocks.startRecording.mockReset().mockImplementation(async (opts) => {
       mocks.onSilence = opts?.onSilence ?? null;
       mocks.recording = true;
@@ -113,5 +120,27 @@ describe('FloatingPage (/flutuante)', () => {
 
     expect(mocks.closeFloatingWindow).toHaveBeenCalled();
     expect(mocks.cancelRecording).toHaveBeenCalled();
+  });
+
+  it('pauses its own conversation while the dictation shortcut listens', async () => {
+    const { rerender } = render(<FloatingPage />);
+    await waitFor(() => expect(mocks.startRecording).toHaveBeenCalledTimes(1));
+
+    mocks.dictation = 'ouvindo';
+    rerender(<FloatingPage />);
+    await waitFor(() => expect(screen.getByTestId('floating-status').textContent).toBe('Ditado: ouvindo…'));
+    expect(mocks.cancelRecording).toHaveBeenCalled();
+
+    mocks.dictation = 'transcrevendo';
+    rerender(<FloatingPage />);
+    await waitFor(() =>
+      expect(screen.getByTestId('floating-status').textContent).toBe('Ditado: transcrevendo…'),
+    );
+
+    // Dictation over: the window stays open and listens again.
+    mocks.dictation = 'pronto';
+    rerender(<FloatingPage />);
+    await waitFor(() => expect(mocks.startRecording).toHaveBeenCalledTimes(2));
+    expect(mocks.closeFloatingWindow).not.toHaveBeenCalled();
   });
 });

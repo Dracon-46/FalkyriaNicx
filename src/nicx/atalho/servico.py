@@ -31,9 +31,12 @@ FabricaEscuta = Callable[[Combinacao, Callable[[], None]], Any]
 
 
 def _escuta_windows(combinacao: Combinacao, ao_apertar: Callable[[], None]) -> Any:
-    from nicx.atalho.windows import EscutaAtalho
+    from nicx.atalho.windows import HOTKEY_ID, EscutaAtalho, laco_compartilhado
 
-    return EscutaAtalho(combinacao, ao_apertar)
+    # Mesmo laço (thread) do atalho do ditado, com outro id.
+    return EscutaAtalho(
+        combinacao, ao_apertar, ident=HOTKEY_ID, laco=laco_compartilhado()
+    )
 
 
 def rotulo_de(teclas: str) -> str:
@@ -151,14 +154,9 @@ class GerenciadorAtalho:
         }
 
 
-def salvar_config(
-    path: Path,
-    *,
-    ativo: Optional[bool] = None,
-    teclas: Optional[str] = None,
-    acao: Optional[str] = None,
-) -> None:
-    """Grava ``[atalho]`` no config.toml sem apagar o resto (escrita atômica)."""
+def salvar_secao(path: Path, nome: str, valores: dict[str, Any]) -> None:
+    """Grava as chaves *valores* (as ``None`` ficam como estão) na seção
+    ``[nome]`` do config.toml sem apagar o resto (escrita atômica)."""
     import tomlkit
 
     path = Path(path)
@@ -168,15 +166,12 @@ def salvar_config(
         if path.exists()
         else tomlkit.document()
     )
-    if "atalho" not in doc:
-        doc.add("atalho", tomlkit.table())
-    secao = doc["atalho"]
-    if ativo is not None:
-        secao["ativo"] = bool(ativo)
-    if teclas is not None:
-        secao["teclas"] = teclas
-    if acao is not None:
-        secao["acao"] = acao
+    if nome not in doc:
+        doc.add(nome, tomlkit.table())
+    secao = doc[nome]
+    for chave, valor in valores.items():
+        if valor is not None:
+            secao[chave] = valor
     temporario: Optional[Path] = None
     try:
         with tempfile.NamedTemporaryFile(
@@ -191,6 +186,25 @@ def salvar_config(
             temporario.unlink(missing_ok=True)
 
 
+def salvar_config(
+    path: Path,
+    *,
+    ativo: Optional[bool] = None,
+    teclas: Optional[str] = None,
+    acao: Optional[str] = None,
+) -> None:
+    """Grava ``[atalho]`` no config.toml sem apagar o resto (escrita atômica)."""
+    salvar_secao(
+        path,
+        "atalho",
+        {
+            "ativo": None if ativo is None else bool(ativo),
+            "teclas": teclas,
+            "acao": acao,
+        },
+    )
+
+
 __all__ = [
     "DESLIGADO",
     "EM_USO",
@@ -201,4 +215,5 @@ __all__ = [
     "GerenciadorAtalho",
     "rotulo_de",
     "salvar_config",
+    "salvar_secao",
 ]

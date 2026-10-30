@@ -194,6 +194,50 @@
     "saveFailed": "无法保存快捷键",
     "restartServer": "请重启 Nicx 服务器以使用快捷键"
   },
+  "dictation": {
+    "title": "听写",
+    "enableLabel": "在任何程序中听写",
+    "enableDescription": "按下快捷键并说话，文字会输入到光标所在位置。全部在你的电脑上完成，不保存任何音频。仅限 Windows；在你开启前保持关闭。",
+    "enableToggle": "开启听写",
+    "keysLabel": "组合键",
+    "keysDescription": "点击后同时按下这些键（例如 Ctrl + Alt + D）。必须与 Nicx 快捷键不同。",
+    "modeLabel": "模式",
+    "modes": {
+      "alternar": "按一下开始，再按一下停止",
+      "segurar": "说话时按住"
+    },
+    "modeDescriptions": {
+      "alternar": "按一下开始，再按一下停止；静音 1.5 秒后自动停止（最长 60 秒）。",
+      "segurar": "按住按键时录音（最长 60 秒）。"
+    },
+    "languageLabel": "语言",
+    "languageDescription": "你将使用的语言",
+    "languageAuto": "与语音对话相同",
+    "soundLabel": "提示音",
+    "soundDescription": "开始和结束聆听时发出短促的提示音",
+    "statusLabel": "状态",
+    "statusDescription": "文字会输入到你按下 {{keys}} 时处于焦点的窗口。",
+    "states": {
+      "desligado": "已关闭",
+      "pronto": "就绪",
+      "ouvindo": "正在聆听…",
+      "transcrevendo": "正在转写…",
+      "em_uso": "已被其他程序占用",
+      "sem_suporte": "仅支持 Windows",
+      "invalido": "设置无效",
+      "erro": "未能完成"
+    },
+    "inUseHint": "其他程序已在使用此组合键：请录制另一个。",
+    "commandsHint": "语音命令：“换行”、“新段落”、“句号”和“逗号”（葡萄牙语同样有效）。",
+    "checking": "正在检查...",
+    "serverUnavailable": "Nicx 服务器不可用",
+    "saveFailed": "无法保存听写设置",
+    "restartServer": "请重启 Nicx 服务器以使用听写",
+    "indicator": {
+      "listening": "听写：正在聆听…",
+      "transcribing": "听写：正在转写…"
+    }
+  },
   "calendar": {
     "title": "日历",
     "defaultLabel": "默认日历",
@@ -234,6 +278,21 @@
     "clearAllDescription": "永久删除所有对话",
     "confirm": "再点一次以确认",
     "clear": "清除"
+  },
+  "context": {
+    "title": "屏幕上下文",
+    "enabledLabel": "读取我复制的内容和打开的窗口",
+    "enabledDescription": "用于“总结我复制的内容”“解释这里”“这个错误是什么？”“我在哪儿？”等请求。文本只发给本地模型，不会进入记忆。",
+    "copyLabel": "需要时复制选中内容",
+    "copyDescription": "如果应用不提供选中的文本，Nicx 会在该窗口按 Ctrl+C（仅当它在最前面时），然后恢复你之前复制的内容。",
+    "limitLabel": "文本最大长度",
+    "limitDescription": "更长的文本会从中间截断；模型的上限同样适用。",
+    "limitOption": "{{formatted}} 个字符",
+    "privacyHint": "不会读取密码和银行窗口。任何内容都不会离开你的电脑。",
+    "windowsOnly": "目前只能在 Windows 上读取剪贴板和打开的窗口。",
+    "serverUnavailable": "Nicx 服务器不可用",
+    "saveFailed": "无法保存屏幕上下文设置",
+    "restartServer": "请重启 Nicx 服务器以使用屏幕上下文"
   },
   "about": {
     "tagline": "Falkyria 的人工智能。",

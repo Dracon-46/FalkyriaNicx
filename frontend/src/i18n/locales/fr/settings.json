@@ -194,6 +194,50 @@
     "saveFailed": "Impossible d'enregistrer le raccourci",
     "restartServer": "Redémarrez le serveur Nicx pour utiliser le raccourci"
   },
+  "dictation": {
+    "title": "Dictée",
+    "enableLabel": "Dicter dans n'importe quel programme",
+    "enableDescription": "Appuyez sur le raccourci, parlez, et le texte est saisi là où se trouve le curseur. Tout reste sur votre PC ; aucun audio n'est conservé. Windows uniquement ; désactivé jusqu'à ce que vous l'activiez.",
+    "enableToggle": "Activer la dictée",
+    "keysLabel": "Combinaison",
+    "keysDescription": "Cliquez et appuyez sur les touches ensemble (ex. : Ctrl + Alt + D). Elle doit être différente du raccourci de Nicx.",
+    "modeLabel": "Mode",
+    "modes": {
+      "alternar": "Appuyer pour démarrer et arrêter",
+      "segurar": "Maintenir pendant que vous parlez"
+    },
+    "modeDescriptions": {
+      "alternar": "Appuyez pour démarrer et à nouveau pour arrêter ; s'arrête seul après 1,5 s de silence (60 s maximum).",
+      "segurar": "Enregistre tant que la touche est maintenue (60 s maximum)."
+    },
+    "languageLabel": "Langue",
+    "languageDescription": "La langue dans laquelle vous allez parler",
+    "languageAuto": "Comme la conversation vocale",
+    "soundLabel": "Signal sonore",
+    "soundDescription": "Un bip court au début et à la fin de l'écoute",
+    "statusLabel": "État",
+    "statusDescription": "Le texte est saisi dans la fenêtre active au moment où vous avez appuyé sur {{keys}}.",
+    "states": {
+      "desligado": "Désactivée",
+      "pronto": "Prête",
+      "ouvindo": "Écoute…",
+      "transcrevendo": "Transcription…",
+      "em_uso": "Utilisé par un autre programme",
+      "sem_suporte": "Windows uniquement",
+      "invalido": "Configuration invalide",
+      "erro": "N'a pas fonctionné"
+    },
+    "inUseHint": "Un autre programme utilise déjà cette combinaison : enregistrez-en une autre.",
+    "commandsHint": "Commandes vocales : « nouvelle ligne », « nouveau paragraphe », « point final » et « virgule » (aussi en portugais).",
+    "checking": "Vérification...",
+    "serverUnavailable": "Serveur Nicx indisponible",
+    "saveFailed": "Impossible d'enregistrer la dictée",
+    "restartServer": "Redémarrez le serveur Nicx pour utiliser la dictée",
+    "indicator": {
+      "listening": "Dictée : écoute…",
+      "transcribing": "Dictée : transcription…"
+    }
+  },
   "calendar": {
     "title": "Calendrier",
     "defaultLabel": "Calendrier par défaut",
@@ -234,6 +278,21 @@
     "clearAllDescription": "Supprime définitivement toutes les conversations",
     "confirm": "Cliquez à nouveau pour confirmer",
     "clear": "Effacer"
+  },
+  "context": {
+    "title": "Contexte de l'écran",
+    "enabledLabel": "Lire ce que j'ai copié et la fenêtre ouverte",
+    "enabledDescription": "Pour des demandes comme « résume ce que j'ai copié », « explique ceci ici », « c'est quoi cette erreur ? » et « où suis-je ? ». Le texte ne va qu'au modèle local et n'entre jamais en mémoire.",
+    "copyLabel": "Copier la sélection si besoin",
+    "copyDescription": "Si l'application n'expose pas le texte sélectionné, Nicx appuie sur Ctrl+C dans cette fenêtre (seulement si elle est au premier plan) puis remet ce que tu avais copié.",
+    "limitLabel": "Taille maximale du texte",
+    "limitDescription": "Les textes plus longs sont coupés au milieu ; la limite du modèle compte aussi.",
+    "limitOption": "{{formatted}} caractères",
+    "privacyHint": "Les fenêtres de mots de passe et de banque ne sont jamais lues. Rien ne quitte ton PC.",
+    "windowsOnly": "Pour l'instant, le presse-papiers et la fenêtre ouverte ne sont lus que sous Windows.",
+    "serverUnavailable": "Serveur Nicx indisponible",
+    "saveFailed": "Impossible d'enregistrer le contexte de l'écran",
+    "restartServer": "Redémarre le serveur Nicx pour utiliser le contexte de l'écran"
   },
   "about": {
     "tagline": "l’intelligence artificielle de Falkyria.",

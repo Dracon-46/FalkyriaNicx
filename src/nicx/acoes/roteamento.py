@@ -47,7 +47,24 @@ _REGEX = re.compile("|".join(f"(?:{p})" for p in _PATTERNS))
 
 
 def needs_tools(text: str) -> bool:
-    """True quando a mensagem parece pedir busca, dados atuais, PC ou contas."""
+    """True quando a mensagem parece pedir busca, dados atuais, PC ou contas.
+
+    Inclui falar do que está na tela ("o que eu copiei", "isso aqui", "this
+    page"): a ferramenta ``contexto`` lê a área de transferência e a janela.
+    """
+    if _REGEX.search(normalize(text or "")):
+        return True
+    from nicx.contexto.pedidos import menciona
+
+    return menciona(text or "")
+
+
+def needs_other_tools(text: str) -> bool:
+    """Como ``needs_tools``, sem contar a referência à tela.
+
+    Para pedidos cujo contexto já foi anexado à mensagem: "resume o que eu
+    copiei" não precisa de ferramenta nenhuma; "anota o que eu copiei", sim.
+    """
     return bool(_REGEX.search(normalize(text or "")))
 
 

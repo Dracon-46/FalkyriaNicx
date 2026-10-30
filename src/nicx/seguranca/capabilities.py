@@ -281,6 +281,8 @@ DEFAULT_TOOL_CAPABILITIES: Dict[str, List[str]] = {
     "lembrete": [Capability.TOOL_INVOKE],
     "agenda": [Capability.TOOL_INVOKE],
     "arquivos": [Capability.TOOL_INVOKE, Capability.FILE_READ, Capability.FILE_WRITE],
+    # Lê a área de transferência e a janela aberta (só leitura, nunca grava).
+    "contexto": [Capability.TOOL_INVOKE, Capability.FILE_READ],
 }
 
 _SAFE_BUILTIN_PROVENANCE = {
@@ -303,6 +305,7 @@ def canonical_tool_capabilities(tool: Any) -> List[str]:
         or module.startswith("nicx.ferramentas.")
         or module == "nicx.agenda.tools"
         or module.startswith("nicx.acoes.")
+        or module.startswith("nicx.contexto.")
     )
     if module == "nicx.ferramentas.integracoes.mcp_adapter":
         # MCP tool names are remote-controlled.  Resolve adapter provenance

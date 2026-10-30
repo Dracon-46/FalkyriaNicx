@@ -51,6 +51,88 @@ acao = "flutuante"      # "flutuante": mascote já ouvindo; "app": abre o app
   com ele ligado. Só no Windows; nos outros sistemas o servidor registra no log
   que não há suporte.
 
+## Ditado
+
+Em qualquer programa (Word, navegador, e-mail, chat...): aperte o atalho do
+ditado, fale, e o texto é digitado onde está o cursor. Fica **desligado** até
+você ligar em **Configurações → Ditado** (ou no `config.toml`):
+
+```toml
+[ditado]
+ativo = true
+teclas = "ctrl+alt+d"   # mesmas regras do [atalho]; diferente dele
+modo = "alternar"       # ou "segurar" (grava enquanto a tecla está apertada)
+idioma = ""             # "pt-BR", "en"...; vazio = o de [speech] language
+som = true              # bipe curto ao começar e ao terminar
+```
+
+- **alternar**: aperte para começar e de novo para parar. Para sozinho após
+  ~1,5 s de silêncio; no máximo 60 s. Se ninguém falar nos primeiros segundos,
+  nada é digitado.
+- O texto vai para a janela que estava em foco quando você apertou o atalho
+  (o Nicx devolve o foco a ela). Se ela fechou ou não aceitar o foco, nada é
+  digitado. Programas abertos como administrador não aceitam o ditado.
+- A digitação é tecla a tecla (não usa a área de transferência: o que você
+  copiou continua lá). A quebra de linha vai como Shift+Enter, para não enviar
+  mensagens em programas de chat.
+- Pontuação e maiúsculas são as do Whisper. Comandos de voz, em português e
+  no idioma escolhido: "nova linha", "novo parágrafo", "ponto final" e
+  "vírgula" (em inglês: "new line", "new paragraph", "full stop", "comma").
+- Com a janela flutuante aberta, o mascote mostra "Ditado: ouvindo…" e a
+  conversa por voz dela pausa até o ditado acabar.
+- Privacidade: tudo local (microfone, VAD e Whisper do `[speech]`). O áudio só
+  existe na memória; o texto não vai para a memória do Nicx nem para os logs
+  (o log mostra só o tamanho).
+- Como o atalho, vive no servidor do Nicx e só funciona no Windows.
+
+## Contexto: o que eu copiei e a janela aberta
+
+O Nicx enxerga o que você está vendo, sem precisar colar nada:
+
+| Pedido | De onde vem o texto |
+|---|---|
+| "resume o que eu copiei", "traduz o texto copiado pra inglês", "corrige o que eu copiei", "responde o que eu copiei" | Área de transferência (o que você copiou com Ctrl+C) |
+| "explica isso aqui", "o que é esse erro?", "resume essa página", "resume esse documento", "traduz isso pra inglês" | A janela que você estava usando antes do Nicx |
+| "onde eu tô?" | Responde na hora: o app e o arquivo aberto |
+
+Também em inglês ("summarize what I copied", "explain this page", "where am
+I?"), espanhol ("resume lo que copié", "¿qué es este error?") e francês
+("résume ce que j'ai copié", "explique cette page", "où suis-je ?").
+
+Da janela, nesta ordem: o **texto selecionado**; o **arquivo aberto** (o nome
+vem do título no VS Code, Bloco de Notas, Word, Excel, leitores de PDF... e o
+arquivo só é lido se estiver na Área de Trabalho, Documentos, Downloads,
+OneDrive, num projeto recente do VS Code ou em `[contexto] pastas_extras`);
+o **texto da página ou do documento** (navegador, Word); os textos de uma
+caixa de erro. Seleção e página são lidas pela acessibilidade do Windows
+(UI Automation, a mesma dos leitores de tela). Se nada disso der texto,
+copie (Ctrl+C) e peça "explica o que eu copiei".
+
+"Traduz isso" sozinho só vale na primeira mensagem da conversa (ou por voz):
+no meio da conversa, "isso" é a resposta anterior do Nicx.
+
+O texto vai para o **modelo local** junto com o pedido, no fim da mensagem,
+marcado como dado (o modelo é instruído a não seguir ordens escritas nele) e
+cortado para caber no contexto do modelo. Nunca sai do PC (com um modelo da
+nuvem escolhido, o Nicx se recusa), não vai para a memória automática nem
+para os logs e rastros. Janelas de gerenciadores de senha (KeePass,
+1Password, Bitwarden...), de banco e com "senha"/"password" no título não são
+lidas, nem o que um gerenciador de senhas copiou.
+
+Configurações → Contexto da tela, ou no `config.toml`:
+
+```toml
+[contexto]
+ativo = true            # ler a área de transferência e a janela
+copiar_selecao = false  # sem texto acessível, apertar Ctrl+C e devolver o que estava copiado
+max_caracteres = 20000
+```
+
+`copiar_selecao` só age quando a janela ainda está na frente (pedido por voz
+ou atalho) e só se a área de transferência tinha texto (imagens e arquivos
+copiados nunca são trocados). O modelo também tem a ferramenta `contexto`,
+que entra no prompt só quando a mensagem fala da tela. Só no Windows.
+
 ## Ações rápidas
 
 Frases que o Nicx executa na hora, sem passar pelo modelo (texto ou voz):

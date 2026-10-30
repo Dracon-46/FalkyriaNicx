@@ -212,6 +212,32 @@ class FasterWhisperBackend(SpeechBackend):
             segments=segments,
         )
 
+    def transcrever_array(
+        self, audio: object, *, language: Optional[str] = None
+    ) -> str:
+        """Transcreve áudio float32 mono a 16 kHz direto da memória.
+
+        Usado pelo ditado: nada vai para o disco (``transcribe`` precisa de um
+        arquivo temporário). Mesmo modelo, mesmo descarregamento por ócio.
+        """
+        try:
+            model = self._ensure_model()
+            self._idle.touch()
+            kwargs: dict = {"condition_on_previous_text": False}
+            if language:
+                kwargs["language"] = language
+            if self._vad_filter:
+                kwargs["vad_filter"] = True
+            if self._hotwords:
+                kwargs["hotwords"] = self._hotwords
+            segments_iter, _info = model.transcribe(audio, **kwargs)
+            partes = [s.text for s in segments_iter if not _likely_not_speech(s)]
+        except Exception as exc:
+            self._last_error = str(exc)
+            raise
+        self._last_error = None
+        return _collapse_repeats("".join(partes).strip())
+
     def health(self) -> bool:
         """Check the package is installed, without loading the model.
 

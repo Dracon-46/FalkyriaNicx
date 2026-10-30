@@ -19,6 +19,8 @@ from nicx.servidor.rotas.briefing import create_digest_router
 from nicx.servidor.rotas.chat import router
 from nicx.servidor.rotas.comparacao import comparison_router
 from nicx.servidor.rotas.conectores import create_connectors_router
+from nicx.servidor.rotas.contexto import router as contexto_router
+from nicx.servidor.rotas.ditado import router as ditado_router
 from nicx.servidor.rotas.escuta import router as wake_router
 from nicx.servidor.rotas.painel_economia import dashboard_router
 from nicx.servidor.rotas.pesquisa import router as research_router
@@ -487,7 +489,9 @@ def create_app(
     app.include_router(analytics_router)
     app.include_router(wake_router)
     app.include_router(atalho_router)
+    app.include_router(ditado_router)
     app.include_router(agenda_router)
+    app.include_router(contexto_router)
     include_all_routes(app)
 
     # Atalho global de teclado ([atalho]): sobe e desce com o servidor. Só faz
@@ -509,6 +513,43 @@ def create_app(
     @app.on_event("shutdown")
     async def _parar_atalho() -> None:
         app.state.atalho.parar()
+
+    # Ditado universal ([ditado]): outro atalho no mesmo laço do Windows.
+    from nicx.servidor.rotas.ditado import criar_servico as _criar_ditado
+
+    app.state.ditado = _criar_ditado(app)
+
+    @app.on_event("startup")
+    async def _iniciar_ditado() -> None:
+        cfg = getattr(app.state, "config", None)
+        if not getattr(getattr(cfg, "ditado", None), "ativo", False):
+            return
+        import asyncio
+
+        await asyncio.to_thread(app.state.ditado.aplicar)
+
+    @app.on_event("shutdown")
+    async def _parar_ditado() -> None:
+        app.state.ditado.parar()
+
+    # Contexto da tela ([contexto]): guarda a última janela de fora que teve
+    # foco, para "explica isso aqui" pedido de dentro do app (só no Windows).
+    @app.on_event("startup")
+    async def _iniciar_contexto() -> None:
+        cfg = getattr(app.state, "config", None)
+        if not getattr(getattr(cfg, "contexto", None), "ativo", False):
+            return
+        import asyncio
+
+        from nicx.contexto import janela as _janela
+
+        await asyncio.to_thread(_janela.iniciar_rastreador)
+
+    @app.on_event("shutdown")
+    async def _parar_contexto() -> None:
+        from nicx.contexto import janela as _janela
+
+        _janela.parar_rastreador()
 
     # Restore SendBlue channel bindings from database on startup
     _restore_sendblue_bindings(app)

@@ -71,6 +71,23 @@ def _unlock_windows(file_obj: Any, *, locking_api: Any | None = None) -> None:
     locking_api.locking(file_obj.fileno(), locking_api.LK_UNLCK, 1)
 
 
+def _replace_with_retry(src: str, dst: Path, *, attempts: int = 50) -> None:
+    """``os.replace`` que espera um leitor soltar o arquivo no Windows.
+
+    No Windows, trocar um arquivo que outro processo está lendo naquele
+    instante dá "Acesso negado" (WinError 5); a leitura dura milissegundos,
+    então basta tentar de novo. Nos outros sistemas a troca nunca falha assim.
+    """
+    for attempt in range(attempts):
+        try:
+            os.replace(src, dst)
+            return
+        except PermissionError:
+            if sys.platform != "win32" or attempt == attempts - 1:
+                raise
+            time.sleep(_WINDOWS_LOCK_RETRY_SECONDS)
+
+
 def _default_fact_path() -> Path:
     """Return the env-aware default JSONL path for automatic memory facts."""
     return get_config_dir() / "memory_facts.jsonl"
@@ -287,7 +304,7 @@ class LocalFactStore(FactStore):
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as tmp_f:
                 tmp_f.write(payload)
-            os.replace(tmp_name, self._path)
+            _replace_with_retry(tmp_name, self._path)
         except BaseException:
             try:
                 os.unlink(tmp_name)

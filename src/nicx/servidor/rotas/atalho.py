@@ -43,6 +43,13 @@ def _config(request: Request) -> Any:
     return config
 
 
+def _forma_gravada(teclas: str) -> str:
+    try:
+        return normalizar(teclas)
+    except CombinacaoInvalida:
+        return str(teclas or "").strip().lower()
+
+
 def gerenciador(request: Request) -> GerenciadorAtalho:
     atual = getattr(request.app.state, "atalho", None)
     if atual is None:
@@ -69,19 +76,24 @@ async def atalho_status(request: Request) -> dict:
 
 @router.put("")
 async def atalho_update(request: Request, body: AtalhoUpdate) -> dict:
+    config = _config(request)
     teclas = None
     if body.teclas is not None:
         try:
             teclas = normalizar(body.teclas)
         except CombinacaoInvalida as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
+        ditado = getattr(config, "ditado", None)
+        if ditado is not None and teclas == _forma_gravada(ditado.teclas):
+            raise HTTPException(
+                status_code=400,
+                detail=f"{rotulo_de(teclas)} já é o atalho do ditado; escolha outra.",
+            )
     if body.acao is not None and body.acao not in ACOES:
         raise HTTPException(
             status_code=400,
             detail="Ação desconhecida: use 'flutuante' (mascote) ou 'app'.",
         )
-
-    config = _config(request)
 
     def aplicar() -> None:
         with _lock_gravacao:

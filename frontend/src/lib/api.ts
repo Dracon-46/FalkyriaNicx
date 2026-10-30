@@ -606,6 +606,79 @@ export async function updateShortcut(change: {
 }
 
 // ---------------------------------------------------------------------------
+// Ditado universal ([ditado] no config.toml)
+// ---------------------------------------------------------------------------
+
+export type DictationMode = 'alternar' | 'segurar';
+
+export interface DictationStatus {
+  ativo: boolean;
+  /** Forma gravada: "ctrl+alt+d". */
+  teclas: string;
+  rotulo: string;
+  modo: DictationMode;
+  /** Código do idioma ("pt-BR", "en"...); vazio = o da conversa por voz. */
+  idioma: string;
+  som: boolean;
+  modos: DictationMode[];
+  idiomas: string[];
+  /** "desligado", "pronto", "ouvindo", "transcrevendo", "em_uso", "sem_suporte", "invalido" ou "erro". */
+  estado: string;
+  mensagem: string;
+  suportado: boolean;
+}
+
+export interface DictationChange {
+  ativo?: boolean;
+  teclas?: string;
+  modo?: DictationMode;
+  idioma?: string;
+  som?: boolean;
+}
+
+/** The running server has no `/v1/ditado` (it needs a restart). */
+export class DictationUnsupportedError extends Error {
+  constructor() {
+    super(i18n.t('settings.dictation.restartServer'));
+    this.name = 'DictationUnsupportedError';
+  }
+}
+
+async function dictationResponse<T>(res: Response): Promise<T> {
+  if (res.status === 404 || res.status === 405) throw new DictationUnsupportedError();
+  if (!res.ok) {
+    let detail = '';
+    try {
+      detail = (await res.json())?.detail ?? '';
+    } catch {
+      // Status-only message below.
+    }
+    throw new Error(detail || i18n.t('settings.dictation.saveFailed'));
+  }
+  return res.json();
+}
+
+export async function fetchDictation(): Promise<DictationStatus> {
+  return dictationResponse<DictationStatus>(await apiFetch(`/v1/ditado`));
+}
+
+export async function updateDictation(change: DictationChange): Promise<DictationStatus> {
+  return dictationResponse<DictationStatus>(
+    await apiFetch(`/v1/ditado`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(change),
+    }),
+  );
+}
+
+/** Só o estado (a janela flutuante pergunta a cada segundo). */
+export async function fetchDictationState(): Promise<string> {
+  const body = await dictationResponse<{ estado: string }>(await apiFetch(`/v1/ditado/estado`));
+  return body.estado;
+}
+
+// ---------------------------------------------------------------------------
 // Agenda: calendário padrão de "manda pro calendário" ([agenda] no config.toml)
 // ---------------------------------------------------------------------------
 
@@ -645,6 +718,41 @@ export async function updateCalendarConfig(target: CalendarTarget): Promise<Cale
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ calendario_padrao: target }),
+    }),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Contexto da tela: "resume o que eu copiei", "explica isso aqui" ([contexto])
+// ---------------------------------------------------------------------------
+
+export interface ScreenContextConfig {
+  ativo: boolean;
+  copiar_selecao: boolean;
+  max_caracteres: number;
+  limites: number[];
+  /** Só o Windows lê a área de transferência e a janela aberta. */
+  suportado: boolean;
+}
+
+export type ScreenContextUpdate = Partial<Pick<ScreenContextConfig, 'ativo' | 'copiar_selecao' | 'max_caracteres'>>;
+
+async function screenContextResponse(res: Response): Promise<ScreenContextConfig> {
+  if (res.status === 404 || res.status === 405) throw new Error(i18n.t('settings.context.restartServer'));
+  if (!res.ok) throw new Error(i18n.t('settings.context.saveFailed'));
+  return res.json();
+}
+
+export async function fetchScreenContextConfig(): Promise<ScreenContextConfig> {
+  return screenContextResponse(await apiFetch(`/v1/contexto/config`));
+}
+
+export async function updateScreenContextConfig(update: ScreenContextUpdate): Promise<ScreenContextConfig> {
+  return screenContextResponse(
+    await apiFetch(`/v1/contexto/config`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(update),
     }),
   );
 }

@@ -237,3 +237,63 @@ def test_sem_suporte_fora_do_windows(caplog) -> None:
     assert status["suportado"] is False
     assert criadas == []
     assert "sem suporte neste sistema" in caplog.text
+
+
+# ---------------------------------------------------------------------------
+# Um laço só para os dois atalhos (Nicx e ditado)
+# ---------------------------------------------------------------------------
+
+
+def test_dois_atalhos_no_mesmo_laco() -> None:
+    from nicx.atalho.windows import HOTKEY_ID_DITADO, LacoAtalhos
+
+    user32 = FakeUser32()
+    laco = LacoAtalhos(win32=_win32(user32), relogio=lambda: 0.0)
+    nicx = threading.Event()
+    ditado = threading.Event()
+
+    assert laco.registrar(HOTKEY_ID, ler_combinacao("ctrl+alt+n"), nicx.set).ok
+    assert laco.registrar(HOTKEY_ID_DITADO, ler_combinacao("ctrl+alt+d"), ditado.set).ok
+    assert [r[1] for r in user32.registros] == [HOTKEY_ID, HOTKEY_ID_DITADO]
+
+    user32.fila.put((WM_HOTKEY, HOTKEY_ID_DITADO))
+    assert ditado.wait(2)
+    assert not nicx.is_set()
+
+    # Tirar um não derruba o outro.
+    laco.remover(HOTKEY_ID_DITADO)
+    assert laco.rodando
+    user32.apertar()
+    assert nicx.wait(2)
+
+    # Sem atalho nenhum, a thread sai sozinha.
+    laco.remover(HOTKEY_ID)
+    laco._thread.join(2)
+    assert not laco.rodando
+    assert user32.removidos == [HOTKEY_ID_DITADO, HOTKEY_ID]
+    assert user32.thread_registro == user32.thread_remocao
+
+    # E volta na próxima vez.
+    assert laco.registrar(HOTKEY_ID, ler_combinacao("ctrl+alt+n"), nicx.set).ok
+    laco.parar()
+    assert not laco.rodando
+
+
+def test_mesma_combinacao_duas_vezes_fica_em_uso() -> None:
+    from nicx.atalho.windows import HOTKEY_ID_DITADO, LacoAtalhos
+
+    class User32Unico(FakeUser32):
+        def RegisterHotKey(self, hwnd, ident, mods, vk) -> int:  # noqa: N802
+            if any(r[2:] == (mods, vk) for r in self.registros):
+                self.ultimo_erro = ERROR_HOTKEY_ALREADY_REGISTERED
+                return 0
+            return super().RegisterHotKey(hwnd, ident, mods, vk)
+
+    user32 = User32Unico()
+    laco = LacoAtalhos(win32=_win32(user32))
+    assert laco.registrar(HOTKEY_ID, ler_combinacao("ctrl+alt+n"), lambda: None).ok
+    resultado = laco.registrar(
+        HOTKEY_ID_DITADO, ler_combinacao("ctrl+alt+n"), lambda: None
+    )
+    assert resultado.em_uso
+    laco.parar()

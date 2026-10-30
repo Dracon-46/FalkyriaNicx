@@ -1706,6 +1706,28 @@ class AtalhoConfig:
 
 
 @dataclass(slots=True)
+class DitadoConfig:
+    """Ditado universal: aperta o atalho em qualquer programa, fala, e o texto
+    é digitado onde está o cursor (:mod:`nicx.ditado`).
+
+    Desligado por padrão. Só no Windows; nenhum áudio vai para o disco e o
+    texto não vai para a memória nem para os logs.
+    """
+
+    ativo: bool = False
+    # Mesmas regras do [atalho]; não pode ser igual ao atalho do Nicx.
+    teclas: str = "ctrl+alt+d"
+    # "alternar": aperta para começar e de novo para parar (para sozinho após
+    # ~1,5 s de silêncio ou 60 s); "segurar": grava enquanto a tecla estiver
+    # apertada.
+    modo: str = "alternar"
+    # Código do idioma ("pt-BR", "en"...); vazio = o de [speech] language.
+    idioma: str = ""
+    # Bipe curto ao começar e ao terminar de ouvir.
+    som: bool = True
+
+
+@dataclass(slots=True)
 class AgendaConfig:
     """Para onde "manda pro calendário" leva os compromissos da agenda.
 
@@ -1719,6 +1741,26 @@ class AgendaConfig:
     calendario_padrao: str = "windows"
     # Fuso dos horários enviados ao Google/Outlook (os da agenda são locais).
     fuso: str = "America/Sao_Paulo"
+
+
+@dataclass(slots=True)
+class ContextoConfig:
+    """O que o usuário está vendo: "resume o que eu copiei", "explica isso aqui".
+
+    O Nicx lê a área de transferência ou a janela aberta (só no Windows) e
+    manda o texto ao modelo local junto com o pedido (:mod:`nicx.contexto`).
+    Nada sai do PC nem vai para a memória automática.
+    """
+
+    ativo: bool = True
+    # Sem texto acessível na janela, copia a seleção com Ctrl+C e devolve o
+    # que estava antes na área de transferência. Desligado: só o usuário liga.
+    copiar_selecao: bool = False
+    # Limite do texto lido (o corte por tokens do modelo vem depois).
+    max_caracteres: int = 20000
+    # Pastas extras onde procurar o arquivo aberto (além de Área de Trabalho,
+    # Documentos, Downloads, OneDrive e projetos recentes do VS Code).
+    pastas_extras: list[str] = field(default_factory=list)
 
 
 @dataclass(slots=True)
@@ -1876,7 +1918,9 @@ class NicxConfig:
     operators: OperatorsConfig = field(default_factory=OperatorsConfig)
     speech: SpeechConfig = field(default_factory=SpeechConfig)
     atalho: AtalhoConfig = field(default_factory=AtalhoConfig)
+    ditado: DitadoConfig = field(default_factory=DitadoConfig)
     agenda: AgendaConfig = field(default_factory=AgendaConfig)
+    contexto: ContextoConfig = field(default_factory=ContextoConfig)
     optimize: OptimizeConfig = field(default_factory=OptimizeConfig)
     agent_manager: AgentManagerConfig = field(default_factory=AgentManagerConfig)
     memory_files: MemoryFilesConfig = field(default_factory=MemoryFilesConfig)
@@ -2165,7 +2209,9 @@ def load_config(path: Optional[Path] = None) -> NicxConfig:
             "operators",
             "speech",
             "atalho",
+            "ditado",
             "agenda",
+            "contexto",
             "optimize",
             "agent_manager",
             "digest",
@@ -2503,6 +2549,8 @@ __all__ = [
     "OperatorsConfig",
     "AgentLearningConfig",
     "AtalhoConfig",
+    "DitadoConfig",
+    "ContextoConfig",
     "BlueBubblesChannelConfig",
     "BrowserConfig",
     "CapabilitiesConfig",
