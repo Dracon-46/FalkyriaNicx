@@ -1,0 +1,27 @@
+{
+  "fps": 30,
+  "duracao": 38.0,
+  "falas": [
+    { "arq": "fala1.wav", "t": 1.2, "texto": "Existem ideias que mudam a forma como enxergamos o mundo." },
+    { "arq": "fala2.wav", "t": 6.4, "texto": "Na Falkyria, desenvolvemos tecnologia para transformar essas possibilidades em realidade." },
+    { "arq": "fala3.wav", "t": 15.0, "texto": "O Lumen revela novas perspectivas sobre os dados públicos do Brasil." },
+    { "arq": "fala4.wav", "t": 22.4, "texto": "O Nicx explora novas fronteiras na interação com a inteligência artificial." },
+    { "arq": "fala5.wav", "t": 30.0, "texto": "Duas iniciativas, uma mesma visão." },
+    { "arq": "fala6.wav", "t": 35.5, "texto": "Falkyria." }
+  ],
+  "planos": [
+    { "nome": "Rajada", "ini": 0.0, "fim": 1.8, "set": "rajada", "u0": 0 },
+    { "nome": "Rede close", "ini": 1.8, "fim": 3.0, "set": "rede", "u0": 0, "opts": { "cam": "close", "c0": 0 } },
+    { "nome": "Rede aberta", "ini": 3.0, "fim": 4.7, "set": "rede", "u0": 1.2, "opts": { "cam": "aberto", "c0": 1.2 } },
+    { "nome": "Voo pela rede", "ini": 4.7, "fim": 6.15, "set": "rede", "u0": 2.9, "opts": { "cam": "voo", "c0": 2.9 } },
+    { "nome": "Logo", "ini": 6.15, "fim": 8.55, "set": "logo", "u0": 0 },
+    { "nome": "Fundo da tipografia", "ini": 8.55, "fim": 10.7, "set": "dados", "u0": -1, "congela": true },
+    { "nome": "Dados", "ini": 10.7, "fim": 14.3, "set": "dados", "u0": 0 },
+    { "nome": "Nicx", "ini": 21.6, "fim": 28.8, "set": "nicx", "u0": 0, "opts": { "modo": "heroi" } },
+    { "nome": "Divisão", "ini": 28.8, "fim": 31.6, "set": "nicx", "u0": 0, "opts": { "modo": "divide" } },
+    { "nome": "Convergência", "ini": 31.6, "fim": 35.0, "set": "nicx", "u0": 0, "opts": { "modo": "converge" } },
+    { "nome": "Assinatura", "ini": 35.0, "fim": 38.0, "set": "logo", "u0": 0, "opts": { "final": true } }
+  ],
+  "rapidos": [[0.4, 1.8], [4.6, 6.95], [13.3, 14.3], [21.6, 22.6], [24.0, 26.1], [35.0, 35.7]],
+  "lumen": { "ini": 14.3, "fim": 21.6 }
+}
