@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import ctypes
+import sys
 from types import SimpleNamespace
+
+import pytest
 
 from nicx.ditado import digitar
 from nicx.ditado.digitar import (
@@ -34,6 +37,7 @@ def test_eventos_unicode_e_quebra_de_linha() -> None:
     assert eventos_para("a\r\nb") == eventos_para("a\nb")
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="estrutura INPUT do Windows")
 def test_estrutura_input_tem_o_tamanho_do_windows() -> None:
     input_t, _ = digitar._estruturas()
     assert ctypes.sizeof(input_t) == (40 if ctypes.sizeof(ctypes.c_void_p) == 8 else 28)

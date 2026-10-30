@@ -185,6 +185,8 @@ class TestCapabilityPolicy:
         for path in [
             *(root / "ferramentas").rglob("*.py"),
             *(root / "acoes").rglob("*.py"),
+            *(root / "contexto").rglob("*.py"),
+            *(root / "projetos").rglob("*.py"),
             root / "agenda" / "tools.py",
         ]:
             tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))

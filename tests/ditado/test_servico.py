@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 import threading
 import time
 from types import SimpleNamespace
@@ -144,6 +145,7 @@ def _servico(
     return svc, registro
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="o ditado só existe no Windows")
 def test_ditado_completo_digita_na_janela_guardada(caplog) -> None:
     svc, reg = _servico(texto=f"{SEGREDO} vírgula tudo bem ponto final")
     assert svc.aplicar()["estado"] == servico.PRONTO
