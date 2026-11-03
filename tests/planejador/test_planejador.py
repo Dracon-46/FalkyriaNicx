@@ -1,4 +1,4 @@
-"""Planejador: prazos, frases, etapas do modelo, datas, lembretes, progresso, reajuste e rotas."""
+"""Planejador: prazos, frases, etapas, datas, lembretes, progresso e rotas."""
 
 from __future__ import annotations
 

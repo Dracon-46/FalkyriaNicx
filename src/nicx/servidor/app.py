@@ -25,6 +25,7 @@ from nicx.servidor.rotas.escuta import router as wake_router
 from nicx.servidor.rotas.historico import router as historico_router
 from nicx.servidor.rotas.painel_economia import dashboard_router
 from nicx.servidor.rotas.pesquisa import router as research_router
+from nicx.servidor.rotas.planejador import router as planejador_router
 from nicx.servidor.rotas.privacidade import (
     configure_analytics,
     stop_analytics,
@@ -34,7 +35,6 @@ from nicx.servidor.rotas.privacidade import (
 )
 from nicx.servidor.rotas.projetos import router as projetos_router
 from nicx.servidor.rotas.resumo import router as resumo_router
-from nicx.servidor.rotas.planejador import router as planejador_router
 from nicx.servidor.rotas.rotinas import router as rotinas_router
 from nicx.servidor.rotas.upload import router as upload_router
 

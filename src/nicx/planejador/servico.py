@@ -69,10 +69,11 @@ def _pedido_modelo(objetivo: str, prazo: date, hoje: date, idioma: str) -> str:
 
     dias = (prazo - hoje).days
     return (
-        "Divida o objetivo abaixo em 3 a 10 etapas práticas, em ordem, para caber em "
-        f"{dias} dias (até {prazo.isoformat()}). Para cada etapa, estime o tempo total de "
-        "trabalho em minutos e diga de quais etapas anteriores ela depende (pelo índice, "
-        "começando em 0). Responda SÓ com um array JSON, sem texto antes ou depois, no formato "
+        "Divida o objetivo abaixo em 3 a 10 etapas práticas, em ordem, para caber "
+        f"em {dias} dias (até {prazo.isoformat()}). Para cada etapa, estime o tempo "
+        "total de trabalho em minutos e diga de quais etapas anteriores ela depende "
+        "(pelo índice, começando em 0). Responda SÓ com um array JSON, sem texto "
+        "antes ou depois, no formato "
         '[{"texto": "...", "minutos": 120, "depende_de": []}].'
         + instrucao_resposta(idioma)
         + f"\n\nObjetivo: {objetivo}"
