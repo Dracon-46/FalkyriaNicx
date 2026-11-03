@@ -32,6 +32,8 @@ _ACTIONS = {
     "print_tela": ("screenshot", ""),
     "bloquear_tela": ("lock", ""),
     "tocar_youtube": ("youtube", ""),
+    "botoes_da_janela": ("ui", "listar"),
+    "clicar_na_janela": ("ui", "clicar"),
 }
 
 
@@ -48,7 +50,8 @@ class ComputerControlTool(BaseTool):
             name="controle_pc",
             description=(
                 "Controla este PC: volume, mídia, abrir app/site/pasta, fechar app,"
-                " anotar, estado do PC, print, bloquear tela."
+                " anotar, estado do PC, print, bloquear tela, ver e clicar botões"
+                " da janela aberta."
             ),
             parameters={
                 "type": "object",
@@ -58,8 +61,8 @@ class ComputerControlTool(BaseTool):
                     "alvo": {
                         "type": "string",
                         "description": (
-                            "app, site ou pasta; o texto a anotar; ou o que tocar"
-                            " no YouTube"
+                            "app, site ou pasta; o texto a anotar; o que tocar"
+                            " no YouTube; ou o nome do botão"
                         ),
                     },
                 },
@@ -102,6 +105,11 @@ class ComputerControlTool(BaseTool):
                 missing = "o texto a anotar" if kind == "note_add" else "o que tocar"
                 return ToolResult(self.tool_id, f"Faltou {missing}.", False)
             action = Action(kind, target=text)
+        elif kind == "ui":
+            target = str(params.get("alvo", "")).strip()
+            if op == "clicar" and not target:
+                return ToolResult(self.tool_id, "Faltou o nome do botão.", False)
+            action = Action(kind, op, target=target)
         elif kind == "volume" and op in ("up", "down"):
             action = Action(kind, op, STEP_NORMAL)
         else:

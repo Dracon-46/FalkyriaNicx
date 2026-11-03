@@ -125,6 +125,8 @@ def nivel_atual() -> str:
 def risco_acao(kind: str, op: str = "") -> str:
     if kind == "power" and op == "abort":
         return "leitura"  # cancelar um desligamento nunca pede confirmação
+    if kind == "ui":  # mexer num app: listar só lê; o resto muda algo
+        return "leitura" if op == "listar" else "moderado"
     return _RISCO_ACAO.get(kind, "leve")
 
 

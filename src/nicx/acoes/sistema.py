@@ -302,6 +302,10 @@ def _run(action: Action) -> Outcome:
             from nicx.resumo import responder
 
             return responder(action)
+        if action.kind == "ui":
+            from nicx.controle.servico import executar
+
+            return executar(action)
         from nicx.acoes import executores
 
         outcome = executores.run(action)

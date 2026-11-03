@@ -157,6 +157,36 @@ ou atalho) e só se a área de transferência tinha texto (imagens e arquivos
 copiados nunca são trocados). O modelo também tem a ferramenta `contexto`,
 que entra no prompt só quando a mensagem fala da tela. Só no Windows.
 
+## Mexer nos apps: "clica em Salvar"
+
+O Nicx aciona botões, menus, abas, caixas e campos da janela que você estava
+usando, pelo nome que aparece neles:
+
+| Pedido | O que faz |
+|---|---|
+| "clica em Salvar", "clique no botão Enviar", "aperta o botão OK" | Clica no botão, link ou item |
+| "abre o menu Arquivo" | Abre o menu |
+| "vai na aba Revisão" | Troca de aba |
+| "marca a caixa Lembrar de mim", "desmarca a opção notificações" | Marca ou desmarca |
+| "escreve Falkyria no campo Pesquisar" | Escreve no campo |
+| "o que dá pra clicar aqui?" | Lista o que dá para usar na janela |
+
+Também em inglês ("click Save", "open the File menu", "type hello into the
+search field"), espanhol ("haz clic en Guardar") e francês ("clique sur
+Enregistrer"). Não acha o nome? Ele diz o que tem na janela.
+
+Funciona pela acessibilidade do Windows (UI Automation, a mesma dos leitores
+de tela): sem mover o mouse e sem foto da tela, em 1 a 3 s. A maioria dos apps
+do Windows, Office e navegadores responde; jogos e alguns apps desenhados à mão
+não. Por segurança:
+
+- janelas de senha e de banco não são tocadas, e campo de senha nunca é preenchido;
+- botões que apagam, enviam, publicam ou pagam ("Excluir", "Enviar", "Comprar"...)
+  pedem "confirmo" antes, conferindo pelo nome do botão que ele achou;
+- o modelo também pode ver e clicar botões (ferramenta `controle_pc`), mas
+  isso passa pelo nível de autonomia: no nível assistido ele pede "confirmo";
+- o histórico guarda em qual botão ou campo ele mexeu, nunca o que foi digitado.
+
 ## Projetos e continuar de onde parei
 
 O Nicx guarda os seus projetos: objetivo, estado (onde você parou, em uma
