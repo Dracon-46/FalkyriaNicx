@@ -352,7 +352,13 @@ class Projetos:
             pendencia.feita_em = agora() if feita else ""
             return pendencia
 
-        return self._mudar_um(projeto_id, aplicar)
+        pendencia = self._mudar_um(projeto_id, aplicar)
+        if pendencia is not None and feita and pendencia.lembrete_id:
+            # etapa do plano concluída: o lembrete do prazo não precisa mais tocar
+            from nicx.acoes import lembretes
+
+            lembretes.cancel_id(pendencia.lembrete_id)
+        return pendencia
 
     def editar_pendencia(
         self, projeto_id: str, pendencia_id: str, texto: str

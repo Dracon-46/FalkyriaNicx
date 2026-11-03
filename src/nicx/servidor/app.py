@@ -34,6 +34,7 @@ from nicx.servidor.rotas.privacidade import (
 )
 from nicx.servidor.rotas.projetos import router as projetos_router
 from nicx.servidor.rotas.resumo import router as resumo_router
+from nicx.servidor.rotas.planejador import router as planejador_router
 from nicx.servidor.rotas.rotinas import router as rotinas_router
 from nicx.servidor.rotas.upload import router as upload_router
 
@@ -500,6 +501,7 @@ def create_app(
     app.include_router(resumo_router)
     app.include_router(historico_router)
     app.include_router(rotinas_router)
+    app.include_router(planejador_router)
     include_all_routes(app)
 
     # Atalho global de teclado ([atalho]): sobe e desce com o servidor. Só faz

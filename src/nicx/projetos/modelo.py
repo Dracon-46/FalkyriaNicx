@@ -61,6 +61,12 @@ class Pendencia:
     criada_em: str = field(default_factory=agora)
     feita_em: str = ""
     origem: str = ""
+    # Planejador (nicx.planejador): data limite (AAAA-MM-DD), estimativa em
+    # minutos, ids das etapas que vêm antes e o lembrete marcado para o prazo.
+    prazo: str = ""
+    minutos: int = 0
+    depende_de: list[str] = field(default_factory=list)
+    lembrete_id: str = ""
 
 
 @dataclass
@@ -81,6 +87,8 @@ class Projeto:
     arquivado: bool = False
     # Dias (ISO) em que houve atividade: o resumo do dia olha aqui.
     dias_ativos: list[str] = field(default_factory=list)
+    # Objetivo com data (planejador): AAAA-MM-DD, vazio se não houver.
+    prazo: str = ""
 
     @property
     def abertas(self) -> list[Pendencia]:
@@ -136,6 +144,12 @@ class Projeto:
                         criada_em=str(item.get("criada_em") or ""),
                         feita_em=str(item.get("feita_em") or ""),
                         origem=str(item.get("origem") or ""),
+                        prazo=_data_ou_vazio(item.get("prazo")),
+                        minutos=_inteiro(item.get("minutos")),
+                        depende_de=[
+                            str(x) for x in (item.get("depende_de") or []) if x
+                        ][:20],
+                        lembrete_id=str(item.get("lembrete_id") or ""),
                     )
                 )
         criado = str(dados.get("criado_em") or "")
@@ -153,12 +167,27 @@ class Projeto:
             ultima_atividade=str(dados.get("ultima_atividade") or criado),
             idioma=str(dados.get("idioma") or ""),
             arquivado=bool(dados.get("arquivado", False)),
+            prazo=_data_ou_vazio(dados.get("prazo")),
             dias_ativos=[
                 d
                 for d in (dados.get("dias_ativos") or [])
                 if isinstance(d, str) and dia_de(d)
             ][-MAX_DIAS_ATIVOS:],
         )
+
+
+def _data_ou_vazio(valor: Any) -> str:
+    texto = str(valor or "")[:10]
+    return texto if dia_de(texto) else ""
+
+
+def _inteiro(valor: Any) -> int:
+    if isinstance(valor, bool):
+        return 0
+    try:
+        return max(0, min(int(valor), 100_000))
+    except (TypeError, ValueError):
+        return 0
 
 
 __all__ = [

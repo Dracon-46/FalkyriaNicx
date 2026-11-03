@@ -226,6 +226,45 @@ async def _quick_action_reply(req: ChatCompletionRequest, config: Any) -> str | 
     return outcome.message if outcome is not None else None
 
 
+async def _plan_turn(req: ChatCompletionRequest, request: Request, model: str):
+    """'monta um plano para aprender inglês até dezembro' (nicx.planejador).
+
+    O modelo local propõe as etapas; as datas, os lembretes e o projeto saem
+    sem modelo. Só modelos locais (o objetivo pode ser pessoal).
+    """
+    if req.tools:
+        return None
+    last = req.messages[-1] if req.messages else None
+    if last is None or last.role != "user" or not isinstance(last.content, str):
+        return None
+    from nicx.acoes.textos import codigo
+    from nicx.planejador import pedidos, servico
+    from nicx.planejador import textos as ptextos
+
+    idioma = codigo(req.language)
+    pedido = pedidos.detectar(last.content, idioma)
+    if pedido is None:
+        return None
+    from nicx.servidor.rotas.nuvem import is_cloud_model
+
+    engine = request.app.state.engine
+    if not model or getattr(engine, "is_cloud", False) or is_cloud_model(model):
+        return ptextos.texto("nuvem", idioma)
+
+    def _montar() -> str:
+        etapas = servico.propor(pedido.objetivo, pedido.prazo, idioma, engine, model)
+        projeto = servico.criar_plano(
+            pedido.objetivo, pedido.prazo, etapas, idioma=idioma
+        )
+        return servico.frase_do_plano(projeto, idioma)
+
+    try:
+        return await asyncio.to_thread(_montar)
+    except Exception as exc:  # noqa: BLE001 - a frase explica
+        logger.info("Plano não montado: %s", exc)
+        return ptextos.texto("erro", idioma, motivo=str(exc))
+
+
 async def _project_turn(req: ChatCompletionRequest, config: Any, model: str):
     """Project requests: "cria o projeto X", "continue de onde parei"...
 
@@ -386,6 +425,10 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
     # plain note. "O que falta no projeto X" answers right away; "continue de
     # onde parei" sends a compact project summary to the model, without the
     # tool list (the summary already has what the answer needs).
+    plano = await _plan_turn(request_body, request, model)
+    if plano is not None:
+        return _immediate_response(plano, model, stream=request_body.stream)
+
     project = await _project_turn(request_body, config, model)
     if project is not None and project.resposta is not None:
         return _immediate_response(project.resposta, model, stream=request_body.stream)
