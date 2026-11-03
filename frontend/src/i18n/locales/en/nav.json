@@ -22,5 +22,6 @@
     "stopBeforeDelete": "Stop generating before deleting this conversation",
     "delete": "Delete conversation",
     "overlay": "Overlay chat"
-  }
+  },
+  "history": "History"
 }

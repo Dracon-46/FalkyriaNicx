@@ -84,9 +84,10 @@ DELEGADAS = frozenset({"controle_pc", "lembrete", "agenda", "arquivos"})
 _RISCO_FERRAMENTA = {
     "shell_exec": "alto",
     "docker_shell_exec": "alto",
-    "code_interpreter": "alto",
-    "code_interpreter_docker": "alto",
-    "repl": "alto",
+    # Python em sandbox: é o trabalho do agente CodeAct, como antes da autonomia
+    "code_interpreter": "leve",
+    "code_interpreter_docker": "leve",
+    "repl": "leve",
     "git_commit": "alto",
     "file_write": "moderado",
     "apply_patch": "moderado",
@@ -94,8 +95,6 @@ _RISCO_FERRAMENTA = {
     "browser_click": "moderado",
     "browser_type": "moderado",
     "execute_pending_actions": "moderado",
-    "agent_spawn": "moderado",
-    "agent_kill": "moderado",
     "projetos": "leve",
     "memory_store": "leve",
     "memory_manage": "leve",

@@ -202,11 +202,16 @@ class ToolExecutor:
         agent_id: str = "",
         boundary_guard: Optional[Any] = None,
         rate_limiter: Optional[Any] = None,
+        autonomia: bool = True,
     ) -> None:
         self._tools: Dict[str, BaseTool] = {t.spec.name: t for t in tools}
         self._bus = bus
         self._interactive = interactive
         self._confirm_callback = confirm_callback
+        # O nível de autonomia vale para o que o modelo decide fazer. Operações
+        # pedidas diretamente pelo usuário (API) passam ``autonomia=False`` e
+        # ficam só com a confirmação das ferramentas sensíveis.
+        self._usar_autonomia = autonomia
         self._default_timeout = default_timeout
         self._capability_policy = capability_policy
         self._agent_id = agent_id
@@ -418,17 +423,32 @@ class ToolExecutor:
             )
             return res
 
-        parada = _hist.portao(
-            tool_call.name,
-            params,
-            pede_confirmacao=bool(tool.spec.requires_confirmation),
-            interativo=bool(self._interactive),
-            confirmar=self._confirm_callback,
-            executar=_executar_confirmada,
-            fazer_resultado=lambda texto, ok, meta: ToolResult(
-                tool_name=tool_call.name, content=texto, success=ok, metadata=meta
-            ),
-        )
+        parada = None
+        if not self._usar_autonomia:
+            if tool.spec.requires_confirmation and (
+                not self._interactive
+                or self._confirm_callback is None
+                or not self._confirm_callback(
+                    f"Allow execution of tool '{tool_call.name}' with args {params}?"
+                )
+            ):
+                return ToolResult(
+                    tool_name=tool_call.name,
+                    content=f"Tool '{tool_call.name}' requires confirmation.",
+                    success=False,
+                )
+        else:
+            parada = _hist.portao(
+                tool_call.name,
+                params,
+                pede_confirmacao=bool(tool.spec.requires_confirmation),
+                interativo=bool(self._interactive),
+                confirmar=self._confirm_callback,
+                executar=_executar_confirmada,
+                fazer_resultado=lambda texto, ok, meta: ToolResult(
+                    tool_name=tool_call.name, content=texto, success=ok, metadata=meta
+                ),
+            )
         if parada is not None:
             return parada
         _planos = _hist.copia_antes(tool_call.name, params)

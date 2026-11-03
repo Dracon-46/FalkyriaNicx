@@ -151,6 +151,7 @@ def execute_secured_tool(
         capability_policy=capability_policy,
         rate_limiter=rate_limiter,
         agent_id=agent_id,
+        autonomia=False,  # o próprio usuário pediu (rota direta)
     )
     return executor.execute(
         ToolCall(

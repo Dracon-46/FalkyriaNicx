@@ -1,0 +1,78 @@
+{
+  "title": "历史记录",
+  "subtitle": "Nicx 为你做过的一切：对话、笔记、提醒、文件和电脑上的操作。只保存在你的电脑上。",
+  "hint": "在聊天或语音中：说“撤销”可撤回上一次更改，说“你做了什么？”可查看最近的活动。",
+  "tabs": {
+    "atividades": "活动",
+    "auditoria": "审计"
+  },
+  "search": "搜索历史记录",
+  "searchPlaceholder": "搜索活动...",
+  "from": "从",
+  "to": "到",
+  "typesLabel": "按类型筛选",
+  "types": {
+    "conversa": "对话",
+    "nota": "笔记",
+    "lembrete": "提醒",
+    "agenda": "日程",
+    "projeto": "项目",
+    "arquivo": "文件",
+    "organizacao": "整理",
+    "acao": "操作",
+    "ferramenta": "工具",
+    "desfazer": "已撤销"
+  },
+  "origins": {
+    "chat": "聊天",
+    "voz": "语音",
+    "app": "应用",
+    "agente": "智能体"
+  },
+  "results": {
+    "ok": "完成",
+    "falhou": "失败",
+    "bloqueado": "已阻止",
+    "pendente": "等待“确认”"
+  },
+  "levels": {
+    "observador": "观察者",
+    "assistido": "辅助",
+    "autonomo": "自主"
+  },
+  "risks": {
+    "leitura": "只读",
+    "leve": "轻度",
+    "moderado": "中度",
+    "alto": "高"
+  },
+  "today": "今天",
+  "yesterday": "昨天",
+  "undo": "撤销",
+  "undone": "已撤销",
+  "dismiss": "关闭",
+  "loading": "加载中...",
+  "loadMore": "加载更多",
+  "empty": "历史记录还是空的。Nicx 做的事情会显示在这里。",
+  "noMatches": "没有符合这些筛选条件的活动。",
+  "loadFailed": "无法加载历史记录。Nicx 服务器在运行吗？",
+  "undoFailed": "无法撤销，请重试。",
+  "restartServer": "请重启 Nicx 服务器以使用历史记录和自主功能。",
+  "integrity": {
+    "ok": "记录完整（{{n}} 条）",
+    "broken": "记录自活动 #{{id}} 起被修改"
+  },
+  "audit": {
+    "tool": "工具",
+    "action": "操作",
+    "operation": "动作",
+    "target": "目标",
+    "risk": "风险",
+    "arguments": "参数",
+    "response": "响应",
+    "noDetail": "没有记录详情。",
+    "showDetail": "显示详情",
+    "hideDetail": "隐藏详情",
+    "empty": "还没有记录任何操作或工具。"
+  }
+}

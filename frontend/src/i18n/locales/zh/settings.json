@@ -332,5 +332,49 @@
     "repository": "代码仓库",
     "product": "Falkyria 出品",
     "copyright": "© 2026 Falkyria。保留所有权利。"
+  },
+  "autonomy": {
+    "title": "自主程度",
+    "description": "选择 Nicx 可以自己做多少事。未放行的操作，它会先询问，只有在你说“确认”后才会继续。",
+    "default": "默认",
+    "levels": {
+      "observador": {
+        "label": "观察者",
+        "description": "只读取和回答。任何更改都需要“确认”。"
+      },
+      "assistido": {
+        "label": "辅助",
+        "description": "轻度操作自己完成。文件和项目需要“确认”。"
+      },
+      "autonomo": {
+        "label": "自主",
+        "description": "也会自己处理文件和项目，始终可以撤销。"
+      }
+    },
+    "matrixTitle": "无需询问即可执行的操作",
+    "riskColumn": "操作类型",
+    "risks": {
+      "leitura": {
+        "label": "只读",
+        "description": "时间、电量、读取文件、搜索"
+      },
+      "leve": {
+        "label": "轻度",
+        "description": "改动小且可撤销：提醒、笔记、打开应用、音量"
+      },
+      "moderado": {
+        "label": "中度",
+        "description": "写入文件、整理文件夹、关闭应用、删除笔记"
+      },
+      "alto": {
+        "label": "高",
+        "description": "关机、重启、终端、git commit"
+      }
+    },
+    "free": "自己完成",
+    "asks": "需要“确认”",
+    "hint": "高风险操作在任何级别下都需要“确认”。所有操作都会记入历史记录，能撤销时可以撤销。",
+    "loadFailed": "无法读取自主程度设置。Nicx 服务器在运行吗？",
+    "saveFailed": "无法保存自主程度设置，请重试。"
   }
 }

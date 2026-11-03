@@ -1,0 +1,78 @@
+{
+  "title": "Historique",
+  "subtitle": "Tout ce que Nicx a fait pour vous : conversations, notes, rappels, fichiers et actions sur le PC. Tout reste sur votre ordinateur.",
+  "hint": "Dans le chat ou à la voix : « annule » revient sur le dernier changement et « qu'as-tu fait ? » résume les dernières activités.",
+  "tabs": {
+    "atividades": "Activités",
+    "auditoria": "Audit"
+  },
+  "search": "Rechercher dans l'historique",
+  "searchPlaceholder": "Rechercher des activités...",
+  "from": "Du",
+  "to": "Au",
+  "typesLabel": "Filtrer par type",
+  "types": {
+    "conversa": "Conversation",
+    "nota": "Note",
+    "lembrete": "Rappel",
+    "agenda": "Agenda",
+    "projeto": "Projet",
+    "arquivo": "Fichier",
+    "organizacao": "Rangement",
+    "acao": "Action",
+    "ferramenta": "Outil",
+    "desfazer": "Annulé"
+  },
+  "origins": {
+    "chat": "Chat",
+    "voz": "Voix",
+    "app": "Appli",
+    "agente": "Agent"
+  },
+  "results": {
+    "ok": "Fait",
+    "falhou": "Échec",
+    "bloqueado": "Bloqué",
+    "pendente": "En attente de « je confirme »"
+  },
+  "levels": {
+    "observador": "Observateur",
+    "assistido": "Assisté",
+    "autonomo": "Autonome"
+  },
+  "risks": {
+    "leitura": "Lecture seule",
+    "leve": "Léger",
+    "moderado": "Modéré",
+    "alto": "Élevé"
+  },
+  "today": "Aujourd'hui",
+  "yesterday": "Hier",
+  "undo": "Annuler",
+  "undone": "Annulé",
+  "dismiss": "Fermer",
+  "loading": "Chargement...",
+  "loadMore": "Charger plus",
+  "empty": "Rien dans l'historique pour l'instant. Ce que fait Nicx apparaît ici.",
+  "noMatches": "Aucune activité avec ces filtres.",
+  "loadFailed": "Impossible de charger l'historique. Le serveur de Nicx est-il lancé ?",
+  "undoFailed": "Impossible d'annuler. Réessayez.",
+  "restartServer": "Redémarrez le serveur de Nicx pour utiliser l'historique et l'autonomie.",
+  "integrity": {
+    "ok": "Registre intact ({{n}} lignes)",
+    "broken": "Registre modifié à partir de l'activité n° {{id}}"
+  },
+  "audit": {
+    "tool": "Outil",
+    "action": "Action",
+    "operation": "Opération",
+    "target": "Cible",
+    "risk": "Risque",
+    "arguments": "Arguments",
+    "response": "Réponse",
+    "noDetail": "Aucun détail enregistré.",
+    "showDetail": "Afficher les détails",
+    "hideDetail": "Masquer les détails",
+    "empty": "Aucune action ni aucun outil enregistré pour l'instant."
+  }
+}

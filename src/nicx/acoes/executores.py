@@ -683,13 +683,25 @@ def historico() -> Outcome:
 
 
 def organize_undo() -> Outcome:
-    from nicx.historico.desfazer import desfazer
+    """'desfaz a organização': a última organização do histórico (ou a mais recente)."""
+    from pathlib import Path
 
-    ok, frase = desfazer(tipos=["organizacao"])
-    if ok:
-        return Outcome(True, frase)
-    # organizações de antes do histórico existir
-    result = arquivos.undo_last()
+    from nicx.historico import anotar
+    from nicx.historico import textos as htextos
+    from nicx.historico.registro import registro
+
+    atividade = registro().ultima_desfazivel(["organizacao"])
+    if atividade is not None and atividade.desfazer:
+        result = arquivos.undo_log(Path(atividade.desfazer["log"]))
+        if result is not None:
+            registro().marcar_desfeito(atividade.id)
+            anotar(
+                "desfazer",
+                htextos.texto("desfeito_titulo", texto=atividade.titulo),
+                detalhe={"atividade": atividade.id},
+            )
+    else:  # organizações de antes do histórico existir
+        result = arquivos.undo_last()
     if result is None:
         return Outcome(True, texto("nada_desfazer"))
     restored, folder_name = result

@@ -332,5 +332,49 @@
     "repository": "Repositorio",
     "product": "Un producto Falkyria",
     "copyright": "© 2026 Falkyria. Todos los derechos reservados."
+  },
+  "autonomy": {
+    "title": "Autonomía",
+    "description": "Elige cuánto hace Nicx por su cuenta. Lo que no esté permitido, lo pregunta antes y solo sigue cuando dices \"confirmo\".",
+    "default": "predeterminado",
+    "levels": {
+      "observador": {
+        "label": "Observador",
+        "description": "Solo lee y responde. Cualquier cambio pide \"confirmo\"."
+      },
+      "assistido": {
+        "label": "Asistido",
+        "description": "Hace solo lo que es leve. Archivos y proyectos piden \"confirmo\"."
+      },
+      "autonomo": {
+        "label": "Autónomo",
+        "description": "También maneja archivos y proyectos por su cuenta, siempre con deshacer."
+      }
+    },
+    "matrixTitle": "Lo que pasa sin preguntar",
+    "riskColumn": "Tipo de acción",
+    "risks": {
+      "leitura": {
+        "label": "Solo lectura",
+        "description": "Hora, batería, leer un archivo, buscar"
+      },
+      "leve": {
+        "label": "Leve",
+        "description": "Cambia poco y se puede deshacer: recordatorio, nota, abrir app, volumen"
+      },
+      "moderado": {
+        "label": "Moderado",
+        "description": "Escribir archivo, organizar carpeta, cerrar app, borrar notas"
+      },
+      "alto": {
+        "label": "Alto",
+        "description": "Apagar, reiniciar, terminal, git commit"
+      }
+    },
+    "free": "Lo hace solo",
+    "asks": "Pide \"confirmo\"",
+    "hint": "Las acciones de riesgo alto siempre piden \"confirmo\", en cualquier nivel. Todo queda en el Historial, con deshacer cuando se puede.",
+    "loadFailed": "No pude leer la autonomía. ¿Está encendido el servidor de Nicx?",
+    "saveFailed": "No pude guardar la autonomía. Inténtalo de nuevo."
   }
 }

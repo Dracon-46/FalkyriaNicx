@@ -1,0 +1,78 @@
+{
+  "title": "Historial",
+  "subtitle": "Todo lo que Nicx hizo por ti: conversaciones, notas, recordatorios, archivos y acciones en el PC. Se queda solo en tu computadora.",
+  "hint": "Por chat o por voz: \"deshaz\" revierte el último cambio y \"¿qué hiciste?\" resume las últimas actividades.",
+  "tabs": {
+    "atividades": "Actividades",
+    "auditoria": "Auditoría"
+  },
+  "search": "Buscar en el historial",
+  "searchPlaceholder": "Buscar actividades...",
+  "from": "Desde",
+  "to": "Hasta",
+  "typesLabel": "Filtrar por tipo",
+  "types": {
+    "conversa": "Conversación",
+    "nota": "Nota",
+    "lembrete": "Recordatorio",
+    "agenda": "Agenda",
+    "projeto": "Proyecto",
+    "arquivo": "Archivo",
+    "organizacao": "Organización",
+    "acao": "Acción",
+    "ferramenta": "Herramienta",
+    "desfazer": "Deshecho"
+  },
+  "origins": {
+    "chat": "Chat",
+    "voz": "Voz",
+    "app": "App",
+    "agente": "Agente"
+  },
+  "results": {
+    "ok": "Hecho",
+    "falhou": "Falló",
+    "bloqueado": "Bloqueado",
+    "pendente": "Esperando \"confirmo\""
+  },
+  "levels": {
+    "observador": "Observador",
+    "assistido": "Asistido",
+    "autonomo": "Autónomo"
+  },
+  "risks": {
+    "leitura": "Solo lectura",
+    "leve": "Leve",
+    "moderado": "Moderado",
+    "alto": "Alto"
+  },
+  "today": "Hoy",
+  "yesterday": "Ayer",
+  "undo": "Deshacer",
+  "undone": "Deshecho",
+  "dismiss": "Cerrar",
+  "loading": "Cargando...",
+  "loadMore": "Cargar más",
+  "empty": "Todavía no hay nada en el historial. Lo que haga Nicx aparece aquí.",
+  "noMatches": "Ninguna actividad con esos filtros.",
+  "loadFailed": "No pude cargar el historial. ¿Está encendido el servidor de Nicx?",
+  "undoFailed": "No pude deshacer. Inténtalo de nuevo.",
+  "restartServer": "Reinicia el servidor de Nicx para usar el historial y la autonomía.",
+  "integrity": {
+    "ok": "Registro íntegro ({{n}} líneas)",
+    "broken": "Registro alterado a partir de la actividad #{{id}}"
+  },
+  "audit": {
+    "tool": "Herramienta",
+    "action": "Acción",
+    "operation": "Operación",
+    "target": "Objetivo",
+    "risk": "Riesgo",
+    "arguments": "Argumentos",
+    "response": "Respuesta",
+    "noDetail": "Sin detalles registrados.",
+    "showDetail": "Mostrar detalles",
+    "hideDetail": "Ocultar detalles",
+    "empty": "Todavía no hay acciones ni herramientas registradas."
+  }
+}

@@ -22,5 +22,6 @@
     "stopBeforeDelete": "请先停止生成再删除此对话",
     "delete": "删除对话",
     "overlay": "悬浮窗对话"
-  }
+  },
+  "history": "历史记录"
 }

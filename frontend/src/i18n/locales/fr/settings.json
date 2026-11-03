@@ -332,5 +332,49 @@
     "repository": "Dépôt",
     "product": "Un produit Falkyria",
     "copyright": "© 2026 Falkyria. Tous droits réservés."
+  },
+  "autonomy": {
+    "title": "Autonomie",
+    "description": "Choisissez ce que Nicx fait seul. Ce qui n'est pas autorisé, il le demande d'abord et ne continue que lorsque vous dites « je confirme ».",
+    "default": "par défaut",
+    "levels": {
+      "observador": {
+        "label": "Observateur",
+        "description": "Lit et répond seulement. Tout changement demande « je confirme »."
+      },
+      "assistido": {
+        "label": "Assisté",
+        "description": "Fait seul ce qui est léger. Fichiers et projets demandent « je confirme »."
+      },
+      "autonomo": {
+        "label": "Autonome",
+        "description": "Gère aussi seul les fichiers et les projets, toujours avec annulation."
+      }
+    },
+    "matrixTitle": "Ce qui passe sans demander",
+    "riskColumn": "Type d'action",
+    "risks": {
+      "leitura": {
+        "label": "Lecture seule",
+        "description": "Heure, batterie, lire un fichier, rechercher"
+      },
+      "leve": {
+        "label": "Léger",
+        "description": "Change peu et s'annule : rappel, note, ouvrir une appli, volume"
+      },
+      "moderado": {
+        "label": "Modéré",
+        "description": "Écrire un fichier, ranger un dossier, fermer une appli, effacer des notes"
+      },
+      "alto": {
+        "label": "Élevé",
+        "description": "Éteindre, redémarrer, terminal, git commit"
+      }
+    },
+    "free": "Le fait seul",
+    "asks": "Demande « je confirme »",
+    "hint": "Les actions à risque élevé demandent toujours « je confirme », à tous les niveaux. Tout va dans l'Historique, avec annulation quand c'est possible.",
+    "loadFailed": "Impossible de lire l'autonomie. Le serveur de Nicx est-il lancé ?",
+    "saveFailed": "Impossible d'enregistrer l'autonomie. Réessayez."
   }
 }

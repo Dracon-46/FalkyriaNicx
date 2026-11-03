@@ -1,0 +1,78 @@
+{
+  "title": "History",
+  "subtitle": "Everything Nicx did for you: conversations, notes, reminders, files and actions on the PC. It stays on your computer only.",
+  "hint": "In chat or by voice: \"undo\" reverts the last change and \"what did you do?\" sums up the latest activities.",
+  "tabs": {
+    "atividades": "Activities",
+    "auditoria": "Audit"
+  },
+  "search": "Search history",
+  "searchPlaceholder": "Search activities...",
+  "from": "From",
+  "to": "To",
+  "typesLabel": "Filter by type",
+  "types": {
+    "conversa": "Conversation",
+    "nota": "Note",
+    "lembrete": "Reminder",
+    "agenda": "Calendar",
+    "projeto": "Project",
+    "arquivo": "File",
+    "organizacao": "Organization",
+    "acao": "Action",
+    "ferramenta": "Tool",
+    "desfazer": "Undone"
+  },
+  "origins": {
+    "chat": "Chat",
+    "voz": "Voice",
+    "app": "App",
+    "agente": "Agent"
+  },
+  "results": {
+    "ok": "Done",
+    "falhou": "Failed",
+    "bloqueado": "Blocked",
+    "pendente": "Waiting for \"confirm\""
+  },
+  "levels": {
+    "observador": "Observer",
+    "assistido": "Assisted",
+    "autonomo": "Autonomous"
+  },
+  "risks": {
+    "leitura": "Read only",
+    "leve": "Light",
+    "moderado": "Moderate",
+    "alto": "High"
+  },
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "undo": "Undo",
+  "undone": "Undone",
+  "dismiss": "Close",
+  "loading": "Loading...",
+  "loadMore": "Load more",
+  "empty": "Nothing in the history yet. What Nicx does shows up here.",
+  "noMatches": "No activities match these filters.",
+  "loadFailed": "Couldn't load the history. Is the Nicx server running?",
+  "undoFailed": "Couldn't undo. Please try again.",
+  "restartServer": "Restart the Nicx server to use the history and autonomy.",
+  "integrity": {
+    "ok": "Log intact ({{n}} entries)",
+    "broken": "Log altered from activity #{{id}} onward"
+  },
+  "audit": {
+    "tool": "Tool",
+    "action": "Action",
+    "operation": "Operation",
+    "target": "Target",
+    "risk": "Risk",
+    "arguments": "Arguments",
+    "response": "Response",
+    "noDetail": "No details recorded.",
+    "showDetail": "Show details",
+    "hideDetail": "Hide details",
+    "empty": "No actions or tools recorded yet."
+  }
+}

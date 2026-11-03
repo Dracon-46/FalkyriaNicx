@@ -22,5 +22,6 @@
     "stopBeforeDelete": "Detén la respuesta antes de borrar esta conversación",
     "delete": "Borrar conversación",
     "overlay": "Conversación rápida"
-  }
+  },
+  "history": "Historial"
 }

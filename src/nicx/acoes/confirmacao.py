@@ -17,12 +17,14 @@ WINDOW_SECONDS = 30.0
 TOOL_WINDOW_SECONDS = 120.0
 
 _lock = threading.Lock()
-_pending: Optional[tuple[Action, float, float, Optional[Callable[[], str]]]] = None
+_pending: Optional[
+    tuple[Action, float, Optional[float], Optional[Callable[[], str]]]
+] = None
 
 
 def ask(
     action: Action,
-    window: float = WINDOW_SECONDS,
+    window: Optional[float] = None,
     fn: Optional[Callable[[], str]] = None,
 ) -> None:
     """Guarda a ação; com ``fn``, "confirmo" roda ``fn`` (que devolve a frase)."""
@@ -36,7 +38,8 @@ def pending() -> Optional[Action]:
         if _pending is None:
             return None
         action, since, window, _fn = _pending
-        if time.monotonic() - since > window:
+        prazo = WINDOW_SECONDS if window is None else window  # lido na hora
+        if time.monotonic() - since > prazo:
             return None
         return action
 

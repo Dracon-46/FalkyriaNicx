@@ -315,3 +315,65 @@ modelo local para reescrevê-lo (leva uns segundos a mais; modelo da nuvem
 nunca é usado). API: `GET /v1/resumo?dia=AAAA-MM-DD&idioma=pt-BR`
 (`&refinar=true` para o modelo) e `GET/PUT /v1/resumo/config`. Nada do
 resumo vai para analytics nem para os logs.
+
+## Histórico, desfazer e autonomia
+
+**Histórico.** O Nicx anota no PC, em `~/.nicx/historico.db`, tudo o que faz:
+o começo de cada pedido no chat (ou por voz), anotações, lembretes,
+compromissos, projetos, pastas organizadas, arquivos escritos pelo modelo,
+ações no PC e cada ferramenta que o modelo usou (com os argumentos). A página
+**Histórico** mostra a linha do tempo, com busca (acentos não importam), filtro
+por tipo e datas. A aba **Auditoria** mostra só ações e ferramentas, com o
+resultado (feito, falhou, bloqueado, esperando "confirmo"), o nível de
+autonomia e a origem. Cada linha leva o hash da anterior: se o arquivo for
+mexido por fora, a auditoria avisa a partir de qual linha.
+
+```toml
+[historico]
+ligado = true
+guardar_conversas = true  # false: não guarda o começo dos pedidos
+dias = 180                # 0 = guarda para sempre
+```
+
+Nada do histórico vai para analytics nem para os logs.
+
+**Desfazer.** "Desfaz" (ou "desfaz isso", "undo", "deshaz eso", "défais ça",
+"撤销", "पूर्ववत करो", "تراجع") volta a última mudança. Na página Histórico,
+o botão **Desfazer** volta uma mudança escolhida, sem perder o que veio depois.
+Dá para desfazer:
+
+- lembrete criado ou cancelado; compromisso marcado ou desmarcado (o aviso de
+  15 minutos volta junto);
+- anotação feita e "apaga minhas anotações";
+- pasta organizada ("desfaz a organização" continua valendo);
+- projeto criado, mudado ou apagado;
+- arquivo escrito pelo modelo (`file_write`, `apply_patch`): volta a cópia de
+  antes; um arquivo novo vai para `~/.nicx/desfazer/` em vez de ser apagado.
+
+As cópias ficam em `~/.nicx/desfazer/` por 30 dias (arquivos acima de 5 MB não
+ganham cópia). "O que você fez?" lista as últimas mudanças.
+
+**Autonomia.** Diz o que o Nicx faz sozinho quando é **o modelo** que decide
+agir (um comando que você mesmo fala ou digita já é a autorização). Em
+Configurações → Autonomia, ou:
+
+```toml
+[autonomia]
+nivel = "assistido"   # observador | assistido | autonomo
+```
+
+| Nível | Faz sozinho | Pede "confirmo" |
+|---|---|---|
+| observador | só consultas (hora, ler arquivo, pesquisar) | qualquer mudança |
+| assistido (padrão) | consultas e mudanças leves (lembrete, anotação, abrir app, volume) | escrever arquivo, organizar pasta, fechar app, apagar em lote |
+| autônomo | também arquivos e projetos (sempre com desfazer) | só o que é de risco alto |
+
+Desligar, reiniciar, rodar comandos no terminal e `git commit` pedem
+"confirmo" em qualquer nível. Quando o modelo precisa de confirmação, ele
+avisa e a ação espera até 2 minutos pelo seu "confirmo" (ou "cancela"). A
+regra fica no código das ferramentas: um texto escondido numa página não faz
+o Nicx pular a confirmação.
+
+API: `GET /v1/historico?busca=&tipos=&desde=&ate=&limite=&antes_de=`,
+`POST /v1/historico/desfazer` (`{"id": 12}` ou vazio para a última),
+`GET /v1/historico/integridade`, `GET/PUT /v1/autonomia`.

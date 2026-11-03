@@ -22,5 +22,6 @@
     "stopBeforeDelete": "Arrêtez la génération avant de supprimer cette discussion",
     "delete": "Supprimer la discussion",
     "overlay": "Discussion rapide"
-  }
+  },
+  "history": "Historique"
 }

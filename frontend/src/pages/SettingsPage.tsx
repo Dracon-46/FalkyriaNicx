@@ -26,6 +26,7 @@ import { PrivacySection } from '../components/Privacy/PrivacySection';
 import { CalendarSettings } from '../components/Settings/CalendarSettings';
 import { ContextSettings } from '../components/Settings/ContextSettings';
 import { DailySummarySettings } from '../components/Settings/DailySummarySettings';
+import { AutonomySettings } from '../components/Settings/AutonomySettings';
 import {
   checkHealth,
   fetchSpeechHealth,
@@ -1215,6 +1216,11 @@ export function SettingsPage() {
           {/* Resumo do dia: o que aconteceu hoje, e o resumo automático */}
           <Section title={t('settings.dailySummary.title')}>
             <DailySummarySettings onSaved={showSaved} />
+          </Section>
+
+          {/* Autonomia: o que o Nicx faz sozinho e o que pede "confirmo" */}
+          <Section title={t('settings.autonomy.title')}>
+            <AutonomySettings onSaved={showSaved} />
           </Section>
 
           {/* Data */}

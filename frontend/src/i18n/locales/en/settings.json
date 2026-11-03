@@ -332,5 +332,49 @@
     "repository": "Repository",
     "product": "A Falkyria product",
     "copyright": "© 2026 Falkyria. All rights reserved."
+  },
+  "autonomy": {
+    "title": "Autonomy",
+    "description": "Choose how much Nicx does on its own. Anything not allowed, it asks first and only goes ahead when you say \"confirm\".",
+    "default": "default",
+    "levels": {
+      "observador": {
+        "label": "Observer",
+        "description": "Only reads and answers. Any change asks for \"confirm\"."
+      },
+      "assistido": {
+        "label": "Assisted",
+        "description": "Does light things on its own. Files and projects ask for \"confirm\"."
+      },
+      "autonomo": {
+        "label": "Autonomous",
+        "description": "Also handles files and projects on its own, always with undo."
+      }
+    },
+    "matrixTitle": "What goes through without asking",
+    "riskColumn": "Kind of action",
+    "risks": {
+      "leitura": {
+        "label": "Read only",
+        "description": "Time, battery, reading a file, searching"
+      },
+      "leve": {
+        "label": "Light",
+        "description": "Small changes with undo: reminder, note, opening an app, volume"
+      },
+      "moderado": {
+        "label": "Moderate",
+        "description": "Writing a file, organizing a folder, closing an app, deleting notes"
+      },
+      "alto": {
+        "label": "High",
+        "description": "Shut down, restart, terminal, git commit"
+      }
+    },
+    "free": "Does it alone",
+    "asks": "Asks for \"confirm\"",
+    "hint": "High-risk actions always ask for \"confirm\", at any level. Everything goes to the History, with undo when possible.",
+    "loadFailed": "Couldn't read the autonomy setting. Is the Nicx server running?",
+    "saveFailed": "Couldn't save the autonomy setting. Please try again."
   }
 }

@@ -169,7 +169,7 @@ def portao(
         return None
     descricao = resumo(nome, params)
     if interativo and confirmar is not None:
-        if confirmar(f"[{nivel}] {nome}: {descricao}?"):
+        if confirmar(f"Allow execution of tool '{nome}' with args {dict(params)}?"):
             return None
         anotar_chamada(
             nome, params, False, "negado pelo usuário", nivel=nivel, resultado=BLOQUEADO
@@ -213,6 +213,8 @@ def portao(
         resumo=descricao,
         nivel=textos.texto(f"nivel_{nivel}"),
     )
+    # o começo em inglês é estável para quem lê o resultado (modelo, testes)
+    frase = f"Tool '{nome}' requires confirmation. {frase}"
     return fazer_resultado(
         frase, False, {"aguardando_confirmacao": True, "nivel": nivel}
     )

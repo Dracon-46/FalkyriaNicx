@@ -14,6 +14,7 @@ import re
 from datetime import timedelta
 from typing import Any, Optional
 
+from nicx.resumo import montagem
 from nicx.resumo.montagem import Item, Resumo, agora_local, hoje, montar
 from nicx.resumo.textos import codigo, texto
 
@@ -30,7 +31,7 @@ def responder(action: Any) -> Any:
     from nicx.acoes import textos as textos_acoes
     from nicx.acoes.sistema import Outcome
 
-    agora = agora_local()
+    agora = montagem.agora_local()  # pelo módulo: os testes congelam a hora
     dia = agora.date()
     if getattr(action, "op", "") == "ontem":
         dia -= timedelta(days=1)

@@ -106,7 +106,7 @@ class ComputerControlTool(BaseTool):
             action = Action(kind, op, STEP_NORMAL)
         else:
             action = Action(kind, op, int(value) if value is not None else None)
-        outcome = run(action)
+        outcome = run(action, pelo_modelo=True)
         return ToolResult(self.tool_id, outcome.message, success=outcome.ok)
 
 
@@ -150,7 +150,7 @@ class ReminderTool(BaseTool):
             )
         if not message:
             return ToolResult(self.tool_id, "Faltou dizer do que lembrar.", False)
-        outcome = run(Action("remind", target=message, when=when))
+        outcome = run(Action("remind", target=message, when=when), pelo_modelo=True)
         return ToolResult(self.tool_id, outcome.message, success=outcome.ok)
 
 
@@ -244,7 +244,7 @@ class AgendaTool(BaseTool):
             action = Action("agenda_export", op=dest, target=target, site="ultimo")
         else:
             return ToolResult(self.tool_id, f"Ação desconhecida: {acao}", False)
-        outcome = run(action)
+        outcome = run(action, pelo_modelo=True)
         return ToolResult(self.tool_id, outcome.message, success=outcome.ok)
 
 
@@ -326,5 +326,5 @@ class FilesTool(BaseTool):
             action = Action("organize_undo")
         else:
             return ToolResult(self.tool_id, f"Ação desconhecida: {acao}", False)
-        outcome = run(action)
+        outcome = run(action, pelo_modelo=True)
         return ToolResult(self.tool_id, outcome.message, success=outcome.ok)

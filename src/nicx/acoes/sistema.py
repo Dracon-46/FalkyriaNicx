@@ -162,14 +162,18 @@ def _lock() -> Outcome:
     return Outcome(True, texto("tela_bloqueada"))
 
 
-def run(action: Action, idioma: Optional[str] = None) -> Outcome:
+def run(
+    action: Action, idioma: Optional[str] = None, *, pelo_modelo: bool = False
+) -> Outcome:
     """Executa a ação. Nunca levanta: falhas viram uma frase explicando.
 
     A resposta sai em ``idioma`` (código da interface: "en", "es"...); sem
     ele, no idioma atual das ações (português, se ninguém mudou).
     """
     with textos.usando(idioma):
-        pedido = _autonomia(action)
+        # O nível de autonomia vale para o que o modelo decide fazer; um comando
+        # dito ou digitado pelo próprio usuário já é a autorização.
+        pedido = _autonomia(action) if pelo_modelo else None
         if pedido is not None:
             return pedido
         outcome = _run(action)

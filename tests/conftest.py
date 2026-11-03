@@ -105,6 +105,22 @@ def _no_update_check(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.fixture(autouse=True)
+def _sem_avisos_reais(monkeypatch: pytest.MonkeyPatch):
+    """Nenhum teste mostra notificação do Windows nem fala de verdade.
+
+    O ``nicx chat`` liga o despertador dos lembretes; sem isto, a thread dele
+    seguia viva e disparava avisos reais para lembretes vencidos que outros
+    testes criam na pasta temporária.
+    """
+    from nicx.acoes import lembretes
+
+    monkeypatch.setattr(lembretes, "show_notification", lambda *_a, **_k: None)
+    monkeypatch.setattr(lembretes, "speak", lambda *_a, **_k: None)
+    yield
+    lembretes.stop_alarm()
+
+
+@pytest.fixture(autouse=True)
 def _isolated_nicx_home(monkeypatch: pytest.MonkeyPatch) -> None:
     """Re-assert NICX_HOME and clear load_config()'s cache per test.
 
