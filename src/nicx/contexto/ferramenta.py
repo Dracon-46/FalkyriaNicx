@@ -61,12 +61,14 @@ class ScreenContextTool(BaseTool):
                 False,
             )
         maximo = min(servico.max_caracteres(None), _MAX_FERRAMENTA)
+        cfg = servico.config_contexto(None)
+        usar_ocr = bool(getattr(cfg, "ocr", True))
         if acao == "area_transferencia":
-            preparo = servico.capturar_area(maximo)
+            preparo = servico.capturar_area(maximo, ocr=usar_ocr)
         else:
-            cfg = servico.config_contexto(None)
             preparo = servico.capturar_janela(
                 maximo,
+                ocr=usar_ocr,
                 copiar=bool(getattr(cfg, "copiar_selecao", False)),
                 extras=tuple(getattr(cfg, "pastas_extras", None) or ()),
             )

@@ -1756,6 +1756,9 @@ class ContextoConfig:
     # Sem texto acessível na janela, copia a seleção com Ctrl+C e devolve o
     # que estava antes na área de transferência. Desligado: só o usuário liga.
     copiar_selecao: bool = False
+    # Sem texto pela acessibilidade (imagem, PDF escaneado, vídeo, área remota),
+    # lê a janela ou a imagem copiada com o OCR do Windows (sem modelo, sem rede).
+    ocr: bool = True
     # Limite do texto lido (o corte por tokens do modelo vem depois).
     max_caracteres: int = 20000
     # Pastas extras onde procurar o arquivo aberto (além de Área de Trabalho,

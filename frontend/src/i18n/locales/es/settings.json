@@ -285,6 +285,8 @@
     "enabledDescription": "Para pedidos como \"resume lo que copié\", \"explica esto de aquí\", \"¿qué es este error?\" y \"¿dónde estoy?\". El texto solo va al modelo local y no entra en la memoria.",
     "copyLabel": "Copiar la selección cuando haga falta",
     "copyDescription": "Si la aplicación no muestra el texto seleccionado, Nicx pulsa Ctrl+C en esa ventana (solo si está al frente) y luego devuelve lo que tenías copiado.",
+    "ocrLabel": "Leer la pantalla cuando no hay texto",
+    "ocrDescription": "En imágenes, PDF escaneados, videos o escritorio remoto, Nicx lee lo que muestra la ventana (o la imagen copiada) con el OCR de Windows. Local, sin descargar nada; la imagen no se guarda.",
     "limitLabel": "Tamaño máximo del texto",
     "limitDescription": "Los textos más largos se recortan por el medio; también cuenta el límite del modelo.",
     "limitOption": "{{formatted}} caracteres",

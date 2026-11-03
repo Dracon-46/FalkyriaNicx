@@ -27,6 +27,7 @@ LIMITES = (5000, 10000, 20000, 40000)
 class ContextoUpdate(BaseModel):
     ativo: Optional[bool] = None
     copiar_selecao: Optional[bool] = None
+    ocr: Optional[bool] = None
     max_caracteres: Optional[int] = Field(default=None, ge=1000, le=200_000)
 
 
@@ -44,6 +45,7 @@ def _status(cfg: Any) -> dict:
     return {
         "ativo": bool(cfg.ativo),
         "copiar_selecao": bool(cfg.copiar_selecao),
+        "ocr": bool(getattr(cfg, "ocr", True)),
         "max_caracteres": int(cfg.max_caracteres),
         "limites": list(LIMITES),
         "suportado": sys.platform == "win32",

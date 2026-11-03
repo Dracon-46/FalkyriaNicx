@@ -22,7 +22,7 @@ from typing import Any, Callable, Optional
 
 from nicx.contexto import area_transferencia, janela, pedidos, selecao
 from nicx.contexto.arquivo_aberto import ler_arquivo, resolver
-from nicx.contexto.montagem import Captura, Leitura
+from nicx.contexto.montagem import Captura, Leitura, ler_limitado
 from nicx.contexto.textos import texto as frase
 
 logger = logging.getLogger(__name__)
@@ -94,8 +94,34 @@ def _motivo_area(leitura: Leitura, idioma: Optional[str]) -> str:
     return frase(chave, idioma)
 
 
-def capturar_area(max_caracteres: int, idioma: Optional[str] = None) -> Preparo:
+def _ocr_area(idioma: Optional[str]):
+    from nicx.visao import ocr
+
+    return ocr.ler_area_transferencia(idioma)
+
+
+def _ocr_janela(hwnd: int, idioma: Optional[str]):
+    from nicx.visao import ocr
+
+    return ocr.ler_janela(hwnd, idioma)
+
+
+def capturar_area(
+    max_caracteres: int, idioma: Optional[str] = None, *, ocr: bool = False
+) -> Preparo:
     leitura = area_transferencia.ler(max_caracteres)
+    if not leitura.ok and leitura.motivo == area_transferencia.VAZIO and ocr:
+        # sem texto copiado: talvez uma imagem (print, "copiar imagem")
+        lido = _ocr_area(idioma)
+        if lido.ok:
+            imagem = ler_limitado(lido.texto, max_caracteres)
+            logger.debug("Contexto da imagem copiada: %d caracteres", imagem.total)
+            return Preparo(
+                pedidos.AREA,
+                captura=Captura(
+                    texto=imagem.texto, fonte="imagem_copiada", total=imagem.total
+                ),
+            )
     if not leitura.ok:
         return Preparo(pedidos.AREA, resposta=_motivo_area(leitura, idioma))
     captura = Captura(
@@ -112,6 +138,7 @@ def capturar_janela(
     copiar: bool = False,
     extras: tuple[str, ...] = (),
     achar_janela: Optional[Callable[[], Optional[janela.InfoJanela]]] = None,
+    ocr: bool = False,
 ) -> Preparo:
     """Texto da janela de fora: seleção, arquivo aberto, documento, rótulos."""
     if sys.platform != "win32":
@@ -160,6 +187,12 @@ def capturar_janela(
                 return pronto(leitura.texto, "arquivo", leitura.total)
     if lido.documento.strip():
         return pronto(lido.documento, "documento")
+    if ocr:
+        # sem texto pela acessibilidade: lê o que aparece na janela (OCR)
+        visto = _ocr_janela(info.hwnd, idioma)
+        if visto.ok and len(visto.texto.strip()) > len(lido.rotulos.strip()):
+            tela = ler_limitado(visto.texto, max_caracteres)
+            return pronto(tela.texto, "tela", tela.total)
     if lido.rotulos.strip():
         return pronto(lido.rotulos, "janela")
     return Preparo(
@@ -196,13 +229,15 @@ def preparar(
     if pedido.fonte == pedidos.ONDE:
         return Preparo(pedidos.ONDE, resposta=onde(idioma))
     maximo = max_caracteres(config)
+    cfg = config_contexto(config)
+    usar_ocr = bool(getattr(cfg, "ocr", True))
     if pedido.fonte == pedidos.AREA:
-        preparo = capturar_area(maximo, idioma)
+        preparo = capturar_area(maximo, idioma, ocr=usar_ocr)
     else:
-        cfg = config_contexto(config)
         preparo = capturar_janela(
             maximo,
             idioma,
+            ocr=usar_ocr,
             copiar=bool(getattr(cfg, "copiar_selecao", False)),
             extras=tuple(getattr(cfg, "pastas_extras", None) or ()),
         )

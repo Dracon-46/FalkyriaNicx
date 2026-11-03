@@ -93,6 +93,8 @@ O Nicx enxerga o que você está vendo, sem precisar colar nada:
 |---|---|
 | "resume o que eu copiei", "traduz o texto copiado pra inglês", "corrige o que eu copiei", "responde o que eu copiei" | Área de transferência (o que você copiou com Ctrl+C) |
 | "explica isso aqui", "o que é esse erro?", "resume essa página", "resume esse documento", "traduz isso pra inglês" | A janela que você estava usando antes do Nicx |
+| "lê a tela", "o que tem na minha tela?" | A janela que você estava usando (pelo OCR se ela não tiver texto acessível) |
+| "lê o texto da imagem que eu copiei" | Uma imagem copiada (print, "copiar imagem"), pelo OCR |
 | "onde eu tô?" | Responde na hora: o app e o arquivo aberto |
 
 Também em inglês ("summarize what I copied", "explain this page", "where am
@@ -105,8 +107,16 @@ arquivo só é lido se estiver na Área de Trabalho, Documentos, Downloads,
 OneDrive, num projeto recente do VS Code ou em `[contexto] pastas_extras`);
 o **texto da página ou do documento** (navegador, Word); os textos de uma
 caixa de erro. Seleção e página são lidas pela acessibilidade do Windows
-(UI Automation, a mesma dos leitores de tela). Se nada disso der texto,
-copie (Ctrl+C) e peça "explica o que eu copiei".
+(UI Automation, a mesma dos leitores de tela).
+
+Quando a janela não tem texto acessível (foto, PDF escaneado, vídeo, acesso
+remoto, jogo), o Nicx lê o que aparece nela com o **OCR do próprio Windows**:
+sem baixar modelo, sem internet, em menos de 1 s. Funciona mesmo com outra
+janela na frente (não com ela minimizada). O mesmo vale para uma imagem
+copiada: sem texto na área de transferência, ele lê o texto da imagem. A
+imagem fica só na memória e nunca é gravada; janelas sensíveis (abaixo) nunca
+passam pelo OCR. O idioma do OCR segue o da interface; se ele não estiver
+instalado no Windows, usa o do seu perfil.
 
 "Traduz isso" sozinho só vale na primeira mensagem da conversa (ou por voz):
 no meio da conversa, "isso" é a resposta anterior do Nicx.
@@ -125,6 +135,7 @@ Configurações → Contexto da tela, ou no `config.toml`:
 [contexto]
 ativo = true            # ler a área de transferência e a janela
 copiar_selecao = false  # sem texto acessível, apertar Ctrl+C e devolver o que estava copiado
+ocr = true              # sem texto acessível, ler a janela ou a imagem copiada pelo OCR do Windows
 max_caracteres = 20000
 ```
 

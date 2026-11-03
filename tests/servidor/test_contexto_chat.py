@@ -62,7 +62,7 @@ def _sent(engine):
 def copiado(monkeypatch):
     lidos = []
 
-    def capturar_area(maximo, idioma=None):
+    def capturar_area(maximo, idioma=None, **_k):
         lidos.append(maximo)
         return servico.Preparo(
             "area_transferencia",
@@ -131,7 +131,7 @@ def test_corte_pelo_num_ctx(monkeypatch):
     monkeypatch.setattr(
         servico,
         "capturar_area",
-        lambda maximo, idioma=None: servico.Preparo(
+        lambda maximo, idioma=None, **_k: servico.Preparo(
             "area_transferencia",
             captura=Captura(enorme, "area_transferencia", total=len(enorme)),
         ),
@@ -263,11 +263,13 @@ def test_config_da_tela(tmp_path, monkeypatch):
 
     estado = client.get("/v1/contexto/config").json()
     assert estado["ativo"] is True and estado["copiar_selecao"] is False
+    assert estado["ocr"] is True
 
     estado = client.put(
-        "/v1/contexto/config", json={"copiar_selecao": True, "max_caracteres": 10000}
+        "/v1/contexto/config",
+        json={"copiar_selecao": True, "max_caracteres": 10000, "ocr": False},
     ).json()
-    assert estado["copiar_selecao"] is True
+    assert estado["copiar_selecao"] is True and estado["ocr"] is False
     assert estado["max_caracteres"] == 10000
     assert cfg.contexto.copiar_selecao is True
     gravado = (tmp_path / "config.toml").read_text("utf-8")

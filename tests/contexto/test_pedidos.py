@@ -54,6 +54,9 @@ def test_area_de_transferencia(frase):
         "explique cette page",
         "c'est quoi cette erreur ?",
         "résume ce document",
+        "lê a tela",
+        "o que tem na minha tela?",
+        "read my screen",
     ],
 )
 def test_janela(frase):

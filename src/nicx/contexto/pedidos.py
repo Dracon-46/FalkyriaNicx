@@ -81,8 +81,9 @@ _JANELA = _juntar(
     r"\b(?:o que|oq|o texto que|o trecho que)\s+(?:eu\s+)?"
     r"(?:selecionei|marquei|destaquei)\b",
     r"\btexto selecionado\b",
-    r"\b(?:o que|oq)\s+(?:ta|esta|aparece)\s+na (?:minha )?tela\b",
+    r"\b(?:o que|oq)\s+(?:tem|ta|esta|aparece)\s+na (?:minha )?tela\b",
     r"\bna minha tela\b",
+    r"\b(?:le|leia|ler|olha|olhe|ve|veja)\s+(?:a\s+)?(?:minha\s+)?tela\b",
     # en
     r"\b(?:this|that)\s+(?:right\s+)?here\b",
     r"\b(?:this|that)\s+(?:page|window|screen|tab|document|doc|file|error|"
@@ -91,6 +92,7 @@ _JANELA = _juntar(
     r"\bwhat i (?:selected|highlighted)\b",
     r"\b(?:the\s+)?selected text\b",
     r"\bon my screen\b",
+    r"\b(?:read|look at|check)\s+(?:my|the)\s+screen\b",
     # es
     r"\b(?:esto|eso)\s+(?:de\s+)?aqui\b",
     r"\b(?:esta|esa)\s+(?:pagina|ventana|pantalla|pestana|hoja|tabla|funcion|"

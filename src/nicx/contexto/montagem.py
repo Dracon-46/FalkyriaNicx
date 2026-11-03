@@ -70,7 +70,9 @@ class Captura:
     """O que vai para o modelo: o texto e um cabeçalho curto (app, arquivo)."""
 
     texto: str
-    fonte: str  # "area_transferencia" | "selecao" | "documento" | "arquivo" | "janela"
+    # "area_transferencia" | "imagem_copiada" | "selecao" | "documento" | "arquivo"
+    # | "janela" | "tela" (as duas com "imagem"/"tela" vêm do OCR)
+    fonte: str
     cabecalho: dict[str, str] = field(default_factory=dict)
     total: int = 0
 

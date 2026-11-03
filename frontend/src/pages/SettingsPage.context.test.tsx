@@ -17,6 +17,7 @@ import { ContextSettings } from '../components/Settings/ContextSettings';
 const base = {
   ativo: true,
   copiar_selecao: false,
+  ocr: true,
   max_caracteres: 20000,
   limites: [5000, 10000, 20000, 40000],
   suportado: true,

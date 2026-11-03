@@ -114,6 +114,15 @@ export function ContextSettings({ onSaved }: { onSaved: () => void }) {
           testId="context-copy"
         />
       </Row>
+      <Row label={t('settings.context.ocrLabel')} description={t('settings.context.ocrDescription')}>
+        <Switch
+          on={config?.ocr ?? true}
+          disabled={busy || !config?.ativo}
+          label={t('settings.context.ocrLabel')}
+          onClick={() => void change({ ocr: !(config?.ocr ?? true) })}
+          testId="context-ocr"
+        />
+      </Row>
       <Row label={t('settings.context.limitLabel')} description={t('settings.context.limitDescription')}>
         <select
           value={current}
