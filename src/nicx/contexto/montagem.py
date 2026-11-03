@@ -75,6 +75,9 @@ class Captura:
     fonte: str
     cabecalho: dict[str, str] = field(default_factory=dict)
     total: int = 0
+    # PNGs em base64 para o modelo de visão ("descreve essa imagem"). Vão no
+    # campo ``images`` da mensagem, só para modelos locais, e nunca são gravados.
+    imagens: tuple[str, ...] = ()
 
 
 def limpar(texto: str) -> str:
@@ -154,6 +157,8 @@ def bloco(captura: Captura, max_caracteres: int) -> str:
     texto, cortado = cortar(_neutralizar(limpar(captura.texto)), max_caracteres)
     total = captura.total or len(captura.texto)
     atributos = {"fonte": captura.fonte, **captura.cabecalho}
+    if captura.imagens:
+        atributos["imagem"] = "anexada; o texto abaixo foi lido dela por OCR"
     if cortado or total > len(texto):
         atributos["cortado"] = f"mostra parte de {total} caracteres"
     cabecalho = " ".join(

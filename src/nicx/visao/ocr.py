@@ -29,6 +29,8 @@ class Leitura:
     # sem_suporte, minimizada, sem_janela, sem_imagem, sem_arquivo, sem_idioma, erro
     motivo: str = ""
     linhas: int = 0
+    # PNG em base64, reduzido para o modelo de visão (só nas funções ``ver_*``)
+    imagem: str = ""
 
 
 def _idioma_ocr(idioma: Optional[str]) -> str:
@@ -76,12 +78,20 @@ def _rodar(argumentos: list[str], idioma: Optional[str]) -> Leitura:
         logger.debug("OCR sem texto: %s", dados.get("motivo"))
         return Leitura(False, motivo=str(dados.get("motivo") or "erro"))
     texto = str(dados.get("texto") or "")
-    logger.debug("OCR: %d linhas, %d caracteres", dados.get("linhas", 0), len(texto))
+    imagem = str(dados.get("imagem") or "")
+    logger.debug(
+        "OCR: %d linhas, %d caracteres, imagem de %d bytes",
+        dados.get("linhas", 0),
+        len(texto),
+        len(imagem),
+    )
+    tem_algo = bool(texto.strip() or imagem)
     return Leitura(
-        bool(texto.strip()),
+        tem_algo,
         texto=texto,
-        motivo="" if texto.strip() else "vazio",
+        motivo="" if tem_algo else "vazio",
         linhas=int(dados.get("linhas") or 0),
+        imagem=imagem,
     )
 
 
@@ -95,6 +105,19 @@ def ler_area_transferencia(idioma: Optional[str] = None) -> Leitura:
     return _rodar(["-Modo", "area"], idioma)
 
 
+def ver_janela(hwnd: int, idioma: Optional[str] = None, lado_max: int = 640) -> Leitura:
+    """Como :func:`ler_janela`, mais a imagem reduzida para o modelo de visão."""
+    argumentos = ["-Modo", "janela", "-Hwnd", str(int(hwnd))]
+    return _rodar([*argumentos, "-LadoMax", str(int(lado_max))], idioma)
+
+
+def ver_area_transferencia(
+    idioma: Optional[str] = None, lado_max: int = 640
+) -> Leitura:
+    """Como :func:`ler_area_transferencia`, mais a imagem reduzida."""
+    return _rodar(["-Modo", "area", "-LadoMax", str(int(lado_max))], idioma)
+
+
 def ler_arquivo(caminho: Path, idioma: Optional[str] = None) -> Leitura:
     """Um arquivo de imagem (png, jpg, bmp, gif, tiff)."""
     return _rodar(
@@ -102,4 +125,11 @@ def ler_arquivo(caminho: Path, idioma: Optional[str] = None) -> Leitura:
     )
 
 
-__all__ = ["Leitura", "ler_area_transferencia", "ler_arquivo", "ler_janela"]
+__all__ = [
+    "Leitura",
+    "ler_area_transferencia",
+    "ler_arquivo",
+    "ler_janela",
+    "ver_area_transferencia",
+    "ver_janela",
+]

@@ -47,6 +47,7 @@ _PT = {
         "O que está na sua tela só vai para modelos locais. Escolha um modelo"
         " local para eu ler."
     ),
+    "sem_visao": "O modelo escolhido não enxerga imagens e não achei texto nela. Use um modelo com visão (o qwen3.5 enxerga).",
     "explorer": "Explorador de Arquivos",
 }
 
@@ -79,6 +80,7 @@ _EN = {
         "What's on your screen only goes to local models. Pick a local model and"
         " I'll read it."
     ),
+    "sem_visao": "The chosen model can't see images and I found no text in it. Use a model with vision (qwen3.5 can see).",
     "explorer": "File Explorer",
 }
 
@@ -115,6 +117,7 @@ _ES = {
         "Lo que hay en tu pantalla solo va a modelos locales. Elige un modelo"
         " local para que lo lea."
     ),
+    "sem_visao": "El modelo elegido no ve imágenes y no encontré texto en ella. Usa un modelo con visión (qwen3.5 ve).",
     "explorer": "Explorador de archivos",
 }
 
@@ -154,6 +157,7 @@ _FR = {
         "Ce qui est à l'écran ne va qu'aux modèles locaux. Choisis un modèle"
         " local pour que je le lise."
     ),
+    "sem_visao": "Le modèle choisi ne voit pas les images et je n'y ai trouvé aucun texte. Utilise un modèle avec vision (qwen3.5 voit).",
     "explorer": "Explorateur de fichiers",
 }
 
@@ -172,6 +176,7 @@ _ZH = {
     "onde_arquivo": "，文件 {arquivo}",
     "onde_titulo": "（{titulo}）",
     "nuvem": "屏幕上的内容只会发给本地模型。请选择一个本地模型。",
+    "sem_visao": "所选模型看不到图片，我也没有在其中找到文字。请使用支持视觉的模型（qwen3.5 可以）。",
     "explorer": "文件资源管理器",
 }
 
@@ -193,6 +198,7 @@ _HI = {
     "onde_arquivo": ", फ़ाइल {arquivo}",
     "onde_titulo": " ({titulo})",
     "nuvem": "स्क्रीन की सामग्री सिर्फ़ लोकल मॉडल को जाती है। पढ़वाने के लिए कोई लोकल मॉडल चुनें।",
+    "sem_visao": "चुना गया मॉडल तस्वीरें नहीं देख सकता और मुझे उसमें कोई टेक्स्ट नहीं मिला। विज़न वाला मॉडल इस्तेमाल करें (qwen3.5 देख सकता है)।",
     "explorer": "फ़ाइल एक्सप्लोरर",
 }
 
@@ -213,6 +219,7 @@ _AR = {
     "onde_arquivo": "، في الملف {arquivo}",
     "onde_titulo": " ({titulo})",
     "nuvem": "ما على شاشتك يذهب إلى النماذج المحلية فقط. اختر نموذجًا محليًا لأقرأه.",
+    "sem_visao": "النموذج المختار لا يرى الصور ولم أجد فيها نصًا. استخدم نموذجًا يدعم الرؤية (qwen3.5 يرى).",
     "explorer": "مستكشف الملفات",
 }
 

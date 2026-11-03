@@ -287,6 +287,8 @@
     "copyDescription": "Si l'application n'expose pas le texte sélectionné, Nicx appuie sur Ctrl+C dans cette fenêtre (seulement si elle est au premier plan) puis remet ce que tu avais copié.",
     "ocrLabel": "Lire l'écran quand il n'y a pas de texte",
     "ocrDescription": "Pour les images, PDF scannés, vidéos ou bureaux à distance, Nicx lit ce qu'affiche la fenêtre (ou l'image copiée) avec l'OCR de Windows. En local, rien à télécharger ; l'image n'est jamais enregistrée.",
+    "visionLabel": "Décrire les images",
+    "visionDescription": "« Décris cette image », « que vois-tu ? » : Nicx envoie une petite copie de la fenêtre (ou de l'image copiée) au modèle local, s'il voit. Environ une minute sur un PC sans GPU ; l'image n'est jamais enregistrée.",
     "limitLabel": "Taille maximale du texte",
     "limitDescription": "Les textes plus longs sont coupés au milieu ; la limite du modèle compte aussi.",
     "limitOption": "{{formatted}} caractères",

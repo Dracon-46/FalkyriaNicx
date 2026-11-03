@@ -1759,6 +1759,11 @@ class ContextoConfig:
     # Sem texto pela acessibilidade (imagem, PDF escaneado, vídeo, área remota),
     # lê a janela ou a imagem copiada com o OCR do Windows (sem modelo, sem rede).
     ocr: bool = True
+    # "Descreve essa imagem", "o que você vê na tela?": manda a imagem da janela
+    # (ou a copiada) ao modelo, se ele enxergar (o qwen3.5 enxerga).
+    ver_imagens: bool = True
+    # Maior lado da imagem enviada: 640 px custam ~350 tokens (~15 s na CPU).
+    lado_imagem: int = 640
     # Limite do texto lido (o corte por tokens do modelo vem depois).
     max_caracteres: int = 20000
     # Pastas extras onde procurar o arquivo aberto (além de Área de Trabalho,

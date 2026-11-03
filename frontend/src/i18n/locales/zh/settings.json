@@ -287,6 +287,8 @@
     "copyDescription": "如果应用不提供选中的文本，Nicx 会在该窗口按 Ctrl+C（仅当它在最前面时），然后恢复你之前复制的内容。",
     "ocrLabel": "没有文本时读取屏幕",
     "ocrDescription": "对于图片、扫描的 PDF、视频或远程桌面，Nicx 会用 Windows OCR 读取窗口（或复制的图片）中显示的内容。完全本地，无需下载；图片不会被保存。",
+    "visionLabel": "描述图片",
+    "visionDescription": "“描述这张图片”“你看到了什么？”：如果本地模型支持视觉，Nicx 会把窗口（或复制的图片）的小副本发给它。在没有 GPU 的电脑上大约需要一分钟；图片不会被保存。",
     "limitLabel": "文本最大长度",
     "limitDescription": "更长的文本会从中间截断；模型的上限同样适用。",
     "limitOption": "{{formatted}} 个字符",

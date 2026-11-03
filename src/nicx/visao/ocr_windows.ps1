@@ -3,11 +3,13 @@
 #   -Modo janela -Hwnd 1234       (PrintWindow: funciona mesmo com outra janela na frente)
 #   -Modo area                    (imagem da área de transferência)
 #   -Modo arquivo -Arquivo C:\x.png
+#   -LadoMax 640                  (também devolve a imagem em PNG base64, com no máximo 640 px de lado)
 param(
     [ValidateSet('janela', 'area', 'arquivo')][string]$Modo = 'janela',
     [long]$Hwnd = 0,
     [string]$Arquivo = '',
-    [string]$Idioma = 'pt-BR'
+    [string]$Idioma = 'pt-BR',
+    [int]$LadoMax = 0
 )
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -62,6 +64,18 @@ public static class NicxJanela {
         $imagem = [System.Drawing.Bitmap]::FromFile($Arquivo)
     }
 
+    # cópia pequena para o modelo de visão (cada 512 px de lado custam ~220 tokens)
+    $base64 = ''
+    if ($LadoMax -gt 0) {
+        $fator = [Math]::Min(1.0, [Math]::Min($LadoMax / $imagem.Width, $LadoMax / $imagem.Height))
+        $pequena = New-Object System.Drawing.Bitmap $imagem, ([Math]::Max(1, [int]($imagem.Width * $fator))), ([Math]::Max(1, [int]($imagem.Height * $fator)))
+        $buffer = New-Object System.IO.MemoryStream
+        $pequena.Save($buffer, [System.Drawing.Imaging.ImageFormat]::Png)
+        $pequena.Dispose()
+        $base64 = [Convert]::ToBase64String($buffer.ToArray())
+        $buffer.Dispose()
+    }
+
     # o OCR aceita no máximo MaxImageDimension por lado
     $limite = [Windows.Media.Ocr.OcrEngine]::MaxImageDimension
     if ($imagem.Width -gt $limite -or $imagem.Height -gt $limite) {
@@ -80,10 +94,13 @@ public static class NicxJanela {
     $motor = $null
     try { $motor = [Windows.Media.Ocr.OcrEngine]::TryCreateFromLanguage((New-Object Windows.Globalization.Language $Idioma)) } catch { $motor = $null }
     if ($null -eq $motor) { $motor = [Windows.Media.Ocr.OcrEngine]::TryCreateFromUserProfileLanguages() }
-    if ($null -eq $motor) { Sair @{ ok = $false; motivo = 'sem_idioma' } }
+    if ($null -eq $motor) {
+        if ($base64) { Sair @{ ok = $true; texto = ''; linhas = 0; imagem = $base64 } }
+        Sair @{ ok = $false; motivo = 'sem_idioma' }
+    }
     $resultado = Esperar ($motor.RecognizeAsync($bitmap)) ([Windows.Media.Ocr.OcrResult])
     $linhas = @($resultado.Lines | ForEach-Object { $_.Text })
-    Sair @{ ok = $true; texto = ($linhas -join "`n"); linhas = $linhas.Count; idioma = $motor.RecognizerLanguage.LanguageTag }
+    Sair @{ ok = $true; texto = ($linhas -join "`n"); linhas = $linhas.Count; idioma = $motor.RecognizerLanguage.LanguageTag; imagem = $base64 }
 } catch {
     Sair @{ ok = $false; motivo = 'erro'; detalhe = $_.Exception.Message }
 }

@@ -731,13 +731,15 @@ export interface ScreenContextConfig {
   copiar_selecao: boolean;
   /** Sem texto acessível, lê a janela ou a imagem copiada pelo OCR do Windows. */
   ocr: boolean;
+  /** "Descreve essa imagem": manda a imagem ao modelo, se ele enxergar. */
+  ver_imagens: boolean;
   max_caracteres: number;
   limites: number[];
   /** Só o Windows lê a área de transferência e a janela aberta. */
   suportado: boolean;
 }
 
-export type ScreenContextUpdate = Partial<Pick<ScreenContextConfig, 'ativo' | 'copiar_selecao' | 'ocr' | 'max_caracteres'>>;
+export type ScreenContextUpdate = Partial<Pick<ScreenContextConfig, 'ativo' | 'copiar_selecao' | 'ocr' | 'ver_imagens' | 'max_caracteres'>>;
 
 async function screenContextResponse(res: Response): Promise<ScreenContextConfig> {
   if (res.status === 404 || res.status === 405) throw new Error(i18n.t('settings.context.restartServer'));

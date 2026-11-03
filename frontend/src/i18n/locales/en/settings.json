@@ -287,6 +287,8 @@
     "copyDescription": "If the app doesn't expose the selected text, Nicx presses Ctrl+C in that window (only while it's in front) and then restores what you had copied.",
     "ocrLabel": "Read the screen when there's no text",
     "ocrDescription": "For images, scanned PDFs, videos or remote desktops, Nicx reads what the window (or the copied image) shows using Windows OCR. Local, nothing to download; the image is never saved.",
+    "visionLabel": "Describe images",
+    "visionDescription": "\"Describe this image\", \"what do you see?\": Nicx sends a small copy of the window (or the copied image) to the local model, if it can see. Takes about a minute on a CPU-only PC; the image is never saved.",
     "limitLabel": "Maximum text size",
     "limitDescription": "Longer texts are cut in the middle; the model's limit also applies.",
     "limitOption": "{{formatted}} characters",

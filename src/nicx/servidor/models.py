@@ -19,6 +19,9 @@ class ChatMessage(BaseModel):
     name: Optional[str] = None
     tool_calls: Optional[List[Dict[str, Any]]] = None
     tool_call_id: Optional[str] = None
+    # Nicx extension: base64 images for vision models (Ollama's "images").
+    # The server fills it for "descreve essa imagem"; never stored.
+    images: Optional[List[str]] = None
 
 
 class ChatCompletionRequest(BaseModel):

@@ -95,6 +95,7 @@ O Nicx enxerga o que você está vendo, sem precisar colar nada:
 | "explica isso aqui", "o que é esse erro?", "resume essa página", "resume esse documento", "traduz isso pra inglês" | A janela que você estava usando antes do Nicx |
 | "lê a tela", "o que tem na minha tela?" | A janela que você estava usando (pelo OCR se ela não tiver texto acessível) |
 | "lê o texto da imagem que eu copiei" | Uma imagem copiada (print, "copiar imagem"), pelo OCR |
+| "descreve essa imagem", "o que você vê na tela?", "explica esse gráfico", "descreve a imagem que eu copiei" | A imagem da janela (ou a copiada) vai ao modelo, que a descreve |
 | "onde eu tô?" | Responde na hora: o app e o arquivo aberto |
 
 Também em inglês ("summarize what I copied", "explain this page", "where am
@@ -118,6 +119,16 @@ imagem fica só na memória e nunca é gravada; janelas sensíveis (abaixo) nunc
 passam pelo OCR. O idioma do OCR segue o da interface; se ele não estiver
 instalado no Windows, usa o do seu perfil.
 
+Para **descrever** uma imagem (uma foto, um gráfico, um desenho), e não só ler
+o texto dela, o Nicx manda uma cópia pequena da janela ou da imagem copiada
+(até 640 px de lado) ao modelo local, junto com o texto lido por OCR. O
+`qwen3.5:4b` já enxerga: não precisa de outro modelo nem de mais memória.
+Leva cerca de 50 s num PC sem placa de vídeo (perto de 1 min e 15 s se o
+modelo ainda não estava carregado). Se o modelo escolhido não enxergar, vai só
+o texto do OCR. Pedidos só de texto ("lê o texto da imagem", "o que está
+escrito aqui?") usam só o OCR, que é bem mais rápido. A imagem não é gravada
+em lugar nenhum e só vai para modelos locais.
+
 "Traduz isso" sozinho só vale na primeira mensagem da conversa (ou por voz):
 no meio da conversa, "isso" é a resposta anterior do Nicx.
 
@@ -136,6 +147,8 @@ Configurações → Contexto da tela, ou no `config.toml`:
 ativo = true            # ler a área de transferência e a janela
 copiar_selecao = false  # sem texto acessível, apertar Ctrl+C e devolver o que estava copiado
 ocr = true              # sem texto acessível, ler a janela ou a imagem copiada pelo OCR do Windows
+ver_imagens = true      # "descreve essa imagem": mandar a imagem ao modelo (se ele enxergar)
+lado_imagem = 640       # maior lado da imagem enviada (menor = mais rápido, menos detalhe)
 max_caracteres = 20000
 ```
 

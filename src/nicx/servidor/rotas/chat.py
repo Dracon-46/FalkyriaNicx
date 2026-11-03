@@ -54,6 +54,7 @@ def _to_messages(chat_messages) -> list[Message]:
                 ]
                 or None,
                 tool_call_id=m.tool_call_id,
+                images=list(m.images) if getattr(m, "images", None) else None,
             )
         )
     return messages
@@ -463,6 +464,20 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
     if screen is not None and screen.resposta is not None:
         return _immediate_response(screen.resposta, model, stream=request_body.stream)
     screen_capture = screen.captura if screen is not None else None
+    if screen_capture is not None and screen_capture.imagens:
+        # "Descreve essa imagem": the picture only reaches the model on the
+        # direct path; a model that can't see gets the OCR text alone.
+        from nicx.visao.modelo import enxerga
+
+        if await asyncio.to_thread(enxerga, model, config):
+            use_server_agent = False
+        elif screen_capture.texto.strip():
+            screen_capture = replace(screen_capture, imagens=())
+        else:
+            from nicx.contexto.textos import texto as frase_contexto
+
+            reply = frase_contexto("sem_visao", request_body.language)
+            return _immediate_response(reply, model, stream=request_body.stream)
     if screen_capture is not None and use_server_agent:
         # The text is already in the message: skip the ~600-token tool list
         # unless the request also wants something else ("anota o que eu copiei").
@@ -538,6 +553,7 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
                             ]
                             or None,
                             tool_call_id=getattr(msg, "tool_call_id", None),
+                            images=getattr(msg, "images", None),
                         )
                     )
                 request_body.messages = new_msgs
@@ -599,6 +615,8 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
                 com_ferramentas=use_server_agent,
             )
             last.content = anexar(last.content, screen_capture, budget)
+            if screen_capture.imagens:
+                last.images = list(screen_capture.imagens)
             screen_attached = True
     # The project summary goes the same way (same markers: it stays out of
     # the automatic memory, traces and logs).

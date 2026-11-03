@@ -263,7 +263,7 @@ def test_config_da_tela(tmp_path, monkeypatch):
 
     estado = client.get("/v1/contexto/config").json()
     assert estado["ativo"] is True and estado["copiar_selecao"] is False
-    assert estado["ocr"] is True
+    assert estado["ocr"] is True and estado["ver_imagens"] is True
 
     estado = client.put(
         "/v1/contexto/config",

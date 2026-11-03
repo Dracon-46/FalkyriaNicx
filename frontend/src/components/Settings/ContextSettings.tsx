@@ -123,6 +123,15 @@ export function ContextSettings({ onSaved }: { onSaved: () => void }) {
           testId="context-ocr"
         />
       </Row>
+      <Row label={t('settings.context.visionLabel')} description={t('settings.context.visionDescription')}>
+        <Switch
+          on={config?.ver_imagens ?? true}
+          disabled={busy || !config?.ativo}
+          label={t('settings.context.visionLabel')}
+          onClick={() => void change({ ver_imagens: !(config?.ver_imagens ?? true) })}
+          testId="context-vision"
+        />
+      </Row>
       <Row label={t('settings.context.limitLabel')} description={t('settings.context.limitDescription')}>
         <select
           value={current}

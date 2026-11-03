@@ -33,6 +33,9 @@ ONDE = "onde"
 class Pedido:
     fonte: str  # AREA | JANELA | ONDE
     resto: str  # a mensagem (normalizada) sem a referência ao contexto
+    # Descrever o que se vê (a imagem vai para o modelo de visão), não só ler
+    # o texto: "descreve essa imagem", "o que você vê na tela?".
+    ver: bool = False
 
 
 def _juntar(*padroes: str) -> re.Pattern[str]:
@@ -44,7 +47,8 @@ _AREA = _juntar(
     # pt
     r"\b(?:(?:o|oq|aquilo|isso|esse texto|o texto|o trecho|o link)\s+)?"
     r"(?:que\s+)?(?:eu\s+)?(?:acabei de copiar|copiei|tinha copiado)\b",
-    r"\b(?:texto|trecho|conteudo|link|codigo|erro)\s+copiad[oa]s?\b",
+    r"\b(?:texto|trecho|conteudo|link|codigo|erro|imagem|foto|print|figura)"
+    r"\s+copiad[oa]s?\b",
     r"\b(?:o que|oq)\s+(?:ta|esta|tem)\s+(?:copiado|na area de transferencia)\b",
     r"\b(?:minha\s+|na\s+|da\s+)?area de transferencia\b",
     r"\bclipboard\b",
@@ -134,6 +138,47 @@ _O_QUE_E_ISSO = re.compile(
     r"que es esto|qu est ce que c est|c est quoi)\b"
 )
 
+# --- Ver (descrever a imagem, não só ler o texto) --------------------------
+_IMAGENS = (
+    r"imagem|imagens|foto|fotos|figura|print|captura|grafico|desenho|diagrama|"
+    r"image|picture|photo|screenshot|chart|graph|drawing|"
+    r"imagen|grafica|dibujo|"
+    r"graphique|dessin"
+)
+_VER = _juntar(
+    # pt
+    r"\bdescrev[aeo]r?\s+(?:(?:a|o|essa|esse|esta|este|minha|meu)\s+)?"
+    rf"(?:tela|{_IMAGENS})\b",
+    r"\b(?:o que|oq)\s+(?:voce|vc|tu)\s+(?:ve|ves|esta vendo|ta vendo|enxerga)\b",
+    rf"\b(?:nessa|nesta|dessa|desta|essa|esta|nesse|neste|desse|deste|esse|este)"
+    rf"\s+(?:{_IMAGENS})\b",
+    rf"\b(?:a|o)\s+(?:{_IMAGENS})\s+(?:que\s+)?(?:eu\s+)?copiei\b",
+    rf"\b(?:{_IMAGENS})\s+copiad[oa]s?\b",
+    rf"\b(?:o que|oq)\s+(?:tem|ha|aparece)\s+(?:na|no)\s+(?:{_IMAGENS})\b",
+    # en
+    rf"\bdescribe\s+(?:(?:this|that|the|my)\s+)?(?:screen|{_IMAGENS})\b",
+    r"\bwhat (?:do|can) you see\b",
+    rf"\b(?:this|that)\s+(?:{_IMAGENS})\b",
+    rf"\bthe\s+(?:{_IMAGENS})\s+i copied\b",
+    # es
+    rf"\bdescribe\s+(?:(?:esta|esa|la|el|mi)\s+)?(?:pantalla|{_IMAGENS})\b",
+    r"\bque (?:ves|estas viendo)\b",
+    rf"\b(?:esta|esa|este|ese)\s+(?:{_IMAGENS})\b",
+    # fr
+    rf"\bdecri[st]?\s+(?:(?:cette|cet|ce|l|la|le|mon|ma)\s+)?(?:ecran|{_IMAGENS})\b",
+    r"\b(?:que vois tu|qu est ce que tu vois)\b",
+    rf"\b(?:cette|cet|ce)\s+(?:{_IMAGENS})\b",
+)
+# Só o texto escrito: o OCR basta, sem gastar o modelo de visão.
+_SO_TEXTO = _juntar(
+    r"\b(?:le|leia|ler|transcrev[ae]r?|extra[ia]r?)\s+(?:o\s+)?texto\b",
+    r"\b(?:o que|oq)\s+(?:ta|esta)\s+escrito\b",
+    r"\b(?:read|transcribe|extract)\s+(?:the\s+)?text\b",
+    r"\bwhat does it say\b",
+    r"\b(?:lee|transcribe|extrae)\s+el texto\b",
+    r"\b(?:lis|transcris|extrais)\s+le texte\b",
+)
+
 # --- Onde eu estou ---------------------------------------------------------
 _ONDE = re.compile(
     r"^(?:(?:onde|aonde) (?:eu )?(?:to|estou|esto)|"
@@ -184,10 +229,14 @@ def detectar(texto: str, *, primeira: bool = True) -> Optional[Pedido]:
     sem_cortesia = _CORTESIA.sub("", norma).strip()
     if _ONDE.match(sem_cortesia.rstrip(" ?")):
         return Pedido(ONDE, "")
+    imagem = bool(_VER.search(norma))
+    ver = imagem and not _SO_TEXTO.search(norma)
     if _AREA.search(norma):
-        return Pedido(AREA, _sem(norma, _AREA))
+        return Pedido(AREA, _sem(_sem(norma, _AREA), _VER), ver)
     if _tem_texto_proprio(original):
         return None
+    if imagem:
+        return Pedido(JANELA, _sem(norma, _VER), ver)
     if _JANELA.search(norma):
         return Pedido(JANELA, _sem(norma, _JANELA))
     if primeira and (

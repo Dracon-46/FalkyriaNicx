@@ -106,6 +106,18 @@ def _ocr_janela(hwnd: int, idioma: Optional[str]):
     return ocr.ler_janela(hwnd, idioma)
 
 
+def _ver_area(idioma: Optional[str], lado_max: int):
+    from nicx.visao import ocr
+
+    return ocr.ver_area_transferencia(idioma, lado_max)
+
+
+def _ver_janela(hwnd: int, idioma: Optional[str], lado_max: int):
+    from nicx.visao import ocr
+
+    return ocr.ver_janela(hwnd, idioma, lado_max)
+
+
 def capturar_area(
     max_caracteres: int, idioma: Optional[str] = None, *, ocr: bool = False
 ) -> Preparo:
@@ -201,6 +213,52 @@ def capturar_janela(
     )
 
 
+def capturar_imagem(
+    fonte: str,
+    max_caracteres: int,
+    idioma: Optional[str] = None,
+    *,
+    lado_max: int = 640,
+    achar_janela: Optional[Callable[[], Optional[janela.InfoJanela]]] = None,
+) -> Optional[Preparo]:
+    """A imagem (reduzida) da janela ou da área de transferência, mais o texto
+    lido dela por OCR, para o modelo de visão.
+
+    ``None`` quando não há imagem (janela minimizada, nada copiado): quem chama
+    cai na leitura de texto de sempre.
+    """
+    if sys.platform != "win32":
+        return None
+    cabecalho: dict[str, str] = {}
+    if fonte == pedidos.AREA:
+        visto = _ver_area(idioma, lado_max)
+        nome = "imagem_copiada"
+    else:
+        info = (achar_janela or janela.janela_de_fora)()
+        if info is None:
+            return None
+        app = janela.nome_app(info, frase("explorer", idioma))
+        if janela.sensivel(info):
+            logger.info("Janela sensível: imagem não capturada")
+            return Preparo(
+                pedidos.JANELA, resposta=frase("janela_sensivel", idioma, app=app)
+            )
+        cabecalho["app"] = app
+        partes = janela.partes_titulo(info.titulo)
+        if partes and partes[0] != app:
+            cabecalho["titulo"] = partes[0]
+        visto = _ver_janela(info.hwnd, idioma, lado_max)
+        nome = "tela"
+    if not visto.ok or not visto.imagem:
+        return None
+    lido = ler_limitado(visto.texto, max_caracteres)
+    logger.debug(
+        "Imagem para o modelo: fonte=%s, %d caracteres de OCR", nome, lido.total
+    )
+    captura = Captura(lido.texto, nome, cabecalho, lido.total, imagens=(visto.imagem,))
+    return Preparo(fonte, captura=captura)
+
+
 def onde(idioma: Optional[str] = None) -> str:
     if sys.platform != "win32":
         return frase("sem_suporte", idioma)
@@ -231,6 +289,15 @@ def preparar(
     maximo = max_caracteres(config)
     cfg = config_contexto(config)
     usar_ocr = bool(getattr(cfg, "ocr", True))
+    if pedido.ver and bool(getattr(cfg, "ver_imagens", True)):
+        visto = capturar_imagem(
+            pedido.fonte,
+            maximo,
+            idioma,
+            lado_max=int(getattr(cfg, "lado_imagem", 640) or 640),
+        )
+        if visto is not None:
+            return Preparo(visto.fonte, visto.resposta, visto.captura, pedido.resto)
     if pedido.fonte == pedidos.AREA:
         preparo = capturar_area(maximo, idioma, ocr=usar_ocr)
     else:
@@ -248,6 +315,7 @@ __all__ = [
     "Preparo",
     "ativo",
     "capturar_area",
+    "capturar_imagem",
     "capturar_janela",
     "onde",
     "preparar",
