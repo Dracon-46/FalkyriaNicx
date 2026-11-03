@@ -665,6 +665,7 @@ def historico() -> Outcome:
 
     tipos = [
         "acao",
+        "rotina",
         "nota",
         "lembrete",
         "agenda",
@@ -720,6 +721,13 @@ def play_youtube(action: Action) -> Outcome:
     return Outcome(True, texto("youtube_tocando", q=action.target))
 
 
+def _rotina(action: Action) -> Outcome:
+    """Rotinas do usuário (nicx.rotinas): criar, listar, apagar e rodar."""
+    from nicx.rotinas.servico import responder
+
+    return responder(action, textos.codigo())
+
+
 def run(action: Action) -> Optional[Outcome]:
     """Executa uma rotina; None se a ação não for uma rotina."""
     simple = {
@@ -754,6 +762,7 @@ def run(action: Action) -> Optional[Outcome]:
         "folder": folder,
         "close": close,
         "power": power,
+        "rotina": _rotina,
     }
     if action.kind in with_action:
         return with_action[action.kind](action)

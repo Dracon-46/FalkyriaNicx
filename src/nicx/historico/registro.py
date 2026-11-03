@@ -36,6 +36,7 @@ TIPOS = (
     "organizacao",
     "acao",
     "ferramenta",
+    "rotina",
     "desfazer",
 )
 # Resultados possíveis de uma linha

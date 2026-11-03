@@ -863,6 +863,10 @@ def serve(
     from nicx.resumo import agendador as resumo_agendador
 
     resumo_agendador.ligar()
+    # Rotinas com horário ([rotinas] em ~/.nicx/rotinas.json), no mesmo despertador.
+    from nicx.rotinas import agendador as rotinas_agendador
+
+    rotinas_agendador.ligar()
     _report_server_started(app, config, model_name, speech_backend, started)
     try:
         run_server(app, host=bind_host, port=bind_port, log_level="info")

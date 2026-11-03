@@ -321,6 +321,12 @@ def parse(text: str, idioma: Optional[str] = None) -> Optional[Action]:
     """
     from nicx.acoes import outros_idiomas, rotinas, textos
 
+    # Rotinas do usuário primeiro: o nome que ele escolheu ganha das outras frases.
+    from nicx.rotinas import pedidos as pedidos_rotinas
+
+    action = pedidos_rotinas.parse(text, textos.codigo(idioma))
+    if action is not None:
+        return action
     t, where = clean_with_map(text)
     if not t or len(t) > 200:
         return None

@@ -69,6 +69,8 @@ _RISCO_ACAO = {
     "agenda_cancel": "leve",
     "agenda_export": "leve",
     "undo": "leve",
+    "rotina": "leve",
+    "open_url": "leve",
     "organize_undo": "leve",
     "remind_clear": "moderado",
     "notes_clear": "moderado",

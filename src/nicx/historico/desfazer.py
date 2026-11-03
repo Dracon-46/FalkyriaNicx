@@ -96,7 +96,12 @@ def _agenda() -> tuple[Callable[[], list[dict]], Callable[[list[dict]], None]]:
 
 def _aplicar_colecao(mudanca: dict[str, Any]) -> None:
     colecao = mudanca["colecao"]
-    if colecao == "projetos":
+    if colecao == "rotinas":
+        from nicx.rotinas import armazenamento as rotinas
+
+        with rotinas._LOCK:
+            rotinas._gravar(mudancas.inverter(mudanca, rotinas._ler()), registrar=False)
+    elif colecao == "projetos":
         from nicx.projetos.armazenamento import Projetos
         from nicx.projetos.modelo import Projeto
 

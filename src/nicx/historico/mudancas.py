@@ -25,7 +25,12 @@ _silencio: contextvars.ContextVar[bool] = contextvars.ContextVar(
 )
 
 # coleção -> (tipo no histórico, chave das frases)
-_TIPO = {"lembretes": "lembrete", "agenda": "agenda", "projetos": "projeto"}
+_TIPO = {
+    "lembretes": "lembrete",
+    "agenda": "agenda",
+    "projetos": "projeto",
+    "rotinas": "rotina",
+}
 
 
 @contextmanager

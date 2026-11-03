@@ -162,6 +162,20 @@ def _lock() -> Outcome:
     return Outcome(True, texto("tela_bloqueada"))
 
 
+def _open_url(action: Action) -> Outcome:
+    """Abre um site (http/https) no navegador padrão: passo de rotina."""
+    from urllib.parse import urlparse
+
+    from nicx.rotinas import textos as rtextos
+
+    url = action.target.strip()
+    partes = urlparse(url)
+    if partes.scheme not in {"http", "https"} or not partes.netloc:
+        return Outcome(False, rtextos.texto("site_invalido", site=url))
+    webbrowser.open(url)
+    return Outcome(True, rtextos.texto("abrindo_site", site=partes.netloc))
+
+
 def run(
     action: Action, idioma: Optional[str] = None, *, pelo_modelo: bool = False
 ) -> Outcome:
@@ -202,6 +216,7 @@ _ANOTAM_SOZINHAS = frozenset(
         "organize",
         "organize_undo",
         "undo",
+        "rotina",
         "confirm",
         "deny",
     }
@@ -271,6 +286,8 @@ def _run(action: Action) -> Outcome:
             return _media(action)
         if action.kind == "open":
             return _open(action)
+        if action.kind == "open_url":
+            return _open_url(action)
         if action.kind == "search":
             return _search(action)
         if action.kind == "time":
