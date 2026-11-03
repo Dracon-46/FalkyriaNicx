@@ -132,7 +132,7 @@ def propor(
 
 # ------------------------------------------------------------------ datas
 def distribuir(minutos: list[int], inicio: date, prazo: date) -> list[date]:
-    """Data de cada etapa, proporcional ao tempo, de ``inicio`` até ``prazo`` (em ordem)."""
+    """Data de cada etapa, proporcional ao tempo, de ``inicio`` até ``prazo``."""
     if not minutos:
         return []
     dias = max(1, (prazo - inicio).days)
@@ -174,7 +174,7 @@ def _anotar_lembretes(
     )
 
 
-# ------------------------------------------------------------------ criar, progresso, reajustar
+# ------------------------------------------------------- criar, progresso, reajustar
 def criar_plano(
     objetivo: str,
     prazo: date,
@@ -184,7 +184,7 @@ def criar_plano(
     idioma: str = "",
     hoje: Optional[date] = None,
 ):
-    """Cria o projeto do plano com as etapas datadas e os lembretes. Devolve o ``Projeto``."""
+    """Cria o projeto do plano com etapas datadas e lembretes; devolve o ``Projeto``."""
     from nicx.historico import mudancas
     from nicx.projetos.armazenamento import Projetos
     from nicx.projetos.modelo import Pendencia

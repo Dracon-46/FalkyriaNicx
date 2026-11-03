@@ -2,7 +2,7 @@
 
 - ``POST /v1/planejador/propor`` (``{"objetivo", "prazo": "AAAA-MM-DD", "idioma"}``):
   o modelo local propõe as etapas; nada é salvo.
-- ``POST /v1/planejador`` (``{"objetivo", "prazo", "etapas": [...], "nome", "idioma"}``):
+- ``POST /v1/planejador`` (``{"objetivo", "prazo", "etapas", "nome", "idioma"}``):
   cria o projeto do plano com datas e lembretes.
 - ``GET /v1/planejador/{projeto_id}``: progresso.
 - ``POST /v1/planejador/{projeto_id}/reajustar`` (``{"prazo": "AAAA-MM-DD"}`` opcional).

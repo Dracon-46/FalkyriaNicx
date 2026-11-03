@@ -261,7 +261,7 @@ async def _plan_turn(req: ChatCompletionRequest, request: Request, model: str):
     try:
         return await asyncio.to_thread(_montar)
     except Exception as exc:  # noqa: BLE001 - a frase explica
-        logger.info("Plano não montado: %s", exc)
+        logging.getLogger("nicx.servidor").info("Plano não montado: %s", exc)
         return ptextos.texto("erro", idioma, motivo=str(exc))
 
 
