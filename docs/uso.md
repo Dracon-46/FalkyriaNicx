@@ -377,3 +377,58 @@ o Nicx pular a confirmação.
 API: `GET /v1/historico?busca=&tipos=&desde=&ate=&limite=&antes_de=`,
 `POST /v1/historico/desfazer` (`{"id": 12}` ou vazio para a última),
 `GET /v1/historico/integridade`, `GET/PUT /v1/autonomia`.
+
+## Rotinas e modo foco
+
+Uma rotina junta várias ações rápidas com um nome. Crie na página **Rotinas**
+ou falando:
+
+> "Cria a rotina preparar faculdade: abre o chrome, abre o vs code, volume em
+> 30, timer de 50 minutos, toda segunda às 9h"
+
+Cada trecho entre vírgulas é um comando que o Nicx já entende sozinho; o
+horário é opcional ("todo dia às 7h30", "de segunda a sexta às 8", "fim de
+semana às 10", "every weekday at 8 am"). Para rodar, diga o nome
+("preparar faculdade") ou "roda a rotina preparar faculdade". "Minhas
+rotinas" lista; "apaga a rotina X" apaga (e "desfaz" traz de volta).
+
+Podem entrar: volume, mídia, abrir apps, sites (`https://`) e pastas,
+pesquisar, tocar no YouTube, fechar apps, anotar, lembretes e timers (contados
+a partir da hora em que a rotina roda), bloquear a tela, print, hora, data,
+bateria, estado do PC, agenda e resumo do dia. Desligar o PC, organizar pastas
+e apagar em lote não entram numa rotina.
+
+Com horário, a rotina roda sozinha com o `nicx serve` ligado, uma vez por dia,
+nos dias marcados. Se o servidor só ligar depois, ela ainda roda até 2 horas
+depois da hora; mais tarde que isso, fica para o próximo dia marcado. Ao rodar
+pelo horário aparece uma notificação com o que foi feito.
+
+**Modo foco** (pronto, editável na página Rotinas): "modo foco" ou "ativa o
+modo foco" fecha o WhatsApp, deixa o volume em 25% e marca 50 minutos. O "não
+perturbe" do Windows não é ligado: o Windows não oferece um jeito estável de
+fazer isso por programa.
+
+As rotinas ficam em `~/.nicx/rotinas.json`. API: `GET/POST /v1/rotinas`,
+`PUT/DELETE /v1/rotinas/{id}`, `POST /v1/rotinas/{id}/executar`,
+`POST /v1/rotinas/interpretar`, `GET /v1/rotinas/opcoes`.
+
+## Planejador de objetivos
+
+> "Monta um plano para aprender inglês até dezembro"
+
+O modelo local divide o objetivo em etapas, com o tempo de cada uma e o que
+depende do quê (leva de 30 s a 1 min e meio neste PC). O plano vira um projeto
+com prazo: cada etapa ganha uma data, proporcional ao tempo estimado, e um
+lembrete às 9h desse dia. Concluir a etapa (na página Projetos ou "conclui a
+pendência X do projeto Y") cancela o lembrete. Prazos aceitos: "até dezembro", "até
+15/12", "em 3 meses", "daqui a duas semanas", "até o fim do ano", "by
+December 15", "in 6 weeks", "hasta diciembre", "dans 6 semaines".
+
+Na página **Planejador** dá para revisar as etapas antes de criar, ver o
+progresso de cada plano (feito, atrasado, se está no ritmo) e **reajustar**: as
+etapas abertas são redistribuídas até o prazo (ou um prazo novo) e os
+lembretes trocados. Planos só são montados com modelos locais.
+
+API: `POST /v1/planejador/propor`, `POST /v1/planejador`,
+`GET /v1/planejador/{projeto_id}`, `POST /v1/planejador/{projeto_id}/reajustar`,
+`POST /v1/planejador/prazo`.

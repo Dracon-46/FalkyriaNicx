@@ -10,6 +10,8 @@ import { DataSourcesPage } from './pages/DataSourcesPage';
 import { LogsPage } from './pages/LogsPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { HistoryPage } from './pages/HistoryPage';
+import { RoutinesPage } from './pages/RoutinesPage';
+import { PlannerPage } from './pages/PlannerPage';
 import { CommandPalette } from './components/CommandPalette';
 import { SetupScreen } from './components/SetupScreen';
 import { Toaster } from './components/ui/sonner';
@@ -160,6 +162,8 @@ export default function App() {
           <Route path="logs" element={<LogsPage />} />
           <Route path="projetos" element={<ProjectsPage />} />
           <Route path="historico" element={<HistoryPage />} />
+          <Route path="rotinas" element={<RoutinesPage />} />
+          <Route path="planejador" element={<PlannerPage />} />
           <Route
             path="painel"
             element={

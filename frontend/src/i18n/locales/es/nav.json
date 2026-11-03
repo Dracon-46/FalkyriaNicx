@@ -23,5 +23,7 @@
     "delete": "Borrar conversación",
     "overlay": "Conversación rápida"
   },
-  "history": "Historial"
+  "history": "Historial",
+  "routines": "Rutinas",
+  "planner": "Planificador"
 }

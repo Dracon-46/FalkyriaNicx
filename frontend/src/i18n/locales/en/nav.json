@@ -23,5 +23,7 @@
     "delete": "Delete conversation",
     "overlay": "Overlay chat"
   },
-  "history": "History"
+  "history": "History",
+  "routines": "Routines",
+  "planner": "Planner"
 }

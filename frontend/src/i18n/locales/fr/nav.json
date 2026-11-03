@@ -23,5 +23,7 @@
     "delete": "Supprimer la discussion",
     "overlay": "Discussion rapide"
   },
-  "history": "Historique"
+  "history": "Historique",
+  "routines": "Routines",
+  "planner": "Planificateur"
 }

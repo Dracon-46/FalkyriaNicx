@@ -21,7 +21,8 @@
     "organizacao": "Organization",
     "acao": "Action",
     "ferramenta": "Tool",
-    "desfazer": "Undone"
+    "desfazer": "Undone",
+    "rotina": "Routine"
   },
   "origins": {
     "chat": "Chat",

@@ -21,7 +21,8 @@
     "organizacao": "整理",
     "acao": "操作",
     "ferramenta": "工具",
-    "desfazer": "已撤销"
+    "desfazer": "已撤销",
+    "rotina": "例程"
   },
   "origins": {
     "chat": "聊天",

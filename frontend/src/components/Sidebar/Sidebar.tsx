@@ -20,6 +20,8 @@ import {
   Database,
   FolderKanban,
   History,
+  Repeat,
+  Target,
 } from 'lucide-react';
 import { ConversationList } from './ConversationList';
 import { useAppStore } from '../../lib/store';
@@ -61,6 +63,8 @@ export function Sidebar() {
     { path: '/', icon: MessageSquare, label: t('nav.chat') },
     { path: '/projetos', icon: FolderKanban, label: t('nav.projects') },
     { path: '/historico', icon: History, label: t('nav.history') },
+    { path: '/rotinas', icon: Repeat, label: t('nav.routines') },
+    { path: '/planejador', icon: Target, label: t('nav.planner') },
     { path: '/dashboard', icon: BarChart3, label: t('nav.dashboard') },
     { path: '/painel', icon: ChartSpline, label: t('nav.painel') },
     { path: '/data-sources', icon: Database, label: t('nav.dataSources') },

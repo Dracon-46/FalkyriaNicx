@@ -21,7 +21,8 @@
     "organizacao": "تنظيم",
     "acao": "إجراء",
     "ferramenta": "أداة",
-    "desfazer": "تم التراجع"
+    "desfazer": "تم التراجع",
+    "rotina": "روتين"
   },
   "origins": {
     "chat": "الدردشة",

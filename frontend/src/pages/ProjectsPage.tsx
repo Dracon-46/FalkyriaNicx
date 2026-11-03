@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Archive, ArchiveRestore, FolderKanban, GitBranch, Play, Plus, Trash2, X } from 'lucide-react';
 import { useAppStore } from '../lib/store';
@@ -431,6 +431,9 @@ export function ProjectsPage() {
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState('');
   const [folder, setFolder] = useState('');
+  // Vindo do planejador: abre o projeto do plano.
+  const location = useLocation();
+  const requested = useRef((location.state as { projeto?: string } | null)?.projeto);
 
   const refresh = useCallback(async () => {
     try {
@@ -457,8 +460,10 @@ export function ProjectsPage() {
     let cancelled = false;
     void refresh().then((data) => {
       if (cancelled || !data || data.projetos.length === 0) return;
-      // Abre o da janela em uso ou o mais recente.
-      void select(data.atual ?? data.projetos[0].id);
+      // Abre o pedido, o da janela em uso ou o mais recente.
+      const wanted = requested.current;
+      requested.current = undefined;
+      void select(wanted && data.projetos.some((p) => p.id === wanted) ? wanted : (data.atual ?? data.projetos[0].id));
     });
     return () => {
       cancelled = true;

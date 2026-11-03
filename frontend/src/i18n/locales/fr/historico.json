@@ -21,7 +21,8 @@
     "organizacao": "Rangement",
     "acao": "Action",
     "ferramenta": "Outil",
-    "desfazer": "Annulé"
+    "desfazer": "Annulé",
+    "rotina": "Routine"
   },
   "origins": {
     "chat": "Chat",

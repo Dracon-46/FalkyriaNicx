@@ -21,7 +21,8 @@
     "organizacao": "Organização",
     "acao": "Ação",
     "ferramenta": "Ferramenta",
-    "desfazer": "Desfeito"
+    "desfazer": "Desfeito",
+    "rotina": "Rotina"
   },
   "origins": {
     "chat": "Chat",

@@ -10,6 +10,7 @@ import {
   FolderTree,
   History,
   MessageSquare,
+  Repeat,
   Search,
   ShieldAlert,
   ShieldCheck,
@@ -45,6 +46,7 @@ const TYPE_ICONS: Record<ActivityType, typeof History> = {
   acao: Zap,
   ferramenta: Wrench,
   desfazer: Undo2,
+  rotina: Repeat,
 };
 
 const RESULT_COLORS: Record<string, string> = {

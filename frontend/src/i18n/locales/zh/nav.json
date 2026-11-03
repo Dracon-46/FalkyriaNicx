@@ -23,5 +23,7 @@
     "delete": "删除对话",
     "overlay": "悬浮窗对话"
   },
-  "history": "历史记录"
+  "history": "历史记录",
+  "routines": "例程",
+  "planner": "规划"
 }

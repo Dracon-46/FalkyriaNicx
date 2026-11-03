@@ -161,6 +161,9 @@ class Registro:
         self._con.row_factory = sqlite3.Row
         with self._lock:
             self._con.execute("PRAGMA journal_mode=WAL")
+            # WAL + NORMAL: não corrompe o banco e não espera o disco a cada linha
+            # (o histórico é gravado em toda chamada de ferramenta)
+            self._con.execute("PRAGMA synchronous=NORMAL")
             self._con.executescript(_SCHEMA)
             self._con.commit()
 
