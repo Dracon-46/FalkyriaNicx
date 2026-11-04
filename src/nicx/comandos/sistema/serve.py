@@ -356,6 +356,17 @@ def serve(
         managed_mcp_tools, mcp_clients = load_mcp_tools_from_config(config.tools.mcp)
     except Exception as exc:
         logger.warning("Managed-agent MCP tools failed to load: %s", exc)
+    # Servidores que o usuário adicionou (tela, ``nicx add``, pacotes): entram
+    # mesmo com ``[tools] enabled`` restrito, porque ele escolheu cada um.
+    try:
+        from nicx.extensoes import mcp as extensoes_mcp
+
+        _ext_tools, _ext_clients = extensoes_mcp.carregar()
+        _nomes = {t.spec.name for t in managed_mcp_tools}
+        managed_mcp_tools += [t for t in _ext_tools if t.spec.name not in _nomes]
+        mcp_clients += _ext_clients
+    except Exception as exc:
+        logger.warning("Servidores MCP do usuário não carregaram: %s", exc)
 
     if agent_key:
         try:
@@ -401,6 +412,7 @@ def serve(
                             tool
                             for tool in managed_mcp_tools
                             if tool.spec.name in allowed
+                            or getattr(tool, "_nicx_extensao", None)
                         ]
                     if mcp_tools:
                         existing = {t.spec.name for t in tools}
@@ -463,6 +475,16 @@ def serve(
                 # connections don't close mid-request.
                 if mcp_clients:
                     agent._mcp_clients = mcp_clients
+                # Habilidades do usuário (~/.nicx/skills) como ferramentas skill_*.
+                if getattr(config.skills, "enabled", True) and getattr(
+                    agent_cls, "accepts_tools", False
+                ):
+                    try:
+                        from nicx.extensoes import habilidades
+
+                        habilidades.ligar_no_agente(agent, bus)
+                    except Exception as exc:
+                        logger.warning("Habilidades não carregaram: %s", exc)
         except Exception as exc:
             import traceback
 
@@ -530,6 +552,7 @@ def serve(
                                 tool
                                 for tool in managed_mcp_tools
                                 if tool.spec.name in _allowed
+                                or getattr(tool, "_nicx_extensao", None)
                             ]
                         if _ch_mcp_tools:
                             _existing = {t.spec.name for t in _channel_tools}

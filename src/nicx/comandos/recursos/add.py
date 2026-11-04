@@ -1,69 +1,11 @@
-"""``nicx add`` — quick MCP server setup."""
+"""``nicx add`` — adiciona um servidor MCP conhecido (o mesmo da página Extensões)."""
 
 from __future__ import annotations
 
-import json
 import sys
 
 import click
 from rich.console import Console
-
-from nicx.nucleo.config import DEFAULT_CONFIG_DIR
-
-_MCP_CONFIG_DIR = DEFAULT_CONFIG_DIR / "mcp"
-
-
-# Known MCP server templates
-_MCP_TEMPLATES = {
-    "github": {
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-github"],
-        "env_key": "GITHUB_PERSONAL_ACCESS_TOKEN",
-        "description": "GitHub API (repos, issues, PRs)",
-    },
-    "filesystem": {
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-filesystem"],
-        "env_key": None,
-        "description": "Local filesystem operations",
-    },
-    "slack": {
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-slack"],
-        "env_key": "SLACK_BOT_TOKEN",
-        "description": "Slack workspace integration",
-    },
-    "postgres": {
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-postgres"],
-        "env_key": "POSTGRES_CONNECTION_STRING",
-        "description": "PostgreSQL database",
-    },
-    "brave-search": {
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-brave-search"],
-        "env_key": "BRAVE_API_KEY",
-        "description": "Brave web search",
-    },
-    "memory": {
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-memory"],
-        "env_key": None,
-        "description": "Knowledge graph memory",
-    },
-    "puppeteer": {
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
-        "env_key": None,
-        "description": "Browser automation via Puppeteer",
-    },
-    "google-maps": {
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-google-maps"],
-        "env_key": "GOOGLE_MAPS_API_KEY",
-        "description": "Google Maps API",
-    },
-}
 
 
 @click.command()
@@ -73,67 +15,74 @@ _MCP_TEMPLATES = {
     "--args",
     "extra_args",
     default=None,
-    help="Argumentos extras (separados por vírgula).",
+    help="Argumentos extras (separados por vírgula), ex.: a pasta do filesystem.",
 )
 def add(server_name: str, key: str | None, extra_args: str | None) -> None:
-    """Adiciona a configuração de um servidor MCP.
+    """Adiciona um servidor MCP às extensões do Nicx.
 
     Atalhos para os servidores MCP mais comuns:
 
     \b
       nicx add github --key TOKEN
-      nicx add filesystem
+      nicx add filesystem --args C:/Users/voce/Documentos
       nicx add slack --key TOKEN
 
-    Servidores conhecidos: github, filesystem, slack, postgres, brave-search,
-    memory, puppeteer, google-maps.
+    O servidor entra em ~/.nicx/mcp.json; com o Nicx aberto, ligue-o na página
+    Extensões (ou reinicie o Nicx).
     """
+    from nicx.extensoes import catalogo_mcp
+    from nicx.extensoes import mcp as extensoes_mcp
+
     console = Console(stderr=True)
 
-    template = _MCP_TEMPLATES.get(server_name)
-    if template is None:
+    modelo = catalogo_mcp.modelo(server_name)
+    if modelo is None:
         console.print(f"[red]Servidor MCP desconhecido: {server_name}[/red]")
         console.print("[dim]Servidores conhecidos:[/dim]")
-        for name, tmpl in _MCP_TEMPLATES.items():
-            console.print(f"  [cyan]{name}[/cyan] — {tmpl['description']}")
+        for m in catalogo_mcp.CATALOGO:
+            console.print(f"  [cyan]{m.chave}[/cyan] — {m.descricao}")
         sys.exit(1)
 
-    # Build server config
-    config = {
-        "command": template["command"],
-        "args": list(template["args"]),
-    }
-
-    # Add extra args
+    args = list(modelo.args)
     if extra_args:
-        config["args"].extend(a.strip() for a in extra_args.split(","))
-
-    # Handle API key
+        args.extend(a.strip() for a in extra_args.split(",") if a.strip())
     env = {}
-    env_key = template["env_key"]
-    if env_key:
+    for chave in modelo.env:
         if key:
-            env[env_key] = key
+            env[chave] = key
         else:
             console.print(
-                f"[yellow]Tip: Pass --key to set {env_key},"
-                " or set it as an environment variable.[/yellow]"
+                f"[yellow]Dica: passe --key para definir {chave}"
+                " (ou defina a variável de ambiente).[/yellow]"
             )
-    if env:
-        config["env"] = env
 
-    # Save to MCP config dir
-    _MCP_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    config_file = _MCP_CONFIG_DIR / f"{server_name}.json"
-    config_file.write_text(json.dumps(config, indent=2))
+    servidor = extensoes_mcp.Servidor(
+        nome=modelo.chave,
+        comando=modelo.comando,
+        args=args,
+        env=env,
+        confianca=modelo.confianca,
+        descricao=modelo.descricao,
+    )
+    existente = next(
+        (s for s in extensoes_mcp.listar() if s.nome == modelo.chave), None
+    )
+    try:
+        if existente is not None:
+            extensoes_mcp.atualizar(existente.id, servidor)
+        else:
+            extensoes_mcp.criar(servidor)
+    except extensoes_mcp.ServidorInvalido as exc:
+        console.print(f"[red]{exc}[/red]")
+        sys.exit(1)
 
     console.print(
-        f"[green]Added MCP server: {server_name}[/green]\n"
-        f"  Config: {config_file}\n"
-        f"  Description: {template['description']}"
+        f"[green]Servidor MCP adicionado: {modelo.chave}[/green]\n"
+        f"  Arquivo: {extensoes_mcp.caminho()}\n"
+        f"  {modelo.descricao}"
     )
-    if env_key and not key:
-        console.print(f"  [dim]Set {env_key} env var or re-run with --key[/dim]")
+    if modelo.pede_args and not extra_args:
+        console.print(f"  [dim]Complete com --args ({modelo.pede_args}).[/dim]")
 
 
 __all__ = ["add"]

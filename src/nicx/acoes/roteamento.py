@@ -57,6 +57,10 @@ def needs_tools(text: str) -> bool:
     """
     if _REGEX.search(normalize(text or "")):
         return True
+    from nicx.extensoes.roteamento import mencionada
+
+    if mencionada(text or ""):  # "abre a issue no github": servidor MCP do usuário
+        return True
     from nicx.contexto.pedidos import menciona
 
     return menciona(text or "")
@@ -68,7 +72,11 @@ def needs_other_tools(text: str) -> bool:
     Para pedidos cujo contexto já foi anexado à mensagem: "resume o que eu
     copiei" não precisa de ferramenta nenhuma; "anota o que eu copiei", sim.
     """
-    return bool(_REGEX.search(normalize(text or "")))
+    if _REGEX.search(normalize(text or "")):
+        return True
+    from nicx.extensoes.roteamento import mencionada
+
+    return mencionada(text or "")
 
 
 def conversation_needs_tools(user_messages: Iterable[str]) -> bool:

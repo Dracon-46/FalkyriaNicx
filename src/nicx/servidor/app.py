@@ -23,6 +23,7 @@ from nicx.servidor.rotas.conectores import create_connectors_router
 from nicx.servidor.rotas.contexto import router as contexto_router
 from nicx.servidor.rotas.ditado import router as ditado_router
 from nicx.servidor.rotas.escuta import router as wake_router
+from nicx.servidor.rotas.extensoes import router as extensoes_router
 from nicx.servidor.rotas.historico import router as historico_router
 from nicx.servidor.rotas.painel_economia import dashboard_router
 from nicx.servidor.rotas.pesquisa import router as research_router
@@ -503,6 +504,7 @@ def create_app(
     app.include_router(historico_router)
     app.include_router(rotinas_router)
     app.include_router(assistentes_router)
+    app.include_router(extensoes_router)
     app.include_router(planejador_router)
     include_all_routes(app)
 

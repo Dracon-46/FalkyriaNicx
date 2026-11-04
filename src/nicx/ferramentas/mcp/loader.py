@@ -55,10 +55,15 @@ def load_mcp_tools_from_config(
         return [], []
 
     try:
-        server_list = (
-            json.loads(servers_blob) if isinstance(servers_blob, str) else servers_blob
-        )
-    except (json.JSONDecodeError, TypeError) as exc:
+        if isinstance(servers_blob, str):
+            # Inline JSON or a path to a .json file (resolve_mcp_servers).
+            from nicx.nucleo.config import resolve_mcp_servers
+            from nicx.nucleo.paths import get_config_dir
+
+            server_list = resolve_mcp_servers(servers_blob, get_config_dir())
+        else:
+            server_list = servers_blob
+    except (ValueError, TypeError, OSError) as exc:
         logger.warning("Failed to parse MCP servers config: %s", exc)
         return [], []
     if not isinstance(server_list, list):
@@ -86,11 +91,12 @@ def load_mcp_tools_from_config(
             token = cfg.get("token")
             command = cfg.get("command", "")
             args = cfg.get("args", [])
+            env = cfg.get("env") or None
 
             if url:
                 transport = StreamableHTTPTransport(url=url, token=token)
             elif command:
-                transport = StdioTransport(command=[command] + args)
+                transport = StdioTransport(command=[command] + args, env=env)
             else:
                 logger.warning(
                     "MCP server '%s' has neither 'url' nor 'command' — skipping",

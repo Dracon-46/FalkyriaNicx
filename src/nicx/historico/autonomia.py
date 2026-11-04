@@ -141,6 +141,11 @@ def risco_ferramenta(
         return "alto"
     if nome in _RISCO_FERRAMENTA:
         return _RISCO_FERRAMENTA[nome]
+    from nicx.extensoes.mcp import risco_de
+
+    externo = risco_de(nome)  # servidor MCP: o risco da confiança dele
+    if externo is not None:
+        return externo
     if nome == "http_request":
         metodo = str((parametros or {}).get("method", "GET")).upper()
         return "leitura" if metodo in {"GET", "HEAD", "OPTIONS"} else "moderado"

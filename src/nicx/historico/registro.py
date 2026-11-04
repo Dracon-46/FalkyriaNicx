@@ -38,6 +38,7 @@ TIPOS = (
     "ferramenta",
     "rotina",
     "assistente",
+    "extensao",
     "desfazer",
 )
 # Resultados possíveis de uma linha

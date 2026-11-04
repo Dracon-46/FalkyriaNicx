@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import queue
+import shutil
 import subprocess
+import sys
 import threading
 import time
 from abc import ABC, abstractmethod
@@ -72,11 +75,13 @@ class StdioTransport(MCPTransport):
         self,
         command: List[str],
         *,
+        env: Optional[dict[str, str]] = None,
         response_timeout: float = 600.0,
     ) -> None:
         if response_timeout <= 0:
             raise ValueError("response_timeout must be positive")
         self._command = command
+        self._env = dict(env or {})
         self._response_timeout = response_timeout
         self._process: Optional[subprocess.Popen[str]] = None
         self._stdout_queue: queue.Queue[Any] = queue.Queue(
@@ -94,12 +99,21 @@ class StdioTransport(MCPTransport):
 
     def _start(self) -> None:
         """Start the subprocess."""
+        command = list(self._command)
+        # "npx" no Windows é npx.cmd: o Popen sem shell só acha pelo caminho.
+        if command:
+            command[0] = shutil.which(command[0]) or command[0]
+        env = {**os.environ, **self._env} if self._env else None
         self._process = subprocess.Popen(
-            self._command,
+            command,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
+            encoding="utf-8",
+            errors="replace",
+            env=env,
+            creationflags=0x08000000 if sys.platform == "win32" else 0,  # sem janela
         )
         self._reader_thread = threading.Thread(
             target=self._read_stdout,

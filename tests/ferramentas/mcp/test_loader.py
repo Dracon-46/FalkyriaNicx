@@ -129,7 +129,7 @@ class TestLoaderTokenPlumbing:
         )
         load_mcp_tools_from_config(cfg)
         _mock_mcp_stack["stdio"].assert_called_once_with(
-            command=["mcp-server-foo", "--flag"]
+            command=["mcp-server-foo", "--flag"], env=None
         )
 
 
