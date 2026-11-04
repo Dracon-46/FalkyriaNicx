@@ -22,7 +22,8 @@
     "acao": "Ação",
     "ferramenta": "Ferramenta",
     "desfazer": "Desfeito",
-    "rotina": "Rotina"
+    "rotina": "Rotina",
+    "assistente": "Assistente"
   },
   "origins": {
     "chat": "Chat",

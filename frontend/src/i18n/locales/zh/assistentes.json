@@ -1,0 +1,79 @@
+{
+  "title": "助手",
+  "subtitle": "无需编程，创建有自己名字、指令和工具的助手：学习导师、文字校对、研究员。它们只保存在这台电脑上。",
+  "hint": "在聊天或语音中说：“和助手 学习导师 说话”、“回到 Nicx”、“我有哪些助手？”或“创建一个审阅合同的助手”。",
+  "loading": "正在加载助手...",
+  "loadFailed": "无法加载助手。",
+  "saveFailed": "无法保存助手。",
+  "deleteFailed": "无法删除助手。",
+  "activateFailed": "无法切换助手。",
+  "proposeFailed": "无法创建助手。",
+  "notFound": "该助手已不存在。请刷新页面。",
+  "restartServer": "Nicx 服务器版本过旧。请重启 Nicx 以使用助手。",
+  "noLocalModel": "没有可用的本地模型来创建助手。",
+  "nothingUsable": "模型没有返回可用的助手。请换一种方式描述。",
+  "invalid": "助手无效：{{detail}}",
+  "active": {
+    "talkingTo": "现在由助手「{{name}}」为你服务。",
+    "nicx": "现在是平常的 Nicx 在说话。",
+    "back": "回到 Nicx"
+  },
+  "describe": {
+    "title": "根据描述创建",
+    "placeholder": "例如：一个用选择题帮我准备考试的助手",
+    "button": "让 Nicx 创建",
+    "blank": "从空白开始",
+    "cancel": "取消",
+    "waiting": "本地模型正在创建助手（30 到 90 秒）。保存前你可以检查。"
+  },
+  "mine": {
+    "title": "我的助手",
+    "empty": "你还没有助手。从下方选一个模板，或描述你想要的。",
+    "use": "使用",
+    "inUse": "使用中",
+    "edit": "编辑",
+    "delete": "删除",
+    "confirmDelete": "确认",
+    "noTools": "无工具",
+    "allTools": "全部工具",
+    "tools": "工具：{{count}}",
+    "noMemory": "不使用记忆"
+  },
+  "templates": {
+    "title": "模板",
+    "use": "使用此模板"
+  },
+  "editor": {
+    "newTitle": "新助手",
+    "editTitle": "编辑助手",
+    "name": "名称",
+    "namePlaceholder": "例如：学习导师",
+    "description": "描述",
+    "descriptionPlaceholder": "一句话说明它做什么",
+    "instructions": "指令",
+    "instructionsPlaceholder": "它应该如何行动和回答。例如：一步步讲解，最后提一个问题。",
+    "instructionsHint": "简短直接的指令效果最好。",
+    "instructionsLong": "指令太长会让这台电脑上的每次回答都变慢。",
+    "count": "{{n}}/{{max}}",
+    "greeting": "问候语",
+    "greetingPlaceholder": "你叫它时它说的话",
+    "tools": "工具",
+    "tools_none": "不用（回答更快）",
+    "tools_some": "选择",
+    "tools_all": "Nicx 的全部工具",
+    "toolsHint": "只有勾选的工具会发给模型。快捷操作（音量、你说的提醒）始终可用。",
+    "noToolsAvailable": "Nicx 现在没有启用任何工具。",
+    "memory": "使用 Nicx 的记忆",
+    "memoryHint": "关闭后，它不会读取 Nicx 对你的了解，和它的对话也不会进入记忆。",
+    "save": "保存",
+    "saving": "正在保存...",
+    "cancel": "取消",
+    "saved": "助手「{{name}}」已保存。",
+    "needName": "请给助手起个名字。",
+    "needInstructions": "请写下助手的指令。"
+  },
+  "picker": {
+    "label": "由谁回答",
+    "nicx": "Nicx"
+  }
+}

@@ -266,6 +266,56 @@ async def _plan_turn(req: ChatCompletionRequest, request: Request, model: str):
         return ptextos.texto("erro", idioma, motivo=str(exc))
 
 
+def _assistant_has_tools(assistente: Any, agent: Any) -> bool:
+    """Whether the active assistant may use any of the agent's tools.
+
+    No assistant keeps the usual rule; an assistant without tools answers on
+    the direct path (no ~600-token tool list).
+    """
+    if assistente is None:
+        return True
+    return any(
+        assistente.permite(tool.spec.name)
+        for tool in getattr(agent, "_tools", None) or []
+    )
+
+
+async def _assistant_turn(req: ChatCompletionRequest, request: Request, model: str):
+    """'cria um assistente que revisa contratos' (nicx.assistentes).
+
+    O modelo local propõe nome, instruções e ferramentas; o código valida e
+    salva. Só modelos locais, como o planejador.
+    """
+    if req.tools:
+        return None
+    last = req.messages[-1] if req.messages else None
+    if last is None or last.role != "user" or not isinstance(last.content, str):
+        return None
+    from nicx.assistentes import pedidos, servico
+    from nicx.assistentes import textos as atextos
+
+    descricao = pedidos.criacao(last.content)
+    if descricao is None:
+        return None
+    from nicx.acoes.textos import codigo
+    from nicx.servidor.rotas.nuvem import is_cloud_model
+
+    idioma = codigo(req.language)
+    engine = request.app.state.engine
+    if not model or getattr(engine, "is_cloud", False) or is_cloud_model(model):
+        return atextos.texto("nuvem", idioma)
+    ferramentas = servico.ferramentas_do_agente(
+        getattr(request.app.state, "agent", None)
+    )
+    try:
+        return await asyncio.to_thread(
+            servico.montar, descricao, idioma, engine, model, ferramentas
+        )
+    except Exception as exc:  # noqa: BLE001 - a frase explica
+        logging.getLogger("nicx.servidor").info("Assistente não montado: %s", exc)
+        return atextos.texto("erro", idioma, motivo=str(exc))
+
+
 async def _project_turn(req: ChatCompletionRequest, config: Any, model: str):
     """Project requests: "cria o projeto X", "continue de onde parei"...
 
@@ -415,12 +465,26 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
     model = request_body.model
     config = getattr(request.app.state, "config", None)
     _registrar_pedido(request_body, model)
+    # The assistant the user picked ("Tutor de estudos"): its instructions go
+    # into the system prompt and only its tools reach the model (contextvar,
+    # read by SystemPromptBuilder and ToolExecutor in the worker threads too).
+    from nicx.assistentes import armazenamento as assistentes
+    from nicx.assistentes.sessao import ATUAL, usa_memoria
+
+    assistente = None if request_body.tools else assistentes.ativo()
+    ATUAL.set(assistente)
     use_server_agent = (
         agent is not None
         and not request_body.tools
         and (not request_body.stream or bool(getattr(agent, "_tools", None)))
+        and _assistant_has_tools(assistente, agent)
         and _turn_needs_agent_tools(request_body, agent, config)
     )
+
+    # "Cria um assistente que revisa contratos": the local model drafts it.
+    created = await _assistant_turn(request_body, request, model)
+    if created is not None:
+        return _immediate_response(created, model, stream=request_body.stream)
 
     # Projects first: "anota no projeto X que..." would otherwise become a
     # plain note. "O que falta no projeto X" answers right away; "continue de
@@ -495,6 +559,7 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
         config is not None
         and config.agent.context_from_memory
         and request_body.messages
+        and usa_memoria()
     ):
         try:
             from nicx.memoria.armazenamento.context import ContextConfig, inject_context
@@ -761,10 +826,13 @@ def _record_completed_exchange(
     """Publish or submit a completed exchange without blocking a reply."""
     if not user_text:
         return
+    from nicx.assistentes.sessao import usa_memoria
     from nicx.contexto.montagem import tem_contexto
 
     if tem_contexto(user_text):
         return  # the clipboard/window text stays out of the automatic memory
+    if not usa_memoria():
+        return  # assistant set to stay out of the memory ("Revisor de textos")
     try:
         if bus is not None:
             from nicx.memoria import publish_completed_exchange

@@ -187,6 +187,48 @@ não. Por segurança:
   isso passa pelo nível de autonomia: no nível assistido ele pede "confirmo";
 - o histórico guarda em qual botão ou campo ele mexeu, nunca o que foi digitado.
 
+## Assistentes: "fala com o Tutor de estudos"
+
+Um assistente é o Nicx com um nome, instruções e as ferramentas que você
+escolher: um tutor de estudos, um revisor de textos, um pesquisador. Monte na
+página **Assistentes** (sem programar) de três jeitos:
+
+- a partir de um modelo pronto (Tutor de estudos, Revisor de textos, Parceiro de
+  código, Organizador do dia, Gerador de ideias, Pesquisador), ajustando o que quiser;
+- descrevendo o que quer ("um assistente que me ajuda a estudar para o ENEM"):
+  o modelo local monta um rascunho em 30 a 90 s e você revisa antes de salvar;
+- do zero.
+
+No chat ou por voz:
+
+| Pedido | O que faz |
+|---|---|
+| "fala com o assistente Tutor de estudos", "usa o assistente revisor" | Passa a responder como ele (diz a saudação dele) |
+| "fala com o Tutor de estudos" | O mesmo, sem a palavra "assistente", se o nome existir |
+| "volta pro Nicx", "sai do assistente" | Volta para o Nicx de sempre |
+| "quais assistentes eu tenho?", "qual assistente está ativo?" | Lista ou diz qual está em uso |
+| "cria um assistente que revisa contratos de aluguel" | O modelo local monta e salva um novo |
+
+Também em inglês ("talk to the study tutor assistant", "back to Nicx"),
+espanhol ("habla con el asistente revisor") e francês ("parle à l'assistant
+tuteur"). No topo do chat, o seletor mostra quem está respondendo e troca na hora.
+
+O assistente ativo vale para o chat, a voz e a janela flutuante até você voltar
+para o Nicx. As instruções dele entram no fim do prompt, sem tirar as regras do
+Nicx (segurança, autonomia, confirmações). Cada assistente define:
+
+- **ferramentas**: nenhuma (responde mais rápido, sem a lista de ~600 tokens),
+  algumas ou todas. Ferramenta que ele não tem nem aparece para o modelo e, se
+  for pedida, é recusada. Ações rápidas ditas por você (volume, lembretes, "clica
+  em Salvar") funcionam sempre;
+- **memória**: desligada, ele não lê o que o Nicx sabe de você e as conversas com
+  ele não vão para a memória (bom para revisar textos e contratos).
+
+Instruções longas deixam cada resposta mais lenta neste PC: cada token é relido
+em todo pedido. Criar, mudar e apagar assistentes vai para o Histórico, com
+desfazer. Tudo fica em `~/.nicx/assistentes.json`; o ativo, em
+`~/.nicx/assistente_ativo.txt`.
+
 ## Projetos e continuar de onde parei
 
 O Nicx guarda os seus projetos: objetivo, estado (onde você parou, em uma

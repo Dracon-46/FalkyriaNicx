@@ -230,6 +230,10 @@ class BaseAgent(ABC):
                 effective_system_prompt = cfg.agent.default_system_prompt or None
             except Exception:
                 effective_system_prompt = None
+            if effective_system_prompt:
+                from nicx.assistentes.sessao import com_assistente
+
+                effective_system_prompt = com_assistente(effective_system_prompt)
         # Fold ALL in-context system messages (both auto-captured memory
         # context and caller-supplied system messages) into one leading system
         # message. Do this even when there is no independently-built prompt:

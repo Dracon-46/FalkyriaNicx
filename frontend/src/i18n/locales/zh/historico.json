@@ -22,7 +22,8 @@
     "acao": "操作",
     "ferramenta": "工具",
     "desfazer": "已撤销",
-    "rotina": "例程"
+    "rotina": "例程",
+    "assistente": "助手"
   },
   "origins": {
     "chat": "聊天",

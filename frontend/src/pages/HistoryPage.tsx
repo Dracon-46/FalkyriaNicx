@@ -11,6 +11,7 @@ import {
   History,
   MessageSquare,
   Repeat,
+  Sparkles,
   Search,
   ShieldAlert,
   ShieldCheck,
@@ -47,6 +48,7 @@ const TYPE_ICONS: Record<ActivityType, typeof History> = {
   ferramenta: Wrench,
   desfazer: Undo2,
   rotina: Repeat,
+  assistente: Sparkles,
 };
 
 const RESULT_COLORS: Record<string, string> = {

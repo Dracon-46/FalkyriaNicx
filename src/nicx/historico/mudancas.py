@@ -30,6 +30,7 @@ _TIPO = {
     "agenda": "agenda",
     "projetos": "projeto",
     "rotinas": "rotina",
+    "assistentes": "assistente",
 }
 
 

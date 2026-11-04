@@ -306,6 +306,10 @@ def _run(action: Action) -> Outcome:
             from nicx.controle.servico import executar
 
             return executar(action)
+        if action.kind == "assistente":
+            from nicx.assistentes.servico import executar as assistente
+
+            return assistente(action)
         from nicx.acoes import executores
 
         outcome = executores.run(action)

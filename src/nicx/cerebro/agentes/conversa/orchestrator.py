@@ -157,11 +157,12 @@ class OrchestratorAgent(ToolUsingAgent):
         if self._system_prompt:
             sys_prompt = self._system_prompt
         else:
+            from nicx.assistentes.sessao import filtrar
             from nicx.cerebro.prompt.orquestrador import (
                 build_system_prompt,
             )
 
-            sys_prompt = build_system_prompt(tools=self._tools)
+            sys_prompt = build_system_prompt(tools=filtrar(self._tools))
 
         messages = self._build_messages(input, context, system_prompt=sys_prompt)
 

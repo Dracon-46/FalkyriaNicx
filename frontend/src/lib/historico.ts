@@ -18,6 +18,7 @@ export const ACTIVITY_TYPES = [
   'ferramenta',
   'desfazer',
   'rotina',
+  'assistente',
 ] as const;
 
 export type ActivityType = (typeof ACTIVITY_TYPES)[number];

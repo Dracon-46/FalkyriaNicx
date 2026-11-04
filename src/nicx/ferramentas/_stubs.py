@@ -262,6 +262,22 @@ class ToolExecutor:
                 content=f"Unknown tool: {tool_call.name}",
                 success=False,
             )
+        # O assistente do chat (nicx.assistentes) só usa as ferramentas que tem.
+        from nicx.assistentes import sessao as _assistente
+
+        if not _assistente.permite(tool_call.name):
+            from nicx.assistentes.textos import texto as _frase
+
+            atual = _assistente.ATUAL.get()
+            return ToolResult(
+                tool_name=tool_call.name,
+                content=_frase(
+                    "sem_ferramenta",
+                    nome=atual.nome if atual else "",
+                    ferramenta=tool_call.name,
+                ),
+                success=False,
+            )
 
         # Parse arguments
         try:
@@ -624,12 +640,16 @@ class ToolExecutor:
         return safe
 
     def available_tools(self) -> List[ToolSpec]:
-        """Return specs for all available tools."""
-        return [t.spec for t in self._tools.values()]
+        """Return specs for all available tools (the chat assistant's, if any)."""
+        from nicx.assistentes.sessao import filtrar
+
+        return [t.spec for t in filtrar(self._tools.values())]
 
     def get_openai_tools(self) -> List[Dict[str, Any]]:
         """Return tools in OpenAI function-calling format."""
-        return [t.to_openai_function() for t in self._tools.values()]
+        from nicx.assistentes.sessao import filtrar
+
+        return [t.to_openai_function() for t in filtrar(self._tools.values())]
 
 
 def build_tool_descriptions(

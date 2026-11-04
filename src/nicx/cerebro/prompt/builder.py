@@ -71,7 +71,10 @@ class SystemPromptBuilder:
             parts.append(f"\n\n## Session Context\n\n{self._session_context}")
         if self._previous_state:
             parts.append(f"\n\n## Previous State\n\n{self._previous_state}")
-        return "".join(parts)
+        # O assistente que o usuário escolheu no chat (nicx.assistentes), no fim.
+        from nicx.assistentes.sessao import com_assistente
+
+        return com_assistente("".join(parts))
 
     def sections(self) -> list[PromptSection]:
         """Return prompt sections with lightweight cache/debug metadata."""

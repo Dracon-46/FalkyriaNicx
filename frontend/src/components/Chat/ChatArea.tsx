@@ -2,6 +2,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { MessageBubble } from './MessageBubble';
 import { InputArea } from './InputArea';
+import { AssistantPicker } from './AssistantPicker';
 import { StreamingDots } from './StreamingDots';
 import { useAppStore } from '../../lib/store';
 import { shouldAutoplayFinishedReply, useTtsStore } from '../../lib/tts';
@@ -134,12 +135,22 @@ export function ChatArea() {
 
   const isEmpty = messages.length === 0 && !isCurrentChatStreaming;
 
+  // The assistant may change by voice or text ("fala com o assistente X"):
+  // the picker reloads whenever a reply finishes.
+  const [pickerKey, setPickerKey] = useState(0);
+  const pickerStreaming = useRef(false);
+  useEffect(() => {
+    if (pickerStreaming.current && !streamState.isStreaming) setPickerKey((k) => k + 1);
+    pickerStreaming.current = streamState.isStreaming;
+  }, [streamState.isStreaming]);
+
   const PanelIcon = systemPanelOpen ? PanelRightClose : PanelRightOpen;
 
   return (
     <div className="flex flex-col h-full">
       {/* Toggle bar */}
-      <div className="flex items-center justify-end px-3 py-1.5 shrink-0">
+      <div className="flex items-center justify-between gap-2 px-3 py-1.5 shrink-0">
+        <AssistantPicker refreshKey={pickerKey} />
         <button
           onClick={toggleSystemPanel}
           className="p-1.5 rounded-md transition-colors cursor-pointer"

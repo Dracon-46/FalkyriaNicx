@@ -1,0 +1,79 @@
+{
+  "title": "Assistants",
+  "subtitle": "Créez des assistants avec leur propre nom, leurs instructions et leurs outils, sans programmer : un tuteur, un correcteur, un chercheur. Ils restent sur ce PC.",
+  "hint": "Dans le chat ou à la voix : « parle à l'assistant Tuteur », « reviens à Nicx », « liste mes assistants » ou « crée un assistant qui relit les contrats ».",
+  "loading": "Chargement des assistants...",
+  "loadFailed": "Je n'ai pas pu charger les assistants.",
+  "saveFailed": "Je n'ai pas pu enregistrer l'assistant.",
+  "deleteFailed": "Je n'ai pas pu supprimer l'assistant.",
+  "activateFailed": "Je n'ai pas pu changer d'assistant.",
+  "proposeFailed": "Je n'ai pas pu créer l'assistant.",
+  "notFound": "Cet assistant n'existe plus. Actualisez la page.",
+  "restartServer": "Le serveur de Nicx n'est pas à jour. Redémarrez Nicx pour utiliser les assistants.",
+  "noLocalModel": "Aucun modèle local disponible pour créer l'assistant.",
+  "nothingUsable": "Le modèle n'a pas renvoyé d'assistant utilisable. Essayez de le décrire autrement.",
+  "invalid": "Assistant invalide : {{detail}}",
+  "active": {
+    "talkingTo": "Vous parlez maintenant à l'assistant « {{name}} ».",
+    "nicx": "Vous parlez au Nicx habituel.",
+    "back": "Revenir à Nicx"
+  },
+  "describe": {
+    "title": "Créer à partir d'une description",
+    "placeholder": "Ex. : un assistant qui m'aide à réviser mes examens avec des QCM",
+    "button": "Créer avec Nicx",
+    "blank": "Partir de zéro",
+    "cancel": "Annuler",
+    "waiting": "Le modèle local crée l'assistant (30 à 90 s). Vous le relisez avant d'enregistrer."
+  },
+  "mine": {
+    "title": "Mes assistants",
+    "empty": "Vous n'avez pas encore d'assistant. Choisissez un modèle ci-dessous ou décrivez ce que vous voulez.",
+    "use": "Utiliser",
+    "inUse": "Actif",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "confirmDelete": "Confirmer",
+    "noTools": "Sans outils",
+    "allTools": "Tous les outils",
+    "tools": "Outils : {{count}}",
+    "noMemory": "Sans mémoire"
+  },
+  "templates": {
+    "title": "Modèles",
+    "use": "Utiliser ce modèle"
+  },
+  "editor": {
+    "newTitle": "Nouvel assistant",
+    "editTitle": "Modifier l'assistant",
+    "name": "Nom",
+    "namePlaceholder": "Ex. : Tuteur d'études",
+    "description": "Description",
+    "descriptionPlaceholder": "Une phrase sur ce qu'il fait",
+    "instructions": "Instructions",
+    "instructionsPlaceholder": "Comment il doit agir et répondre. Ex. : Explique pas à pas et pose une question à la fin.",
+    "instructionsHint": "Des instructions courtes et directes marchent mieux.",
+    "instructionsLong": "Des instructions longues ralentissent chaque réponse sur ce PC.",
+    "count": "{{n}}/{{max}}",
+    "greeting": "Salutation",
+    "greetingPlaceholder": "Ce qu'il dit quand vous l'appelez",
+    "tools": "Outils",
+    "tools_none": "Aucun (répond plus vite)",
+    "tools_some": "Choisir",
+    "tools_all": "Tous ceux de Nicx",
+    "toolsHint": "Seuls les outils cochés arrivent au modèle. Les actions rapides (volume, rappels dits par vous) marchent toujours.",
+    "noToolsAvailable": "Aucun outil n'est activé dans Nicx pour l'instant.",
+    "memory": "Utiliser la mémoire de Nicx",
+    "memoryHint": "Désactivé, il ne lit pas ce que Nicx sait de vous et ses conversations ne vont pas dans la mémoire.",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "cancel": "Annuler",
+    "saved": "Assistant « {{name}} » enregistré.",
+    "needName": "Donnez un nom à l'assistant.",
+    "needInstructions": "Écrivez les instructions de l'assistant."
+  },
+  "picker": {
+    "label": "Qui répond",
+    "nicx": "Nicx"
+  }
+}

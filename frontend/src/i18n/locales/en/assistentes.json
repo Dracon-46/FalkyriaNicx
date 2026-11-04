@@ -1,0 +1,79 @@
+{
+  "title": "Assistants",
+  "subtitle": "Build assistants with their own name, instructions and tools, no coding: a study tutor, a text reviewer, a researcher. They stay on this PC only.",
+  "hint": "In the chat or by voice: \"talk to the study tutor assistant\", \"back to Nicx\", \"list my assistants\" or \"create an assistant that reviews contracts\".",
+  "loading": "Loading assistants...",
+  "loadFailed": "I couldn't load the assistants.",
+  "saveFailed": "I couldn't save the assistant.",
+  "deleteFailed": "I couldn't delete the assistant.",
+  "activateFailed": "I couldn't switch assistants.",
+  "proposeFailed": "I couldn't build the assistant.",
+  "notFound": "This assistant no longer exists. Refresh the page.",
+  "restartServer": "The Nicx server is out of date. Restart Nicx to use assistants.",
+  "noLocalModel": "No local model available to build the assistant.",
+  "nothingUsable": "The model didn't return a usable assistant. Try describing it another way.",
+  "invalid": "Invalid assistant: {{detail}}",
+  "active": {
+    "talkingTo": "You are now talking to the \"{{name}}\" assistant.",
+    "nicx": "You are talking to the usual Nicx.",
+    "back": "Back to Nicx"
+  },
+  "describe": {
+    "title": "Build from a description",
+    "placeholder": "E.g.: an assistant that helps me study for exams with multiple-choice questions",
+    "button": "Build with Nicx",
+    "blank": "Start from scratch",
+    "cancel": "Cancel",
+    "waiting": "The local model is building the assistant (30 to 90 s). You review it before saving."
+  },
+  "mine": {
+    "title": "My assistants",
+    "empty": "You have no assistants yet. Pick a template below or describe what you want.",
+    "use": "Use",
+    "inUse": "In use",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Confirm",
+    "noTools": "No tools",
+    "allTools": "All tools",
+    "tools": "Tools: {{count}}",
+    "noMemory": "Memory off"
+  },
+  "templates": {
+    "title": "Templates",
+    "use": "Use this template"
+  },
+  "editor": {
+    "newTitle": "New assistant",
+    "editTitle": "Edit assistant",
+    "name": "Name",
+    "namePlaceholder": "E.g.: Study tutor",
+    "description": "Description",
+    "descriptionPlaceholder": "One sentence about what it does",
+    "instructions": "Instructions",
+    "instructionsPlaceholder": "How it should act and answer. E.g.: Explain step by step and ask a question at the end.",
+    "instructionsHint": "Short, direct instructions work best.",
+    "instructionsLong": "Long instructions make every reply slower on this PC.",
+    "count": "{{n}}/{{max}}",
+    "greeting": "Greeting",
+    "greetingPlaceholder": "What it says when you call it",
+    "tools": "Tools",
+    "tools_none": "None (answers faster)",
+    "tools_some": "Choose",
+    "tools_all": "All of Nicx's",
+    "toolsHint": "Only the checked tools reach the model. Quick actions (volume, reminders you say) always work.",
+    "noToolsAvailable": "No tools are enabled in Nicx right now.",
+    "memory": "Use Nicx's memory",
+    "memoryHint": "When off, it doesn't read what Nicx knows about you and its conversations don't go into memory.",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "saved": "Assistant \"{{name}}\" saved.",
+    "needName": "Give the assistant a name.",
+    "needInstructions": "Write the assistant's instructions."
+  },
+  "picker": {
+    "label": "Who answers",
+    "nicx": "Nicx"
+  }
+}

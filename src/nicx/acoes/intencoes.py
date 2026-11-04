@@ -24,7 +24,8 @@ class Action:
     # remind, remind_list, remind_clear, remind_cancel, note_add, notes_list,
     # notes_clear, status, folder, screenshot, close, power, confirm, deny;
     # ui (nicx.controle: op listar/clicar/menu/aba/marcar/desmarcar/digitar,
-    # target = nome do controle, site = o que digitar)
+    # target = nome do controle, site = o que digitar);
+    # assistente (nicx.assistentes: op usar/sair/listar/qual, target = nome)
     kind: str
     op: str = ""  # volume: up/down/set/mute; media: toggle/next/prev; power
     value: Optional[int] = None  # volume: passos (up/down) ou nível 0-100 (set)
@@ -332,13 +333,16 @@ def parse(text: str, idioma: Optional[str] = None) -> Optional[Action]:
     t, where = clean_with_map(text)
     if not t or len(t) > 200:
         return None
+    from nicx.assistentes import pedidos as pedidos_assistentes
     from nicx.controle import pedidos as pedidos_controle
     from nicx.resumo import pedidos as pedidos_resumo
 
-    # "Resumo do dia", "como foi meu dia?" (pt, en, es, fr); "clica em Salvar".
+    # "Resumo do dia", "como foi meu dia?" (pt, en, es, fr); "clica em Salvar";
+    # "fala com o assistente de estudos".
     action = (
         pedidos_resumo.parse(t)
         or pedidos_controle.parse(text, t, where)
+        or pedidos_assistentes.parse(text, t, where)
         or rotinas.parse(text, t, where)
     )
     if action is None and len(t) <= 80:

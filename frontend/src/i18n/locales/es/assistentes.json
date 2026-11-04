@@ -1,0 +1,79 @@
+{
+  "title": "Asistentes",
+  "subtitle": "Arma asistentes con nombre, instrucciones y herramientas propias, sin programar: un tutor de estudio, un revisor de textos, un investigador. Se quedan solo en este PC.",
+  "hint": "En el chat o por voz: \"habla con el asistente Tutor de estudio\", \"vuelve a Nicx\", \"¿cuáles asistentes tengo?\" o \"crea un asistente que revise contratos\".",
+  "loading": "Cargando los asistentes...",
+  "loadFailed": "No pude cargar los asistentes.",
+  "saveFailed": "No pude guardar el asistente.",
+  "deleteFailed": "No pude eliminar el asistente.",
+  "activateFailed": "No pude cambiar de asistente.",
+  "proposeFailed": "No pude armar el asistente.",
+  "notFound": "Ese asistente ya no existe. Actualiza la página.",
+  "restartServer": "El servidor de Nicx está desactualizado. Reinicia Nicx para usar los asistentes.",
+  "noLocalModel": "No hay un modelo local disponible para armar el asistente.",
+  "nothingUsable": "El modelo no devolvió un asistente utilizable. Intenta describirlo de otra forma.",
+  "invalid": "Asistente no válido: {{detail}}",
+  "active": {
+    "talkingTo": "Ahora habla el asistente \"{{name}}\".",
+    "nicx": "Ahora habla el Nicx de siempre.",
+    "back": "Volver a Nicx"
+  },
+  "describe": {
+    "title": "Armar a partir de una descripción",
+    "placeholder": "Ej.: un asistente que me ayude a estudiar para exámenes con preguntas de opción múltiple",
+    "button": "Armar con Nicx",
+    "blank": "Empezar de cero",
+    "cancel": "Cancelar",
+    "waiting": "El modelo local está armando el asistente (30 a 90 s). Lo revisas antes de guardar."
+  },
+  "mine": {
+    "title": "Mis asistentes",
+    "empty": "Todavía no tienes asistentes. Elige una plantilla abajo o describe lo que quieres.",
+    "use": "Usar",
+    "inUse": "En uso",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "confirmDelete": "Confirmar",
+    "noTools": "Sin herramientas",
+    "allTools": "Todas las herramientas",
+    "tools": "Herramientas: {{count}}",
+    "noMemory": "Sin memoria"
+  },
+  "templates": {
+    "title": "Plantillas",
+    "use": "Usar esta plantilla"
+  },
+  "editor": {
+    "newTitle": "Nuevo asistente",
+    "editTitle": "Editar asistente",
+    "name": "Nombre",
+    "namePlaceholder": "Ej.: Tutor de estudio",
+    "description": "Descripción",
+    "descriptionPlaceholder": "Una frase sobre lo que hace",
+    "instructions": "Instrucciones",
+    "instructionsPlaceholder": "Cómo debe actuar y responder. Ej.: Explica paso a paso y haz una pregunta al final.",
+    "instructionsHint": "Las instrucciones cortas y directas funcionan mejor.",
+    "instructionsLong": "Las instrucciones largas hacen cada respuesta más lenta en este PC.",
+    "count": "{{n}}/{{max}}",
+    "greeting": "Saludo",
+    "greetingPlaceholder": "Lo que dice cuando lo llamas",
+    "tools": "Herramientas",
+    "tools_none": "Ninguna (responde más rápido)",
+    "tools_some": "Elegir",
+    "tools_all": "Todas las de Nicx",
+    "toolsHint": "Solo las herramientas marcadas llegan al modelo. Las acciones rápidas (volumen, recordatorios que dices) funcionan siempre.",
+    "noToolsAvailable": "No hay herramientas activas en Nicx ahora.",
+    "memory": "Usar la memoria de Nicx",
+    "memoryHint": "Desactivado, no lee lo que Nicx sabe de ti y sus conversaciones no van a la memoria.",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "cancel": "Cancelar",
+    "saved": "Asistente \"{{name}}\" guardado.",
+    "needName": "Ponle un nombre al asistente.",
+    "needInstructions": "Escribe las instrucciones del asistente."
+  },
+  "picker": {
+    "label": "Quién responde",
+    "nicx": "Nicx"
+  }
+}
