@@ -161,7 +161,7 @@ site_url = "https://dracon-46.github.io/nicx-painel/"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://dracon-46.github.io/nicx-painel/", "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8000", "tauri://localhost", "http://tauri.localhost"]
+additional_redirect_urls = ["https://dracon-46.github.io/nicx-painel/", "https://dracon-46.github.io/nicx/conta/", "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8000", "tauri://localhost", "http://tauri.localhost"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to auth.external_url.
@@ -174,8 +174,9 @@ enable_refresh_token_rotation = true
 # Requires enable_refresh_token_rotation = true.
 refresh_token_reuse_interval = 10
 # Allow/disallow new user signups to your project.
-# Painel só para administradores: ninguém cria conta (as contas são criadas à mão).
-enable_signup = false
+# Conta Falkyria (opcional) pelo app: qualquer pessoa cria conta. O Painel
+# continua só para quem está em nicx_admins, com e-mail confirmado e 2FA.
+enable_signup = true
 # Allow/disallow anonymous sign-ins to your project.
 enable_anonymous_sign_ins = false
 # Allow/disallow testing manual linking of accounts
@@ -184,7 +185,7 @@ enable_manual_linking = false
 minimum_password_length = 10
 # Passwords that do not meet the following requirements will be rejected as weak. Supported values
 # are: `letters_digits`, `lower_upper_letters_digits`, `lower_upper_letters_digits_symbols`
-password_requirements = ""
+password_requirements = "letters_digits"
 
 # Configure passkey sign-ins.
 # [auth.passkey]
@@ -245,6 +246,18 @@ otp_expiry = 3600
 # pass = "env(SENDGRID_API_KEY)"
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
+
+# Conta Falkyria: modelos em português com código (supabase/templates/). O plano
+# gratuito só aceita trocar os modelos com um serviço de e-mail próprio (SMTP);
+# até lá valem os do Supabase, com link, que abre https://dracon-46.github.io/nicx/conta/.
+# Com o SMTP configurado, descomente e rode `supabase config push`.
+# [auth.email.template.confirmation]
+# subject = "Seu código da Conta Falkyria"
+# content_path = "./supabase/templates/confirmacao.html"
+#
+# [auth.email.template.recovery]
+# subject = "Código para nova senha da Conta Falkyria"
+# content_path = "./supabase/templates/recuperacao.html"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]

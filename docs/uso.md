@@ -285,6 +285,32 @@ Uma mensagem que cita o nome de um servidor, de uma ferramenta dele ou de uma
 habilidade manda a lista de ferramentas ao modelo (`[agent] tools_on_demand`).
 Adicionar, mudar e remover extensões vai para o Histórico.
 
+## Conta Falkyria (opcional)
+
+O Nicx funciona inteiro sem conta. Com uma (Configurações → Conta Falkyria),
+você guarda um **backup criptografado** dos seus assistentes, rotinas,
+habilidades, servidores MCP (sem chaves nem senhas) e da lista de pacotes, e
+restaura em outro PC. Conversas, memória, notas e arquivos não vão.
+
+- **Criar:** nome (opcional), e-mail e senha (10 caracteres ou mais, com letras e
+  números), aceitando os Termos de Uso e a Política de Privacidade. Chega um
+  e-mail de confirmação: abra o link (ou digite o código, se vier um) e toque em
+  "Já confirmei, entrar".
+- **Esqueci a senha:** chega um link que abre a página do site para criar a
+  senha nova.
+- **Backup:** escolha uma senha de backup (8 caracteres ou mais; não é a da
+  conta). O backup é cifrado no PC (scrypt + AES-256-GCM) antes de sair, e a
+  Falkyria não consegue abrir. **Senha do backup esquecida = backup perdido.**
+  Ficam os 5 mais novos. Restaurar põe de volta o que não existe neste PC e não
+  mexe no que já existe; servidores MCP voltam desligados, esperando as chaves.
+- **Seus dados (LGPD):** "Baixar meus dados" gera um JSON com tudo o que a
+  Falkyria guarda da conta; "Apagar minha conta" (pede a senha) apaga login,
+  perfil e backups na hora.
+- A sessão fica em `~/.nicx/conta.bin`, protegida pelo Windows (DPAPI); a senha
+  nunca é guardada. A conta não tem ligação com as estatísticas anônimas.
+- Quando os Termos ou a Política mudam, a conta pede o aceite da versão nova
+  antes de continuar.
+
 ## Projetos e continuar de onde parei
 
 O Nicx guarda os seus projetos: objetivo, estado (onde você parou, em uma

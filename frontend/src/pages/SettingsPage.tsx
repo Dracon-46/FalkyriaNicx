@@ -25,6 +25,7 @@ import { FalkyriaLogo, FALKYRIA_URL } from '../components/brand/FalkyriaLogo';
 import { PrivacySection } from '../components/Privacy/PrivacySection';
 import { CalendarSettings } from '../components/Settings/CalendarSettings';
 import { ContextSettings } from '../components/Settings/ContextSettings';
+import { AccountSettings } from '../components/Settings/AccountSettings';
 import { DailySummarySettings } from '../components/Settings/DailySummarySettings';
 import { AutonomySettings } from '../components/Settings/AutonomySettings';
 import {
@@ -1262,6 +1263,11 @@ export function SettingsPage() {
                 <Trash2 size={12} /> {confirmClear ? t('settings.data.confirm') : t('settings.data.clear')}
               </button>
             </SettingRow>
+          </Section>
+
+          {/* Conta Falkyria (opcional) */}
+          <Section title={t('conta.title')}>
+            <AccountSettings />
           </Section>
 
           {/* Privacidade */}

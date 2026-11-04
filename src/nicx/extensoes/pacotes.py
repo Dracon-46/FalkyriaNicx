@@ -206,9 +206,16 @@ def _nome_livre(nome: str, usados: set[str], limite: int) -> str:
 
 
 def instalar(
-    pacote: dict[str, Any], *, com_mcp: bool = False, loja: bool = False
+    pacote: dict[str, Any],
+    *,
+    com_mcp: bool = False,
+    loja: bool = False,
+    pular_existentes: bool = False,
 ) -> dict[str, Any]:
     """Instala o que passar na validação; devolve o que entrou e o que ficou de fora.
+
+    Com ``pular_existentes`` (restaurar backup), o que já tem o mesmo nome fica
+    como está em vez de entrar com " 2" no nome, e nada é marcado como do pacote.
 
     Reinstalar o mesmo pacote tira a versão anterior antes (atualização).
     """
@@ -231,6 +238,9 @@ def instalar(
         for dados in pacote["assistentes"]:
             try:
                 a = Assistente.de_dict({**dados, "id": "", "modelo": ""})
+                if pular_existentes and normalizar(a.nome) in usados:
+                    pulados.append(f"assistente {a.nome}: já existe")
+                    continue
                 a.nome = _nome_livre(a.nome, usados, MAX_NOME_ASSISTENTE)
                 itens["assistentes"].append(assistentes.criar(a).id)
             except ValueError as exc:
@@ -240,6 +250,9 @@ def instalar(
         for dados in pacote["rotinas"]:
             try:
                 r = Rotina.de_dict({k: v for k, v in dados.items() if k != "id"})
+                if pular_existentes and normalizar(r.nome) in usados:
+                    pulados.append(f"rotina {r.nome}: já existe")
+                    continue
                 r.nome = _nome_livre(r.nome, usados, MAX_NOME_ROTINA)
                 itens["rotinas"].append(rotinas.criar(r).id)
             except ValueError as exc:
@@ -257,7 +270,7 @@ def instalar(
                     str(dados.get("descricao", "")),
                     str(dados.get("instrucoes", "")),
                     nome,
-                    pacote=pacote["id"],
+                    pacote="" if pular_existentes else pacote["id"],
                 )
                 itens["habilidades"].append(h.nome)
             except ValueError as exc:
@@ -265,7 +278,12 @@ def instalar(
 
         for dados in pacote["mcp"] if com_mcp else []:
             try:
-                s = mcp.Servidor.de_dict({**dados, "id": "", "pacote": pacote["id"]})
+                marca = "" if pular_existentes else pacote["id"]
+                s = mcp.Servidor.de_dict({**dados, "id": "", "pacote": marca})
+                nomes_mcp = {x.nome.lower() for x in mcp.listar()}
+                if pular_existentes and s.nome.lower() in nomes_mcp:
+                    pulados.append(f"servidor {s.nome}: já existe")
+                    continue
                 # segredo em branco: entra desligado até o usuário preencher
                 falta_token = s.tipo == "http" and "token" in dados and not s.token
                 s.ativo = all(s.env.values()) and not falta_token
@@ -291,6 +309,12 @@ def instalar(
         _gravar([p for p in instalados() if p.get("id") != pacote["id"]] + [registro])
     _anotar(f"Pacote instalado: {pacote['nome']}")
     return {"instalado": registro, "pulados": pulados}
+
+
+def esquecer(pacote_id: str) -> None:
+    """Tira o pacote do registro sem apagar o que ele pôs (ficam do usuário)."""
+    with _LOCK:
+        _gravar([p for p in instalados() if p.get("id") != pacote_id])
 
 
 def desinstalar(pacote_id: str, *, anotar: bool = True) -> bool:

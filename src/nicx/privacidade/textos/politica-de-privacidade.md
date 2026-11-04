@@ -14,8 +14,11 @@ programa de linha de comando, o app desktop e a interface no navegador.
   aceitar, o Nicx envia dados anônimos de uso (quais recursos você usa, tempos,
   erros e avisos técnicos, saúde do programa), nunca o conteúdo do que você
   escreve.
-- **Você manda.** Pode recusar, mudar de ideia ou apagar o que já foi enviado a
-  qualquer momento.
+- **Conta Falkyria é opcional.** Se você criar uma, guardamos o seu e-mail, o
+  nome (se informar), quando você aceitou estes termos e os seus backups, que
+  vão **cifrados** do seu computador: a Falkyria não consegue lê-los.
+- **Você manda.** Pode recusar, mudar de ideia, baixar ou apagar o que já foi
+  enviado a qualquer momento.
 
 ## 1. Quem é responsável pelos dados
 
@@ -78,23 +81,54 @@ O provedor de infraestrutura pode registrar o endereço IP de cada envio em
 registros técnicos de acesso, por tempo limitado e para fins de segurança. A
 Falkyria não guarda o IP na base de estatísticas.
 
-## 4. Para que usamos
+## 4. Conta Falkyria (opcional)
+
+O Nicx funciona inteiro sem conta. Se você criar uma, tratamos:
+
+| Dado | Para quê |
+|---|---|
+| E-mail e senha | entrar na conta; mandar o código de confirmação e o de nova senha. A senha é guardada pelo serviço de login só como código irreversível (hash) e nunca fica no Nicx |
+| Nome (opcional) | mostrar na conta |
+| Aceite | qual versão dos Termos de Uso e desta política você aceitou, e quando |
+| Backups | guardar e devolver, quando você pedir, seus assistentes, rotinas, habilidades, servidores MCP (sem chaves nem senhas) e a lista de pacotes |
+| Registros de acesso | data do cadastro e do último login; o serviço de login registra o endereço IP e o navegador por segurança, por tempo limitado |
+
+**Os backups são cifrados no seu computador** (AES-256, com uma chave tirada da
+senha do backup) antes de sair dele. A senha do backup não é enviada nem
+guardada: a Falkyria não consegue abrir os backups, e se você a esquecer não há
+como recuperá-los. Ficam guardados os 5 backups mais novos de cada conta. No
+computador, a sessão fica protegida pelo Windows.
+
+Conversas, memória, notas e arquivos **não** vão para a conta. A conta não tem
+ligação com o identificador anônimo das estatísticas: uma coisa não leva à
+outra.
+
+**Base legal:** a execução do contrato que você aceita ao criar a conta (LGPD,
+art. 7º, V). **Por quanto tempo:** enquanto a conta existir. Ao apagá-la, o
+login, o perfil e todos os backups são excluídos na hora.
+
+**No próprio Nicx** (Configurações → Conta Falkyria): ver os seus dados,
+corrigir o nome, **baixar tudo** o que a Falkyria guarda da conta (arquivo
+JSON) e **apagar a conta**.
+
+## 5. Para que usamos as estatísticas
 
 Somente para melhorar o Nicx: entender se a instalação funciona, quais recursos
 são usados, onde ocorrem erros e como está o desempenho. Não usamos esses dados
 para publicidade, não traçamos perfis de pessoas e **não vendemos nem
 compartilhamos** os dados com terceiros.
 
-## 5. Base legal
+## 6. Base legal
 
-O envio de estatísticas se baseia no seu **consentimento** (LGPD, art. 7º, I).
+O envio de estatísticas se baseia no seu **consentimento** (LGPD, art. 7º, I);
+a Conta Falkyria, na execução do contrato (seção 4).
 Ele é opcional: recusar não muda nenhuma função do Nicx. Você pode revogá-lo a
 qualquer momento, e a revogação vale a partir daquele momento.
 
-## 6. Onde os dados ficam e por quanto tempo
+## 7. Onde os dados ficam e por quanto tempo
 
-As estatísticas são armazenadas no **Supabase**, em servidores localizados em
-**São Paulo, Brasil**. O Supabase atua como operador, tratando os dados apenas
+As estatísticas, a Conta Falkyria e a Loja ficam no **Supabase**, em servidores
+localizados em **São Paulo, Brasil**. O Supabase atua como operador, tratando os dados apenas
 conforme as instruções da Falkyria.
 
 Os eventos são **apagados automaticamente após 24 meses**; os avisos e erros
@@ -103,10 +137,10 @@ técnicos, **após 90 dias**.
 O acesso é restrito a administradores da Falkyria, que entram com senha **e**
 um código de verificação de um aplicativo autenticador; cada acesso fica
 registrado. A comunicação é criptografada (HTTPS) e as regras do banco de dados
-só permitem que o Nicx **adicione** dados: nenhuma instalação consegue ler os
-dados de outra.
+só permitem que o Nicx **adicione** estatísticas: nenhuma instalação consegue
+ler os dados de outra, e cada conta só vê o que é dela.
 
-## 7. Seus direitos
+## 8. Seus direitos
 
 Pela LGPD (art. 18), você pode pedir confirmação de tratamento, acesso,
 correção, anonimização, portabilidade, eliminação dos dados, informação sobre
@@ -119,16 +153,19 @@ No próprio Nicx:
 - **Apagar o que já foi enviado**: Configurações → Privacidade → "Apagar meus
   dados". Isso exclui dos servidores da Falkyria todos os eventos desta
   instalação e cria um novo identificador.
+- **Conta Falkyria**: Configurações → Conta Falkyria → "Baixar meus dados" ou
+  "Apagar minha conta".
 
 Para os demais pedidos, ou se tiver dúvidas, escreva para o contato da seção 1.
 Você também pode reclamar à Autoridade Nacional de Proteção de Dados (ANPD).
 
-## 8. Crianças e adolescentes
+## 9. Crianças e adolescentes
 
 O Nicx não se destina a menores de 18 anos sem a supervisão de um responsável.
 
-## 9. Mudanças nesta política
+## 10. Mudanças nesta política
 
 Quando esta política mudar de forma relevante, a versão no topo será
 atualizada e o Nicx pedirá o seu consentimento de novo antes de enviar
-qualquer estatística.
+qualquer estatística; quem tem Conta Falkyria aceita a versão nova antes de
+continuar a usá-la.

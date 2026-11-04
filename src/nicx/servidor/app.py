@@ -20,6 +20,7 @@ from nicx.servidor.rotas.briefing import create_digest_router
 from nicx.servidor.rotas.chat import router
 from nicx.servidor.rotas.comparacao import comparison_router
 from nicx.servidor.rotas.conectores import create_connectors_router
+from nicx.servidor.rotas.conta import router as conta_router
 from nicx.servidor.rotas.contexto import router as contexto_router
 from nicx.servidor.rotas.ditado import router as ditado_router
 from nicx.servidor.rotas.escuta import router as wake_router
@@ -505,6 +506,7 @@ def create_app(
     app.include_router(rotinas_router)
     app.include_router(assistentes_router)
     app.include_router(extensoes_router)
+    app.include_router(conta_router)
     app.include_router(planejador_router)
     include_all_routes(app)
 
