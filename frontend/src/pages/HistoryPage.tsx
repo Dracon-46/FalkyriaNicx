@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Repeat,
   Sparkles,
+  Puzzle,
   Search,
   ShieldAlert,
   ShieldCheck,
@@ -49,6 +50,7 @@ const TYPE_ICONS: Record<ActivityType, typeof History> = {
   desfazer: Undo2,
   rotina: Repeat,
   assistente: Sparkles,
+  extensao: Puzzle,
 };
 
 const RESULT_COLORS: Record<string, string> = {

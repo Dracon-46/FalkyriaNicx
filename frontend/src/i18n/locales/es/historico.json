@@ -23,7 +23,8 @@
     "ferramenta": "Herramienta",
     "desfazer": "Deshecho",
     "rotina": "Rutina",
-    "assistente": "Asistente"
+    "assistente": "Asistente",
+    "extensao": "Extensión"
   },
   "origins": {
     "chat": "Chat",

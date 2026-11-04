@@ -229,6 +229,45 @@ em todo pedido. Criar, mudar e apagar assistentes vai para o Histórico, com
 desfazer. Tudo fica em `~/.nicx/assistentes.json`; o ativo, em
 `~/.nicx/assistente_ativo.txt`.
 
+## Extensões: pacotes, servidores MCP e habilidades
+
+A página **Extensões** acrescenta capacidades ao Nicx. Tudo fica no PC.
+
+**Pacotes** juntam assistentes, rotinas, habilidades e servidores MCP. Os prontos
+(Professor, Estudante, Programador, Criador de conteúdo, Escritório) instalam com
+um clique; remover o pacote tira tudo o que ele pôs (o que já era seu fica).
+Também dá para importar um pacote recebido (`.nicx.json`): antes de instalar, a
+tela mostra o que ele faz (programas que roda, endereços, chaves que pede,
+ferramentas dos assistentes, rotinas com horário). Servidores MCP de um pacote só
+entram se você marcar, e entram desligados enquanto faltar chave. **Exportar**
+monta um pacote com os seus itens; chaves, tokens e senhas nunca vão no arquivo.
+
+**Servidores MCP** dão ao Nicx ferramentas de outros programas: arquivos de uma
+pasta, GitHub, Slack, PostgreSQL, busca do Brave... O catálogo adiciona os mais
+comuns (precisam do Node.js, por causa do `npx`); "Adicionar outro" aceita
+qualquer servidor stdio (programa no PC) ou HTTP. **Testar** liga, lista as
+ferramentas e desliga; ao salvar, as ferramentas entram no chat sem reiniciar.
+No terminal: `nicx add github --key TOKEN`, `nicx add filesystem --args C:/pasta`.
+
+- token e variáveis de ambiente ficam em `~/.nicx/mcp.json` e nunca voltam pela
+  tela (aparecem como `••••••`);
+- cada servidor tem uma **confiança**: "pedir confirmação no modo assistido"
+  (padrão), "livre" (só leitura, nunca pergunta) ou "sempre pedir confirmação";
+- um servidor stdio roda um programa com as suas permissões: adicione só o que
+  você conhece.
+
+**Habilidades** são instruções que o Nicx segue quando o pedido combina ("como
+fazer uma ata", "como revisar código"), no formato `SKILL.md` em `~/.nicx/skills`.
+Crie na tela (título, quando usar, instruções), ligue e desligue sem apagar, ou
+importe de um `.zip` ou de um repositório do GitHub. A pasta `scripts/` nunca é
+copiada, e habilidade que pede permissão perigosa (rodar comandos, escrever
+arquivos, abrir porta) só entra se você confirmar. No chat, cada habilidade ativa
+vira a ferramenta `skill_<nome>`.
+
+Uma mensagem que cita o nome de um servidor, de uma ferramenta dele ou de uma
+habilidade manda a lista de ferramentas ao modelo (`[agent] tools_on_demand`).
+Adicionar, mudar e remover extensões vai para o Histórico.
+
 ## Projetos e continuar de onde parei
 
 O Nicx guarda os seus projetos: objetivo, estado (onde você parou, em uma

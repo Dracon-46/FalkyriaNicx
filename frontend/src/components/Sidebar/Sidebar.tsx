@@ -22,6 +22,7 @@ import {
   History,
   Repeat,
   Sparkles,
+  Puzzle,
   Target,
 } from 'lucide-react';
 import { ConversationList } from './ConversationList';
@@ -67,6 +68,7 @@ export function Sidebar() {
     { path: '/rotinas', icon: Repeat, label: t('nav.routines') },
     { path: '/planejador', icon: Target, label: t('nav.planner') },
     { path: '/assistentes', icon: Sparkles, label: t('nav.assistants') },
+    { path: '/extensoes', icon: Puzzle, label: t('nav.extensions') },
     { path: '/dashboard', icon: BarChart3, label: t('nav.dashboard') },
     { path: '/painel', icon: ChartSpline, label: t('nav.painel') },
     { path: '/data-sources', icon: Database, label: t('nav.dataSources') },

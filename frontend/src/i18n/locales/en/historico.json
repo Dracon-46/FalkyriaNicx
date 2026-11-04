@@ -23,7 +23,8 @@
     "ferramenta": "Tool",
     "desfazer": "Undone",
     "rotina": "Routine",
-    "assistente": "Assistant"
+    "assistente": "Assistant",
+    "extensao": "Extension"
   },
   "origins": {
     "chat": "Chat",

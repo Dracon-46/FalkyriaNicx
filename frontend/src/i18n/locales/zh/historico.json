@@ -23,7 +23,8 @@
     "ferramenta": "工具",
     "desfazer": "已撤销",
     "rotina": "例程",
-    "assistente": "助手"
+    "assistente": "助手",
+    "extensao": "扩展"
   },
   "origins": {
     "chat": "聊天",

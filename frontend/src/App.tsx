@@ -13,6 +13,7 @@ import { HistoryPage } from './pages/HistoryPage';
 import { RoutinesPage } from './pages/RoutinesPage';
 import { PlannerPage } from './pages/PlannerPage';
 import { AssistantsPage } from './pages/AssistantsPage';
+import { ExtensionsPage } from './pages/ExtensionsPage';
 import { CommandPalette } from './components/CommandPalette';
 import { SetupScreen } from './components/SetupScreen';
 import { Toaster } from './components/ui/sonner';
@@ -166,6 +167,7 @@ export default function App() {
           <Route path="rotinas" element={<RoutinesPage />} />
           <Route path="planejador" element={<PlannerPage />} />
           <Route path="assistentes" element={<AssistantsPage />} />
+          <Route path="extensoes" element={<ExtensionsPage />} />
           <Route
             path="painel"
             element={
