@@ -264,6 +264,23 @@ copiada, e habilidade que pede permissão perigosa (rodar comandos, escrever
 arquivos, abrir porta) só entra se você confirmar. No chat, cada habilidade ativa
 vira a ferramenta `skill_<nome>`.
 
+**Loja da Falkyria** (primeira aba): pacotes revisados e assinados pela Falkyria,
+com busca, categorias, número de downloads e aviso de atualização. Antes de
+mostrar ou instalar, o Nicx confere a impressão digital (sha256) e a assinatura
+Ed25519 do pacote com a chave da Falkyria que vem no app; pacote mexido ou de
+outra chave é recusado. Navegar e baixar não envia nada seu (o contador só soma).
+
+Para a Falkyria publicar:
+
+1. monte o pacote (pela tela, em Exportar, ou à mão) com `id` e `versao`;
+2. `nicx loja assinar pacote.nicx.json` gera `<id>-<versao>.assinado.json` com a
+   chave de `~/.falkyria-loja/` (que nunca sai do PC; guarde uma cópia segura);
+3. no Painel Falkyria, seção Loja, envie o arquivo: o Painel confere a assinatura,
+   mostra o conteúdo e publica. Ali também dá para esconder ou remover.
+
+Versão nova: suba a `versao` no pacote, assine de novo e envie. `nicx loja
+verificar arquivo` confere um arquivo assinado.
+
 Uma mensagem que cita o nome de um servidor, de uma ferramenta dele ou de uma
 habilidade manda a lista de ferramentas ao modelo (`[agent] tools_on_demand`).
 Adicionar, mudar e remover extensões vai para o Histórico.

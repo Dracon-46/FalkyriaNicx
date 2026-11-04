@@ -22,6 +22,7 @@
   "off": "Désactivé",
   "fromPack": "pack {{id}}",
   "tabs": {
+    "store": "Boutique",
     "packs": "Packs",
     "mcp": "Serveurs MCP",
     "skills": "Compétences"
@@ -164,6 +165,29 @@
       "importadas": "importée",
       "github": "GitHub",
       "pasta": "dossier"
+    }
+  },
+  "store": {
+    "intro": "Packs vérifiés et signés par Falkyria. Nicx vérifie la signature avant d'installer ; naviguer n'envoie rien sur vous.",
+    "search": "Rechercher dans la boutique",
+    "refresh": "Actualiser",
+    "all": "Tous",
+    "loading": "Ouverture de la boutique...",
+    "empty": "Aucun pack publié pour l'instant.",
+    "meta": "{{author}} · v{{version}} · {{downloads}} téléchargements",
+    "update": "Mise à jour",
+    "details": "Voir",
+    "verified": "Signature de Falkyria vérifiée.",
+    "unreachable": "La boutique n'a pas répondu : {{detail}}",
+    "categories": {
+      "educacao": "Éducation",
+      "programacao": "Programmation",
+      "escritorio": "Bureau",
+      "criacao": "Création",
+      "saude": "Santé",
+      "juridico": "Juridique",
+      "negocios": "Affaires",
+      "geral": "Général"
     }
   }
 }

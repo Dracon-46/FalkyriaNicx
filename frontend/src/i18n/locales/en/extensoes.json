@@ -22,6 +22,7 @@
   "off": "Off",
   "fromPack": "pack {{id}}",
   "tabs": {
+    "store": "Store",
     "packs": "Packs",
     "mcp": "MCP servers",
     "skills": "Skills"
@@ -164,6 +165,29 @@
       "importadas": "imported",
       "github": "GitHub",
       "pasta": "folder"
+    }
+  },
+  "store": {
+    "intro": "Packs reviewed and signed by Falkyria. Nicx checks the signature before installing; browsing sends nothing about you.",
+    "search": "Search the store",
+    "refresh": "Refresh",
+    "all": "All",
+    "loading": "Opening the store...",
+    "empty": "No packs published yet.",
+    "meta": "{{author}} · v{{version}} · {{downloads}} downloads",
+    "update": "Update",
+    "details": "View",
+    "verified": "Falkyria signature checked.",
+    "unreachable": "The store didn't respond: {{detail}}",
+    "categories": {
+      "educacao": "Education",
+      "programacao": "Programming",
+      "escritorio": "Office",
+      "criacao": "Creation",
+      "saude": "Health",
+      "juridico": "Legal",
+      "negocios": "Business",
+      "geral": "General"
     }
   }
 }

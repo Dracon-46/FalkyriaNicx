@@ -28,6 +28,12 @@ Pacotes:
 - ``POST /v1/extensoes/pacotes/instalar`` (``{"pronto": "professor"}`` ou
   ``{"conteudo": "<json>", "com_mcp": false}``); ``DELETE /v1/extensoes/pacotes/{id}``.
 - ``POST /v1/extensoes/pacotes/exportar``: monta um pacote com os itens escolhidos.
+
+Loja da Falkyria (Supabase; o app só lê e confere a assinatura):
+
+- ``GET /v1/extensoes/loja``: o catálogo publicado, com o instalado e atualizações.
+- ``GET /v1/extensoes/loja/{id}``: a prévia do pacote, já conferido.
+- ``POST /v1/extensoes/loja/{id}/instalar`` (``{"com_mcp": false}``).
 """
 
 from __future__ import annotations
@@ -388,6 +394,49 @@ async def desinstalar_pacote(request: Request, pacote_id: str):
         raise HTTPException(status_code=404, detail="pacote não instalado")
     await asyncio.to_thread(_religar, request.app.state)
     return {"ok": True}
+
+
+# --------------------------------------------------------------------- loja
+class InstalacaoLoja(BaseModel):
+    com_mcp: bool = False
+
+
+def _erro_loja(exc: Exception) -> HTTPException:
+    return HTTPException(status_code=502, detail=str(exc))
+
+
+@router.get("/loja")
+async def catalogo_loja():
+    from nicx.extensoes import loja
+
+    try:
+        return {"pacotes": await asyncio.to_thread(loja.catalogo)}
+    except loja.LojaErro as exc:
+        raise _erro_loja(exc) from exc
+
+
+@router.get("/loja/{pacote_id}")
+async def previa_loja(pacote_id: str):
+    from nicx.extensoes import loja
+
+    try:
+        return await asyncio.to_thread(loja.previa, pacote_id)
+    except loja.LojaErro as exc:
+        raise _erro_loja(exc) from exc
+
+
+@router.post("/loja/{pacote_id}/instalar")
+async def instalar_da_loja(request: Request, pacote_id: str, pedido: InstalacaoLoja):
+    from nicx.extensoes import loja
+
+    try:
+        resultado = await asyncio.to_thread(
+            lambda: loja.instalar(pacote_id, com_mcp=pedido.com_mcp)
+        )
+    except loja.LojaErro as exc:
+        raise _erro_loja(exc) from exc
+    await asyncio.to_thread(_religar, request.app.state)
+    return resultado
 
 
 __all__ = ["router"]

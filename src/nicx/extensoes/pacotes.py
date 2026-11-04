@@ -66,6 +66,7 @@ def ler(texto: str | bytes) -> dict[str, Any]:
     dados["descricao"] = " ".join(str(dados.get("descricao", "")).split())[:300]
     dados["versao"] = str(dados.get("versao", ""))[:20]
     dados["autor"] = " ".join(str(dados.get("autor", "")).split())[:60]
+    dados.pop("pronto", None)  # só os prontos do próprio Nicx se dizem prontos
     return dados
 
 
@@ -204,7 +205,9 @@ def _nome_livre(nome: str, usados: set[str], limite: int) -> str:
     return atual
 
 
-def instalar(pacote: dict[str, Any], *, com_mcp: bool = False) -> dict[str, Any]:
+def instalar(
+    pacote: dict[str, Any], *, com_mcp: bool = False, loja: bool = False
+) -> dict[str, Any]:
     """Instala o que passar na validação; devolve o que entrou e o que ficou de fora.
 
     Reinstalar o mesmo pacote tira a versão anterior antes (atualização).
@@ -281,6 +284,7 @@ def instalar(pacote: dict[str, Any], *, com_mcp: bool = False) -> dict[str, Any]
             "versao": pacote.get("versao", ""),
             "autor": pacote.get("autor", ""),
             "pronto": bool(pacote.get("pronto")),
+            "loja": loja,
             "instalado_em": datetime.now().isoformat(timespec="seconds"),
             "itens": itens,
         }

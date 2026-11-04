@@ -117,6 +117,7 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     from nicx.comandos.recursos.channels import channels
     from nicx.comandos.recursos.connect import connect
     from nicx.comandos.recursos.feedback import feedback_group
+    from nicx.comandos.recursos.loja import loja
     from nicx.comandos.recursos.memory import memory
     from nicx.comandos.recursos.model import model
     from nicx.comandos.recursos.registry import registry
@@ -151,6 +152,7 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     cli.add_command(status, "status")
     cli.add_command(vault, "vault")
     cli.add_command(add, "add")
+    cli.add_command(loja, "loja")
     cli.add_command(operators, "operators")
     cli.add_command(host, "host")
     cli.add_command(quickstart, "quickstart")

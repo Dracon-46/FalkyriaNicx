@@ -285,6 +285,41 @@ export async function exportarPacote(pedido: PackExport): Promise<Record<string,
   return json(await send(`${base}/pacotes/exportar`, 'POST', pedido), 'extensoes.exportFailed');
 }
 
+// -------------------------------------------------------------------- loja
+export interface StorePack {
+  id: string;
+  nome: string;
+  descricao: string;
+  autor: string;
+  categoria: string;
+  versao: string;
+  downloads: number;
+  atualizado_em: string;
+  versao_instalada: string;
+  atualizacao: boolean;
+}
+
+async function storeJson<T>(res: Response, failure: string): Promise<T> {
+  if (res.status === 502) {
+    const why = await detail(res);
+    throw new Error(why ? i18n.t('extensoes.store.unreachable', { detail: why }) : i18n.t(failure));
+  }
+  return json(res, failure);
+}
+
+export async function listarLoja(): Promise<StorePack[]> {
+  return (await storeJson<{ pacotes: StorePack[] }>(await apiFetch(`${base}/loja`), 'extensoes.loadFailed')).pacotes;
+}
+
+/** Baixa e confere a assinatura antes de mostrar. */
+export async function previaLoja(id: string): Promise<PackPreview> {
+  return storeJson(await apiFetch(`${base}/loja/${enc(id)}`), 'extensoes.previewFailed');
+}
+
+export async function instalarDaLoja(id: string, comMcp: boolean): Promise<{ instalado: InstalledPack; pulados: string[] }> {
+  return storeJson(await send(`${base}/loja/${enc(id)}/instalar`, 'POST', { com_mcp: comMcp }), 'extensoes.installFailed');
+}
+
 /** Baixa o pacote como `<id>.nicx.json`. */
 export function baixarPacote(pacote: Record<string, unknown>): void {
   const blob = new Blob([JSON.stringify(pacote, null, 2)], { type: 'application/json' });

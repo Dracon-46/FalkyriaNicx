@@ -24,6 +24,9 @@ const api = vi.hoisted(() => ({
   importarHabilidadesZip: vi.fn(),
   instalarHabilidadesGithub: vi.fn(),
   recarregarHabilidades: vi.fn(),
+  listarLoja: vi.fn(),
+  previaLoja: vi.fn(),
+  instalarDaLoja: vi.fn(),
 }));
 
 vi.mock('../lib/extensoes', async (importOriginal) => ({
@@ -69,6 +72,7 @@ beforeEach(() => {
   api.listarHabilidades.mockResolvedValue({ habilidades: [], pasta: 'C:/skills' });
   api.recarregarMcp.mockResolvedValue(undefined);
   api.recarregarHabilidades.mockResolvedValue(undefined);
+  api.listarLoja.mockResolvedValue([]);
 });
 afterEach(cleanup);
 
@@ -76,6 +80,7 @@ describe('ExtensionsPage: pacotes', () => {
   it('instala um pacote pronto', async () => {
     api.instalarPacote.mockResolvedValue({ instalado: { id: 'professor' }, pulados: [] });
     render(<ExtensionsPage />);
+    fireEvent.click(screen.getByTestId('ext-tab-packs'));
     fireEvent.click(await screen.findByTestId('pack-install-professor'));
     await waitFor(() => expect(api.instalarPacote).toHaveBeenCalledWith(expect.objectContaining({ pronto: 'professor' })));
     expect(await screen.findByText('Pacote "Professor" instalado.')).toBeTruthy();
@@ -92,6 +97,7 @@ describe('ExtensionsPage: pacotes', () => {
     api.previaPacote.mockResolvedValue(importado);
     api.instalarPacote.mockResolvedValue({ instalado: { id: 'meu' }, pulados: [] });
     render(<ExtensionsPage />);
+    fireEvent.click(screen.getByTestId('ext-tab-packs'));
     const file = new File(['{"formato":1}'], 'meu.nicx.json', { type: 'application/json' });
     fireEvent.change(await screen.findByTestId('pack-file'), { target: { files: [file] } });
     const perms = await screen.findByTestId('pack-perms-meu');
@@ -158,5 +164,43 @@ describe('ExtensionsPage: habilidades', () => {
     fireEvent.click(await screen.findByTestId('skill-confirm-dangerous'));
     await waitFor(() => expect(api.importarHabilidadesZip).toHaveBeenLastCalledWith(file, true));
     expect(await screen.findByText('Importadas: limpa.')).toBeTruthy();
+  });
+});
+
+describe('ExtensionsPage: loja', () => {
+  const item = {
+    id: 'saude',
+    nome: 'Saúde',
+    descricao: 'Para clínicas.',
+    autor: 'Falkyria',
+    categoria: 'saude',
+    versao: '1.1.0',
+    downloads: 12,
+    atualizado_em: '',
+    versao_instalada: '1.0.0',
+    atualizacao: true,
+  };
+
+  it('mostra atualização, confere e instala com MCP marcado', async () => {
+    api.listarLoja.mockResolvedValue([item, { ...item, id: 'outro', nome: 'Outro', categoria: 'educacao', atualizacao: false, versao_instalada: '' }]);
+    api.previaLoja.mockResolvedValue(preview({ id: 'saude', nome: 'Saúde', pronto: false, itens: { assistentes: ['Recepção'], rotinas: [], habilidades: [], mcp: ['agenda'] } }));
+    api.instalarDaLoja.mockResolvedValue({ instalado: { id: 'saude' }, pulados: [] });
+    render(<ExtensionsPage />);
+    expect((await screen.findByTestId('store-saude')).textContent).toContain('Atualização');
+    fireEvent.click(screen.getByTestId('store-category-educacao'));
+    expect(screen.queryByTestId('store-saude')).toBeNull();
+    fireEvent.click(screen.getByTestId('store-category-all'));
+    fireEvent.click(screen.getByTestId('store-open-saude'));
+    expect((await screen.findByTestId('store-preview')).textContent).toContain('Assinatura da Falkyria conferida.');
+    fireEvent.click(screen.getByTestId('store-with-mcp'));
+    fireEvent.click(screen.getByTestId('store-install'));
+    await waitFor(() => expect(api.instalarDaLoja).toHaveBeenCalledWith('saude', true));
+    expect(await screen.findByText('Pacote "Saúde" instalado.')).toBeTruthy();
+  });
+
+  it('avisa quando a loja não responde', async () => {
+    api.listarLoja.mockRejectedValue(new Error('A loja não respondeu: sem conexão com a loja'));
+    render(<ExtensionsPage />);
+    expect(await screen.findByText('A loja não respondeu: sem conexão com a loja')).toBeTruthy();
   });
 });

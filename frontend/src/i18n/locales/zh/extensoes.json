@@ -22,6 +22,7 @@
   "off": "已关闭",
   "fromPack": "套件 {{id}}",
   "tabs": {
+    "store": "商店",
     "packs": "套件",
     "mcp": "MCP 服务器",
     "skills": "技能"
@@ -164,6 +165,29 @@
       "importadas": "导入",
       "github": "GitHub",
       "pasta": "文件夹"
+    }
+  },
+  "store": {
+    "intro": "由 Falkyria 审核并签名的套件。Nicx 在安装前会核对签名；浏览不会发送任何关于你的信息。",
+    "search": "搜索商店",
+    "refresh": "刷新",
+    "all": "全部",
+    "loading": "正在打开商店……",
+    "empty": "还没有发布的套件。",
+    "meta": "{{author}} · v{{version}} · {{downloads}} 次下载",
+    "update": "可更新",
+    "details": "查看",
+    "verified": "已核对 Falkyria 签名。",
+    "unreachable": "商店没有响应：{{detail}}",
+    "categories": {
+      "educacao": "教育",
+      "programacao": "编程",
+      "escritorio": "办公",
+      "criacao": "创作",
+      "saude": "健康",
+      "juridico": "法律",
+      "negocios": "商业",
+      "geral": "通用"
     }
   }
 }

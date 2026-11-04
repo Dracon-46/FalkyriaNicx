@@ -1,6 +1,6 @@
 # Política de Privacidade do Nicx
 
-**Versão 2026-10-28**
+**Versão 2026-11-04**
 
 Esta política explica quais dados o **Nicx**, a inteligência artificial da
 **Falkyria**, trata, por quê, e como você controla isso. Ela vale para o
@@ -42,6 +42,14 @@ Algumas ferramentas, quando você as usa, acessam a internet por conta própria:
 por exemplo, a busca na web consulta um mecanismo de busca e os conectores
 (e-mail, agenda etc.) falam com os serviços que você autorizar. Esses acessos
 seguem as políticas desses serviços e não passam pela Falkyria.
+
+A **Loja da Falkyria** (página Extensões) busca o catálogo e os pacotes nos
+servidores da Falkyria quando você abre a página ou instala um pacote dela.
+Esse pedido não leva nada sobre você nem sobre o que você faz no Nicx; o
+contador de downloads de cada pacote só soma um, sem saber quem baixou. Como
+em qualquer acesso à internet, o provedor de infraestrutura pode registrar o
+endereço IP (veja a seção 3). A loja não depende da permissão de estatísticas
+e só é acessada quando você a abre.
 
 ## 3. O que enviamos se você permitir
 

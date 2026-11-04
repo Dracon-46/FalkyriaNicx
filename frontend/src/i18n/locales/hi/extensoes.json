@@ -22,6 +22,7 @@
   "off": "बंद",
   "fromPack": "पैक {{id}}",
   "tabs": {
+    "store": "स्टोर",
     "packs": "पैक",
     "mcp": "MCP सर्वर",
     "skills": "कौशल"
@@ -164,6 +165,29 @@
       "importadas": "आयातित",
       "github": "GitHub",
       "pasta": "फ़ोल्डर"
+    }
+  },
+  "store": {
+    "intro": "Falkyria द्वारा जाँचे और हस्ताक्षरित पैक। इंस्टॉल से पहले Nicx हस्ताक्षर जाँचता है; ब्राउज़ करने पर आपकी कोई जानकारी नहीं जाती।",
+    "search": "स्टोर में खोजें",
+    "refresh": "रीफ़्रेश करें",
+    "all": "सभी",
+    "loading": "स्टोर खुल रहा है...",
+    "empty": "अभी कोई पैक प्रकाशित नहीं है।",
+    "meta": "{{author}} · v{{version}} · {{downloads}} डाउनलोड",
+    "update": "अपडेट",
+    "details": "देखें",
+    "verified": "Falkyria का हस्ताक्षर जाँचा गया।",
+    "unreachable": "स्टोर ने जवाब नहीं दिया: {{detail}}",
+    "categories": {
+      "educacao": "शिक्षा",
+      "programacao": "प्रोग्रामिंग",
+      "escritorio": "ऑफ़िस",
+      "criacao": "रचना",
+      "saude": "स्वास्थ्य",
+      "juridico": "क़ानूनी",
+      "negocios": "व्यवसाय",
+      "geral": "सामान्य"
     }
   }
 }

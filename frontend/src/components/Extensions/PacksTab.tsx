@@ -17,7 +17,7 @@ import { listarAssistentes } from '../../lib/assistentes';
 import { listarRotinas } from '../../lib/rotinas';
 import { Badge, Message, buttonClass, card, dangerButton, errorText, field, input, labelClass, primaryButton, secondaryButton } from './ui';
 
-function Items({ preview }: { preview: PackPreview }) {
+export function Items({ preview }: { preview: PackPreview }) {
   const { t } = useTranslation();
   const groups = (['assistentes', 'rotinas', 'habilidades', 'mcp'] as const).filter((k) => preview.itens[k].length);
   return (
@@ -32,7 +32,7 @@ function Items({ preview }: { preview: PackPreview }) {
 }
 
 /** O que o pacote pode fazer: o usuário vê antes de instalar. */
-function Permissions({ preview }: { preview: PackPreview }) {
+export function Permissions({ preview }: { preview: PackPreview }) {
   const { t } = useTranslation();
   const p = preview.permissoes;
   const lines: { key: string; text: string; warn?: boolean }[] = [];

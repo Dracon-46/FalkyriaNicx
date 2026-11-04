@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, Package, Plug, Puzzle } from 'lucide-react';
+import { BookOpen, Package, Plug, Puzzle, Store } from 'lucide-react';
 import { PacksTab } from '../components/Extensions/PacksTab';
 import { McpTab } from '../components/Extensions/McpTab';
 import { SkillsTab } from '../components/Extensions/SkillsTab';
+import { StoreTab } from '../components/Extensions/StoreTab';
 
 const TABS = [
+  { id: 'store', icon: Store },
   { id: 'packs', icon: Package },
   { id: 'mcp', icon: Plug },
   { id: 'skills', icon: BookOpen },
@@ -15,7 +17,7 @@ type Tab = (typeof TABS)[number]['id'];
 
 export function ExtensionsPage() {
   const { t } = useTranslation();
-  const [tab, setTab] = useState<Tab>('packs');
+  const [tab, setTab] = useState<Tab>('store');
 
   return (
     <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-10">
@@ -48,6 +50,7 @@ export function ExtensionsPage() {
             </button>
           ))}
         </div>
+        {tab === 'store' && <StoreTab />}
         {tab === 'packs' && <PacksTab />}
         {tab === 'mcp' && <McpTab />}
         {tab === 'skills' && <SkillsTab />}
