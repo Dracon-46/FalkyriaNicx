@@ -312,7 +312,6 @@ def _find_ollama() -> str | None:
     return None
 
 
-@EngineRegistry.register("ollama")
 def _juntar_partes(resp: Any, payload: Dict[str, Any]) -> Dict[str, Any]:
     """Monta, das partes de /api/chat, a mesma resposta do pedido sem partes.
 
@@ -349,6 +348,7 @@ def _juntar_partes(resp: Any, payload: Dict[str, Any]) -> Dict[str, Any]:
     return data
 
 
+@EngineRegistry.register("ollama")
 class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
     """Ollama backend via its native HTTP API."""
 

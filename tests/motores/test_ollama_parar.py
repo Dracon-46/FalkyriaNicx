@@ -162,3 +162,11 @@ def test_queda_da_placa_em_partes_tenta_na_cpu():
         cancelamento.ATUAL.reset(marca)
     assert resultado["content"] == "Olá, tudo bem?"
     assert pedidos[1]["options"]["num_gpu"] == 0
+
+
+def test_registro_aponta_para_o_motor():
+    """O motor registrado como "ollama" é a classe (já apontou para uma função)."""
+    import nicx.motores  # noqa: F401 - registra os motores
+    from nicx.nucleo.registry import EngineRegistry
+
+    assert EngineRegistry.get("ollama") is OllamaEngine
