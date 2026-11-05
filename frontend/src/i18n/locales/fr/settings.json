@@ -381,5 +381,16 @@
     "hint": "Les actions à risque élevé demandent toujours « je confirme », à tous les niveaux. Tout va dans l'Historique, avec annulation quand c'est possible.",
     "loadFailed": "Impossible de lire l'autonomie. Le serveur de Nicx est-il lancé ?",
     "saveFailed": "Impossible d'enregistrer l'autonomie. Réessayez."
+  },
+  "vscode": {
+    "titulo": "VS Code",
+    "intro": "Utilisez Nicx dans VS Code : chat à côté du code et, avec une sélection, expliquer, corriger (vous validez la modification dans un diff), améliorer et écrire des tests. Il utilise le modèle de ce PC ; le code ne sort pas d'ici et n'entre pas dans la mémoire de Nicx.",
+    "conectar": "Connecter à VS Code",
+    "atualizar": "Réinstaller l'extension",
+    "instalada": "Extension {{versao}} installée dans VS Code",
+    "pronto": "C'est fait. Ouvrez VS Code : Nicx apparaît dans la barre latérale et dans le clic droit (menu Nicx).",
+    "semVSCode": "VS Code introuvable sur ce PC. Installez VS Code puis revenez ici.",
+    "semPacote": "L'extension n'est pas fournie avec cette installation de Nicx.",
+    "erro": "Impossible : {{detail}}"
   }
 }

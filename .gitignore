@@ -130,3 +130,6 @@ learning.db
 minion_logs/
 *.oj-debug.json
 oj-debug.*.json
+# Extensão do VS Code gerada de vscode/ pelo build-installer.ps1
+src/nicx/vscode/nicx.vsix
+vscode/node_modules/

@@ -381,5 +381,16 @@
     "hint": "高风险操作在任何级别下都需要“确认”。所有操作都会记入历史记录，能撤销时可以撤销。",
     "loadFailed": "无法读取自主程度设置。Nicx 服务器在运行吗？",
     "saveFailed": "无法保存自主程度设置，请重试。"
+  },
+  "vscode": {
+    "titulo": "VS Code",
+    "intro": "在 VS Code 中使用 Nicx：在代码旁聊天，选中代码后可以解释、修复（在差异视图中由你确认修改）、改进和编写测试。使用本机模型；代码不会离开这台电脑，也不会进入 Nicx 的记忆。",
+    "conectar": "连接到 VS Code",
+    "atualizar": "重新安装扩展",
+    "instalada": "扩展 {{versao}} 已安装到 VS Code",
+    "pronto": "完成。打开 VS Code：Nicx 会出现在侧边栏和右键菜单（Nicx）中。",
+    "semVSCode": "在这台电脑上没有找到 VS Code。安装 VS Code 后再回来。",
+    "semPacote": "此 Nicx 安装未附带该扩展。",
+    "erro": "无法完成：{{detail}}"
   }
 }

@@ -381,5 +381,16 @@
     "hint": "Ações de risco alto sempre pedem \"confirmo\", em qualquer nível. Tudo fica no Histórico, com desfazer quando dá.",
     "loadFailed": "Não consegui ler a autonomia. O servidor do Nicx está ligado?",
     "saveFailed": "Não consegui salvar a autonomia. Tente de novo."
+  },
+  "vscode": {
+    "titulo": "VS Code",
+    "intro": "Use o Nicx dentro do VS Code: chat ao lado do código e, com um trecho selecionado, explicar, corrigir (você aprova a mudança num diff), melhorar e escrever testes. Usa o modelo deste PC; o código não sai daqui nem entra na memória do Nicx.",
+    "conectar": "Conectar ao VS Code",
+    "atualizar": "Reinstalar a extensão",
+    "instalada": "Extensão {{versao}} instalada no VS Code",
+    "pronto": "Pronto. Abra o VS Code: o Nicx aparece na barra lateral e no botão direito (menu Nicx).",
+    "semVSCode": "Não achei o VS Code neste PC. Instale o VS Code e volte aqui.",
+    "semPacote": "A extensão não veio com esta instalação do Nicx.",
+    "erro": "Não consegui: {{detail}}"
   }
 }

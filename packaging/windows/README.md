@@ -101,6 +101,8 @@ Saídas (ignoradas pelo git):
    `nicx-atualizacao.json`. O app procura em
    `releases/latest/download/nicx-atualizacao.json`; sem esse arquivo, ninguém
    vê a versão nova pelo app.
+   Suba também `packaging/windows/dist/nicx-vscode.vsix` (a extensão do VS
+   Code, gerada de `vscode/` pelo build e já incluída no instalador).
 
 Na atualização pelo app, o Nicx abre o instalador com
 `/SILENT /SUPPRESSMSGBOXES /NORESTART /REABRIR=1`: o `setup-runtime.ps1` para o

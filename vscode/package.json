@@ -1,0 +1,207 @@
+{
+  "name": "nicx",
+  "displayName": "Nicx",
+  "description": "%description%",
+  "version": "0.1.0",
+  "publisher": "falkyria",
+  "author": "Falkyria",
+  "license": "SEE LICENSE IN LICENSE",
+  "homepage": "https://dracon-46.github.io/nicx/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dracon-46/FalkyriaNicx"
+  },
+  "icon": "media/nicx.png",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "AI",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "nicx",
+    "falkyria",
+    "ia local",
+    "ollama",
+    "assistente"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "nicx",
+          "title": "Nicx",
+          "icon": "media/nicx-activity.svg"
+        }
+      ]
+    },
+    "views": {
+      "nicx": [
+        {
+          "type": "webview",
+          "id": "nicx.chat",
+          "name": "%view.chat%"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "nicx.abrirChat",
+        "title": "%cmd.abrirChat%",
+        "category": "Nicx"
+      },
+      {
+        "command": "nicx.explicar",
+        "title": "%cmd.explicar%",
+        "category": "Nicx"
+      },
+      {
+        "command": "nicx.corrigir",
+        "title": "%cmd.corrigir%",
+        "category": "Nicx"
+      },
+      {
+        "command": "nicx.melhorar",
+        "title": "%cmd.melhorar%",
+        "category": "Nicx"
+      },
+      {
+        "command": "nicx.testes",
+        "title": "%cmd.testes%",
+        "category": "Nicx"
+      },
+      {
+        "command": "nicx.perguntar",
+        "title": "%cmd.perguntar%",
+        "category": "Nicx"
+      },
+      {
+        "command": "nicx.aplicar",
+        "title": "%cmd.aplicar%",
+        "category": "Nicx",
+        "icon": "$(check)"
+      },
+      {
+        "command": "nicx.descartar",
+        "title": "%cmd.descartar%",
+        "category": "Nicx",
+        "icon": "$(close)"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "submenu": "nicx.menu",
+          "group": "1_modification@9"
+        }
+      ],
+      "nicx.menu": [
+        {
+          "command": "nicx.explicar",
+          "when": "editorHasSelection",
+          "group": "1@1"
+        },
+        {
+          "command": "nicx.corrigir",
+          "when": "editorHasSelection",
+          "group": "1@2"
+        },
+        {
+          "command": "nicx.melhorar",
+          "when": "editorHasSelection",
+          "group": "1@3"
+        },
+        {
+          "command": "nicx.testes",
+          "when": "editorHasSelection",
+          "group": "1@4"
+        },
+        {
+          "command": "nicx.perguntar",
+          "group": "2@1"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "nicx.aplicar",
+          "when": "nicx.temProposta && resourceScheme == nicx-proposta",
+          "group": "navigation@1"
+        },
+        {
+          "command": "nicx.descartar",
+          "when": "nicx.temProposta && resourceScheme == nicx-proposta",
+          "group": "navigation@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "nicx.aplicar",
+          "when": "nicx.temProposta"
+        },
+        {
+          "command": "nicx.descartar",
+          "when": "nicx.temProposta"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "nicx.menu",
+        "label": "Nicx"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "nicx.perguntar",
+        "key": "ctrl+alt+n",
+        "mac": "cmd+alt+n",
+        "when": "editorTextFocus"
+      }
+    ],
+    "configuration": {
+      "title": "Nicx",
+      "properties": {
+        "nicx.servidor": {
+          "type": "string",
+          "default": "http://127.0.0.1:8000",
+          "markdownDescription": "%cfg.servidor%"
+        },
+        "nicx.modelo": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "%cfg.modelo%"
+        },
+        "nicx.chaveApi": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "%cfg.chaveApi%"
+        },
+        "nicx.linhasDeContexto": {
+          "type": "number",
+          "default": 40,
+          "minimum": 0,
+          "maximum": 200,
+          "markdownDescription": "%cfg.linhas%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --platform=node --format=cjs --target=node18 --external:vscode --outfile=out/extension.js --minify --sourcemap=external",
+    "typecheck": "tsc -p . --noEmit",
+    "test": "vitest run",
+    "package": "npm run build && node -e \"require('fs').mkdirSync('dist',{recursive:true})\" && vsce package --no-dependencies --out dist/"
+  },
+  "devDependencies": {
+    "@types/node": "^22.12.0",
+    "@types/vscode": "~1.90.0",
+    "@vscode/vsce": "^4.1.0",
+    "esbuild": "^0.28.0",
+    "typescript": "~7.0.2",
+    "vitest": "^5.0.3"
+  }
+}

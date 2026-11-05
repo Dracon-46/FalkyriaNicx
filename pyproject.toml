@@ -257,7 +257,7 @@ artifacts = ["/src/nicx/servidor/static/**"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/nicx"]
-artifacts = ["/src/nicx/servidor/static/**"]
+artifacts = ["/src/nicx/servidor/static/**", "/src/nicx/vscode/nicx.vsix"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "src/nicx/canais/whatsapp_baileys_bridge" = "_node_modules/whatsapp_baileys_bridge"

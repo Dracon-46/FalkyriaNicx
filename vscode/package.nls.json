@@ -1,0 +1,16 @@
+{
+  "description": "A IA da Falkyria no seu editor: explica, corrige e melhora o código com o Nicx que roda no seu computador. Nada sai do PC.",
+  "view.chat": "Chat",
+  "cmd.abrirChat": "Abrir o chat",
+  "cmd.explicar": "Explicar o trecho",
+  "cmd.corrigir": "Corrigir o trecho",
+  "cmd.melhorar": "Melhorar o trecho",
+  "cmd.testes": "Escrever testes",
+  "cmd.perguntar": "Perguntar sobre o código",
+  "cmd.aplicar": "Aplicar a proposta",
+  "cmd.descartar": "Descartar a proposta",
+  "cfg.servidor": "Endereço do Nicx neste PC. Só endereços locais (`127.0.0.1`) são aceitos.",
+  "cfg.modelo": "Modelo usado pela extensão. Vazio = o modelo padrão do Nicx.",
+  "cfg.chaveApi": "Chave da API do Nicx, se você ligou uma (`NICX_API_KEY`). Vazio na instalação padrão.",
+  "cfg.linhas": "Quantas linhas antes e depois da seleção vão junto, só como contexto."
+}

@@ -59,6 +59,7 @@ import {
 } from '../lib/api';
 import { ShortcutRecorder } from '../components/Settings/ShortcutRecorder';
 import { DictationSettings } from '../components/Settings/DictationSettings';
+import { VSCodeSettings } from '../components/Settings/VSCodeSettings';
 
 // Os testes e outras telas importam o campo daqui.
 export { ShortcutRecorder };
@@ -1282,6 +1283,11 @@ export function SettingsPage() {
                 <Trash2 size={12} /> {confirmClear ? t('settings.data.confirm') : t('settings.data.clear')}
               </button>
             </SettingRow>
+          </Section>
+
+          {/* VS Code: a extensão do Nicx */}
+          <Section title={t('settings.vscode.titulo')}>
+            <VSCodeSettings />
           </Section>
 
           {/* Conta Falkyria (opcional) */}

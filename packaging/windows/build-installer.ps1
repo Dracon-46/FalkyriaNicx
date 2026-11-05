@@ -170,6 +170,27 @@ if ($SkipFrontend) {
 if (-not (Test-Path -LiteralPath $staticIndex)) { Stop-Build "Interface ausente: $staticIndex" }
 Write-Ok "interface em src\nicx\servidor\static ($((Get-Item $staticIndex).LastWriteTime))"
 
+# Extensão "Nicx para VS Code" (vscode/): vai dentro do pacote, para o botão
+# "Conectar ao VS Code" do app, e na release (dist\nicx-vscode.vsix).
+$vsixDestino = Join-Path $Repo 'src\nicx\vscode\nicx.vsix'
+if ($SkipFrontend -and (Test-Path -LiteralPath $vsixDestino)) {
+    Write-Step 'Extensão do VS Code: reaproveitando src/nicx/vscode/nicx.vsix (-SkipFrontend)'
+} else {
+    Write-Step 'Extensão do VS Code: npm run package'
+    $vscodeDir = Join-Path $Repo 'vscode'
+    if (-not (Test-Path -LiteralPath (Join-Path $vscodeDir 'node_modules'))) {
+        Invoke-Native 'npm.cmd' @('ci', '--no-audit', '--no-fund') $vscodeDir
+    }
+    Invoke-Native 'npm.cmd' @('test') $vscodeDir
+    Invoke-Native 'npm.cmd' @('run', 'package') $vscodeDir
+    $vsix = Get-ChildItem -LiteralPath (Join-Path $vscodeDir 'dist') -Filter 'nicx-*.vsix' | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    if (-not $vsix) { Stop-Build 'a extensão do VS Code não foi gerada' }
+    Copy-Item -LiteralPath $vsix.FullName -Destination $vsixDestino -Force
+}
+New-Item -ItemType Directory -Force -Path $DistDir | Out-Null
+Copy-Item -LiteralPath $vsixDestino -Destination (Join-Path $DistDir 'nicx-vscode.vsix') -Force
+Write-Ok "extensão do VS Code ($([math]::Round((Get-Item $vsixDestino).Length / 1KB)) KB)"
+
 # ---------------------------------------------------------------------------
 # 2. Wheel do nicx
 # ---------------------------------------------------------------------------
@@ -192,6 +213,7 @@ try {
 } finally { $zip.Dispose() }
 $required = @(
     'nicx/servidor/static/index.html',
+    'nicx/vscode/nicx.vsix',
     'nicx/privacidade/textos/termos-de-uso.md',
     'nicx/privacidade/textos/politica-de-privacidade.md',
     'nicx/privacidade/textos/consentimento.md'

@@ -381,5 +381,16 @@
     "hint": "High-risk actions always ask for \"confirm\", at any level. Everything goes to the History, with undo when possible.",
     "loadFailed": "Couldn't read the autonomy setting. Is the Nicx server running?",
     "saveFailed": "Couldn't save the autonomy setting. Please try again."
+  },
+  "vscode": {
+    "titulo": "VS Code",
+    "intro": "Use Nicx inside VS Code: chat next to your code and, with a selection, explain, fix (you approve the change in a diff), improve and write tests. It uses this PC's model; your code doesn't leave it nor go into Nicx's memory.",
+    "conectar": "Connect to VS Code",
+    "atualizar": "Reinstall the extension",
+    "instalada": "Extension {{versao}} installed in VS Code",
+    "pronto": "Done. Open VS Code: Nicx shows up in the side bar and in the right-click menu (Nicx).",
+    "semVSCode": "I couldn't find VS Code on this PC. Install VS Code and come back.",
+    "semPacote": "The extension didn't come with this Nicx install.",
+    "erro": "Couldn't do it: {{detail}}"
   }
 }

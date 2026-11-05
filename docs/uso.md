@@ -301,6 +301,24 @@ Uma mensagem que cita o nome de um servidor, de uma ferramenta dele ou de uma
 habilidade manda a lista de ferramentas ao modelo (`[agent] tools_on_demand`).
 Adicionar, mudar e remover extensões vai para o Histórico.
 
+## VS Code
+
+Configurações → **VS Code** → **Conectar ao VS Code** instala a extensão
+"Nicx para VS Code" (também vem na release, `nicx-vscode.vsix`). No VS Code:
+
+- **Chat** no ícone do Nicx da barra lateral; os blocos de código da resposta
+  têm Copiar e Inserir no editor.
+- **Botão direito → Nicx**, com um trecho selecionado: Explicar, Corrigir,
+  Melhorar, Escrever testes e Perguntar sobre o código (`Ctrl+Alt+N`). Corrigir
+  e Melhorar abrem a mudança como diff; nada entra no arquivo antes de você
+  clicar em **Aplicar** (Ctrl+Z desfaz).
+- Vão junto o arquivo, a linguagem, algumas linhas em volta e os erros que o VS
+  Code mostra no trecho.
+- A extensão só conversa com o Nicx deste PC (`127.0.0.1`). O pedido vai direto
+  ao modelo (`"editor": true`): sem ferramentas do PC, sem ler a tela, e o
+  código não entra na memória automática.
+- O Nicx precisa estar aberto. Código-fonte da extensão em `vscode/`.
+
 ## Atualizações
 
 A página **Atualizações** (menu ao lado) mostra a versão instalada, as
