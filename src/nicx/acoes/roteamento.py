@@ -19,17 +19,17 @@ _PATTERNS = [
     # Buscar fora: web, notícias, sites.
     r"\b(?:pesquis\w*|procur\w*|busc\w*|google|internet|na web|site|link|url|"
     r"noticia\w*|manchete\w*|wikipedia)\b",
-    # Coisas que mudam com o tempo.
-    r"\b(?:hoje|agora|ontem|amanha|atual\w*|ultim[oa]s?|recente\w*|esta semana|"
+    # Coisas que mudam com o tempo. "hoje", "agora", "ontem" e "amanhã" sozinhos
+    # não contam: "tudo bem com você hoje?" mandava ~600 tokens de ferramentas.
+    r"\b(?:atual\w*|ultim[oa]s?|recente\w*|esta semana|"
     r"este mes|este ano|202\d|preco\w*|cotac\w*|dolar|euro|bitcoin|bolsa|clima|"
     r"temperatura|chuva|previsao|placar|quem ganhou|eleic\w*|lancament\w*)\b",
     r"\b(?:como esta o tempo|tempo hoje|tempo amanha)\b",
     # Arquivos e o próprio computador.
     r"\b(?:arquivo\w*|pasta\w*|diretorio\w*|documento\w*|pdf|planilha\w*|csv|"
     r"txt|leia|ler o|ler a|abr[ae]\w*|execut\w*|rod[ae]\w*|comando\w*|terminal|"
-    r"powershell|cmd|instal\w*|desinstal\w*|programa\w*|aplicativo\w*|volume|"
-    r"som|musica|midia|tela|computador|pc|notebook|bateria|windows|processo\w*|"
-    r"disco|memoria ram)\b",
+    r"powershell|cmd|instal\w*|desinstal\w*|aplicativo\w*|volume|"
+    r"musica|midia|tela|bateria|processo\w*|disco|memoria ram)\b",
     # Contas e código.
     r"\b(?:calcul\w*|vezes|dividido|porcentagem|raiz quadrada|potencia|python|"
     r"codigo|script|funcao|algoritmo|regex)\b",
@@ -86,4 +86,9 @@ def conversation_needs_tools(user_messages: Iterable[str]) -> bool:
     continua o pedido anterior, que precisava de busca.
     """
     recent = list(user_messages)[-2:]
-    return any(needs_tools(text) for text in recent)
+    if not recent:
+        return False
+    if needs_tools(recent[-1]):
+        return True
+    # Só uma resposta curta continua o pedido anterior ("Sorocaba").
+    return len(recent) == 2 and len(recent[-1].split()) <= 4 and needs_tools(recent[0])

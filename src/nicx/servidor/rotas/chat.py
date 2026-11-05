@@ -116,7 +116,7 @@ def _ensure_identity_prompt(messages: list[Message], app_config) -> list[Message
             )
             prompt = builder.build()
         except Exception:
-            logging.getLogger("nicx.servidor").debug(
+            logging.getLogger("nicx.servidor").warning(
                 "Identity system prompt resolution failed; "
                 "serving request without identity grounding",
                 exc_info=True,
@@ -398,6 +398,59 @@ async def _screen_context(req: ChatCompletionRequest, config: Any, model: str):
     )
 
 
+# Respostas que o app mostra quando algo falhou: não voltam para o modelo.
+_RESPOSTAS_DE_ERRO = (
+    "Não consegui responder",
+    "Nenhuma resposta foi gerada",
+    "Sorry, an error occurred",
+    "Error during generation",
+)
+
+
+def _cortar_historico(messages: list, num_ctx: int) -> list:
+    """O histórico que cabe em ~1/4 do contexto, da mensagem mais nova para trás.
+
+    O app manda a conversa inteira; na CPU cada caractere é relido em todo
+    pedido, e uma conversa longa levava minutos até a primeira palavra. As
+    mensagens de sistema ficam, a última (o pedido) sempre fica, respostas de
+    erro saem e só a última mensagem leva imagens.
+    """
+    if len(messages) <= 1:
+        return messages
+    orcamento = max(2000, num_ctx)  # caracteres, ~4 por token: ~1/4 do contexto
+    sistema = [m for m in messages[:-1] if m.role == "system"]
+    resto = [
+        m
+        for m in messages[:-1]
+        if m.role != "system"
+        and not (
+            m.role == "assistant"
+            and isinstance(m.content, str)
+            and not m.tool_calls
+            and (
+                not m.content.strip()
+                or m.content.strip().startswith(_RESPOSTAS_DE_ERRO)
+            )
+        )
+    ]
+    ficam: list = []
+    usado = len(messages[-1].content) if isinstance(messages[-1].content, str) else 0
+    for m in reversed(resto):
+        tamanho = len(m.content) if isinstance(m.content, str) else 200
+        if usado + tamanho > orcamento and ficam:
+            break
+        usado += tamanho
+        ficam.append(m)
+    ficam.reverse()
+    # Mensagens de ferramenta sem a chamada que as pediu quebram o modelo.
+    while ficam and ficam[0].role == "tool":
+        ficam.pop(0)
+    for m in ficam:
+        if getattr(m, "images", None):
+            m.images = None
+    return [*sistema, *ficam, messages[-1]]
+
+
 def _num_ctx(config: Any) -> int:
     ollama = getattr(getattr(config, "engine", None), "ollama", None)
     try:
@@ -465,6 +518,10 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
     model = request_body.model
     config = getattr(request.app.state, "config", None)
     _registrar_pedido(request_body, model)
+    if not request_body.tools:
+        request_body.messages = _cortar_historico(
+            list(request_body.messages), _num_ctx(config)
+        )
     # The assistant the user picked ("Tutor de estudos"): its instructions go
     # into the system prompt and only its tools reach the model (contextvar,
     # read by SystemPromptBuilder and ToolExecutor in the worker threads too).
@@ -623,7 +680,7 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
                     )
                 request_body.messages = new_msgs
         except Exception:
-            logging.getLogger("nicx.servidor").debug(
+            logging.getLogger("nicx.servidor").warning(
                 "Memory context injection failed",
                 exc_info=True,
             )
@@ -643,9 +700,12 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
             )
 
             cr = score_complexity(query_text_for_complexity)
-            suggested = adjust_tokens_for_model(
-                cr.suggested_max_tokens,
-                model,
+            # Teto de um quarto do contexto: o qwen3.5 contava como "modelo que
+            # pensa" (dobra o orçamento) mesmo com think=False, e um modelo de
+            # 4B em repetição seguia até 16 mil tokens (dezenas de minutos na CPU).
+            suggested = min(
+                adjust_tokens_for_model(cr.suggested_max_tokens, model),
+                max(512, _num_ctx(config) // 4),
             )
             complexity_info = ComplexityInfo(
                 score=cr.score,
@@ -1867,7 +1927,8 @@ async def server_info(request: Request):
 async def health(request: Request):
     """Health check endpoint."""
     engine = request.app.state.engine
-    healthy = engine.health()
+    # Fora do laço principal: até 2 s por motor travavam os outros pedidos.
+    healthy = await asyncio.to_thread(engine.health)
     if not healthy:
         raise HTTPException(status_code=503, detail="Engine unhealthy")
     return {"status": "ok"}

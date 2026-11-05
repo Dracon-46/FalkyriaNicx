@@ -483,6 +483,12 @@ class ToolUsingAgent(BaseAgent):
         executor = getattr(self, "_executor", None)
         if executor is not None:
             executor.begin_session([input])
+        # O agente do servidor atende todos os pedidos: sem zerar, a mesma busca
+        # feita de novo noutro pedido virava "loop" e ficava bloqueada até
+        # reiniciar o Nicx.
+        guard = getattr(self, "_loop_guard", None)
+        if guard is not None:
+            guard.reset()
         super()._emit_turn_start(input)
 
     def _build_messages(

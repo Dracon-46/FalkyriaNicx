@@ -299,11 +299,16 @@ def _find_ollama() -> str | None:
     found = shutil.which("ollama")
     if found:
         return found
-    local = os.environ.get("LOCALAPPDATA")
-    if local:
-        exe = Path(local) / "Programs" / "Ollama" / "ollama.exe"
-        if exe.is_file():
-            return str(exe)
+    # Os mesmos lugares que o lançador e o instalador procuram.
+    for base, *resto in (
+        (os.environ.get("LOCALAPPDATA"), "Programs", "Ollama"),
+        (os.environ.get("ProgramFiles"), "Ollama"),
+        (os.environ.get("ProgramW6432"), "Ollama"),
+    ):
+        if base:
+            exe = Path(base, *resto) / "ollama.exe"
+            if exe.is_file():
+                return str(exe)
     return None
 
 
@@ -318,7 +323,9 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
     # ``EngineContextLengthError`` branch, unlike the OpenAI-compat engines).
     # Out-of-memory 500s are recognized first, see below.
 
-    _DEFAULT_HOST = "http://localhost:11434"
+    # 127.0.0.1, não "localhost": no Windows o localhost tenta o ::1 antes, onde
+    # o Ollama não escuta, e cada conexão nova podia perder ~2 s.
+    _DEFAULT_HOST = "http://127.0.0.1:11434"
 
     def __init__(
         self,
@@ -830,7 +837,7 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
             logger.debug("Ollama health check failed at %s: %s", self._host, exc)
             return False
 
-    def start_server(self, wait: float = 20.0) -> bool:
+    def start_server(self, wait: float = 90.0) -> bool:
         """Liga o ``ollama serve`` em segundo plano quando ele está desligado.
 
         Sem isso, com o Ollama fora da inicialização do Windows, o Nicx
@@ -890,14 +897,29 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
         moves the 5-30 s disk load out of the first question; prompt reading
         cannot be done ahead of time (qwen3.5 reuses no prompt cache here).
         """
+        # As mesmas opções do chat: com outro num_ctx o Ollama descarregava e
+        # carregava o modelo de novo na primeira pergunta.
+        opcoes = _ollama_request_options(temperature=0.7, max_tokens=1, kwargs={})
+        opcoes.pop("temperature", None)
+        opcoes.pop("num_predict", None)
         try:
-            self._client.post(
+            resp = self._client.post(
                 "/api/generate",
-                json={"model": model, "keep_alive": _keep_alive()},
+                json={"model": model, "keep_alive": _keep_alive(), "options": opcoes},
                 timeout=300.0,
             )
+            if not resp.is_success:
+                if _motor_caiu(resp.text) and not _SO_CPU:
+                    _passar_para_cpu(resp.text)
+                    return self.load(model)
+                logger.warning(
+                    "O Ollama não carregou o modelo %s (%s): %s",
+                    model,
+                    resp.status_code,
+                    resp.text[:300],
+                )
         except Exception as exc:  # noqa: BLE001 - optional optimisation
-            logger.debug("Could not preload %s: %s", model, exc)
+            logger.warning("Não deu para pré-carregar o modelo %s: %s", model, exc)
 
     def unload(self, model: str) -> None:
         """Free the model's RAM now instead of after ``keep_alive``."""

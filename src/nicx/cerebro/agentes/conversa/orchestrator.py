@@ -16,6 +16,7 @@ import concurrent.futures
 import json
 import logging
 import re
+import time
 from typing import Any, Callable, List, Optional
 
 from nicx.cerebro.agentes._stubs import AgentContext, AgentResult, ToolUsingAgent
@@ -26,6 +27,13 @@ from nicx.nucleo.registry import AgentRegistry
 from nicx.nucleo.types import Message, Role, ToolCall, ToolResult
 
 logger = logging.getLogger(__name__)
+
+# Tempo máximo do laço com ferramentas antes de pedir a resposta final. Na CPU
+# cada turno relê o prompt inteiro (com a lista de ferramentas).
+PRAZO_AGENTE_S = 150.0
+SEM_RESPOSTA = (
+    "Não consegui chegar a uma resposta desta vez. Tente perguntar de outro jeito."
+)
 
 
 @AgentRegistry.register("orchestrator")
@@ -365,6 +373,7 @@ class OrchestratorAgent(ToolUsingAgent):
         turns = 0
         total_prompt_tokens = 0
         total_completion_tokens = 0
+        inicio = time.monotonic()
 
         for _turn in range(self._max_turns):
             turns += 1
@@ -372,10 +381,26 @@ class OrchestratorAgent(ToolUsingAgent):
             if self._loop_guard:
                 messages = self._loop_guard.compress_context(messages)
 
-            # Build generate kwargs
+            # No último turno (ou passado o prazo) o modelo responde com o que
+            # tem, sem ferramentas: antes podia pedir ferramenta atrás de
+            # ferramenta por 10 turnos (minutos na CPU) e terminar sem resposta.
+            ultimo = (
+                _turn == self._max_turns - 1
+                or time.monotonic() - inicio > PRAZO_AGENTE_S
+            )
             gen_kwargs: dict[str, Any] = {}
-            if openai_tools:
+            if openai_tools and not ultimo:
                 gen_kwargs["tools"] = openai_tools
+            elif openai_tools and turns > 1:
+                messages.append(
+                    Message(
+                        role=Role.USER,
+                        content=(
+                            "(Responda agora ao pedido com o que você já tem, "
+                            "sem usar mais ferramentas.)"
+                        ),
+                    )
+                )
 
             result = self._generate(messages, **gen_kwargs)
 
@@ -388,15 +413,20 @@ class OrchestratorAgent(ToolUsingAgent):
             raw_tool_calls = result.get("tool_calls", [])
 
             # No tool calls -> check continuation, then final answer
-            if not raw_tool_calls:
+            if not raw_tool_calls or ultimo:
                 content = self._check_continuation(result, messages)
                 content = self._strip_think_tags(content)
+                if not content.strip():
+                    logger.warning("O modelo terminou o turno sem escrever nada")
+                    content = SEM_RESPOSTA
                 self._emit_turn_end(turns=turns, content_length=len(content))
                 return AgentResult(
                     content=content,
                     tool_results=all_tool_results,
                     turns=turns,
                     metadata={
+                        # ainda queria ferramentas quando o limite chegou
+                        "max_turns_exceeded": bool(raw_tool_calls),
                         "prompt_tokens": total_prompt_tokens,
                         "completion_tokens": total_completion_tokens,
                         "total_tokens": total_prompt_tokens + total_completion_tokens,
@@ -530,7 +560,7 @@ class OrchestratorAgent(ToolUsingAgent):
         final_content = self._strip_think_tags(content) if content else ""
         self._emit_turn_end(turns=turns, max_turns_exceeded=True)
         return AgentResult(
-            content=final_content or "Maximum turns reached without a final answer.",
+            content=final_content or SEM_RESPOSTA,
             tool_results=all_tool_results,
             turns=turns,
             metadata={
@@ -542,4 +572,4 @@ class OrchestratorAgent(ToolUsingAgent):
         )
 
 
-__all__ = ["OrchestratorAgent"]
+__all__ = ["PRAZO_AGENTE_S", "SEM_RESPOSTA", "OrchestratorAgent"]
