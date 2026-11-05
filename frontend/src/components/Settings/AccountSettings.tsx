@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CloudUpload, Download, KeyRound, Loader2, LogIn, LogOut, RotateCcw, ShieldCheck, Trash2, UserPlus } from 'lucide-react';
-import {
+import { useAdmin,
   AccountError,
   aceitar,
   apagarBackup,
@@ -524,6 +524,14 @@ export function AccountSettings() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  // Entrou ou saiu da conta: o menu mostra (ou esconde) o Painel Falkyria.
+  const conectado = state?.conectado;
+  const email = state?.email;
+  useEffect(() => {
+    if (conectado === undefined) return;
+    void useAdmin.getState().conferir();
+  }, [conectado, email]);
 
   return (
     <div data-testid="account-settings">

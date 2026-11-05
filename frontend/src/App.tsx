@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef, lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router';
+import { Routes, Route, Navigate } from 'react-router';
 import { Layout } from './components/Layout';
 import { ChatPage } from './pages/ChatPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -25,6 +25,7 @@ import { fetchModels, fetchServerInfo, fetchSavings, isTauri } from './lib/api';
 import { track, hashId } from './lib/analytics';
 import { ConsentGate } from './components/Privacy/ConsentDialog';
 import { atualizarEstado } from './lib/atualizacao';
+import { useAdmin } from './lib/conta';
 import { toast } from 'sonner';
 import i18n from './i18n';
 
@@ -164,6 +165,12 @@ export default function App() {
     };
   }, []);
 
+  // Opções de administrador escondidas até o banco confirmar a conta.
+  const admin = useAdmin((s) => s.admin);
+  useEffect(() => {
+    void useAdmin.getState().conferir();
+  }, []);
+
   const toggleSystemPanel = useAppStore((s) => s.toggleSystemPanel);
 
   // Global keyboard shortcuts
@@ -208,9 +215,13 @@ export default function App() {
           <Route
             path="painel"
             element={
-              <Suspense fallback={null}>
-                <PainelPage />
-              </Suspense>
+              admin === null ? null : !admin ? (
+                <Navigate to="/" replace />
+              ) : (
+                <Suspense fallback={null}>
+                  <PainelPage />
+                </Suspense>
+              )
             }
           />
         </Route>

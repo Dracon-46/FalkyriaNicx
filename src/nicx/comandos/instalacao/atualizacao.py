@@ -17,7 +17,7 @@ from rich.console import Console
 
 @click.group()
 def atualizacao() -> None:
-    """Procura atualizações e assina o arquivo de versões (Falkyria)."""
+    """Procura atualizações do Nicx."""
 
 
 @atualizacao.command("procurar")
@@ -43,7 +43,8 @@ def procurar() -> None:
         console.print(f"Você já tem a versão mais nova ({info['versao_atual']}).")
 
 
-@atualizacao.command("assinar")
+# Só da Falkyria (exige a chave privada): fora da ajuda.
+@atualizacao.command("assinar", hidden=True)
 @click.argument(
     "instalador", type=click.Path(exists=True, dir_okay=False, path_type=Path)
 )
@@ -105,7 +106,7 @@ def assinar(instalador: Path, versao: str, saida: Path | None, sem_banco: bool) 
     )
 
 
-@atualizacao.command("novidades")
+@atualizacao.command("novidades", hidden=True)
 def listar_novidades() -> None:
     """Mostra as novidades publicadas no banco (as que vão na próxima assinatura)."""
     from nicx.atualizacao import banco

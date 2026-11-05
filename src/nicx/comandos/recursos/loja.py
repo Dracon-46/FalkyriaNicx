@@ -15,7 +15,9 @@ import click
 from rich.console import Console
 
 
-@click.group()
+# Só da Falkyria: fora da ajuda. Esconder não protege nada (assinar exige a
+# chave privada, que fica só no PC da Falkyria); só não confunde quem usa.
+@click.group(hidden=True)
 def loja() -> None:
     """Assina e confere pacotes da loja da Falkyria."""
 

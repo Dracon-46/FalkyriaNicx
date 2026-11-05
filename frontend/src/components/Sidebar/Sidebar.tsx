@@ -30,6 +30,7 @@ import { ConversationList } from './ConversationList';
 import { useAppStore } from '../../lib/store';
 import { appShortcut } from '../../lib/shortcut';
 import { useAtualizacao } from '../../lib/atualizacao';
+import { useAdmin } from '../../lib/conta';
 import { useTranslation } from 'react-i18next';
 
 export function Sidebar() {
@@ -65,6 +66,8 @@ export function Sidebar() {
   };
 
   const haAtualizacao = useAtualizacao((s) => Boolean(s.estado?.ha_nova));
+  // Painel Falkyria só para administradores (o banco confirma; na dúvida, escondido).
+  const admin = useAdmin((s) => s.admin === true);
   const navItems = [
     { path: '/', icon: MessageSquare, label: t('nav.chat') },
     { path: '/projetos', icon: FolderKanban, label: t('nav.projects') },
@@ -74,7 +77,7 @@ export function Sidebar() {
     { path: '/assistentes', icon: Sparkles, label: t('nav.assistants') },
     { path: '/extensoes', icon: Puzzle, label: t('nav.extensions') },
     { path: '/dashboard', icon: BarChart3, label: t('nav.dashboard') },
-    { path: '/painel', icon: ChartSpline, label: t('nav.painel') },
+    ...(admin ? [{ path: '/painel', icon: ChartSpline, label: t('nav.painel') }] : []),
     { path: '/data-sources', icon: Database, label: t('nav.dataSources') },
     { path: '/agents', icon: Bot, label: t('nav.agents') },
     { path: '/logs', icon: ScrollText, label: t('nav.logs') },

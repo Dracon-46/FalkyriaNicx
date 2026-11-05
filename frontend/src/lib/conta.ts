@@ -3,8 +3,27 @@
  * Nicx (a sessão fica protegida no PC); o backup é cifrado no PC com uma senha
  * que nem a Falkyria conhece.
  */
+import { create } from 'zustand';
 import { apiFetch } from './api';
 import i18n from '../i18n';
+
+/**
+ * Opções de administrador da Falkyria (Painel): escondidas até o banco dizer
+ * que a conta logada é de administrador. `null` = ainda conferindo; erro,
+ * sem conta ou sem internet = `false`.
+ */
+export const useAdmin = create<{ admin: boolean | null; conferir: () => Promise<void> }>((set) => ({
+  admin: null,
+  conferir: async () => {
+    try {
+      const res = await apiFetch('/v1/conta/admin');
+      const corpo = res.ok ? ((await res.json()) as { admin?: unknown }) : {};
+      set({ admin: corpo.admin === true });
+    } catch {
+      set({ admin: false });
+    }
+  },
+}));
 
 export interface AccountState {
   conectado: boolean;

@@ -83,6 +83,14 @@ async def estado():
     return await _rodar(servico.estado)
 
 
+@router.get("/admin")
+async def admin():
+    """Mostrar as opções de administrador? Só com conta de administrador."""
+    from nicx.conta import servico
+
+    return {"admin": await asyncio.to_thread(servico.e_admin)}
+
+
 @router.post("/cadastrar")
 async def cadastrar(pedido: Cadastro):
     from nicx.conta import servico

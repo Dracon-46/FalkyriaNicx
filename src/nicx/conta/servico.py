@@ -138,7 +138,41 @@ def redefinir(email: str, codigo: str, nova: str) -> dict[str, Any]:
     return estado()
 
 
+_ADMIN_CACHE: dict[str, Any] = {"uid": None, "ate": 0.0, "admin": False}
+_ADMIN_TTL_S = 600.0
+
+
+def e_admin() -> bool:
+    """A conta logada é de administrador da Falkyria? Na dúvida, não.
+
+    Quem decide é o banco (``nicx_admin_status``: lista de administradores e
+    e-mail confirmado); sem conta, sem internet ou com erro, as opções de
+    administrador ficam escondidas. Guardado por 10 minutos.
+    """
+    if cofre.ler() is None:
+        return False
+    try:
+        sessao = _sessao()
+    except ContaErro:
+        return False
+    uid = sessao.get("user_id")
+    with _LOCK:
+        if _ADMIN_CACHE["uid"] == uid and _ADMIN_CACHE["ate"] > time.time():
+            return bool(_ADMIN_CACHE["admin"])
+    try:
+        status = cliente.rpc("nicx_admin_status", sessao["access_token"])
+        admin = isinstance(status, dict) and status.get("admin") is True
+    except Exception:  # noqa: BLE001 - na dúvida, escondido
+        logger.debug("Não deu para saber se a conta é de administrador", exc_info=True)
+        return False
+    with _LOCK:
+        _ADMIN_CACHE.update(uid=uid, ate=time.time() + _ADMIN_TTL_S, admin=admin)
+    return admin
+
+
 def sair() -> None:
+    with _LOCK:
+        _ADMIN_CACHE.update(uid=None, ate=0.0, admin=False)
     sessao = cofre.ler()
     cofre.apagar()
     if sessao:
