@@ -165,8 +165,21 @@ def test_queda_da_placa_em_partes_tenta_na_cpu():
 
 
 def test_registro_aponta_para_o_motor():
-    """O motor registrado como "ollama" é a classe (já apontou para uma função)."""
-    import nicx.motores  # noqa: F401 - registra os motores
-    from nicx.nucleo.registry import EngineRegistry
+    """O ``register("ollama")`` decora a classe (já decorou uma função por engano).
 
-    assert EngineRegistry.get("ollama") is OllamaEngine
+    Conferido no código, não no registro: outros testes limpam o registro.
+    """
+    import ast
+    import inspect
+
+    arvore = ast.parse(inspect.getsource(ollama))
+    decorados = {
+        no.name: type(no).__name__
+        for no in arvore.body
+        if isinstance(no, (ast.ClassDef, ast.FunctionDef))
+        for d in no.decorator_list
+        if isinstance(d, ast.Call)
+        and getattr(d.func, "attr", "") == "register"
+        and [getattr(a, "value", None) for a in d.args] == ["ollama"]
+    }
+    assert decorados == {"OllamaEngine": "ClassDef"}
