@@ -626,6 +626,18 @@ def create_app(
         except Exception as exc:
             logger.debug("Auth middleware init skipped: %s", exc)
 
+    # Sites abertos no navegador não podem usar a API local (DNS rebinding e
+    # CSRF): ver nicx.servidor.protecao_local. Servidor aberto de propósito
+    # para a rede (host 0.0.0.0, com api_key) não confere o Host.
+    from nicx.servidor.protecao_local import HOSTS_DO_PC, ProtecaoLocal
+
+    _bind = str(getattr(getattr(config, "server", None), "host", "127.0.0.1") or "")
+    app.add_middleware(
+        ProtecaoLocal,
+        origens=_origins,
+        checar_host=_bind in HOSTS_DO_PC and not os.environ.get("NICX_ALLOW_ANY_HOST"),
+    )
+
     # Register CORS last so it is the outermost middleware. In addition to
     # handling preflights, this ensures browser clients can read 401 responses
     # produced directly by AuthMiddleware instead of seeing an opaque CORS

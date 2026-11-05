@@ -187,3 +187,17 @@ def test_rotas():
     assert client.post("/v1/extensoes/habilidades/recarregar").json() == {"ligadas": 0}
     assert client.delete("/v1/extensoes/habilidades/ata").json() == {"ok": True}
     assert client.delete("/v1/extensoes/habilidades/ata").status_code == 404
+
+
+@pytest.mark.parametrize(
+    "nome", ["../../..", "..", "C:/Users/x/Documents", "a/../../b"]
+)
+def test_zip_com_nome_que_sai_da_pasta_nao_apaga_nada(home, nome):
+    alvo = home.parent / "precioso"
+    alvo.mkdir()
+    (alvo / "foto.txt").write_text("não apagar", encoding="utf-8")
+    toml = "[skill]\nname = " + repr(nome).replace("'", '"') + '\ndescription = "x"\n'
+    md = SKILL.format(nome="ok", desc="Ok.")
+    (resultado,) = hab.importar_zip(_zip({"x/skill.toml": toml, "x/SKILL.md": md}))
+    assert not resultado["ok"]
+    assert (alvo / "foto.txt").read_text(encoding="utf-8") == "não apagar"

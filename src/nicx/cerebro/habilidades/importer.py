@@ -16,6 +16,7 @@ Steps performed by ``import_skill``:
 
 from __future__ import annotations
 
+import re
 import shutil
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -33,6 +34,9 @@ from nicx.cerebro.habilidades.security import (
 from nicx.cerebro.habilidades.sources.base import ResolvedSkill
 from nicx.cerebro.habilidades.tool_translator import ToolTranslator
 from nicx.nucleo.paths import get_config_dir
+
+# Nome de pasta seguro para a habilidade e a fonte (sem "..", barras ou letra de drive).
+_NOME_SEGURO = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$")
 
 # Subdirectories of a skill that are always copied (never gated by --with-scripts)
 COPIED_SUBDIRS = ("references", "assets", "templates")
@@ -83,7 +87,21 @@ class SkillImporter:
         tools, untranslated tools, and warnings.
         """
         result = ImportResult()
-        target_dir = self._target_root / resolved.source / resolved.name
+        # O nome e a fonte viram pastas (e a pasta antiga é apagada com
+        # rmtree): "../../.." num skill.toml apagaria a pasta do usuário.
+        raiz = self._target_root.resolve()
+        target_dir = (raiz / resolved.source / resolved.name).resolve()
+        if (
+            not _NOME_SEGURO.match(resolved.name or "")
+            or not _NOME_SEGURO.match(resolved.source or "")
+            or target_dir.parent.parent != raiz
+        ):
+            result.success = False
+            result.warnings.append(
+                f"Nome de habilidade inválido: {resolved.name!r} "
+                "(use letras minúsculas, números e hífen)"
+            )
+            return result
         result.target_path = target_dir
 
         # Skip if already installed and force is False
