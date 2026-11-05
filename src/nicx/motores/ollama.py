@@ -313,6 +313,42 @@ def _find_ollama() -> str | None:
 
 
 @EngineRegistry.register("ollama")
+def _juntar_partes(resp: Any, payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Monta, das partes de /api/chat, a mesma resposta do pedido sem partes.
+
+    Confere o Parar a cada parte: :class:`~nicx.nucleo.cancelamento.Cancelado`
+    sai do ``with`` de quem chamou e a conexão fecha.
+    """
+    from nicx.nucleo import cancelamento
+
+    texto: List[str] = []
+    chamadas: List[Dict[str, Any]] = []
+    final: Dict[str, Any] = {}
+    for linha in resp.iter_lines():
+        cancelamento.verificar()
+        if not linha.strip():
+            continue
+        try:
+            parte = json.loads(linha)
+        except json.JSONDecodeError:
+            continue
+        if parte.get("error"):
+            return {"error": parte["error"]}
+        mensagem = parte.get("message") or {}
+        if mensagem.get("content"):
+            texto.append(mensagem["content"])
+        if mensagem.get("tool_calls"):
+            chamadas.extend(mensagem["tool_calls"])
+        if parte.get("done"):
+            final = parte
+    data = {k: v for k, v in final.items() if k != "message"}
+    data.setdefault("model", payload.get("model", ""))
+    data["message"] = {"role": "assistant", "content": "".join(texto)}
+    if chamadas:
+        data["message"]["tool_calls"] = chamadas
+    return data
+
+
 class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
     """Ollama backend via its native HTTP API."""
 
@@ -355,6 +391,44 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
         if _looks_like_out_of_memory(detail):
             raise _out_of_memory_error((detail or "").strip()[:500], status)
         super()._raise_stream_http_error(status, detail)
+
+    def _pedir_chat(self, payload: Dict[str, Any], *, com_ferramentas: bool) -> dict:
+        """POST /api/chat e a resposta inteira, no formato sem partes.
+
+        Dentro de um pedido que pode ser parado (:mod:`nicx.nucleo.cancelamento`,
+        o chat do app), pede em partes e confere o Parar entre elas: sair do
+        ``with`` fecha a conexão e o Ollama para de gerar. Fora disso (terminal,
+        rotinas, testes), o pedido simples de sempre.
+        """
+        from nicx.nucleo import cancelamento
+
+        if cancelamento.atual() is None:
+            resp = self._client.post("/api/chat", json=payload)
+            if resp.status_code == 400 and com_ferramentas:
+                # Model may not support function calling -- retry without tools
+                payload.pop("tools", None)
+                resp = self._client.post("/api/chat", json=payload)
+            resp.raise_for_status()
+            return resp.json()
+
+        cancelamento.verificar()
+        sem_ferramentas = False
+        with self._client.stream(
+            "POST", "/api/chat", json={**payload, "stream": True}
+        ) as resp:
+            if resp.status_code == 400 and com_ferramentas:
+                resp.read()
+                sem_ferramentas = True
+            elif not resp.is_success:
+                resp.read()
+                resp.raise_for_status()
+            else:
+                return _juntar_partes(resp, payload)
+        # O modelo não aceita ferramentas: de novo, sem elas.
+        if sem_ferramentas:
+            payload.pop("tools", None)
+            return self._pedir_chat(payload, com_ferramentas=False)
+        return {}
 
     def generate(
         self,
@@ -409,12 +483,7 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
             elif isinstance(response_format, dict):
                 payload["format"] = "json"
         try:
-            resp = self._client.post("/api/chat", json=payload)
-            if resp.status_code == 400 and tools:
-                # Model may not support function calling -- retry without tools
-                payload.pop("tools", None)
-                resp = self._client.post("/api/chat", json=payload)
-            resp.raise_for_status()
+            data = self._pedir_chat(payload, com_ferramentas=bool(tools))
         except (httpx.ConnectError, httpx.TimeoutException) as exc:
             raise EngineConnectionError(
                 f"Ollama not reachable at {self._host}"
@@ -436,9 +505,20 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
             raise EngineRequestError(
                 f"Ollama returned {status}: {body}", status=status, detail=body
             ) from exc
-        data = resp.json()
         if data.get("error"):
-            raise _erro_do_ollama(str(data["error"]))
+            erro = str(data["error"])
+            # Em partes, a queda da placa de vídeo chega como erro no meio
+            # da resposta (HTTP 200): mesma volta para a CPU.
+            if _motor_caiu(erro) and not _SO_CPU and "num_gpu" not in kwargs:
+                _passar_para_cpu(erro)
+                return self.generate(
+                    messages,
+                    model=model,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    **kwargs,
+                )
+            raise _erro_do_ollama(erro)
         # prompt_eval_count = tokens actually evaluated (KV-cache-aware).
         # estimate_prompt_tokens = full prompt size (for cost comparison).
         # We report both so downstream can use the right one:

@@ -22,6 +22,7 @@ from typing import Any, Callable, List, Optional
 from nicx.cerebro.agentes._stubs import AgentContext, AgentResult, ToolUsingAgent
 from nicx.ferramentas._stubs import BaseTool
 from nicx.motores._stubs import InferenceEngine
+from nicx.nucleo import cancelamento
 from nicx.nucleo.events import EventBus
 from nicx.nucleo.registry import AgentRegistry
 from nicx.nucleo.types import Message, Role, ToolCall, ToolResult
@@ -178,6 +179,7 @@ class OrchestratorAgent(ToolUsingAgent):
         turns = 0
 
         for _turn in range(self._max_turns):
+            cancelamento.verificar()
             turns += 1
 
             if self._loop_guard:
@@ -376,6 +378,7 @@ class OrchestratorAgent(ToolUsingAgent):
         inicio = time.monotonic()
 
         for _turn in range(self._max_turns):
+            cancelamento.verificar()
             turns += 1
 
             if self._loop_guard:
@@ -543,6 +546,7 @@ class OrchestratorAgent(ToolUsingAgent):
                             )
                             continue
 
+                    cancelamento.verificar()
                     tool_result = self._executor.execute(tc)
                     all_tool_results.append(tool_result)
 

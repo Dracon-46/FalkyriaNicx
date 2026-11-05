@@ -155,14 +155,29 @@ class AgentStreamBridge:
 
     async def stream(self) -> AsyncGenerator[str, None]:
         """Async generator that yields SSE-formatted strings."""
+        from nicx.nucleo import cancelamento
+
         self._subscribe_all()
 
-        # Kick off agent.run() in a background thread
+        # Kick off agent.run() in a background thread. O Parar do app fecha
+        # esta conexão: o ``finally`` abaixo avisa a thread (que vê o mesmo
+        # Cancelamento, porque ``to_thread`` copia o contexto) e o Ollama
+        # para de gerar.
+        parar = cancelamento.Cancelamento()
+        marca = cancelamento.ATUAL.set(parar)
         loop = asyncio.get_event_loop()
-        agent_task = asyncio.ensure_future(asyncio.to_thread(self._run_agent))
+        try:
+            agent_task = asyncio.ensure_future(asyncio.to_thread(self._run_agent))
+        finally:
+            cancelamento.ATUAL.reset(marca)
 
         def _on_done(fut):
             loop.call_soon_threadsafe(self._queue.put_nowait, _DONE)
+            # Parado: a exceção é esperada e ninguém vai ler o resultado.
+            if not fut.cancelled() and isinstance(
+                fut.exception(), cancelamento.Cancelado
+            ):
+                return
 
         agent_task.add_done_callback(_on_done)
 
@@ -309,6 +324,10 @@ class AgentStreamBridge:
                 agent_task.cancel()
             raise
         finally:
+            # Saiu antes do fim (o navegador parou ou caiu): a thread do
+            # agente para no próximo passo e a geração do Ollama é cortada.
+            if not agent_task.done():
+                parar.cancelar()
             self._unsubscribe_all()
 
 
