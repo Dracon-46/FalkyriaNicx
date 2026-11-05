@@ -615,6 +615,11 @@ function Stop-AppServer {
     if (-not $proc.HasExited) { Stop-Process -Id $serverPid -Force -ErrorAction SilentlyContinue }
 }
 
+# Definida já aqui: com o Ollama aberto antes (bandeja, ou o Nicx ligado numa
+# atualização) a preparação não o liga, e o Set-StrictMode derrubava o fim
+# com "a variável $script:OllamaFromSetup ainda não foi definida".
+$script:OllamaFromSetup = $null
+
 function Start-Ollama([string] $exe) {
     # Só o "ollama serve", escondido: o "ollama app.exe" abre uma janela e,
     # como processo filho, prenderia o assistente até o usuário fechá-la.
