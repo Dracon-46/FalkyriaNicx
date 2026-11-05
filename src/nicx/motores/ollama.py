@@ -158,6 +158,63 @@ def _out_of_memory_error(detail: str, status: int) -> EngineOutOfMemoryError:
     )
 
 
+# Quando o processo do modelo cai (placa de vídeo com pouca memória, driver
+# instável), o Ollama responde com um erro, às vezes *dentro* do stream (HTTP
+# 200 e uma linha {"error": ...}). O Nicx tenta de novo só no processador e, a
+# partir daí, não usa mais a placa neste processo.
+_CRASH_MARKERS = (
+    "runner process has terminated",
+    "has unexpectedly stopped",
+    "llama runner",
+    "model runner",
+    "exit status",
+    "cuda error",
+    "cudamalloc",
+    "ggml_cuda",
+    "vulkan",
+    "rocm",
+    "hip error",
+    "gpu",
+)
+_SO_CPU = False
+
+
+class _MotorCaiu(Exception):
+    """O processo do modelo caiu; ``detail`` é o que o Ollama disse."""
+
+    def __init__(self, detail: str) -> None:
+        super().__init__(detail)
+        self.detail = detail
+
+
+def _motor_caiu(detail: str) -> bool:
+    low = (detail or "").lower()
+    return any(marker in low for marker in _CRASH_MARKERS)
+
+
+def _passar_para_cpu(detail: str) -> None:
+    global _SO_CPU
+    _SO_CPU = True
+    logger.warning(
+        "O Ollama caiu usando a placa de vídeo; o Nicx vai usar só o processador: %s",
+        (detail or "").strip()[:300],
+    )
+
+
+def _erro_do_ollama(detail: str, status: int = 500) -> EngineRequestError:
+    """Erro do Ollama em português, com o que ele disse (para o log e a tela)."""
+    texto = (detail or "").strip()[:300]
+    if _looks_like_out_of_memory(texto):
+        return _out_of_memory_error(texto, status)
+    logger.warning("O Ollama falhou ao responder: %s", texto)
+    return EngineRequestError(
+        f"O motor de IA (Ollama) falhou ao responder: {texto}. Tente de novo; "
+        "se continuar, reinicie o Nicx.",
+        status=status,
+        detail=texto,
+    )
+
+
 def _ollama_request_options(
     *,
     temperature: float,
@@ -175,6 +232,8 @@ def _ollama_request_options(
         options["num_ctx"] = _default_num_ctx()
     if kwargs.get("num_gpu") is not None:
         options["num_gpu"] = int(kwargs["num_gpu"])
+    elif _SO_CPU:
+        options["num_gpu"] = 0  # a placa de vídeo já derrubou o motor
     return options
 
 
@@ -356,12 +415,23 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
         except httpx.HTTPStatusError as exc:
             body = exc.response.text[:500] if exc.response else ""
             status = exc.response.status_code
+            if _motor_caiu(body) and not _SO_CPU and "num_gpu" not in kwargs:
+                _passar_para_cpu(body)
+                return self.generate(
+                    messages,
+                    model=model,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    **kwargs,
+                )
             if _looks_like_out_of_memory(body):
                 raise _out_of_memory_error(body, status) from exc
             raise EngineRequestError(
                 f"Ollama returned {status}: {body}", status=status, detail=body
             ) from exc
         data = resp.json()
+        if data.get("error"):
+            raise _erro_do_ollama(str(data["error"]))
         # prompt_eval_count = tokens actually evaluated (KV-cache-aware).
         # estimate_prompt_tokens = full prompt size (for cost comparison).
         # We report both so downstream can use the right one:
@@ -455,6 +525,31 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
             payload["think"] = False
         elif kwargs["think"] is not None:
             payload["think"] = kwargs["think"]
+        gerou = False
+        try:
+            async for parte in self._stream_texto(payload, messages):
+                gerou = True
+                yield parte
+        except _MotorCaiu as exc:
+            # Caiu antes de escrever: de novo, só no processador.
+            if gerou or _SO_CPU or "num_gpu" in kwargs:
+                raise _erro_do_ollama(exc.detail) from exc
+            _passar_para_cpu(exc.detail)
+            payload["options"]["num_gpu"] = 0
+            try:
+                async for parte in self._stream_texto(payload, messages):
+                    gerou = True
+                    yield parte
+            except _MotorCaiu as de_novo:
+                raise _erro_do_ollama(de_novo.detail) from de_novo
+        if not gerou:
+            # Sem texto e sem erro: antes a tela ficava em branco, sem aviso.
+            raise _erro_do_ollama("o modelo terminou sem escrever nada")
+
+    async def _stream_texto(
+        self, payload: Dict[str, Any], messages: Sequence[Message]
+    ) -> AsyncIterator[str]:
+        """Uma tentativa do stream de texto; ``_MotorCaiu`` se o modelo cair."""
         try:
             # ASYNC streaming: ``httpx.AsyncClient`` + ``aiter_lines`` never
             # blocks the event loop between tokens (the previous SYNC
@@ -474,6 +569,8 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
                     # Read the (short) error body before touching ``.text``:
                     # a streaming response is otherwise unread.
                     await resp.aread()
+                    if _motor_caiu(resp.text):
+                        raise _MotorCaiu(resp.text)
                     self._raise_stream_http_error(resp.status_code, resp.text)
                 async for line in resp.aiter_lines():
                     if not line.strip():
@@ -482,6 +579,13 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
                         chunk = json.loads(line)
                     except json.JSONDecodeError:
                         continue
+                    if chunk.get("error"):
+                        # Erro no meio do stream (HTTP 200): antes era ignorado
+                        # e a resposta saía vazia.
+                        erro = str(chunk["error"])
+                        if _motor_caiu(erro):
+                            raise _MotorCaiu(erro)
+                        raise _erro_do_ollama(erro)
                     content = chunk.get("message", {}).get("content", "")
                     if content:
                         yield content
@@ -556,10 +660,25 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
         if tools:
             payload["tools"] = tools
 
-        async for chunk in self._run_stream(
-            payload, messages, retry_without_tools=bool(tools)
-        ):
-            yield chunk
+        gerou = False
+        try:
+            async for chunk in self._run_stream(
+                payload, messages, retry_without_tools=bool(tools)
+            ):
+                gerou = gerou or bool(chunk.content or chunk.tool_calls)
+                yield chunk
+        except _MotorCaiu as exc:
+            if gerou or _SO_CPU or "num_gpu" in kwargs:
+                raise _erro_do_ollama(exc.detail) from exc
+            _passar_para_cpu(exc.detail)
+            payload["options"]["num_gpu"] = 0
+            try:
+                async for chunk in self._run_stream(
+                    payload, messages, retry_without_tools=bool(payload.get("tools"))
+                ):
+                    yield chunk
+            except _MotorCaiu as de_novo:
+                raise _erro_do_ollama(de_novo.detail) from de_novo
 
     async def _run_stream(
         self,
@@ -594,6 +713,8 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
                 # silent EMPTY stream rather than a clean engine error.
                 if not resp.is_success:
                     await resp.aread()
+                    if _motor_caiu(resp.text):
+                        raise _MotorCaiu(resp.text)
                     self._raise_stream_http_error(resp.status_code, resp.text)
 
                 finish_reason: str | None = None
@@ -604,6 +725,11 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
                         chunk = json.loads(line)
                     except json.JSONDecodeError:
                         continue
+                    if chunk.get("error"):
+                        erro = str(chunk["error"])
+                        if _motor_caiu(erro):
+                            raise _MotorCaiu(erro)
+                        raise _erro_do_ollama(erro)
 
                     message = chunk.get("message", {}) or {}
                     content = message.get("content", "")

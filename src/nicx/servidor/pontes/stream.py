@@ -213,7 +213,7 @@ class AgentStreamBridge:
                 elif "400" in error_str:
                     error_content = f"The model returned an error: {error_str}"
                 else:
-                    error_content = f"Sorry, an error occurred: {error_str}"
+                    error_content = f"Não consegui responder: {error_str}"
                 error_chunk = ChatCompletionChunk(
                     id=self._chunk_id,
                     model=self._model,

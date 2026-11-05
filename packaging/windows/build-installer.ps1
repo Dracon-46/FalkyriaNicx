@@ -241,6 +241,11 @@ Invoke-Native $uv @('export', '--quiet', '--frozen', '--format', 'requirements.t
     '--extra', 'server', '--extra', 'memory-bm25', '--extra', 'pdf', '--extra', 'speech', '--extra', 'voice',
     '--output-file', $constraints)
 $pins = @(Get-Content -LiteralPath $constraints | Where-Object { $_ -match '^[A-Za-z0-9]' }).Count
+# Sem tzdata o Windows não tem fusos: ZoneInfo("America/Sao_Paulo") falha nos
+# PCs dos usuários (aconteceu na 0.2.0) e passa despercebido aqui.
+if (-not (Select-String -LiteralPath $constraints -Pattern '^tzdata==' -Quiet)) {
+    throw 'constraints.txt sem tzdata: confira a dependência no pyproject.toml e rode uv lock.'
+}
 Write-Ok "$pins versões fixadas em dist\constraints.txt"
 
 # Dependências publicadas só como código-fonte (sdist) seriam compiladas na

@@ -1185,7 +1185,7 @@ async def _handle_agent_stream(
                 choices=[
                     StreamChoice(
                         delta=DeltaMessage(
-                            content=f"Sorry, an error occurred: {exc}",
+                            content=f"Não consegui responder: {exc}",
                         ),
                         finish_reason="stop",
                     )
@@ -1324,7 +1324,7 @@ async def _handle_stream_tools(
                 choices=[
                     StreamChoice(
                         delta=DeltaMessage(
-                            content=f"\n\nError during generation: {exc}",
+                            content=f"\n\nNão consegui responder: {exc}",
                         ),
                         finish_reason="stop",
                     )
@@ -1492,7 +1492,7 @@ async def _handle_stream(
                 choices=[
                     StreamChoice(
                         delta=DeltaMessage(
-                            content=f"\n\nError during generation: {exc}",
+                            content=f"\n\nNão consegui responder: {exc}",
                         ),
                         finish_reason="stop",
                     )

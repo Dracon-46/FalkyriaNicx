@@ -43,6 +43,9 @@ dependencies = [
     "rich>=13",
     "tomli>=2.0; python_version < '3.11'",
     "tomlkit>=0.12",
+    # O Windows não tem banco de fusos: sem isto, ZoneInfo("America/Sao_Paulo")
+    # falha (briefing, agenda, resumo do dia e a hora certa).
+    "tzdata>=2024.1; sys_platform == 'win32'",
     "websockets>=15.0.1",
 ]
 
