@@ -884,7 +884,13 @@ voice_speed = 1.0
             }
             Set-StepProgress 0.88
             Write-StatusInfo 'Instalando o Ollama...'
-            $p = Start-Process -FilePath $setup -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-' -PassThru -Wait
+            # Sem -Wait: ele espera também os processos filhos, e o instalador do
+            # Ollama abre o "ollama app" (bandeja), que fica rodando. A espera
+            # nunca acabava e a instalação do Nicx parava aqui.
+            $p = Start-Process -FilePath $setup -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-' -PassThru
+            if (-not $p.WaitForExit(15 * 60 * 1000)) {
+                throw 'O instalador do Ollama passou de 15 minutos sem terminar. Reinicie o computador e execute o instalador do Nicx de novo.'
+            }
             if ($p.ExitCode -ne 0) { throw "O instalador do Ollama terminou com código $($p.ExitCode)." }
             Remove-Item -LiteralPath $setup -Force -ErrorAction SilentlyContinue
             $ollamaExe = Find-Ollama
