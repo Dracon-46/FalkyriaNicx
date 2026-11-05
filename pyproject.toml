@@ -102,6 +102,12 @@ server = [
     "python-docx>=1.1",
     # Seleção de texto e "clica em Salvar" (UI Automation); antes só vinha com a voz.
     "pythonnet>=3.0; sys_platform == 'win32'",
+    # Imagens e vídeos anexados no chat (nicx.anexos): reduzir as imagens e
+    # tirar quadros do vídeo, também na instalação sem voz. A fala do vídeo
+    # usa o Whisper, que vem com a voz.
+    "pillow>=10",
+    "av>=11,<19",
+    "numpy>=1.24",
 ]
 desktop = [
     "fastapi>=0.110",

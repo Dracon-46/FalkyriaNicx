@@ -451,6 +451,24 @@ def _cortar_historico(messages: list, num_ctx: int) -> list:
     return [*sistema, *ficam, messages[-1]]
 
 
+async def _preparar_anexos(request_body: Any) -> bool:
+    """Confere e reduz as imagens da última mensagem; diz se havia alguma."""
+    if not request_body.messages:
+        return False
+    ultima = request_body.messages[-1]
+    imagens = getattr(ultima, "images", None)
+    if ultima.role != "user" or not imagens:
+        return False
+    from nicx.anexos import AnexoInvalido
+    from nicx.anexos.imagens import preparar
+
+    try:
+        ultima.images = await asyncio.to_thread(preparar, list(imagens))
+    except AnexoInvalido as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return True
+
+
 def _num_ctx(config: Any) -> int:
     ollama = getattr(getattr(config, "engine", None), "ollama", None)
     try:
@@ -522,6 +540,9 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
         request_body.messages = _cortar_historico(
             list(request_body.messages), _num_ctx(config)
         )
+    # Imagens que a pessoa anexou (ou quadros de um vídeo): abertas de
+    # verdade e reduzidas aqui, porque a API aceita qualquer cliente.
+    anexou_imagens = await _preparar_anexos(request_body)
     # The assistant the user picked ("Tutor de estudos"): its instructions go
     # into the system prompt and only its tools reach the model (contextvar,
     # read by SystemPromptBuilder and ToolExecutor in the worker threads too).
@@ -538,8 +559,22 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
         and _turn_needs_agent_tools(request_body, agent, config)
     )
 
+    if anexou_imagens:
+        # A imagem só chega ao modelo pelo caminho direto (sem a lista de
+        # ferramentas); um modelo que não enxerga avisa em vez de inventar.
+        from nicx.visao.modelo import enxerga
+
+        if not await asyncio.to_thread(enxerga, model, config):
+            from nicx.contexto.textos import texto as frase_contexto
+
+            reply = frase_contexto("sem_visao", request_body.language)
+            return _immediate_response(reply, model, stream=request_body.stream)
+        use_server_agent = False
+
     # "Cria um assistente que revisa contratos": the local model drafts it.
-    created = await _assistant_turn(request_body, request, model)
+    created = (
+        None if anexou_imagens else await _assistant_turn(request_body, request, model)
+    )
     if created is not None:
         return _immediate_response(created, model, stream=request_body.stream)
 
@@ -547,11 +582,13 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
     # plain note. "O que falta no projeto X" answers right away; "continue de
     # onde parei" sends a compact project summary to the model, without the
     # tool list (the summary already has what the answer needs).
-    plano = await _plan_turn(request_body, request, model)
+    plano = None if anexou_imagens else await _plan_turn(request_body, request, model)
     if plano is not None:
         return _immediate_response(plano, model, stream=request_body.stream)
 
-    project = await _project_turn(request_body, config, model)
+    project = (
+        None if anexou_imagens else await _project_turn(request_body, config, model)
+    )
     if project is not None and project.resposta is not None:
         return _immediate_response(project.resposta, model, stream=request_body.stream)
     project_summary = project.resumo if project is not None else None
@@ -562,7 +599,7 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
     # "Aumenta o volume", "que horas são": executa na hora, sem o modelo.
     quick_reply = (
         None
-        if project_summary is not None
+        if project_summary is not None or anexou_imagens
         else await _quick_action_reply(request_body, config)
     )
     if quick_reply is not None:
@@ -577,9 +614,10 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
 
     # "Resume o que eu copiei", "explica isso aqui": the clipboard or the
     # window the user is looking at goes to the model with the request.
+    # Com imagem anexada, "o que é isso?" fala da imagem, não da tela.
     screen = (
         None
-        if project_summary is not None
+        if project_summary is not None or anexou_imagens
         else await _screen_context(request_body, config, model)
     )
     if screen is not None and screen.resposta is not None:

@@ -4,7 +4,8 @@ import i18n from '../i18n';
 
 export interface ChatRequest {
   model: string;
-  messages: Array<{ role: string; content: string }>;
+  /** `images`: base64 sem o prefixo data:, só na última mensagem. */
+  messages: Array<{ role: string; content: string; images?: string[] }>;
   stream: true;
   temperature?: number;
   max_tokens?: number;

@@ -5,7 +5,8 @@ import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import 'katex/dist/katex.min.css';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, Film, Image as ImageIcon } from 'lucide-react';
+import { miniaturasDa } from '../../lib/anexos';
 import { AudioPlayer } from './AudioPlayer';
 import { ToolCallCard } from './ToolCallCard';
 import { ResearchTimeline } from './ResearchTimeline';
@@ -101,6 +102,29 @@ function CopyMessageButton({ content }: { content: string }) {
   );
 }
 
+/** Imagens e vídeos da mensagem: miniaturas nesta sessão, nomes depois. */
+function MessageAttachments({ id, attachments }: { id: string; attachments: NonNullable<ChatMessage['attachments']> }) {
+  const miniaturas = miniaturasDa(id);
+  if (miniaturas.length) {
+    return (
+      <div className="flex flex-wrap gap-1.5 mb-1.5" style={{ whiteSpace: 'normal' }}>
+        {miniaturas.map((src, i) => (
+          <img key={i} src={src} alt={attachments[i]?.nome ?? ''} className="h-20 rounded-lg object-cover" />
+        ))}
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-wrap gap-1.5 mb-1.5 text-xs opacity-80" style={{ whiteSpace: 'normal' }}>
+      {attachments.map((a, i) => (
+        <span key={i} className="inline-flex items-center gap-1">
+          {a.tipo === 'video' ? <Film size={12} /> : <ImageIcon size={12} />} {a.nome}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function MessageBubble({ message, isLive = false }: Props) {
   const isUser = message.role === 'user';
 
@@ -135,6 +159,9 @@ export function MessageBubble({ message, isLive = false }: Props) {
             wordBreak: 'break-word',
           }}
         >
+          {message.attachments && message.attachments.length > 0 && (
+            <MessageAttachments id={message.id} attachments={message.attachments} />
+          )}
           {message.content}
         </div>
       </div>

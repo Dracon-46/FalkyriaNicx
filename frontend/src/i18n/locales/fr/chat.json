@@ -154,5 +154,21 @@
     "hint": "Vous pouvez parler. Dites « tchau » pour me fermer.",
     "listenAgain": "Écouter à nouveau",
     "end": "Terminer"
+  },
+  "attach": {
+    "button": "Joindre une image ou une vidéo",
+    "remove": "Retirer {{name}}",
+    "preparingVideo": "Préparation de la vidéo…",
+    "videoReady": "{{frames}} images prêtes",
+    "waitVideo": "Attendez que la vidéo soit prête.",
+    "notSupported": "{{name}} : seules les images et les vidéos peuvent être jointes.",
+    "tooMany": "Au maximum {{max}} images par message (une vidéo les utilise toutes).",
+    "pasted": "Image collée",
+    "imageFailed": "Je n'ai pas pu ouvrir l'image.",
+    "videoFailed": "Je n'ai pas pu préparer la vidéo : {{detail}}",
+    "imagePrompt": "Qu'y a-t-il sur cette image ?",
+    "videoPrompt": "Que se passe-t-il dans cette vidéo ?",
+    "videoInfo": "Vidéo « {{name}} », {{seconds}} s ; les images en sont des extraits, dans l'ordre",
+    "videoAudio": "Ce qui y est dit"
   }
 }

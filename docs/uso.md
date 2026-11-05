@@ -85,6 +85,22 @@ som = true              # bipe curto ao começar e ao terminar
   (o log mostra só o tamanho).
 - Como o atalho, vive no servidor do Nicx e só funciona no Windows.
 
+## Imagens e vídeos no chat
+
+Anexe pelo clipe ao lado do campo, cole um print (Win+Shift+S e Ctrl+V) ou
+arraste o arquivo para o campo. Escreva a pergunta ou mande só o anexo ("O que
+tem nesta imagem?").
+
+- **Imagens:** até 4 por mensagem, reduzidas para 640 px antes de irem ao
+  modelo (o `qwen3.5:4b` enxerga). Um modelo sem visão avisa em vez de inventar.
+- **Vídeos:** viram 4 quadros espalhados pela duração e, se você instalou a voz,
+  a transcrição dos primeiros 3 minutos de áudio (Whisper local). Até 300 MB.
+  Um vídeo usa as 4 vagas de imagem da mensagem.
+- Tudo fica no PC. As imagens não são guardadas na conversa: depois de fechar o
+  app, a mensagem mostra só o nome do arquivo.
+- Pela API: `images` (base64) na última mensagem de `/v1/chat/completions`, e
+  `POST /v1/anexos/video` (multipart, campo `arquivo`) para os quadros e a fala.
+
 ## Contexto: o que eu copiei e a janela aberta
 
 O Nicx enxerga o que você está vendo, sem precisar colar nada:

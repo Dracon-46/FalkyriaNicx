@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Send, Square, Paperclip, Search, AudioLines } from 'lucide-react';
+import { Send, Square, Paperclip, Search, AudioLines, X, Loader2, Film } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocation, useNavigate } from 'react-router';
 import { useAppStore, generateId } from '../../lib/store';
@@ -9,6 +9,17 @@ import { apiFetch, fetchSavings, getBase } from '../../lib/api';
 import { listConnectors, getSyncStatus } from '../../lib/connectors-api';
 import { serializeToolCallArguments } from '../../lib/tool-call';
 import { appShortcut } from '../../lib/shortcut';
+import {
+  MAX_IMAGENS,
+  contarImagens,
+  guardarMiniaturas,
+  prepararImagem,
+  prepararVideo,
+  textoParaModelo,
+  tipoDoArquivo,
+  videoPendente,
+  type Anexo,
+} from '../../lib/anexos';
 import {
   engineFromCompletionChunk,
   resolveChatEngine,
@@ -99,6 +110,13 @@ export function InputArea() {
   const { t } = useTranslation();
   const [input, setInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // Imagens e vídeos que vão com a próxima mensagem.
+  const [anexos, setAnexos] = useState<Anexo[]>([]);
+  const anexosRef = useRef<Anexo[]>([]);
+  anexosRef.current = anexos;
+  const arquivoRef = useRef<HTMLInputElement>(null);
+  const [arrastando, setArrastando] = useState(false);
+  const videoAbort = useRef(new Map<string, AbortController>());
 
   const activeId = useAppStore((s) => s.activeId);
   const selectedModel = useAppStore((s) => s.selectedModel);
@@ -218,13 +236,24 @@ export function InputArea() {
   // `spoken` is a hands-free utterance: sent as is, leaving the typed draft alone.
   const sendMessage = useCallback(async (spoken?: string): Promise<SendOutcome> => {
     const content = (spoken ?? input).trim();
-    if (!content || streamState.isStreaming) return 'not-sent';
+    // A fala do modo mãos-livres não leva os anexos do campo.
+    const usados = spoken === undefined ? anexosRef.current : [];
+    if ((!content && usados.length === 0) || streamState.isStreaming) return 'not-sent';
+    if (usados.some((a) => a.preparando)) {
+      toast(i18n.t('chat.attach.waitVideo'));
+      return 'not-sent';
+    }
+    // Pesquisa profunda é só texto: com anexo, vai pela conversa normal.
+    const pesquisar = deepResearch && usados.length === 0;
     if (!selectedModel) {
       toast.error(i18n.t('chat.input.pickModel', { shortcut: appShortcut('k') }));
       return 'not-sent';
     }
 
-    if (spoken === undefined) setInput('');
+    if (spoken === undefined) {
+      setInput('');
+      if (usados.length) setAnexos([]);
+    }
     // A new question silences whatever Nicx is still saying.
     useTtsStore.getState().stop();
     let stopped = false;
@@ -239,22 +268,30 @@ export function InputArea() {
       role: 'user',
       content,
       timestamp: Date.now(),
+      ...(usados.length ? { attachments: usados.map((a) => ({ tipo: a.tipo, nome: a.nome })) } : {}),
     };
+    guardarMiniaturas(userMsg.id, usados);
     addMessage(convId, userMsg);
 
     // Build API messages before adding assistant placeholder
     const currentMessages = useAppStore.getState().messages;
-    const apiMessages = currentMessages.map((m) => ({
+    const apiMessages: Array<{ role: string; content: string; images?: string[] }> = currentMessages.map((m) => ({
       role: m.role,
       content: m.content,
     }));
+    if (usados.length && apiMessages.length) {
+      // Só a mensagem nova leva as imagens (e a fala dos vídeos).
+      const ultima = apiMessages[apiMessages.length - 1];
+      ultima.content = textoParaModelo(content, usados);
+      ultima.images = usados.flatMap((a) => a.imagens);
+    }
 
     const assistantMsg: ChatMessage = {
       id: generateId(),
       role: 'assistant',
       content: '',
       timestamp: Date.now(),
-      isResearch: deepResearch || undefined,
+      isResearch: pesquisar || undefined,
     };
     addMessage(convId, assistantMsg);
 
@@ -283,7 +320,7 @@ export function InputArea() {
     setStreamState({
       conversationId: convId,
       isStreaming: true,
-      phase: deepResearch ? i18n.t('chat.phase.researching') : i18n.t('chat.phase.generating'),
+      phase: pesquisar ? i18n.t('chat.phase.researching') : i18n.t('chat.phase.generating'),
       elapsedMs: 0,
       activeToolCalls: [],
       content: '',
@@ -292,13 +329,13 @@ export function InputArea() {
       timestamp: Date.now(),
       level: 'info',
       category: 'chat',
-      message: deepResearch
+      message: pesquisar
         ? i18n.t('chat.log.research', { text: `${content.slice(0, 80)}${content.length > 80 ? '...' : ''}` })
         : i18n.t('chat.log.request', { text: `${content.slice(0, 80)}${content.length > 80 ? '...' : ''}`, model: selectedModel }),
     });
 
     try {
-      if (deepResearch) {
+      if (pesquisar) {
         for await (const ev of streamResearch(
           content,
           selectedModel,
@@ -601,7 +638,7 @@ export function InputArea() {
       // `done` event's usage payload — re-fetching here would overwrite
       // it with a potentially stale snapshot if the server's research
       // telemetry hasn't been merged into /v1/savings yet.
-      if (!deepResearch) {
+      if (!pesquisar) {
         fetchSavings()
           .then((data) => useAppStore.getState().setSavings(data))
           .catch(() => {});
@@ -643,6 +680,53 @@ export function InputArea() {
     pendingPromptRef.current = null;
     void sendMessage();
   }, [input, selectedModel, streamState.isStreaming, sendMessage]);
+
+  const removerAnexo = (id: string) => {
+    videoAbort.current.get(id)?.abort();
+    videoAbort.current.delete(id);
+    setAnexos((lista) => lista.filter((a) => a.id !== id));
+  };
+
+  const adicionarArquivos = async (arquivos: File[]) => {
+    for (const arquivo of arquivos) {
+      const tipo = tipoDoArquivo(arquivo);
+      if (!tipo) {
+        toast.error(t('chat.attach.notSupported', { name: arquivo.name }));
+        continue;
+      }
+      const ocupadas = contarImagens(anexosRef.current);
+      const pede = tipo === 'video' ? MAX_IMAGENS : 1;
+      if (ocupadas + pede > MAX_IMAGENS) {
+        toast.error(t('chat.attach.tooMany', { max: MAX_IMAGENS }));
+        return;
+      }
+      if (tipo === 'imagem') {
+        try {
+          const anexo = await prepararImagem(arquivo, arquivo.name || t('chat.attach.pasted'));
+          anexosRef.current = [...anexosRef.current, anexo];
+          setAnexos(anexosRef.current);
+        } catch (err) {
+          toast.error(err instanceof Error ? err.message : String(err));
+        }
+        continue;
+      }
+      const pendente = videoPendente(arquivo);
+      anexosRef.current = [...anexosRef.current, pendente];
+      setAnexos(anexosRef.current);
+      const parar = new AbortController();
+      videoAbort.current.set(pendente.id, parar);
+      prepararVideo(arquivo, pendente, parar.signal)
+        .then((pronto) => {
+          setAnexos((lista) => lista.map((a) => (a.id === pronto.id ? pronto : a)));
+        })
+        .catch((err) => {
+          if (parar.signal.aborted) return;
+          setAnexos((lista) => lista.filter((a) => a.id !== pendente.id));
+          toast.error(err instanceof Error ? err.message : String(err));
+        })
+        .finally(() => videoAbort.current.delete(pendente.id));
+    }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -728,19 +812,99 @@ export function InputArea() {
           </div>
         )}
       </div>
+      {anexos.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-2" data-testid="chat-attachments">
+          {anexos.map((a) => (
+            <div
+              key={a.id}
+              className="relative flex items-center gap-2 pl-1 pr-7 py-1 rounded-xl text-xs max-w-[14rem]"
+              style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }}
+            >
+              {a.miniatura ? (
+                <img src={a.miniatura} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
+              ) : (
+                <span className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'var(--color-bg-tertiary)' }}>
+                  {a.preparando ? <Loader2 size={14} className="animate-spin" /> : <Film size={14} />}
+                </span>
+              )}
+              <span className="min-w-0">
+                <span className="block truncate" style={{ color: 'var(--color-text)' }}>{a.nome}</span>
+                {a.preparando && <span className="block">{t('chat.attach.preparingVideo')}</span>}
+                {a.tipo === 'video' && !a.preparando && (
+                  <span className="block">{t('chat.attach.videoReady', { frames: a.imagens.length })}</span>
+                )}
+              </span>
+              <button
+                type="button"
+                onClick={() => removerAnexo(a.id)}
+                className="absolute top-1 right-1 p-0.5 rounded cursor-pointer"
+                style={{ color: 'var(--color-text-tertiary)' }}
+                aria-label={t('chat.attach.remove', { name: a.nome })}
+                title={t('chat.attach.remove', { name: a.nome })}
+              >
+                <X size={12} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
       <div
         className="flex items-center gap-2 rounded-2xl px-4 py-3 transition-shadow"
         style={{
           background: 'var(--color-input-bg)',
-          border: '1px solid var(--color-input-border)',
+          border: `1px ${arrastando ? 'dashed var(--color-accent)' : 'solid var(--color-input-border)'}`,
           boxShadow: 'var(--shadow-sm)',
         }}
+        onDragOver={(e) => {
+          if (!Array.from(e.dataTransfer.types).includes('Files')) return;
+          e.preventDefault();
+          setArrastando(true);
+        }}
+        onDragLeave={() => setArrastando(false)}
+        onDrop={(e) => {
+          if (!e.dataTransfer.files.length) return;
+          e.preventDefault();
+          setArrastando(false);
+          void adicionarArquivos(Array.from(e.dataTransfer.files));
+        }}
       >
+        <input
+          ref={arquivoRef}
+          type="file"
+          accept="image/*,video/*"
+          multiple
+          hidden
+          data-testid="chat-attach-input"
+          onChange={(e) => {
+            const lista = Array.from(e.target.files ?? []);
+            e.target.value = '';
+            void adicionarArquivos(lista);
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => arquivoRef.current?.click()}
+          disabled={streamState.isStreaming || modelLoading}
+          className="p-1.5 rounded-lg shrink-0 cursor-pointer disabled:opacity-30 disabled:cursor-default"
+          style={{ color: 'var(--color-text-tertiary)' }}
+          title={t('chat.attach.button')}
+          aria-label={t('chat.attach.button')}
+          data-testid="chat-attach"
+        >
+          <Paperclip size={16} />
+        </button>
         <textarea
           ref={textareaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
+          onPaste={(e) => {
+            // Print colado (Win+Shift+S) vira anexo; texto colado segue normal.
+            const arquivos = Array.from(e.clipboardData.files).filter((f) => tipoDoArquivo(f) !== null);
+            if (!arquivos.length) return;
+            e.preventDefault();
+            void adicionarArquivos(arquivos);
+          }}
           placeholder={
             streamState.isStreaming && !isCurrentChatStreaming
               ? t('chat.input.busyElsewhere')
@@ -773,13 +937,19 @@ export function InputArea() {
             />
             <button
               onClick={() => void sendMessage()}
-              disabled={streamState.isStreaming || !input.trim() || modelLoading || !selectedModel}
+              disabled={
+                streamState.isStreaming ||
+                (!input.trim() && anexos.length === 0) ||
+                anexos.some((a) => a.preparando) ||
+                modelLoading ||
+                !selectedModel
+              }
               title={selectedModel ? t('chat.input.send') : t('chat.input.pickModel', { shortcut: appShortcut('k') })}
               aria-label={t('chat.input.send')}
               className="p-2 rounded-xl transition-colors shrink-0 cursor-pointer disabled:opacity-30 disabled:cursor-default"
               style={{
-                background: input.trim() ? 'var(--color-accent)' : 'var(--color-bg-tertiary)',
-                color: input.trim() ? 'white' : 'var(--color-text-tertiary)',
+                background: input.trim() || anexos.length ? 'var(--color-accent)' : 'var(--color-bg-tertiary)',
+                color: input.trim() || anexos.length ? 'white' : 'var(--color-text-tertiary)',
               }}
             >
               <Send size={16} />

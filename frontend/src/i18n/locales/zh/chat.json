@@ -154,5 +154,21 @@
     "hint": "请说话。说“tchau”我就会关闭。",
     "listenAgain": "再次聆听",
     "end": "结束"
+  },
+  "attach": {
+    "button": "附加图片或视频",
+    "remove": "移除 {{name}}",
+    "preparingVideo": "正在准备视频…",
+    "videoReady": "{{frames}} 帧已就绪",
+    "waitVideo": "请等待视频准备好。",
+    "notSupported": "{{name}}：只能附加图片和视频。",
+    "tooMany": "每条消息最多 {{max}} 张图片（一个视频会全部占用）。",
+    "pasted": "粘贴的图片",
+    "imageFailed": "无法打开图片。",
+    "videoFailed": "无法准备视频：{{detail}}",
+    "imagePrompt": "这张图片里有什么？",
+    "videoPrompt": "这个视频里发生了什么？",
+    "videoInfo": "视频“{{name}}”，{{seconds}} 秒；图片是其中的画面，按顺序排列",
+    "videoAudio": "视频中说的话"
   }
 }

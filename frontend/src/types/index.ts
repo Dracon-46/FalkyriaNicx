@@ -127,6 +127,8 @@ export interface ChatMessage {
   usage?: TokenUsage;
   telemetry?: MessageTelemetry;
   audio?: { url: string };
+  /** Imagens e vídeos que foram com a mensagem (só o tipo e o nome). */
+  attachments?: { tipo: 'imagem' | 'video'; nome: string }[];
 }
 
 export interface Conversation {

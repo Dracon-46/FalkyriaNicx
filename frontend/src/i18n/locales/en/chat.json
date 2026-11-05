@@ -154,5 +154,21 @@
     "hint": "Go ahead and talk. Say “tchau” to close me.",
     "listenAgain": "Listen again",
     "end": "End"
+  },
+  "attach": {
+    "button": "Attach image or video",
+    "remove": "Remove {{name}}",
+    "preparingVideo": "Preparing the video…",
+    "videoReady": "{{frames}} frames ready",
+    "waitVideo": "Wait for the video to be ready.",
+    "notSupported": "{{name}}: only images and videos can be attached.",
+    "tooMany": "At most {{max}} images per message (a video uses all of them).",
+    "pasted": "Pasted image",
+    "imageFailed": "I couldn't open the image.",
+    "videoFailed": "I couldn't prepare the video: {{detail}}",
+    "imagePrompt": "What is in this image?",
+    "videoPrompt": "What happens in this video?",
+    "videoInfo": "Video \"{{name}}\", {{seconds}} s; the images are its frames, in order",
+    "videoAudio": "What is said in it"
   }
 }

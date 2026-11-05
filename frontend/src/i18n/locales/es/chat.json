@@ -154,5 +154,21 @@
     "hint": "Puedes hablar. Di “tchau” para que me vaya.",
     "listenAgain": "Escuchar de nuevo",
     "end": "Terminar"
+  },
+  "attach": {
+    "button": "Adjuntar imagen o video",
+    "remove": "Quitar {{name}}",
+    "preparingVideo": "Preparando el video…",
+    "videoReady": "{{frames}} fotogramas listos",
+    "waitVideo": "Espera a que el video esté listo.",
+    "notSupported": "{{name}}: solo se pueden adjuntar imágenes y videos.",
+    "tooMany": "Como máximo {{max}} imágenes por mensaje (un video usa todas).",
+    "pasted": "Imagen pegada",
+    "imageFailed": "No pude abrir la imagen.",
+    "videoFailed": "No pude preparar el video: {{detail}}",
+    "imagePrompt": "¿Qué hay en esta imagen?",
+    "videoPrompt": "¿Qué pasa en este video?",
+    "videoInfo": "Video \"{{name}}\", {{seconds}} s; las imágenes son fotogramas, en orden",
+    "videoAudio": "Lo que se dice en él"
   }
 }
