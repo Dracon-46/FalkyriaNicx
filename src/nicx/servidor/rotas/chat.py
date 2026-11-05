@@ -7,6 +7,7 @@ import logging
 import threading
 import uuid
 import weakref
+from contextvars import ContextVar
 from dataclasses import replace
 from typing import Any
 
@@ -543,6 +544,10 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
     # Imagens que a pessoa anexou (ou quadros de um vídeo): abertas de
     # verdade e reduzidas aqui, porque a API aceita qualquer cliente.
     anexou_imagens = await _preparar_anexos(request_body)
+    # Editor de código ou imagem anexada: o pedido vai direto ao modelo.
+    direto = anexou_imagens or bool(getattr(request_body, "editor", False))
+    do_editor = bool(getattr(request_body, "editor", False))
+    _SEM_MEMORIA.set(do_editor)
     # The assistant the user picked ("Tutor de estudos"): its instructions go
     # into the system prompt and only its tools reach the model (contextvar,
     # read by SystemPromptBuilder and ToolExecutor in the worker threads too).
@@ -570,11 +575,11 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
             reply = frase_contexto("sem_visao", request_body.language)
             return _immediate_response(reply, model, stream=request_body.stream)
         use_server_agent = False
+    if do_editor:
+        use_server_agent = False
 
     # "Cria um assistente que revisa contratos": the local model drafts it.
-    created = (
-        None if anexou_imagens else await _assistant_turn(request_body, request, model)
-    )
+    created = None if direto else await _assistant_turn(request_body, request, model)
     if created is not None:
         return _immediate_response(created, model, stream=request_body.stream)
 
@@ -582,13 +587,11 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
     # plain note. "O que falta no projeto X" answers right away; "continue de
     # onde parei" sends a compact project summary to the model, without the
     # tool list (the summary already has what the answer needs).
-    plano = None if anexou_imagens else await _plan_turn(request_body, request, model)
+    plano = None if direto else await _plan_turn(request_body, request, model)
     if plano is not None:
         return _immediate_response(plano, model, stream=request_body.stream)
 
-    project = (
-        None if anexou_imagens else await _project_turn(request_body, config, model)
-    )
+    project = None if direto else await _project_turn(request_body, config, model)
     if project is not None and project.resposta is not None:
         return _immediate_response(project.resposta, model, stream=request_body.stream)
     project_summary = project.resumo if project is not None else None
@@ -599,7 +602,7 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
     # "Aumenta o volume", "que horas são": executa na hora, sem o modelo.
     quick_reply = (
         None
-        if project_summary is not None or anexou_imagens
+        if project_summary is not None or direto
         else await _quick_action_reply(request_body, config)
     )
     if quick_reply is not None:
@@ -617,7 +620,7 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
     # Com imagem anexada, "o que é isso?" fala da imagem, não da tela.
     screen = (
         None
-        if project_summary is not None or anexou_imagens
+        if project_summary is not None or direto
         else await _screen_context(request_body, config, model)
     )
     if screen is not None and screen.resposta is not None:
@@ -655,6 +658,7 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
         and config.agent.context_from_memory
         and request_body.messages
         and usa_memoria()
+        and not do_editor
     ):
         try:
             from nicx.memoria.armazenamento.context import ContextConfig, inject_context
@@ -804,6 +808,10 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
             last.content = f"{last.content}{_VOICE_HINT}"
             request_body.max_tokens = min(request_body.max_tokens, _VOICE_MAX_TOKENS)
 
+    # O código do editor não entra na memória automática.
+    memoria_servico = (
+        None if do_editor else getattr(request.app.state, "memory_service", None)
+    )
     if request_body.stream:
         # When the client passes `tools`, stream the model's raw
         # OpenAI-compat function-calling decision directly from the engine
@@ -824,7 +832,7 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
                 complexity_info,
                 app_config=config,
                 bus=getattr(request.app.state, "bus", None),
-                memory_service=getattr(request.app.state, "memory_service", None),
+                memory_service=memoria_servico,
             )
         if use_server_agent:
             return await _handle_agent_stream(
@@ -834,7 +842,7 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
                 complexity_info,
                 trace_store=getattr(request.app.state, "trace_store", None),
                 bus=getattr(request.app.state, "bus", None),
-                memory_service=getattr(request.app.state, "memory_service", None),
+                memory_service=memoria_servico,
             )
         return await _handle_stream(
             engine,
@@ -844,7 +852,7 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
             trace_store=getattr(request.app.state, "trace_store", None),
             app_config=config,
             bus=getattr(request.app.state, "bus", None),
-            memory_service=getattr(request.app.state, "memory_service", None),
+            memory_service=memoria_servico,
         )
 
     # Non-streaming: use agent if available, otherwise direct engine call.
@@ -893,7 +901,7 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
     # on the user's screen never goes there.
     if not screen_attached:
         _remember_exchange(
-            getattr(request.app.state, "memory_service", None),
+            memoria_servico,
             query_text_for_complexity,
             response,
             bus=getattr(request.app.state, "bus", None),
@@ -913,6 +921,12 @@ def _response_content(response) -> str:
     return content
 
 
+# Pedido do editor de código (extensão do VS Code, editor do app): o código
+# não entra na memória automática. Marcado no começo da rota; vale também no
+# stream, que roda na mesma tarefa.
+_SEM_MEMORIA: ContextVar[bool] = ContextVar("nicx_chat_sem_memoria", default=False)
+
+
 def _record_completed_exchange(
     memory_service,
     user_text: str,
@@ -922,7 +936,7 @@ def _record_completed_exchange(
     source: str = "server.chat",
 ) -> None:
     """Publish or submit a completed exchange without blocking a reply."""
-    if not user_text:
+    if not user_text or _SEM_MEMORIA.get():
         return
     from nicx.assistentes.sessao import usa_memoria
     from nicx.contexto.montagem import tem_contexto

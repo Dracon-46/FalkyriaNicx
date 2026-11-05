@@ -37,6 +37,10 @@ class ChatCompletionRequest(BaseModel):
     # Nicx extension: interface language ("pt-BR", "en", "es"...). Replies
     # come in this language; empty or "pt-BR" keeps the default Portuguese.
     language: Optional[str] = None
+    # Nicx: o pedido vem de um editor de código (extensão do VS Code, editor do
+    # app). Vai direto ao modelo: sem ferramentas do PC, sem ler a tela, sem
+    # ações rápidas, e o código não entra na memória automática.
+    editor: bool = False
 
 
 # ---------------------------------------------------------------------------
