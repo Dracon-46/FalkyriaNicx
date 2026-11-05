@@ -17,7 +17,8 @@ import type {
 import type { ManagedAgent } from './api';
 import { isEmbedOnlyModel } from './model-capabilities';
 import { serializeToolCallArguments } from './tool-call';
-import { detectLanguage } from '../i18n';
+import { toast } from 'sonner';
+import i18n, { detectLanguage } from '../i18n';
 
 export interface CachedConnector {
   connector_id: string;
@@ -84,8 +85,20 @@ function loadConversations(): ConversationStore {
 }
 
 function saveConversations(store: ConversationStore): void {
-  localStorage.setItem(CONVERSATIONS_KEY, JSON.stringify(store));
+  // Armazenamento cheio não pode derrubar o chat (antes o envio sumia e o
+  // campo ficava travado). Avisa uma vez e segue só na memória.
+  try {
+    localStorage.setItem(CONVERSATIONS_KEY, JSON.stringify(store));
+  } catch (err) {
+    if (!avisouCheio) {
+      avisouCheio = true;
+      console.warn('Nicx: não deu para guardar as conversas neste navegador', err);
+      toast.warning(i18n.t('errors.storageFull'), { duration: 10000 });
+    }
+  }
 }
+
+let avisouCheio = false;
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -175,6 +188,8 @@ interface AppState {
 
   // Actions: conversations
   loadConversations: () => void;
+  /** Junta as conversas de um arquivo exportado; devolve quantas entraram, ou -1 se o arquivo não serve. */
+  importConversations: (data: unknown) => number;
   importOverlayConversation: () => Promise<void>;
   createConversation: (model?: string) => string;
   selectConversation: (id: string) => void;
@@ -288,6 +303,40 @@ export const useAppStore = create<AppState>((set, get) => {
         ),
         activeId: store.activeId,
       });
+    },
+
+    importConversations: (data: unknown) => {
+      // Antes o arquivo substituía tudo (e um JSON errado sumia em silêncio).
+      // Agora junta: conversa nova entra, a mesma conversa fica com a versão
+      // mais recente, e nada daqui é apagado.
+      const chegou = data as Partial<ConversationStore> | null;
+      if (!chegou || chegou.version !== 1 || typeof chegou.conversations !== 'object' || !chegou.conversations) {
+        return -1;
+      }
+      const store = loadConversations();
+      let entraram = 0;
+      for (const conv of Object.values(chegou.conversations)) {
+        if (
+          !conv ||
+          typeof conv.id !== 'string' ||
+          !Array.isArray(conv.messages) ||
+          typeof conv.updatedAt !== 'number'
+        ) {
+          continue;
+        }
+        const atual = store.conversations[conv.id];
+        if (atual && atual.updatedAt >= conv.updatedAt) continue;
+        store.conversations[conv.id] = {
+          ...conv,
+          title: typeof conv.title === 'string' ? conv.title : '',
+          createdAt: typeof conv.createdAt === 'number' ? conv.createdAt : conv.updatedAt,
+          model: typeof conv.model === 'string' ? conv.model : '',
+        };
+        entraram += 1;
+      }
+      if (entraram > 0) saveConversations(store);
+      get().loadConversations();
+      return entraram;
     },
 
     importOverlayConversation: async () => {

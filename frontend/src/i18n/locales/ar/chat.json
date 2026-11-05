@@ -38,14 +38,15 @@
   },
   "input": {
     "placeholder": "اكتب إلى Nicx...",
-    "pickModel": "اختر نموذجًا أولًا (⌘K)",
+    "pickModel": "اختر نموذجًا أولًا ({{shortcut}})",
     "send": "إرسال الرسالة",
     "stop": "إيقاف التوليد",
     "deepResearch": "بحث معمّق",
     "deepResearchOn": "البحث المعمّق: مفعّل",
     "deepResearchOff": "البحث المعمّق: معطّل",
     "enterToSend": "للإرسال",
-    "shiftEnterNewLine": "لسطر جديد"
+    "shiftEnterNewLine": "لسطر جديد",
+    "busyElsewhere": "يرد Nicx في محادثة أخرى…"
   },
   "phase": {
     "generating": "جارٍ التوليد...",

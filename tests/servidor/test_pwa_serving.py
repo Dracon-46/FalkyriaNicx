@@ -104,3 +104,15 @@ class TestPWAServing:
         assert resp.status_code == 200
         # Should get index.html, not the passwd file
         assert "SPA" in resp.text
+
+    def test_rota_de_api_inexistente_da_404_json(self, client_with_static):
+        """Rota /v1 ou /api que não existe: 404 em JSON, não a página do app."""
+        for caminho in ("/v1/nao-existe", "/api/nao-existe", "/v1"):
+            resp = client_with_static.get(caminho)
+            assert resp.status_code == 404, caminho
+            assert resp.json() == {"detail": "Not Found"}
+
+    def test_rota_do_app_continua_no_index(self, client_with_static):
+        resp = client_with_static.get("/configuracoes/v1")
+        assert resp.status_code == 200
+        assert "SPA" in resp.text

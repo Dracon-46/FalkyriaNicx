@@ -38,14 +38,15 @@
   },
   "input": {
     "placeholder": "Message Nicx...",
-    "pickModel": "Pick a model first (⌘K)",
+    "pickModel": "Pick a model first ({{shortcut}})",
     "send": "Send message",
     "stop": "Stop generating",
     "deepResearch": "Deep Research",
     "deepResearchOn": "Deep Research: on",
     "deepResearchOff": "Deep Research: off",
     "enterToSend": "to send",
-    "shiftEnterNewLine": "for new line"
+    "shiftEnterNewLine": "for new line",
+    "busyElsewhere": "Nicx is replying in another chat…"
   },
   "phase": {
     "generating": "Generating...",

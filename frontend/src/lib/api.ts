@@ -1423,6 +1423,21 @@ export async function getMemoryConfig(): Promise<MemoryConfig> {
   return res.json();
 }
 
+export type MemoryConfigPatch = Partial<
+  Pick<MemoryConfig, 'context_from_memory' | 'context_top_k' | 'context_min_score' | 'context_max_tokens'>
+>;
+
+/** Grava no config.toml do servidor e já vale para o próximo pedido. */
+export async function updateMemoryConfig(patch: MemoryConfigPatch): Promise<MemoryConfig> {
+  const res = await apiFetch(`/v1/memory/config`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(patch),
+  });
+  if (!res.ok) throw new Error(await memoryErrorDetail(res, i18n.t('errors.memory.configFailed')));
+  return res.json();
+}
+
 // ---------------------------------------------------------------------------
 // Approvals
 // ---------------------------------------------------------------------------

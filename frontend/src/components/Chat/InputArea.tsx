@@ -5,9 +5,10 @@ import { useLocation, useNavigate } from 'react-router';
 import { useAppStore, generateId } from '../../lib/store';
 import { useTtsStore } from '../../lib/tts';
 import { streamChat, streamResearch } from '../../lib/sse';
-import { fetchSavings, getBase } from '../../lib/api';
+import { apiFetch, fetchSavings, getBase } from '../../lib/api';
 import { listConnectors, getSyncStatus } from '../../lib/connectors-api';
 import { serializeToolCallArguments } from '../../lib/tool-call';
+import { appShortcut } from '../../lib/shortcut';
 import {
   engineFromCompletionChunk,
   resolveChatEngine,
@@ -88,12 +89,16 @@ function useResearchCorpusSync(enabled: boolean): {
   return state;
 }
 
+// A resposta em andamento é uma só para o app inteiro: ficam fora do
+// componente para o "Parar" funcionar depois de ir às Configurações e voltar
+// (o InputArea é montado de novo e um useRef nasceria vazio).
+const abortRef: { current: AbortController | null } = { current: null };
+const timerRef: { current: ReturnType<typeof setInterval> | null } = { current: null };
+
 export function InputArea() {
   const { t } = useTranslation();
   const [input, setInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const abortRef = useRef<AbortController | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const activeId = useAppStore((s) => s.activeId);
   const selectedModel = useAppStore((s) => s.selectedModel);
@@ -215,7 +220,7 @@ export function InputArea() {
     const content = (spoken ?? input).trim();
     if (!content || streamState.isStreaming) return 'not-sent';
     if (!selectedModel) {
-      toast.error(i18n.t('chat.input.pickModel'));
+      toast.error(i18n.t('chat.input.pickModel', { shortcut: appShortcut('k') }));
       return 'not-sent';
     }
 
@@ -547,20 +552,35 @@ export function InputArea() {
         complexity_tier: complexity?.tier,
         suggested_max_tokens: complexity?.suggested_max_tokens,
       };
-      // Check if the response has digest audio available
+      // Áudio só quando ESTA resposta gerou o resumo do dia: antes o player
+      // do resumo aparecia em toda resposta depois que existia um.
       let audioMeta: { url: string } | undefined;
-      try {
-        const digestRes = await fetch(`${getBase()}/api/digest`);
-        if (digestRes.ok) {
-          const digest = await digestRes.json();
-          if (digest.audio_available) {
-            audioMeta = { url: `${getBase()}/api/digest/audio` };
+      if (abortRef.current === controller) {
+        try {
+          const digestRes = await apiFetch('/api/digest');
+          if (digestRes.ok) {
+            const digest = await digestRes.json();
+            const geradoEm = Date.parse(digest.generated_at ?? '');
+            if (digest.audio_available && geradoEm >= startTime) {
+              audioMeta = { url: `${getBase()}/api/digest/audio` };
+            }
           }
+        } catch {
+          // Sem resumo ou servidor indisponível: sem áudio.
         }
-      } catch {
-        // Not a digest response or server unavailable — skip
+      }
+      // Parou e mandou outra antes deste "finally": não mexe no envio novo.
+      if (abortRef.current !== controller && abortRef.current !== null) {
+        return stopped ? 'stopped' : 'done';
       }
 
+      // Primeiro destrava o campo: se gravar falhar (armazenamento cheio), o
+      // chat não fica "gerando" para sempre.
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      resetStream();
       updateLastAssistant(
         convId,
         accumulatedContent,
@@ -571,11 +591,6 @@ export function InputArea() {
         researchTraces.length > 0 ? researchTraces : undefined,
         researchSourcesByRef.size > 0 ? flushSources() : undefined,
       );
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-      resetStream();
       useAppStore.getState().addLogEntry({
         timestamp: Date.now(), level: 'info', category: 'chat',
         message: i18n.t('chat.log.response', { chars: accumulatedContent.length }),
@@ -726,13 +741,19 @@ export function InputArea() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={selectedModel ? t('chat.input.placeholder') : t('chat.input.pickModel')}
+          placeholder={
+            streamState.isStreaming && !isCurrentChatStreaming
+              ? t('chat.input.busyElsewhere')
+              : selectedModel
+                ? t('chat.input.placeholder')
+                : t('chat.input.pickModel', { shortcut: appShortcut('k') })
+          }
           rows={1}
           className="flex-1 bg-transparent outline-none resize-none text-sm leading-relaxed"
           style={{ color: 'var(--color-text)', maxHeight: '200px' }}
           disabled={streamState.isStreaming || modelLoading}
         />
-        {isCurrentChatStreaming ? (
+        {streamState.isStreaming ? (
           <button
             onClick={stopStreaming}
             className="p-2 rounded-xl transition-colors shrink-0 cursor-pointer"
@@ -753,7 +774,7 @@ export function InputArea() {
             <button
               onClick={() => void sendMessage()}
               disabled={streamState.isStreaming || !input.trim() || modelLoading || !selectedModel}
-              title={selectedModel ? t('chat.input.send') : t('chat.input.pickModel')}
+              title={selectedModel ? t('chat.input.send') : t('chat.input.pickModel', { shortcut: appShortcut('k') })}
               aria-label={t('chat.input.send')}
               className="p-2 rounded-xl transition-colors shrink-0 cursor-pointer disabled:opacity-30 disabled:cursor-default"
               style={{

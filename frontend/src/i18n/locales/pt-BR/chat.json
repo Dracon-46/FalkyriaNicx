@@ -38,14 +38,15 @@
   },
   "input": {
     "placeholder": "Pergunte ao Nicx...",
-    "pickModel": "Escolha um modelo primeiro (⌘K)",
+    "pickModel": "Escolha um modelo primeiro ({{shortcut}})",
     "send": "Enviar mensagem",
     "stop": "Parar de gerar",
     "deepResearch": "Pesquisa profunda",
     "deepResearchOn": "Pesquisa profunda: ligada",
     "deepResearchOff": "Pesquisa profunda: desligada",
     "enterToSend": "para enviar",
-    "shiftEnterNewLine": "para nova linha"
+    "shiftEnterNewLine": "para nova linha",
+    "busyElsewhere": "O Nicx está respondendo em outra conversa…"
   },
   "phase": {
     "generating": "Gerando...",

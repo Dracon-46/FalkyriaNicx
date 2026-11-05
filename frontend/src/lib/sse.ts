@@ -27,12 +27,24 @@ export async function* streamChat(
   });
 
   if (!response.ok) {
-    throw new Error(i18n.t('errors.chatRequestFailed', { status: response.status }));
+    // O motivo do servidor ("Ollama unreachable", "imagem grande demais") vale
+    // mais que só o código HTTP.
+    let detalhe = '';
+    try {
+      const corpo = (await response.json()) as { detail?: unknown };
+      if (typeof corpo.detail === 'string') detalhe = corpo.detail;
+    } catch {
+      // corpo sem JSON
+    }
+    const base = i18n.t('errors.chatRequestFailed', { status: response.status });
+    throw new Error(detalhe ? `${base}: ${detalhe}` : base);
   }
 
   const reader = response.body!.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
+  // Fora do laço: "event:" e "data:" podem chegar em pedaços diferentes.
+  let currentEvent: string | undefined;
 
   try {
     while (true) {
@@ -42,8 +54,6 @@ export async function* streamChat(
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
       buffer = lines.pop() || '';
-
-      let currentEvent: string | undefined;
 
       for (const line of lines) {
         if (line.startsWith('event: ')) {

@@ -18,6 +18,7 @@ import {
   Brain,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { LANGUAGES, setLanguage } from '../i18n';
 import { useAppStore, type ThemeMode } from '../lib/store';
 import { NicxMascot } from '../components/Mascot/NicxMascot';
@@ -35,6 +36,9 @@ import {
   fetchWakeStatus,
   updateWake,
   getMemoryStats,
+  getMemoryConfig,
+  updateMemoryConfig,
+  type MemoryConfigPatch,
   getInferenceSource,
   setInferenceSource,
   getCloudKeyStatus,
@@ -602,21 +606,15 @@ export function SettingsPage() {
 
   const [memoryStatus, setMemoryStatus] = useState<MemoryStatus>({ kind: 'loading' });
   const memoryRequestId = useRef(0);
-  const [memoryEnabled, setMemoryEnabled] = useState(() => {
-    try { return localStorage.getItem('nicx-memory-enabled') !== 'false'; } catch { return true; }
-  });
-  const [memoryBackend, setMemoryBackend] = useState(() => {
-    try { return localStorage.getItem('nicx-memory-backend') || 'sqlite'; } catch { return 'sqlite'; }
-  });
-  const [memoryTopK, setMemoryTopK] = useState(() => {
-    try { return parseInt(localStorage.getItem('nicx-memory-top-k') || '5'); } catch { return 5; }
-  });
-  const [memoryMinScore, setMemoryMinScore] = useState(() => {
-    try { return parseFloat(localStorage.getItem('nicx-memory-min-score') || '0.1'); } catch { return 0.1; }
-  });
-  const [memoryMaxTokens, setMemoryMaxTokens] = useState(() => {
-    try { return parseInt(localStorage.getItem('nicx-memory-max-tokens') || '2048'); } catch { return 2048; }
-  });
+  // Opções da memória: vêm do servidor e voltam para o config.toml (antes
+  // ficavam só no navegador e o servidor nunca as lia).
+  const [memoryEnabled, setMemoryEnabled] = useState(true);
+  const [memoryTopK, setMemoryTopK] = useState(5);
+  const [memoryMinScore, setMemoryMinScore] = useState(0);
+  const [memoryMaxTokens, setMemoryMaxTokens] = useState(2048);
+  const [memoryConfigLoaded, setMemoryConfigLoaded] = useState(false);
+  const memoryPatch = useRef<MemoryConfigPatch>({});
+  const memoryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [srcKind, setSrcKind] = useState<InferenceSource['kind']>('ollama');
   const [customHost, setCustomHost] = useState('http://localhost:1234/v1');
@@ -646,6 +644,39 @@ export function SettingsPage() {
       setSrcMsg(e?.message ?? t('settings.inference.saveFailed'));
     }
   }, [srcKind, customHost, customModel, customEngine, customKey, t]);
+
+  useEffect(() => {
+    let vivo = true;
+    getMemoryConfig()
+      .then((c) => {
+        if (!vivo) return;
+        setMemoryEnabled(c.context_from_memory);
+        setMemoryTopK(c.context_top_k);
+        setMemoryMinScore(c.context_min_score);
+        setMemoryMaxTokens(c.context_max_tokens);
+        setMemoryConfigLoaded(true);
+      })
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
+  // Junta as mudanças (o controle deslizante muda a cada passo) e grava uma vez.
+  // Função simples (não useCallback): showSaved é declarada mais abaixo e só
+  // é lida quando o timer dispara.
+  const saveMemory = (patch: MemoryConfigPatch) => {
+    memoryPatch.current = { ...memoryPatch.current, ...patch };
+    if (memoryTimer.current) clearTimeout(memoryTimer.current);
+    memoryTimer.current = setTimeout(() => {
+      const enviar = memoryPatch.current;
+      memoryPatch.current = {};
+      memoryTimer.current = null;
+      updateMemoryConfig(enviar)
+        .then(() => showSaved())
+        .catch((err) => toast.error(err instanceof Error ? err.message : String(err)));
+    }, 500);
+  };
 
   const refreshMemoryStatus = useCallback(async () => {
     const requestId = ++memoryRequestId.current;
@@ -710,14 +741,18 @@ export function SettingsPage() {
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (ev) => {
+        let data: unknown = null;
         try {
-          const data = JSON.parse(ev.target?.result as string);
-          if (data.version === 1) {
-            localStorage.setItem('nicx-conversations', JSON.stringify(data));
-            useAppStore.getState().loadConversations();
-            showSaved();
-          }
-        } catch {}
+          data = JSON.parse(ev.target?.result as string);
+        } catch {
+          // não é JSON: cai no aviso abaixo
+        }
+        const entraram = useAppStore.getState().importConversations(data);
+        if (entraram < 0) {
+          toast.error(t('errors.importInvalid'));
+        } else {
+          toast.success(t('settings.data.imported', { count: entraram }));
+        }
       };
       reader.readAsText(file);
     };
@@ -982,10 +1017,13 @@ export function SettingsPage() {
                 onClick={() => {
                   const next = !memoryEnabled;
                   setMemoryEnabled(next);
-                  try { localStorage.setItem('nicx-memory-enabled', String(next)); } catch {}
-                  showSaved();
+                  saveMemory({ context_from_memory: next });
                 }}
-                className="relative w-11 h-6 rounded-full transition-colors cursor-pointer"
+                disabled={!memoryConfigLoaded}
+                role="switch"
+                aria-checked={memoryEnabled}
+                aria-label={t('settings.memory.useContext')}
+                className="relative w-11 h-6 rounded-full transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-default"
                 style={{
                   background: memoryEnabled ? 'var(--color-accent)' : 'var(--color-bg-tertiary)',
                 }}
@@ -999,28 +1037,6 @@ export function SettingsPage() {
                 />
               </button>
             </SettingRow>
-            <SettingRow label={t('settings.memory.backend')} description={t('settings.memory.backendDescription')}>
-              <select
-                value={memoryBackend}
-                onChange={(e) => {
-                  setMemoryBackend(e.target.value);
-                  try { localStorage.setItem('nicx-memory-backend', e.target.value); } catch {}
-                  showSaved();
-                }}
-                className="text-sm px-3 py-1.5 rounded-lg outline-none cursor-pointer"
-                style={{
-                  background: 'var(--color-bg-secondary)',
-                  color: 'var(--color-text)',
-                  border: '1px solid var(--color-border)',
-                }}
-              >
-                <option value="sqlite">sqlite</option>
-                <option value="faiss">faiss</option>
-                <option value="bm25">bm25</option>
-                <option value="colbert">colbert</option>
-                <option value="hybrid">hybrid</option>
-              </select>
-            </SettingRow>
             <SettingRow label={t('settings.memory.topK')} description={`${memoryTopK}`}>
               <input
                 type="range"
@@ -1031,9 +1047,10 @@ export function SettingsPage() {
                 onChange={(e) => {
                   const v = parseInt(e.target.value);
                   setMemoryTopK(v);
-                  try { localStorage.setItem('nicx-memory-top-k', String(v)); } catch {}
-                  showSaved();
+                  saveMemory({ context_top_k: v });
                 }}
+                disabled={!memoryConfigLoaded}
+                aria-label={t('settings.memory.topK')}
                 className="w-32 cursor-pointer accent-[var(--color-accent)]"
               />
             </SettingRow>
@@ -1047,9 +1064,10 @@ export function SettingsPage() {
                 onChange={(e) => {
                   const v = parseFloat(e.target.value);
                   setMemoryMinScore(v);
-                  try { localStorage.setItem('nicx-memory-min-score', String(v)); } catch {}
-                  showSaved();
+                  saveMemory({ context_min_score: v });
                 }}
+                disabled={!memoryConfigLoaded}
+                aria-label={t('settings.memory.minScore')}
                 className="w-32 cursor-pointer accent-[var(--color-accent)]"
               />
             </SettingRow>
@@ -1063,9 +1081,10 @@ export function SettingsPage() {
                 onChange={(e) => {
                   const v = parseInt(e.target.value);
                   setMemoryMaxTokens(v);
-                  try { localStorage.setItem('nicx-memory-max-tokens', String(v)); } catch {}
-                  showSaved();
+                  saveMemory({ context_max_tokens: v });
                 }}
+                disabled={!memoryConfigLoaded}
+                aria-label={t('settings.memory.maxTokens')}
                 className="w-32 cursor-pointer accent-[var(--color-accent)]"
               />
             </SettingRow>

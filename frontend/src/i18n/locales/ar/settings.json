@@ -277,7 +277,8 @@
     "clearAll": "مسح كل البيانات",
     "clearAllDescription": "يحذف كل المحادثات نهائيًا",
     "confirm": "انقر مرة أخرى للتأكيد",
-    "clear": "مسح"
+    "clear": "مسح",
+    "imported": "المحادثات المستوردة: {{count}}"
   },
   "context": {
     "title": "سياق الشاشة",

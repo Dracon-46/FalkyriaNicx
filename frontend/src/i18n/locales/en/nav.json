@@ -21,7 +21,8 @@
     "empty": "No conversations yet",
     "stopBeforeDelete": "Stop generating before deleting this conversation",
     "delete": "Delete conversation",
-    "overlay": "Overlay chat"
+    "overlay": "Overlay chat",
+    "confirmDelete": "Click again to delete"
   },
   "history": "History",
   "routines": "Routines",

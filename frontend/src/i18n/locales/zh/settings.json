@@ -277,7 +277,8 @@
     "clearAll": "清除所有数据",
     "clearAllDescription": "永久删除所有对话",
     "confirm": "再点一次以确认",
-    "clear": "清除"
+    "clear": "清除",
+    "imported": "已导入的对话：{{count}}"
   },
   "context": {
     "title": "屏幕上下文",

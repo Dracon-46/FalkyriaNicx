@@ -63,5 +63,7 @@
     "forgetFailed": "Não foi possível apagar seus dados agora. Tente de novo.",
     "documentUnreachable": "Não foi possível carregar o documento. Verifique se o Nicx está rodando.",
     "documentFailed": "Não foi possível carregar o documento."
-  }
+  },
+  "storageFull": "O armazenamento deste navegador encheu: as conversas novas não serão guardadas. Exporte ou apague conversas antigas.",
+  "importInvalid": "Este arquivo não é uma exportação de conversas do Nicx."
 }

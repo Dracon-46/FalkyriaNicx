@@ -38,14 +38,15 @@
   },
   "input": {
     "placeholder": "Nicx को संदेश भेजें...",
-    "pickModel": "पहले एक मॉडल चुनें (⌘K)",
+    "pickModel": "पहले एक मॉडल चुनें ({{shortcut}})",
     "send": "संदेश भेजें",
     "stop": "जनरेट करना रोकें",
     "deepResearch": "गहन शोध",
     "deepResearchOn": "गहन शोध: चालू",
     "deepResearchOff": "गहन शोध: बंद",
     "enterToSend": "भेजने के लिए",
-    "shiftEnterNewLine": "नई पंक्ति के लिए"
+    "shiftEnterNewLine": "नई पंक्ति के लिए",
+    "busyElsewhere": "Nicx दूसरी बातचीत में जवाब दे रहा है…"
   },
   "phase": {
     "generating": "जनरेट हो रहा है...",

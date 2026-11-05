@@ -255,7 +255,16 @@ export function McpTab() {
     }
   };
 
-  if (!data) return <Message error={error} />;
+  if (!data) {
+    // Carregando: um indicador, não a aba em branco.
+    return error ? (
+      <Message error={error} />
+    ) : (
+      <div className="py-6 flex justify-center" aria-busy="true" data-testid="mcp-loading">
+        <Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-text-tertiary)' }} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">

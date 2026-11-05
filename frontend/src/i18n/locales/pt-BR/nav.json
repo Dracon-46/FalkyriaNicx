@@ -21,7 +21,8 @@
     "empty": "Nenhuma conversa ainda",
     "stopBeforeDelete": "Pare a resposta antes de apagar esta conversa",
     "delete": "Apagar conversa",
-    "overlay": "Conversa rápida"
+    "overlay": "Conversa rápida",
+    "confirmDelete": "Clique de novo para apagar"
   },
   "history": "Histórico",
   "routines": "Rotinas",

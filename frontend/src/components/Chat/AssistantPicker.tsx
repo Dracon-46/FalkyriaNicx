@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
 import { ativarAssistente, listarAssistentes, type Assistant } from '../../lib/assistentes';
 
 /**
@@ -41,6 +42,8 @@ export function AssistantPicker({ refreshKey }: { refreshKey: number }) {
     } catch {
       setActive(previous);
       setFailed(true);
+      // Só a borda vermelha passava despercebida.
+      toast.error(t('assistentes.activateFailed'));
     }
   };
 

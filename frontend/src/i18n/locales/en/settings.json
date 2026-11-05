@@ -277,7 +277,8 @@
     "clearAll": "Clear all data",
     "clearAllDescription": "Permanently deletes all conversations",
     "confirm": "Click again to confirm",
-    "clear": "Clear"
+    "clear": "Clear",
+    "imported": "Conversations imported: {{count}}"
   },
   "context": {
     "title": "Screen context",

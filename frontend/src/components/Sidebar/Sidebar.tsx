@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { ConversationList } from './ConversationList';
 import { useAppStore } from '../../lib/store';
+import { appShortcut } from '../../lib/shortcut';
 import { useTranslation } from 'react-i18next';
 
 export function Sidebar() {
@@ -185,7 +186,7 @@ export function Sidebar() {
                 className="text-[10px] px-1.5 py-0.5 rounded font-mono"
                 style={{ background: 'var(--color-bg-tertiary)', color: 'var(--color-text-tertiary)' }}
               >
-                ⌘K
+                {appShortcut('k')}
               </kbd>
             )}
           </button>

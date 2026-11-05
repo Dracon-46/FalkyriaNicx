@@ -18,7 +18,7 @@ from fastapi import (
     WebSocket,
     WebSocketDisconnect,
 )
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
@@ -327,6 +327,59 @@ async def memory_config(request: Request):
         }
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
+
+
+class MemoryConfigUpdate(BaseModel):
+    """O que a página de Configurações muda na memória (o resto fica)."""
+
+    context_from_memory: Optional[bool] = None
+    context_top_k: Optional[int] = Field(default=None, ge=1, le=20)
+    context_min_score: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    context_max_tokens: Optional[int] = Field(default=None, ge=256, le=8192)
+
+
+@memory_router.put("/config")
+async def memory_config_update(body: MemoryConfigUpdate, request: Request):
+    """Grava no config.toml e já vale para o próximo pedido.
+
+    Antes essas opções ficavam só no navegador e o servidor nunca as lia.
+    ``context_from_memory`` mora em ``[agent]``; as outras em ``[memory]``.
+    """
+    from nicx.atalho.servico import salvar_secao
+    from nicx.nucleo.config import load_config
+    from nicx.nucleo.paths import get_config_path
+
+    valores = body.model_dump(exclude_none=True)
+    if not valores:
+        return await memory_config(request)
+    agente = {k: v for k, v in valores.items() if k == "context_from_memory"}
+    memoria = {k: v for k, v in valores.items() if k != "context_from_memory"}
+
+    config = getattr(request.app.state, "config", None)
+    path = getattr(config, "_config_path", None) or get_config_path()
+
+    def _gravar() -> None:
+        if agente:
+            salvar_secao(path, "agent", agente)
+        if memoria:
+            salvar_secao(path, "memory", memoria)
+
+    await asyncio.to_thread(_gravar)
+
+    # Vale já: a config do servidor e a do cache de load_config().
+    alvos = [config]
+    try:
+        alvos.append(load_config())
+    except Exception:  # noqa: BLE001 - o arquivo já está gravado
+        logger.debug("Config em cache não atualizada", exc_info=True)
+    for alvo in alvos:
+        if alvo is None:
+            continue
+        for chave, valor in agente.items():
+            setattr(alvo.agent, chave, valor)
+        for chave, valor in memoria.items():
+            setattr(alvo.memory, chave, valor)
+    return await memory_config(request)
 
 
 @memory_router.post("/index")

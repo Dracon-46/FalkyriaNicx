@@ -63,5 +63,7 @@
     "forgetFailed": "Couldn't delete your data right now. Please try again.",
     "documentUnreachable": "Couldn't load the document. Check that Nicx is running.",
     "documentFailed": "Couldn't load the document."
-  }
+  },
+  "storageFull": "This browser's storage is full: new conversations won't be saved. Export or delete old conversations.",
+  "importInvalid": "This file is not a Nicx conversation export."
 }

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useAppStore } from '../../lib/store';
@@ -38,6 +39,13 @@ export function ConversationList({ searchQuery }: Props) {
   );
   const selectConversation = useAppStore((s) => s.selectConversation);
   const deleteConversation = useAppStore((s) => s.deleteConversation);
+  // Apagar pede dois cliques: o botão fica vermelho por 3 s esperando o segundo.
+  const [apagando, setApagando] = useState<string | null>(null);
+  useEffect(() => {
+    if (!apagando) return;
+    const id = setTimeout(() => setApagando(null), 3000);
+    return () => clearTimeout(id);
+  }, [apagando]);
 
   const filtered = searchQuery
     ? conversations.filter((c) =>
@@ -95,19 +103,29 @@ export function ConversationList({ searchQuery }: Props) {
             <button
               onClick={(e) => {
                 e.stopPropagation();
+                if (apagando !== conv.id) {
+                  setApagando(conv.id);
+                  return;
+                }
+                setApagando(null);
                 deleteConversation(conv.id);
               }}
               disabled={isStreaming}
-              className="p-1.5 mr-1 rounded opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
-              style={{ color: 'var(--color-text-tertiary)' }}
+              className={`p-1.5 mr-1 rounded transition-opacity cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 focus-visible:opacity-100 ${apagando === conv.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+              style={{ color: apagando === conv.id ? 'var(--color-error)' : 'var(--color-text-tertiary)' }}
               onMouseEnter={(e) => {
                 if (!isStreaming) e.currentTarget.style.color = 'var(--color-error)';
               }}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-tertiary)')}
+              onMouseLeave={(e) => {
+                if (apagando !== conv.id) e.currentTarget.style.color = 'var(--color-text-tertiary)';
+              }}
+              aria-label={apagando === conv.id ? t('nav.chats.confirmDelete') : t('nav.chats.delete')}
               title={
                 isStreaming
                   ? t('nav.chats.stopBeforeDelete')
-                  : t('nav.chats.delete')
+                  : apagando === conv.id
+                    ? t('nav.chats.confirmDelete')
+                    : t('nav.chats.delete')
               }
             >
               <Trash2 size={14} />

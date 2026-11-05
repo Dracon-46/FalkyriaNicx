@@ -63,5 +63,7 @@
     "forgetFailed": "No se pudieron borrar tus datos ahora. Inténtalo de nuevo.",
     "documentUnreachable": "No se pudo cargar el documento. Comprueba que Nicx esté en marcha.",
     "documentFailed": "No se pudo cargar el documento."
-  }
+  },
+  "storageFull": "El almacenamiento de este navegador está lleno: las conversaciones nuevas no se guardarán. Exporta o borra conversaciones antiguas.",
+  "importInvalid": "Este archivo no es una exportación de conversaciones de Nicx."
 }

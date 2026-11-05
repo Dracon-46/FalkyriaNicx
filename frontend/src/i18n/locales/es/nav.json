@@ -21,7 +21,8 @@
     "empty": "Aún no hay conversaciones",
     "stopBeforeDelete": "Detén la respuesta antes de borrar esta conversación",
     "delete": "Borrar conversación",
-    "overlay": "Conversación rápida"
+    "overlay": "Conversación rápida",
+    "confirmDelete": "Haz clic de nuevo para borrar"
   },
   "history": "Historial",
   "routines": "Rutinas",

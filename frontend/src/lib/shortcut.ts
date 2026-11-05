@@ -7,6 +7,12 @@
 
 /** Ordem canônica, igual à do servidor. */
 export const MODIFIERS = ['ctrl', 'alt', 'shift', 'win'] as const;
+
+/** Atalho do app com a tecla certa do sistema: "⌘K" no Mac, "Ctrl+K" no resto. */
+export function appShortcut(letra: string): string {
+  const mac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
+  return mac ? `⌘${letra.toUpperCase()}` : `Ctrl+${letra.toUpperCase()}`;
+}
 export type Modifier = (typeof MODIFIERS)[number];
 
 const MODIFIER_LABELS: Record<Modifier, string> = { ctrl: 'Ctrl', alt: 'Alt', shift: 'Shift', win: 'Win' };

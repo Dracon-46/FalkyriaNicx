@@ -21,7 +21,8 @@
     "empty": "Aucune discussion pour l'instant",
     "stopBeforeDelete": "Arrêtez la génération avant de supprimer cette discussion",
     "delete": "Supprimer la discussion",
-    "overlay": "Discussion rapide"
+    "overlay": "Discussion rapide",
+    "confirmDelete": "Cliquez à nouveau pour supprimer"
   },
   "history": "Historique",
   "routines": "Routines",

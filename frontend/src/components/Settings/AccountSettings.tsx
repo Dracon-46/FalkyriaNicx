@@ -126,7 +126,15 @@ function LoggedOut({ onDone, onOpenDoc }: { onDone: (s: AccountState) => void; o
   const submitLabel = { entrar: 'conta.signIn', criar: 'conta.create', confirmar: 'conta.confirm', esqueci: 'conta.sendCode', redefinir: 'conta.savePassword' }[mode];
 
   return (
-    <div className="space-y-3">
+    // <form>: Enter no campo envia (entrar, criar, confirmar…).
+    <form
+      className="space-y-3"
+      noValidate
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!busy && email.trim()) void submit();
+      }}
+    >
       <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
         {t('conta.intro')}
       </p>
@@ -166,7 +174,7 @@ function LoggedOut({ onDone, onOpenDoc }: { onDone: (s: AccountState) => void; o
       )}
       {mode === 'criar' && <Consent checked={agreed} onChange={setAgreed} onOpen={onOpenDoc} />}
       <div className="flex flex-wrap items-center gap-2">
-        <button type="button" onClick={() => void submit()} disabled={busy || !email.trim()} className={buttonClass} style={primary} data-testid="account-submit">
+        <button type="submit" disabled={busy || !email.trim()} className={buttonClass} style={primary} data-testid="account-submit">
           {busy && <Loader2 size={12} className="animate-spin" />} {t(submitLabel)}
         </button>
         {mode === 'entrar' && (
@@ -200,7 +208,7 @@ function LoggedOut({ onDone, onOpenDoc }: { onDone: (s: AccountState) => void; o
           {error}
         </p>
       )}
-    </div>
+    </form>
   );
 }
 

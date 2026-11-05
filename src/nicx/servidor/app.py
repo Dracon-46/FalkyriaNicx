@@ -9,7 +9,7 @@ import threading
 import time
 
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from nicx.servidor.rotas.agenda import router as agenda_router
@@ -682,6 +682,11 @@ def create_app(
         @app.get("/{full_path:path}")
         async def spa_catch_all(full_path: str):
             """Serve static files directly, fall back to index.html for SPA routes."""
+            # Rota de API que não existe: 404 em JSON, não a página do app
+            # (o cliente leria HTML como resposta e mostraria lixo).
+            primeiro = full_path.split("/", 1)[0]
+            if primeiro in ("v1", "api", "webhooks"):
+                return JSONResponse({"detail": "Not Found"}, status_code=404)
             if full_path:
                 candidate = (static_dir / full_path).resolve()
                 # Path traversal prevention

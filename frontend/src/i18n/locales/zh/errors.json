@@ -63,5 +63,7 @@
     "forgetFailed": "现在无法删除你的数据，请重试。",
     "documentUnreachable": "无法加载文档。请确认 Nicx 正在运行。",
     "documentFailed": "无法加载文档。"
-  }
+  },
+  "storageFull": "此浏览器的存储空间已满：新对话将不会保存。请导出或删除旧对话。",
+  "importInvalid": "此文件不是 Nicx 对话导出文件。"
 }

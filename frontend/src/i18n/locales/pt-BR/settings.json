@@ -277,7 +277,8 @@
     "clearAll": "Apagar todos os dados",
     "clearAllDescription": "Apaga todas as conversas de vez",
     "confirm": "Clique de novo para confirmar",
-    "clear": "Apagar"
+    "clear": "Apagar",
+    "imported": "Conversas importadas: {{count}}"
   },
   "context": {
     "title": "Contexto da tela",
