@@ -260,7 +260,23 @@ function Get-Download([string] $url, [string] $dest, [string] $label) {
     if (Test-Path -LiteralPath $partial) { $existing = (Get-Item -LiteralPath $partial).Length }
     $req = New-WebRequest $url
     if ($existing -gt 0) { $req.AddRange([long] $existing) }
-    $resp = $req.GetResponse()
+    try {
+        $resp = $req.GetResponse()
+    } catch [System.Net.WebException] {
+        $codigo = if ($_.Exception.Response) { [int] $_.Exception.Response.StatusCode } else { 0 }
+        if ($existing -gt 0 -and $codigo -eq 416) {
+            # O .partial já estava inteiro (parou antes de ser renomeado):
+            # antes, toda nova tentativa falhava aqui até apagar downloads\.
+            Move-Item -LiteralPath $partial -Destination $dest -Force
+            return $dest
+        }
+        if ($existing -gt 0) {
+            # Pedaço de outro arquivo ou servidor sem retomada: recomeça do zero.
+            Remove-Item -LiteralPath $partial -Force -ErrorAction SilentlyContinue
+            return Get-Download $url $dest $label
+        }
+        throw
+    }
     try {
         $status = [int] $resp.StatusCode
         $append = ($existing -gt 0 -and $status -eq 206)
@@ -447,6 +463,10 @@ $DownloadDir = Join-Path $AppDir 'downloads'
 $NicxHome = Get-NicxHome
 $ConfigPath = Join-Path $NicxHome 'config.toml'
 $OllamaBase = Get-OllamaBase
+# Versão do Ollama testada com o Nicx (baixada do GitHub, não o "latest" do
+# site, que muda sem teste) e a mínima aceita de um Ollama que já está no PC.
+$OllamaVersaoTestada = '0.40.14'
+$OllamaVersaoMinima = '0.40.8'
 $OllamaModelsDir = if ($env:OLLAMA_MODELS) { $env:OLLAMA_MODELS } else { Join-Path $env:USERPROFILE '.ollama\models' }
 
 if (-not $DryRun) {
@@ -523,6 +543,11 @@ $ollamaVersion = Get-OllamaVersion $OllamaBase
 $ollamaRunning = [bool] $ollamaVersion
 if (-not $ollamaVersion -and $ollamaExe) {
     try { $ollamaVersion = (Get-Item -LiteralPath $ollamaExe).VersionInfo.ProductVersion } catch { }
+}
+$ollamaAntigo = $false
+if ($ollamaVersion) {
+    $limpa = ($ollamaVersion -replace '[^0-9.].*$', '')
+    try { $ollamaAntigo = ([version] $limpa) -lt ([version] $OllamaVersaoMinima) } catch { }
 }
 $models = if ($ollamaRunning) { Get-OllamaModels $OllamaBase } else { $null }
 $modelPresent = $null
@@ -776,7 +801,7 @@ try {
         $rustUrl = ([Uri] $rustWheel.FullName).AbsoluteUri
         # --no-build: nada é compilado neste computador. Dependências que o
         # PyPI só oferece como código-fonte vão pré-geradas em wheels\.
-        $pipArgs = @('pip', 'install', '--python', $VenvPython, '--compile-bytecode', '--no-build',
+        $pipArgs = @('pip', 'install', '--python', $VenvPython, '--no-build',
             '--find-links', $wheelDir, '--reinstall-package', 'nicx', '--reinstall-package', 'nicx-rust')
         if (Test-Path -LiteralPath $constraints) { $pipArgs += @('--constraints', $constraints) }
         $pipArgs += @("nicx[$($extras -join ',')] @ $nicxUrl", "nicx-rust @ $rustUrl")
@@ -784,7 +809,10 @@ try {
         $r = Invoke-Tool $uvExe $pipArgs $uvEnv
         if ($r.ExitCode -ne 0) { throw (Get-ToolError $r 'A instalação dos componentes do Nicx falhou. Verifique a conexão com a internet e tente de novo') }
         Set-StepProgress 0.95
-        $check = Invoke-Tool $VenvPython @('-X', 'utf8', '-c', 'import nicx, nicx_rust, fastapi, uvicorn; print(nicx.__version__)') -Quiet
+        # Confere também o fuso (sem tzdata o Windows não tem nenhum) e compila
+        # só o próprio Nicx: o --compile-bytecode do site-packages inteiro
+        # (torch, spacy...) levava minutos em CPU fraca.
+        $check = Invoke-Tool $VenvPython @('-X', 'utf8', '-c', 'import compileall, zoneinfo, nicx, nicx_rust, fastapi, uvicorn; zoneinfo.ZoneInfo("America/Sao_Paulo"); compileall.compile_dir(nicx.__path__[0], quiet=1); print(nicx.__version__)') -Quiet
         if ($check.ExitCode -ne 0) { throw 'Os pacotes foram instalados, mas o Nicx não pôde ser carregado. Veja o registro.' }
         Write-StatusOk "Nicx $($check.StdOut.Trim()) instalado"
     }
@@ -793,6 +821,18 @@ try {
     # 5. Configuração --------------------------------------------------------
     Start-Step 'config'
     if ($configExists) {
+        # Configs criadas pela 0.2.0 do instalador: tira a lista de ferramentas
+        # que deixava o modelo sem controle do PC, lembretes e agenda (e com o
+        # shell ligado) e troca o Whisper "base" pelo "small".
+        $texto = [System.IO.File]::ReadAllText($ConfigPath)
+        if ($texto -match 'criada pelo instalador' -and -not $DryRun) {
+            $novo = $texto -replace '(?m)^\[tools\]\r?\nenabled = \["code_interpreter", "web_search", "file_read", "shell_exec"\]\r?\n', ''
+            $novo = $novo -replace '(?m)^model = "base"\s*$', 'model = "small"          # o "base" erra muito em português'
+            if ($novo -ne $texto) {
+                [System.IO.File]::WriteAllText($ConfigPath, $novo, (New-Object System.Text.UTF8Encoding($false)))
+                Write-StatusInfo 'configuração atualizada (ferramentas padrão e reconhecimento de voz melhor)'
+            }
+        }
         Write-StatusOk "configuração existente mantida: $ConfigPath"
         if ($configEngine -and $configEngine -ne 'ollama') { Write-StatusInfo "Motor configurado: $configEngine (o Ollama não será verificado)" }
     } elseif ($DryRun) {
@@ -821,8 +861,8 @@ default_model = "$chosenModel"
 [agent]
 default_agent = "simple"
 
-[tools]
-enabled = ["code_interpreter", "web_search", "file_read", "shell_exec"]
+# Sem [tools]: valem as ferramentas padrão do Nicx (controle do PC, lembretes,
+# agenda, arquivos, busca, contas). A lista antiga tirava essas e ligava o shell.
 
 [security]
 profile = "personal"
@@ -834,7 +874,7 @@ enabled = false
 [speech]
 # Voz em português do Brasil, tudo local (faster-whisper + Kokoro).
 backend = "faster-whisper"
-model = "base"
+model = "small"          # o "base" erra muito em português
 language = "pt"
 device = "cpu"
 compute_type = "int8"
@@ -857,9 +897,12 @@ voice_speed = 1.0
     # 6. Ollama --------------------------------------------------------------
     if ($useOllama) {
         Start-Step 'ollama'
-        if ($ollamaRunning) {
+        if ($ollamaAntigo) {
+            Write-StatusInfo "O Ollama $ollamaVersion é antigo para o modelo do Nicx; atualizando para o $OllamaVersaoTestada."
+        }
+        if ($ollamaRunning -and -not $ollamaAntigo) {
             Write-StatusOk "Ollama $ollamaVersion em execução ($OllamaBase)"
-        } elseif ($ollamaExe) {
+        } elseif ($ollamaExe -and -not $ollamaAntigo) {
             if ($DryRun) {
                 Write-StatusOk "Ollama $ollamaVersion instalado em $ollamaExe"
                 Write-StatusTodo 'iniciaria o Ollama'
@@ -876,7 +919,7 @@ voice_speed = 1.0
             Write-StatusTodo 'baixaria e instalaria o Ollama (instalador oficial, cerca de 1,6 GB; só para este usuário, sem pedir administrador)'
         } else {
             Write-StatusInfo 'Baixando o Ollama (instalador oficial, cerca de 1,6 GB)...'
-            $setup = Get-Download 'https://ollama.com/download/OllamaSetup.exe' (Join-Path $DownloadDir 'OllamaSetup.exe') 'Ollama'
+            $setup = Get-Download "https://github.com/ollama/ollama/releases/download/v$OllamaVersaoTestada/OllamaSetup.exe" (Join-Path $DownloadDir "OllamaSetup-$OllamaVersaoTestada.exe") 'Ollama'
             $sig = Get-AuthenticodeSignature -LiteralPath $setup
             if ($sig.Status -ne 'Valid' -or $sig.SignerCertificate.Subject -notmatch 'O=Ollama Inc\.') {
                 Remove-Item -LiteralPath $setup -Force -ErrorAction SilentlyContinue
@@ -929,14 +972,14 @@ voice_speed = 1.0
         if (Test-VoiceModelsCached) {
             Write-StatusOk 'modelos de voz já baixados (Whisper base e Kokoro pt-BR)'
         } elseif ($DryRun) {
-            Write-StatusTodo 'baixaria os modelos de voz (Whisper base e Kokoro, cerca de 500 MB) para o cache do Hugging Face'
+            Write-StatusTodo 'baixaria os modelos de voz (Whisper small e Kokoro, cerca de 800 MB) para o cache do Hugging Face'
         } else {
-            Write-StatusInfo 'Baixando os modelos de voz (reconhecimento e fala, cerca de 500 MB)...'
+            Write-StatusInfo 'Baixando os modelos de voz (reconhecimento e fala, cerca de 800 MB)...'
             $py = @'
 import sys
 from faster_whisper.utils import download_model
-print('Reconhecimento de fala (Whisper base)...', file=sys.stderr, flush=True)
-download_model('base')
+print('Reconhecimento de fala (Whisper small)...', file=sys.stderr, flush=True)
+download_model('small')
 from huggingface_hub import hf_hub_download
 for name in ('config.json', 'kokoro-v1_0.pth', 'voices/pf_dora.pt', 'voices/pm_alex.pt', 'voices/pm_santa.pt'):
     print('Voz (Kokoro): ' + name, file=sys.stderr, flush=True)

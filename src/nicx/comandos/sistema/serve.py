@@ -140,7 +140,20 @@ def _resolve_server_model(
         if candidate and (not available or candidate in available):
             return candidate
 
-    return available[0] if available else ""
+    # O modelo configurado não está baixado: usa outro de conversa (nunca um de
+    # embedding, que não responde) e avisa, para o problema aparecer no log.
+    conversa = [m for m in available if "embed" not in m.lower()]
+    escolhido = conversa[0] if conversa else ""
+    configurado = next((c for c in candidates if c), "")
+    if configurado:
+        logger.warning(
+            "O modelo %s não está baixado no Ollama; usando %s. Rode o instalador "
+            "de novo ou `ollama pull %s`.",
+            configurado,
+            escolhido or "nenhum",
+            configurado,
+        )
+    return escolhido
 
 
 @click.command()

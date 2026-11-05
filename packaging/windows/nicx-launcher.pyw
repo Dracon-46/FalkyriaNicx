@@ -135,9 +135,22 @@ def http_status(url: str, timeout: float = 2.0) -> int | None:
 
 
 def port_in_use(port: int) -> bool:
+    """Se a porta não serve para o Nicx: alguém escutando ou reservada.
+
+    Com Hyper-V, WSL2 ou Docker o Windows reserva faixas de portas (a 8000
+    costuma cair nelas): ninguém escuta, o connect diz "livre" e o servidor
+    falhava ao abrir (WinError 10013). Por isso testa abrindo a porta.
+    """
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.settimeout(0.5)
-        return sock.connect_ex(("127.0.0.1", port)) == 0
+        if sock.connect_ex(("127.0.0.1", port)) == 0:
+            return True
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        try:
+            sock.bind(("127.0.0.1", port))
+        except OSError:
+            return True
+    return False
 
 
 def server_url(port: int) -> str:

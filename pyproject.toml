@@ -96,6 +96,12 @@ server = [
     "uvicorn>=0.30",
     "pydantic>=2.0",
     "python-multipart>=0.0.9",
+    # Loja (assinatura) e Conta Falkyria (backup cifrado); antes vinha por tabela.
+    "cryptography>=43",
+    # Upload de .docx para a base de conhecimento.
+    "python-docx>=1.1",
+    # Seleção de texto e "clica em Salvar" (UI Automation); antes só vinha com a voz.
+    "pythonnet>=3.0; sys_platform == 'win32'",
 ]
 desktop = [
     "fastapi>=0.110",
