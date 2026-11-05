@@ -106,6 +106,7 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     from nicx.comandos.conversa.ask import ask
     from nicx.comandos.conversa.chat import chat
     from nicx.comandos.instalacao._bootstrap import bootstrap_cmd
+    from nicx.comandos.instalacao.atualizacao import atualizacao
     from nicx.comandos.instalacao.config import config
     from nicx.comandos.instalacao.doctor import doctor
     from nicx.comandos.instalacao.init import init
@@ -153,6 +154,7 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     cli.add_command(vault, "vault")
     cli.add_command(add, "add")
     cli.add_command(loja, "loja")
+    cli.add_command(atualizacao, "atualizacao")
     cli.add_command(operators, "operators")
     cli.add_command(host, "host")
     cli.add_command(quickstart, "quickstart")

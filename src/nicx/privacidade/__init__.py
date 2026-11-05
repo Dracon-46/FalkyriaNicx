@@ -23,7 +23,7 @@ from nicx.privacidade.redaction import hash_id, redact
 
 # Version of docs/legal/politica-de-privacidade.md shown when asking for
 # consent. Bump it whenever the policy changes so consent is asked again.
-POLICY_VERSION = "2026-11-04"
+POLICY_VERSION = "2026-11-05"
 # Version of the terms of use (termos-de-uso.md); the Conta Falkyria records
 # which version each account accepted and asks again when it changes.
 TERMS_VERSION = "2026-11-04"

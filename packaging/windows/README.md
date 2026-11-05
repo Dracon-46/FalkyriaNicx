@@ -72,6 +72,30 @@ Saídas (ignoradas pelo git):
 - `packaging/windows/dist/constraints.txt` (versões do `uv.lock`)
 - `packaging/windows/build/` (imagens, ícone, `uv.exe`, termos de uso em texto)
 
+## Publicar uma versão (com atualização pelo app)
+
+1. Escreva as novidades da versão no topo de `src/nicx/atualizacao/novidades.py`.
+2. Gere o instalador (`build-installer.ps1 -Version X.Y.Z`) e teste numa
+   instalação descartável.
+3. Assine o arquivo de versões (no PC da Falkyria, com a chave em
+   `~/.falkyria-loja/`):
+
+   ```powershell
+   uv run nicx atualizacao assinar packaging\windows\dist\NicxSetup.exe --versao X.Y.Z
+   ```
+
+   Gera `packaging/windows/dist/nicx-atualizacao.json` (versão, endereço e
+   sha256 do instalador, novidades), assinado com Ed25519.
+4. Suba **os dois** arquivos na release `vX.Y.Z`: `NicxSetup.exe` e
+   `nicx-atualizacao.json`. O app procura em
+   `releases/latest/download/nicx-atualizacao.json`; sem esse arquivo, ninguém
+   vê a versão nova pelo app.
+
+Na atualização pelo app, o Nicx abre o instalador com
+`/SILENT /SUPPRESSMSGBOXES /NORESTART /REABRIR=1`: o `setup-runtime.ps1` para o
+servidor, troca os pacotes e o `[Run]` com `ReabrirDepois` religa o Nicx sem
+abrir outra aba.
+
 ## Testar sem instalar
 
 O script de preparação mostra o plano sem alterar nada:

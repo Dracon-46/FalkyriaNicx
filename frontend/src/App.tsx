@@ -14,6 +14,7 @@ import { RoutinesPage } from './pages/RoutinesPage';
 import { PlannerPage } from './pages/PlannerPage';
 import { AssistantsPage } from './pages/AssistantsPage';
 import { ExtensionsPage } from './pages/ExtensionsPage';
+import { UpdatesPage } from './pages/UpdatesPage';
 import { CommandPalette } from './components/CommandPalette';
 import { SetupScreen } from './components/SetupScreen';
 import { Toaster } from './components/ui/sonner';
@@ -23,6 +24,9 @@ import { startVoiceBusyReporter } from './lib/voice-busy';
 import { fetchModels, fetchServerInfo, fetchSavings, isTauri } from './lib/api';
 import { track, hashId } from './lib/analytics';
 import { ConsentGate } from './components/Privacy/ConsentDialog';
+import { atualizarEstado } from './lib/atualizacao';
+import { toast } from 'sonner';
+import i18n from './i18n';
 
 // Loaded on demand: brings supabase-js and the charts only when opened.
 const PainelPage = lazy(() => import('./pages/PainelPage'));
@@ -128,6 +132,38 @@ export default function App() {
     return () => clearTimeout(t);
   }, []);
 
+  // Versão nova: o menu ganha um ponto e aparece um aviso, uma vez por versão.
+  // (Quem procura na internet é o servidor, uma vez por dia; aqui só lê.)
+  useEffect(() => {
+    const ler = () =>
+      void atualizarEstado().then((estado) => {
+        const nova = estado?.ha_nova ? estado.ultima?.versao : undefined;
+        if (!nova) return;
+        let avisada: string | null = null;
+        try {
+          avisada = localStorage.getItem('nicx-aviso-atualizacao');
+        } catch {
+          // sem armazenamento: avisa de novo, sem problema
+        }
+        if (avisada === nova) return;
+        try {
+          localStorage.setItem('nicx-aviso-atualizacao', nova);
+        } catch {
+          // idem
+        }
+        toast(i18n.t('atualizacoes.toast', { versao: nova }), {
+          duration: 12000,
+          action: { label: i18n.t('atualizacoes.verAgora'), onClick: () => window.location.assign('/atualizacoes') },
+        });
+      });
+    const primeiro = setTimeout(ler, 4000);
+    const intervalo = setInterval(ler, 3 * 3600 * 1000);
+    return () => {
+      clearTimeout(primeiro);
+      clearInterval(intervalo);
+    };
+  }, []);
+
   const toggleSystemPanel = useAppStore((s) => s.toggleSystemPanel);
 
   // Global keyboard shortcuts
@@ -168,6 +204,7 @@ export default function App() {
           <Route path="planejador" element={<PlannerPage />} />
           <Route path="assistentes" element={<AssistantsPage />} />
           <Route path="extensoes" element={<ExtensionsPage />} />
+          <Route path="atualizacoes" element={<UpdatesPage />} />
           <Route
             path="painel"
             element={

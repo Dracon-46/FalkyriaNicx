@@ -301,6 +301,24 @@ Uma mensagem que cita o nome de um servidor, de uma ferramenta dele ou de uma
 habilidade manda a lista de ferramentas ao modelo (`[agent] tools_on_demand`).
 Adicionar, mudar e remover extensões vai para o Histórico.
 
+## Atualizações
+
+A página **Atualizações** (menu ao lado) mostra a versão instalada, as
+novidades de cada versão e, quando sai uma nova, o botão **Atualizar para a
+X**. O Nicx baixa o instalador, confere que é o que a Falkyria publicou
+(assinatura Ed25519 e sha256) e instala por cima: fecha por um ou dois minutos
+e volta sozinho, com as conversas e configurações no lugar. A página recarrega
+quando a versão nova responde.
+
+- **Procurar sozinho** (ligado por padrão): uma vez por dia o servidor baixa o
+  arquivo público de versões da release mais nova (`nicx-atualizacao.json`) e
+  avisa com uma notificação. Nada sobre você vai junto. Desligue na própria
+  página ou em `[atualizacao] automatica = false`.
+- Só a instalação pelo `NicxSetup.exe` se atualiza pelo app. Num clone do git
+  (Mac, Linux, desenvolvimento), a página mostra `nicx self-update`.
+- Pelo terminal: `nicx atualizacao procurar`.
+- O instalador baixado e o registro da instalação ficam em `~/.nicx/atualizacoes/`.
+
 ## Conta Falkyria (opcional)
 
 O Nicx funciona inteiro sem conta. Com uma (Configurações → Conta Falkyria),

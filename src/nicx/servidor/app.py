@@ -13,9 +13,11 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from nicx.servidor.rotas.agenda import router as agenda_router
+from nicx.servidor.rotas.anexos import router as anexos_router
 from nicx.servidor.rotas.api import include_all_routes
 from nicx.servidor.rotas.assistentes import router as assistentes_router
 from nicx.servidor.rotas.atalho import router as atalho_router
+from nicx.servidor.rotas.atualizacao import router as atualizacao_router
 from nicx.servidor.rotas.briefing import create_digest_router
 from nicx.servidor.rotas.chat import router
 from nicx.servidor.rotas.comparacao import comparison_router
@@ -507,6 +509,8 @@ def create_app(
     app.include_router(assistentes_router)
     app.include_router(extensoes_router)
     app.include_router(conta_router)
+    app.include_router(anexos_router)
+    app.include_router(atualizacao_router)
     app.include_router(planejador_router)
     include_all_routes(app)
 

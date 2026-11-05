@@ -903,6 +903,11 @@ def serve(
     from nicx.rotinas import agendador as rotinas_agendador
 
     rotinas_agendador.ligar()
+    # Atualizações: procura uma vez por dia se [atualizacao] automatica (o
+    # primeiro pedido espera 2 minutos para não pesar na abertura).
+    from nicx.atualizacao import servico as atualizacao
+
+    atualizacao.ligar_verificacao_diaria()
     _report_server_started(app, config, model_name, speech_backend, started)
     try:
         run_server(app, host=bind_host, port=bind_port, log_level="info")

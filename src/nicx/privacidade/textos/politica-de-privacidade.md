@@ -1,6 +1,6 @@
 # Política de Privacidade do Nicx
 
-**Versão 2026-11-04**
+**Versão 2026-11-05**
 
 Esta política explica quais dados o **Nicx**, a inteligência artificial da
 **Falkyria**, trata, por quê, e como você controla isso. Ela vale para o
@@ -53,6 +53,13 @@ contador de downloads de cada pacote só soma um, sem saber quem baixou. Como
 em qualquer acesso à internet, o provedor de infraestrutura pode registrar o
 endereço IP (veja a seção 3). A loja não depende da permissão de estatísticas
 e só é acessada quando você a abre.
+
+Para saber se há **versão nova do Nicx**, o app baixa uma vez por dia o
+arquivo público de versões das releases do Nicx no GitHub (onde fica o
+instalador) e confere a assinatura da Falkyria. Esse pedido não leva nada
+sobre você; o GitHub, como provedor, pode registrar o endereço IP. Você
+desliga isso na página Atualizações (opção "Procurar sozinho") e ainda pode
+procurar quando quiser. Instalar a versão nova é sempre escolha sua.
 
 ## 3. O que enviamos se você permitir
 

@@ -118,6 +118,9 @@ Name: "{autodesktop}\Nicx"; Filename: "{app}\venv\Scripts\pythonw.exe"; Paramete
 
 [Run]
 Filename: "{app}\venv\Scripts\pythonw.exe"; Parameters: """{app}\nicx-launcher.pyw"""; WorkingDir: "{app}"; Description: "Abrir o Nicx agora"; Flags: postinstall nowait skipifsilent; Check: RuntimeReady
+; Atualização pelo app (/REABRIR=1, silenciosa): o Nicx volta sozinho e a aba que
+; já estava aberta recarrega; por isso sem abrir o navegador de novo.
+Filename: "{app}\venv\Scripts\pythonw.exe"; Parameters: """{app}\nicx-launcher.pyw"" --no-browser"; WorkingDir: "{app}"; Description: "Reabrir o Nicx"; Flags: postinstall nowait; Check: ReabrirDepois
 
 [UninstallRun]
 Filename: "{app}\venv\Scripts\python.exe"; Parameters: """{app}\nicx-launcher.pyw"" --stop --quiet"; WorkingDir: "{app}"; Flags: runhidden waituntilterminated skipifdoesntexist; RunOnceId: "PararNicx"
@@ -155,6 +158,12 @@ var
 function RuntimeReady: Boolean;
 begin
   Result := RuntimeDone and (RuntimeExitCode = 0);
+end;
+
+{ /REABRIR=1: atualização pedida pelo próprio app (nicx.atualizacao). }
+function ReabrirDepois: Boolean;
+begin
+  Result := RuntimeReady and (ExpandConstant('{param:REABRIR|0}') = '1');
 end;
 
 procedure StopButtonClick(Sender: TObject);

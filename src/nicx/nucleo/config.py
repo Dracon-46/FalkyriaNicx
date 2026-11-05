@@ -1710,6 +1710,20 @@ class AtalhoConfig:
 
 
 @dataclass(slots=True)
+class AtualizacaoConfig:
+    """Atualizações do Nicx (:mod:`nicx.atualizacao`).
+
+    Uma vez por dia o servidor baixa o arquivo de versões da release mais nova
+    do Nicx (assinado pela Falkyria; nenhum dado do usuário vai junto) e avisa
+    quando há versão nova. Instalar é sempre escolha do usuário.
+    """
+
+    automatica: bool = True
+    # Endereço do arquivo de versões; vazio = o da release mais nova do Nicx.
+    url: str = ""
+
+
+@dataclass(slots=True)
 class DitadoConfig:
     """Ditado universal: aperta o atalho em qualquer programa, fala, e o texto
     é digitado onde está o cursor (:mod:`nicx.ditado`).
@@ -1974,6 +1988,7 @@ class NicxConfig:
     speech: SpeechConfig = field(default_factory=SpeechConfig)
     atalho: AtalhoConfig = field(default_factory=AtalhoConfig)
     ditado: DitadoConfig = field(default_factory=DitadoConfig)
+    atualizacao: AtualizacaoConfig = field(default_factory=AtualizacaoConfig)
     agenda: AgendaConfig = field(default_factory=AgendaConfig)
     contexto: ContextoConfig = field(default_factory=ContextoConfig)
     resumo: ResumoConfig = field(default_factory=ResumoConfig)
@@ -2268,6 +2283,7 @@ def load_config(path: Optional[Path] = None) -> NicxConfig:
             "speech",
             "atalho",
             "ditado",
+            "atualizacao",
             "agenda",
             "contexto",
             "resumo",
@@ -2610,6 +2626,7 @@ __all__ = [
     "OperatorsConfig",
     "AgentLearningConfig",
     "AtalhoConfig",
+    "AtualizacaoConfig",
     "DitadoConfig",
     "ContextoConfig",
     "ResumoConfig",

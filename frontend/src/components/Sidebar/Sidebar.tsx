@@ -20,6 +20,7 @@ import {
   Database,
   FolderKanban,
   History,
+  ArrowUpCircle,
   Repeat,
   Sparkles,
   Puzzle,
@@ -28,6 +29,7 @@ import {
 import { ConversationList } from './ConversationList';
 import { useAppStore } from '../../lib/store';
 import { appShortcut } from '../../lib/shortcut';
+import { useAtualizacao } from '../../lib/atualizacao';
 import { useTranslation } from 'react-i18next';
 
 export function Sidebar() {
@@ -62,6 +64,7 @@ export function Sidebar() {
     navigate('/');
   };
 
+  const haAtualizacao = useAtualizacao((s) => Boolean(s.estado?.ha_nova));
   const navItems = [
     { path: '/', icon: MessageSquare, label: t('nav.chat') },
     { path: '/projetos', icon: FolderKanban, label: t('nav.projects') },
@@ -75,6 +78,7 @@ export function Sidebar() {
     { path: '/data-sources', icon: Database, label: t('nav.dataSources') },
     { path: '/agents', icon: Bot, label: t('nav.agents') },
     { path: '/logs', icon: ScrollText, label: t('nav.logs') },
+    { path: '/atualizacoes', icon: ArrowUpCircle, label: t('nav.updates'), ponto: haAtualizacao },
     { path: '/settings', icon: Settings, label: t('nav.settings') },
     { path: '/get-started', icon: Rocket, label: t('nav.getStarted') },
   ];
@@ -247,6 +251,14 @@ export function Sidebar() {
                   )}
                   <item.icon size={16} style={isActive ? { color: 'var(--color-accent)' } : undefined} />
                   {item.label}
+                  {'ponto' in item && item.ponto && (
+                    <span
+                      className="ml-auto w-2 h-2 rounded-full"
+                      style={{ background: 'var(--color-accent)' }}
+                      title={t('atualizacoes.temNova')}
+                      aria-label={t('atualizacoes.temNova')}
+                    />
+                  )}
                 </button>
               );
             })}
