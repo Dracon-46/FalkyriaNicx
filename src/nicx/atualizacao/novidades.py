@@ -1,9 +1,10 @@
-"""O que mudou em cada versão do Nicx (a mais nova primeiro).
+"""Novidades que vêm junto com o app, para a página Atualizações sem internet.
 
-Vai junto no app (página Atualizações, mesmo sem internet) e no arquivo de
-versões assinado (:func:`nicx.atualizacao.manifesto.montar`), para quem ainda
-está numa versão antiga ver o que vem na nova. Ao lançar uma versão,
-acrescente o item dela no topo.
+A fonte é a tabela ``nicx_novidades`` do Supabase da Falkyria (Painel, seção
+Novidades, ou um INSERT): ``nicx atualizacao assinar`` lê de lá e põe no
+arquivo de versões assinado, que o app guarda e mostra. Esta lista só aparece
+enquanto o app ainda não baixou nenhum arquivo de versões; não precisa ser
+mexida a cada versão (``--sem-banco`` a usa para assinar sem internet).
 """
 
 from __future__ import annotations

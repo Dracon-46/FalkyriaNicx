@@ -74,7 +74,17 @@ Saídas (ignoradas pelo git):
 
 ## Publicar uma versão (com atualização pelo app)
 
-1. Escreva as novidades da versão no topo de `src/nicx/atualizacao/novidades.py`.
+1. Cadastre as novidades da versão na tabela `nicx_novidades` do Supabase da
+   Falkyria e marque como publicada: pelo Painel Falkyria (seção 10, Novidades)
+   ou com um INSERT:
+
+   ```sql
+   insert into public.nicx_novidades (versao, data, titulo, itens, publicado)
+   values ('0.2.2', '2026-11-10', 'Título curto',
+           array['O que mudou, em uma frase.', 'Outra mudança.'], true);
+   ```
+
+   `uv run nicx atualizacao novidades` mostra o que está publicado.
 2. Gere o instalador (`build-installer.ps1 -Version X.Y.Z`) e teste numa
    instalação descartável.
 3. Assine o arquivo de versões (no PC da Falkyria, com a chave em
@@ -85,7 +95,8 @@ Saídas (ignoradas pelo git):
    ```
 
    Gera `packaging/windows/dist/nicx-atualizacao.json` (versão, endereço e
-   sha256 do instalador, novidades), assinado com Ed25519.
+   sha256 do instalador, novidades lidas do banco), assinado com Ed25519. Sem
+   internet, `--sem-banco` usa a lista de `src/nicx/atualizacao/novidades.py`.
 4. Suba **os dois** arquivos na release `vX.Y.Z`: `NicxSetup.exe` e
    `nicx-atualizacao.json`. O app procura em
    `releases/latest/download/nicx-atualizacao.json`; sem esse arquivo, ninguém

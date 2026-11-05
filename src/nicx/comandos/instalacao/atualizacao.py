@@ -49,20 +49,41 @@ def procurar() -> None:
 )
 @click.option("--versao", required=True, help="versão da release, ex.: 0.2.1")
 @click.option("--saida", type=click.Path(dir_okay=False, path_type=Path), default=None)
-def assinar(instalador: Path, versao: str, saida: Path | None) -> None:
-    """Gera o nicx-atualizacao.json assinado para a release."""
-    from nicx.atualizacao import manifesto
+@click.option(
+    "--sem-banco",
+    is_flag=True,
+    help="usa as novidades de src/nicx/atualizacao/novidades.py (sem internet)",
+)
+def assinar(instalador: Path, versao: str, saida: Path | None, sem_banco: bool) -> None:
+    """Gera o nicx-atualizacao.json assinado para a release.
+
+    As novidades vêm da tabela nicx_novidades (Painel Falkyria ou INSERT).
+    """
+    from nicx.atualizacao import banco, manifesto
     from nicx.atualizacao.novidades import NOVIDADES
 
     console = Console(stderr=True)
-    if not NOVIDADES or NOVIDADES[0]["versao"] != versao:
+    if sem_banco:
+        novidades = NOVIDADES
+    else:
+        try:
+            novidades = banco.buscar()
+        except banco.NovidadesIndisponiveis as exc:
+            console.print(f"[red]{exc}. Use --sem-banco para assinar sem ele.[/red]")
+            sys.exit(1)
+    if not novidades or novidades[0]["versao"] != versao:
+        onde = (
+            "src/nicx/atualizacao/novidades.py"
+            if sem_banco
+            else "nicx_novidades (Painel Falkyria, seção Novidades, ou INSERT)"
+        )
         console.print(
-            f"[red]Escreva as novidades da {versao} no topo de "
-            "src/nicx/atualizacao/novidades.py antes de assinar.[/red]"
+            f"[red]Cadastre e publique as novidades da {versao} em {onde} "
+            "antes de assinar.[/red]"
         )
         sys.exit(1)
     try:
-        conteudo = manifesto.montar(versao, instalador)
+        conteudo = manifesto.montar(versao, instalador, novidades=novidades)
         assinado = manifesto.assinar(conteudo)
         manifesto.ler(assinado)  # confere com as chaves que o app aceita
     except FileNotFoundError:
@@ -82,6 +103,25 @@ def assinar(instalador: Path, versao: str, saida: Path | None) -> None:
         f"sha256 {win['sha256'][:16]}…\n"
         f"  Suba os dois arquivos na release v{versao}."
     )
+
+
+@atualizacao.command("novidades")
+def listar_novidades() -> None:
+    """Mostra as novidades publicadas no banco (as que vão na próxima assinatura)."""
+    from nicx.atualizacao import banco
+
+    console = Console()
+    try:
+        novidades = banco.buscar()
+    except banco.NovidadesIndisponiveis as exc:
+        console.print(f"[red]{exc}[/red]")
+        sys.exit(1)
+    if not novidades:
+        console.print("Nenhuma novidade publicada.")
+    for n in novidades:
+        console.print(f"[bold]{n['versao']}[/bold] · {n['data']} · {n['titulo']}")
+        for item in n["itens"]:
+            console.print(f"  • {item}")
 
 
 __all__ = ["atualizacao"]
