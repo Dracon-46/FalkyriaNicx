@@ -53,6 +53,13 @@ class Senha(BaseModel):
     senha: str = Field(min_length=1, max_length=200)
 
 
+class Aceite(BaseModel):
+    """As versões que a pessoa leu: só grava se ainda forem as atuais."""
+
+    termos_versao: str = Field(min_length=1, max_length=20)
+    politica_versao: str = Field(min_length=1, max_length=20)
+
+
 class NovoBackup(Senha):
     rotulo: str = Field(default="", max_length=60)
 
@@ -135,9 +142,20 @@ async def sair():
 
 
 @router.post("/aceitar")
-async def aceitar():
+async def aceitar(pedido: Aceite):
     from nicx.conta import servico
 
+    atuais = servico.versoes()
+    lidas = (pedido.termos_versao, pedido.politica_versao)
+    if lidas != (atuais["termos_versao"], atuais["politica_versao"]):
+        # A tela mostrava textos de outra versão: não dá para registrar um
+        # aceite do que a pessoa não leu.
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "Os Termos ou a Política mudaram. Leia a versão nova e aceite de novo."
+            ),
+        )
     return await _rodar(servico.aceitar)
 
 

@@ -244,6 +244,29 @@ def test_conta_antiga_precisa_aceitar(supabase):
     assert not servico.aceitar()["precisa_aceitar"]
 
 
+def test_rota_aceitar_exige_as_versoes_lidas(supabase):
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+
+    from nicx.servidor.rotas.conta import router
+
+    _conta_pronta()
+    uid = cofre.ler()["user_id"]
+    supabase.contas[uid]["termos_versao"] = "2020-01-01"
+    app = FastAPI()
+    app.include_router(router)
+    client = TestClient(app)
+    # Sem dizer o que leu: recusado.
+    assert client.post("/v1/conta/aceitar").status_code == 422
+    # Leu uma versão que não é mais a atual: recusado, nada gravado.
+    antiga = {"termos_versao": "2020-01-01", "politica_versao": "2020-01-01"}
+    assert client.post("/v1/conta/aceitar", json=antiga).status_code == 409
+    assert supabase.contas[uid]["termos_versao"] == "2020-01-01"
+    resposta = client.post("/v1/conta/aceitar", json=servico.versoes())
+    assert resposta.status_code == 200
+    assert resposta.json()["precisa_aceitar"] is False
+
+
 def test_esqueci_a_senha(supabase):
     _conta_pronta()
     servico.sair()

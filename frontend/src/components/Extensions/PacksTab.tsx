@@ -42,6 +42,7 @@ export function Permissions({ preview }: { preview: PackPreview }) {
   if (p.todas_as_ferramentas) lines.push({ key: 'all', text: t('extensoes.packs.perm.allTools'), warn: true });
   else if (p.ferramentas.length) lines.push({ key: 'tools', text: t('extensoes.packs.perm.tools', { list: p.ferramentas.join(', ') }) });
   if (p.rotinas_com_horario.length) lines.push({ key: 'sched', text: t('extensoes.packs.perm.scheduled', { list: p.rotinas_com_horario.join(', ') }) });
+  if (p.mcp_confirma) lines.push({ key: 'mcpAsk', text: t('extensoes.packs.perm.mcpAsk') });
   if (!lines.length) lines.push({ key: 'none', text: t('extensoes.packs.perm.none') });
   return (
     <ul className="text-xs space-y-0.5 mt-1" data-testid={`pack-perms-${preview.id}`}>

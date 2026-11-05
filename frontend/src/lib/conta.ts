@@ -80,7 +80,9 @@ export const esqueci = async (email: string): Promise<void> => void (await json(
 export const redefinir = async (email: string, codigo: string, senha: string): Promise<AccountState> =>
   json(await send('/redefinir', 'POST', { email, codigo, senha }));
 export const sair = async (): Promise<void> => void (await json(await send('/sair', 'POST')));
-export const aceitar = async (): Promise<AccountState> => json(await send('/aceitar', 'POST'));
+/** Aceita as versões que a tela mostrou (o servidor recusa se já mudaram). */
+export const aceitar = async (versoes: Pick<AccountState, 'termos_versao' | 'politica_versao'>): Promise<AccountState> =>
+  json(await send('/aceitar', 'POST', { termos_versao: versoes.termos_versao, politica_versao: versoes.politica_versao }));
 export const mudarNome = async (nome: string): Promise<AccountState> => json(await send('/nome', 'PUT', { nome }));
 export const listarBackups = async (): Promise<Backup[]> => (await json<{ backups: Backup[] }>(await send('/backups', 'GET'))).backups;
 export const fazerBackup = async (senha: string, rotulo: string): Promise<Backup & { resumo: BackupSummary }> =>

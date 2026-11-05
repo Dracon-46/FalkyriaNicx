@@ -12,7 +12,8 @@ usuário marcar, e entram desligados quando faltam segredos.
 
 A instalação fica registrada em ``~/.nicx/pacotes.json`` com os ids de tudo que
 entrou, para :func:`desinstalar` tirar o pacote inteiro. Exportar
-(:func:`exportar`) nunca leva token nem valor de variável de ambiente.
+(:func:`exportar`) nunca leva token, valor de variável de ambiente nem chave
+escrita nos argumentos ou no endereço (:mod:`segredos_mcp`).
 """
 
 from __future__ import annotations
@@ -72,15 +73,22 @@ def ler(texto: str | bytes) -> dict[str, Any]:
 
 def permissoes(pacote: dict[str, Any]) -> dict[str, Any]:
     """O que o pacote pode fazer no PC, para o usuário ver antes de instalar."""
+    from nicx.extensoes import segredos_mcp
+
     comandos, enderecos, segredos = [], [], []
     for s in pacote.get("mcp", []):
         if s.get("url"):
-            enderecos.append(str(s["url"]))
+            enderecos.append(segredos_mcp.limpar_url(str(s["url"])))
         else:
-            comandos.append(
-                " ".join([str(s.get("comando", "")), *map(str, s.get("args", []))])
-            )
+            args = segredos_mcp.limpar_args(list(s.get("args") or []))
+            comandos.append(" ".join([str(s.get("comando", "")), *args]))
         segredos.extend(str(k) for k in (s.get("env") or {}))
+        segredos.extend(
+            segredos_mcp.faltando(
+                segredos_mcp.limpar_args(list(s.get("args") or [])),
+                segredos_mcp.limpar_url(str(s.get("url") or "")),
+            )
+        )
         if s.get("token") is not None and s.get("url"):
             segredos.append(f"token ({s.get('nome', '')})")
     ferramentas: set[str] = set()
@@ -100,6 +108,9 @@ def permissoes(pacote: dict[str, Any]) -> dict[str, Any]:
         "ferramentas": sorted(ferramentas),
         "todas_as_ferramentas": "*" in ferramentas,
         "rotinas_com_horario": agendadas,
+        # Servidor de pacote entra em "perguntar", seja qual for a confiança
+        # que o arquivo pede: quem decide soltar as ferramentas é o usuário.
+        "mcp_confirma": bool(pacote.get("mcp")),
     }
 
 
@@ -222,7 +233,7 @@ def instalar(
     from nicx.assistentes import armazenamento as assistentes
     from nicx.assistentes.modelo import MAX_NOME as MAX_NOME_ASSISTENTE
     from nicx.assistentes.modelo import Assistente
-    from nicx.extensoes import habilidades, mcp
+    from nicx.extensoes import habilidades, mcp, segredos_mcp
     from nicx.rotinas import armazenamento as rotinas
     from nicx.rotinas.armazenamento import normalizar
     from nicx.rotinas.modelo import MAX_NOME as MAX_NOME_ROTINA
@@ -280,13 +291,19 @@ def instalar(
             try:
                 marca = "" if pular_existentes else pacote["id"]
                 s = mcp.Servidor.de_dict({**dados, "id": "", "pacote": marca})
+                if not pular_existentes:
+                    # Pacote (até da loja) não escolhe "livre" nem "sempre":
+                    # começa pedindo confirmação. Backup do próprio usuário
+                    # (pular_existentes) volta com a confiança que ele tinha.
+                    s.confianca = "perguntar"
                 nomes_mcp = {x.nome.lower() for x in mcp.listar()}
                 if pular_existentes and s.nome.lower() in nomes_mcp:
                     pulados.append(f"servidor {s.nome}: já existe")
                     continue
                 # segredo em branco: entra desligado até o usuário preencher
                 falta_token = s.tipo == "http" and "token" in dados and not s.token
-                s.ativo = all(s.env.values()) and not falta_token
+                falta_outro = bool(segredos_mcp.faltando(s.args, s.url or ""))
+                s.ativo = all(s.env.values()) and not falta_token and not falta_outro
                 s.nome = _nome_livre(s.nome, {x.nome.lower() for x in mcp.listar()}, 40)
                 itens["mcp"].append(mcp.criar(s).id)
             except ValueError as exc:
@@ -360,7 +377,7 @@ def exportar(
 ) -> dict[str, Any]:
     """Monta um pacote com os itens escolhidos (sem segredos)."""
     from nicx.assistentes import armazenamento as assistentes
-    from nicx.extensoes import habilidades, mcp
+    from nicx.extensoes import habilidades, mcp, segredos_mcp
     from nicx.rotinas import armazenamento as rotinas
 
     if not _ID.match(pacote_id):
@@ -397,6 +414,9 @@ def exportar(
             dados = tirar(s.para_dict(), "id", "criado_em", "pacote", "ativo")
             dados["env"] = {k: "" for k in s.env}
             dados["token"] = ""
+            dados["args"] = segredos_mcp.limpar_args(list(s.args))
+            if dados.get("url"):
+                dados["url"] = segredos_mcp.limpar_url(str(dados["url"]))
             lista_mcp.append(dados)
     pacote = {
         "formato": FORMATO,

@@ -33,6 +33,26 @@ DEFAULT_SENSITIVE_PATTERNS: frozenset[str] = frozenset(
     }
 )
 
+# Pastas inteiras de chaves e senhas: nada lá dentro passa pelas ferramentas
+# de arquivo, seja qual for o nome do arquivo (a chave da loja Falkyria, a
+# senha do banco, SSH, GPG, nuvem).
+SENSITIVE_DIRS: frozenset[str] = frozenset(
+    {
+        ".ssh",
+        ".gnupg",
+        ".aws",
+        ".azure",
+        ".kube",
+        ".docker",
+        ".falkyria-loja",
+        ".supabase-nicx",
+    }
+)
+
+# Arquivos do próprio Nicx com segredo: a sessão da Conta Falkyria (cofre
+# DPAPI) e os servidores MCP com tokens e variáveis.
+SENSITIVE_NICX_FILES: frozenset[str] = frozenset({"conta.bin", "mcp.json"})
+
 
 def is_sensitive_file(path: Union[str, Path]) -> bool:
     """Return ``True`` if *path* matches a sensitive file pattern.
@@ -50,7 +70,25 @@ def is_sensitive_file(path: Union[str, Path]) -> bool:
     except ImportError:
         check = _is_sensitive_file_py
 
-    return any(check(str(candidate)) for candidate in _paths_for_policy(Path(path)))
+    candidates = list(_paths_for_policy(Path(path)))
+    if any(_in_sensitive_place(candidate) for candidate in candidates):
+        return True
+    return any(check(str(candidate)) for candidate in candidates)
+
+
+def _in_sensitive_place(path: Path) -> bool:
+    """Dentro de uma pasta de segredos, ou um arquivo de segredo do Nicx."""
+    if any(part.lower() in SENSITIVE_DIRS for part in path.parts):
+        return True
+    if path.name.lower() not in SENSITIVE_NICX_FILES:
+        return False
+    try:
+        from nicx.nucleo.paths import get_config_dir
+
+        home = get_config_dir().resolve()
+        return path.resolve(strict=False).parent == home
+    except Exception:  # noqa: BLE001 - na dúvida, bloqueia
+        return True
 
 
 def _paths_for_policy(path: Path) -> Iterator[Path]:
@@ -93,6 +131,8 @@ def filter_sensitive_paths(paths: Iterable[Union[str, Path]]) -> List[Path]:
 
 __all__ = [
     "DEFAULT_SENSITIVE_PATTERNS",
+    "SENSITIVE_DIRS",
+    "SENSITIVE_NICX_FILES",
     "filter_sensitive_paths",
     "is_sensitive_file",
 ]

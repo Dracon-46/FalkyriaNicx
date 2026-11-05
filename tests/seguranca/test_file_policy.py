@@ -232,3 +232,33 @@ class TestFilterSensitivePaths:
 
     def test_filter_empty(self) -> None:
         assert filter_sensitive_paths([]) == []
+
+
+class TestPastasDeSegredo:
+    """Pasta inteira de chaves fica de fora, seja qual for o nome do arquivo."""
+
+    @pytest.mark.parametrize(
+        "caminho",
+        [
+            "C:/Users/ana/.falkyria-loja/chave-privada.txt",
+            "C:/Users/ana/.supabase-nicx/db-password.txt",
+            "/home/ana/.ssh/config",
+            "/home/ana/.aws/config",
+            "/home/ana/.gnupg/pubring.kbx",
+        ],
+    )
+    def test_bloqueia(self, caminho, policy_backend) -> None:
+        assert is_sensitive_file(caminho)
+
+    def test_segredos_do_nicx(self, tmp_path, monkeypatch, policy_backend) -> None:
+        monkeypatch.setenv("NICX_HOME", str(tmp_path / "nicx"))
+        (tmp_path / "nicx").mkdir()
+        assert is_sensitive_file(tmp_path / "nicx" / "conta.bin")
+        assert is_sensitive_file(tmp_path / "nicx" / "mcp.json")
+        # Mesmo nome em outro lugar é arquivo comum do usuário.
+        assert not is_sensitive_file(tmp_path / "projeto" / "mcp.json")
+        assert not is_sensitive_file(tmp_path / "nicx" / "notas.md")
+
+    def test_nome_parecido_passa(self, policy_backend) -> None:
+        assert not is_sensitive_file("/home/ana/ssh-notas/x.txt")
+        assert not is_sensitive_file("/home/ana/falkyria-loja.md")

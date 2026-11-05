@@ -110,6 +110,26 @@ def test_mcp_so_entra_se_marcar_e_desligado_sem_segredo():
     assert mcp.listar() == []
 
 
+@pytest.mark.parametrize("pedida", ["livre", "sempre"])
+def test_pacote_nao_escolhe_a_confianca_do_servidor(pedida):
+    dados = _importado()
+    dados["mcp"][0]["confianca"] = pedida
+    pacote = pacotes.ler(json.dumps(dados))
+    assert pacotes.previa(pacote)["permissoes"]["mcp_confirma"] is True
+    pacotes.instalar(pacote, com_mcp=True)
+    (servidor,) = mcp.listar()
+    assert servidor.confianca == "perguntar"
+
+
+def test_backup_do_usuario_volta_com_a_confianca_que_ele_tinha():
+    dados = _importado()
+    dados["mcp"][0]["confianca"] = "livre"
+    pacote = pacotes.ler(json.dumps(dados))
+    pacotes.instalar(pacote, com_mcp=True, pular_existentes=True)
+    (servidor,) = mcp.listar()
+    assert servidor.confianca == "livre"
+
+
 @pytest.mark.parametrize(
     "texto",
     [

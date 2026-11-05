@@ -61,4 +61,7 @@ def apply_analytics_choice(content: str, choice: bool | None, *, prompt: bool) -
         doc.add("analytics", tomlkit.table())
     doc["analytics"]["enabled"] = choice
     doc["analytics"]["choice_recorded"] = True
+    from nicx.privacidade import POLICY_VERSION
+
+    doc["analytics"]["policy_version"] = POLICY_VERSION
     return tomlkit.dumps(doc)

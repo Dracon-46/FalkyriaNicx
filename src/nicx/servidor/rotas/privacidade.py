@@ -47,6 +47,8 @@ class AnalyticsIdentity(BaseModel):
     key: str
     choice_recorded: bool = False
     policy_version: str = POLICY_VERSION
+    # Havia escolha, mas para uma política anterior: o app pergunta de novo.
+    policy_changed: bool = False
 
 
 class AnalyticsPreference(BaseModel):
@@ -89,12 +91,14 @@ def get_identity(request: Request) -> AnalyticsIdentity:
     cfg = getattr(request.app.state, "config", None) or load_config()
     enabled = is_analytics_enabled(cfg.analytics)
     anon_id = get_or_create_anon_id(cfg.analytics.anon_id_path) if enabled else ""
+    atual = cfg.analytics.policy_version == POLICY_VERSION
     return AnalyticsIdentity(
         enabled=enabled,
         anon_id=anon_id,
         host=cfg.analytics.host,
         key=cfg.analytics.key if enabled else "",
-        choice_recorded=cfg.analytics.choice_recorded,
+        choice_recorded=cfg.analytics.choice_recorded and atual,
+        policy_changed=cfg.analytics.choice_recorded and not atual,
     )
 
 
@@ -173,6 +177,7 @@ def set_preference(choice: AnalyticsPreference, request: Request) -> AnalyticsId
     """Persist an explicit UI choice and update analytics without restarting."""
     with _preference_lock:
         cfg = getattr(request.app.state, "config", None) or load_config()
+        versao_anterior = cfg.analytics.policy_version
         path = cfg._config_path
         temporary: Path | None = None
         try:
@@ -186,6 +191,7 @@ def set_preference(choice: AnalyticsPreference, request: Request) -> AnalyticsId
                 doc.add("analytics", tomlkit.table())
             doc["analytics"]["enabled"] = choice.enabled
             doc["analytics"]["choice_recorded"] = True
+            doc["analytics"]["policy_version"] = POLICY_VERSION
             with tempfile.NamedTemporaryFile(
                 mode="w", encoding="utf-8", dir=path.parent, delete=False
             ) as handle:
@@ -202,6 +208,7 @@ def set_preference(choice: AnalyticsPreference, request: Request) -> AnalyticsId
                 temporary.unlink(missing_ok=True)
         cfg.analytics.enabled = choice.enabled
         cfg.analytics.choice_recorded = True
+        cfg.analytics.policy_version = POLICY_VERSION
         load_config.cache_clear()
         client = getattr(request.app.state, "analytics_client", None)
         was_sending = client is not None and client.enabled
@@ -219,7 +226,12 @@ def set_preference(choice: AnalyticsPreference, request: Request) -> AnalyticsId
         else:
             request.app.state.config = cfg
         new_client = getattr(request.app.state, "analytics_client", None)
-        if choice.enabled and not was_sending and new_client is not None:
+        # Registro do consentimento: quando começa a enviar, ou quando confirma
+        # de novo para uma política nova (já enviando). Salvar a mesma escolha
+        # outra vez não repete o registro.
+        politica_nova = versao_anterior != POLICY_VERSION
+        registrar = not was_sending or politica_nova
+        if choice.enabled and new_client is not None and registrar:
             new_client.capture(
                 "analytics_consent",
                 {"granted": True, "policy_version": POLICY_VERSION},

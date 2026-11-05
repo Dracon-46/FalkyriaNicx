@@ -47,8 +47,27 @@ _SUBSTITUTIONS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"\"[^\"\n]*\"|'[^'\n]*'|“[^”\n]*”|‘[^’\n]*’"), "…"),
     (re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+"), "<email>"),
     (re.compile(r"\b(?:https?|wss?|file)://\S+"), "<link>"),
-    (re.compile(r"\b[A-Za-z]:[\\/][^\s:)\]}>,;]*"), "<caminho>"),
-    (re.compile(r"(?<![\w.])/(?:[\w.~-]+/)+[\w.~-]*"), "<caminho>"),
+    # Caminhos: as pastas do meio podem ter espaço ("C:\Users\Ana Maria\...",
+    # "/Users/ana/Library/Application Support/..."), o último pedaço não
+    # (senão engoliria o resto da frase). Rede (\\servidor\pasta) também.
+    (
+        re.compile(
+            r"\\\\[^\s\\/]+[\\/](?:[^\s\\/:*?\"<>|,;)\]}][^\\/\n:*?\"<>|,;)\]}]*[\\/])*"
+            r"[^\s\\/:*?\"<>|,;)\]}]*"
+        ),
+        "<caminho>",
+    ),
+    (
+        re.compile(
+            r"\b[A-Za-z]:[\\/](?:[^\s\\/:*?\"<>|,;)\]}][^\\/\n:*?\"<>|,;)\]}]*[\\/])*"
+            r"[^\s\\/:*?\"<>|,;)\]}]*"
+        ),
+        "<caminho>",
+    ),
+    (
+        re.compile(r"(?<![\w.])/(?:[\w.~-][^/\n:*?\"<>|,;)\]}]*/)+[\w.~-]*"),
+        "<caminho>",
+    ),
     (re.compile(r"\b\d{1,3}(?:\.\d{1,3}){3}(?::\d+)?\b"), "<ip>"),
     (
         re.compile(

@@ -12,6 +12,7 @@ from click.testing import CliRunner
 from nicx.comandos.instalacao import _analytics_consent
 from nicx.comandos.instalacao.init import init
 from nicx.nucleo.config import load_config
+from nicx.privacidade import POLICY_VERSION
 
 
 class TerminalInput(io.StringIO):
@@ -108,6 +109,7 @@ def test_decline_replaces_existing_enabled_value_without_losing_settings() -> No
         "enabled": False,
         "flush_at_size": 7,
         "choice_recorded": True,
+        "policy_version": POLICY_VERSION,
     }
     assert "# Keep this comment" in result
 

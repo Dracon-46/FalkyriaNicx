@@ -25,6 +25,16 @@ from nicx.privacidade.saude import model_family, server_started_properties
         ("Sem acesso a C:\\Users\\Arthur\\Documentos\\x.txt", "Sem acesso a <caminho>"),
         ("Arquivo /home/ana/notas.md sumiu", "Arquivo <caminho> sumiu"),
         ("Falhou (C:\\Users\\Ana\\x.txt), de novo", "Falhou (<caminho>), de novo"),
+        (
+            "Sem acesso a C:\\Users\\Ana Maria\\Documentos\\x.txt agora",
+            "Sem acesso a <caminho> agora",
+        ),
+        ("Pasta \\\\servidor\\rh\\Ana Souza\\fotos fora", "Pasta <caminho> fora"),
+        (
+            "Sem /Users/ana/Library/Application Support/Nicx/x.db ok",
+            "Sem <caminho> ok",
+        ),
+        ("C:/Users/Ana Maria/x.txt e D:\\y.txt", "<caminho> e <caminho>"),
         ("Mande para ana@exemplo.com", "Mande para <email>"),
         ("Erro em https://site.com/a?b=c", "Erro em <link>"),
         ("Conexão 192.168.0.10:8000 caiu", "Conexão <ip> caiu"),

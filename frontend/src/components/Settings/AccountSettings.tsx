@@ -442,7 +442,7 @@ function LoggedIn({ state, onChange, onOpenDoc }: { state: AccountState; onChang
             {t('conta.consent.update')}
           </p>
           <Consent checked={agreed} onChange={setAgreed} onOpen={onOpenDoc} />
-          <button type="button" onClick={() => void run('accept', async () => onChange(await aceitar()))} disabled={!agreed || busy !== null} className={buttonClass} style={primary} data-testid="account-accept">
+          <button type="button" onClick={() => void run('accept', async () => onChange(await aceitar(state)))} disabled={!agreed || busy !== null} className={buttonClass} style={primary} data-testid="account-accept">
             {t('conta.consent.accept')}
           </button>
         </div>

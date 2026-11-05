@@ -6,7 +6,8 @@
     "notNow": "Agora não",
     "accept": "Aceitar",
     "readPolicy": "Ler a política de privacidade",
-    "version": "versão {{version}}"
+    "version": "versão {{version}}",
+    "policyChanged": "A política de privacidade mudou desde a sua última escolha. Leia e confirme de novo: até lá, vale o que você escolheu antes."
   },
   "legal": {
     "titles": {

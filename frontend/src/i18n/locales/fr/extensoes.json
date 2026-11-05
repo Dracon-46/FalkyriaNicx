@@ -56,7 +56,8 @@
       "allTools": "Un assistant peut utiliser tous les outils de Nicx",
       "tools": "Outils des assistants : {{list}}",
       "scheduled": "Routines qui se lancent seules à l'heure : {{list}}",
-      "none": "Rien d'autre que discuter : ni programmes, ni sites, ni outils."
+      "none": "Rien d'autre que discuter : ni programmes, ni sites, ni outils.",
+      "mcpAsk": "Les serveurs demandent votre confirmation avant chaque action (modifiable ensuite dans l'onglet MCP)."
     },
     "import": {
       "title": "Importer un pack",

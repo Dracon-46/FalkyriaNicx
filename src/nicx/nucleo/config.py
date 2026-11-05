@@ -1239,6 +1239,10 @@ class AnalyticsConfig:
 
     enabled: bool = False
     choice_recorded: bool = False
+    # Versão da política a que a escolha se refere. Mudou a política
+    # (``nicx.privacidade.POLICY_VERSION``)? O app pergunta de novo, mostrando
+    # que mudou; até a resposta vale a escolha anterior (LGPD, art. 8, § 6).
+    policy_version: str = ""
     # Falkyria's Supabase project. Nothing is sent until the user consents
     # (``enabled``). The publishable key is public by design: row level
     # security only lets it insert events (supabase/migrations/).

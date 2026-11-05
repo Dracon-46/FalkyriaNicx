@@ -14,6 +14,8 @@ type Choice = 'accept' | 'decline';
 interface ConsentDialogProps {
   open: boolean;
   policyVersion?: string;
+  /** The user had chosen for an older policy: say it changed. */
+  policyChanged?: boolean;
   /** Save the choice; rejects with a user-facing message. */
   onChoose: (enabled: boolean) => Promise<unknown>;
   /** Close without a saved choice (asked again on the next launch). */
@@ -24,7 +26,7 @@ interface ConsentDialogProps {
  * First-launch question: may Nicx send anonymous usage statistics?
  * Both answers carry the same weight, and Esc means "Agora não".
  */
-export function ConsentDialog({ open, policyVersion, onChoose, onDismiss }: ConsentDialogProps) {
+export function ConsentDialog({ open, policyVersion, policyChanged, onChoose, onDismiss }: ConsentDialogProps) {
   const { t } = useTranslation();
   const { state } = useLegalDocument('consentimento', open);
   const [busy, setBusy] = useState<Choice | null>(null);
@@ -93,6 +95,11 @@ export function ConsentDialog({ open, policyVersion, onChoose, onDismiss }: Cons
         </>
       }
     >
+      {policyChanged && (
+        <p className="mb-3 text-sm font-medium" role="status" data-testid="consent-policy-changed">
+          {t('privacy.consent.policyChanged')}
+        </p>
+      )}
       {state.kind === 'loading' && <LegalLoading />}
       {state.kind !== 'loading' && (
         <LegalText>{state.kind === 'ready' ? state.body : t('privacy.consent.fallbackText')}</LegalText>
@@ -153,6 +160,7 @@ export function ConsentGate() {
     <ConsentDialog
       open={open}
       policyVersion={identity?.policy_version}
+      policyChanged={identity?.policy_changed}
       onChoose={setAnalyticsPreference}
       onDismiss={() => setDismissed(true)}
     />

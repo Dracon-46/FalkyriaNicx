@@ -63,6 +63,8 @@ export interface AnalyticsIdentity {
   choice_recorded: boolean;
   /** Version of the privacy policy the choice refers to. */
   policy_version: string;
+  /** There was a choice, but for an older policy: ask again, saying so. */
+  policy_changed: boolean;
 }
 
 export type LegalDocument = 'privacidade' | 'termos' | 'consentimento';
@@ -90,6 +92,7 @@ function normalizeIdentity(raw: Partial<AnalyticsIdentity> | null | undefined): 
     key: typeof raw?.key === 'string' ? raw.key : '',
     choice_recorded: raw?.choice_recorded === true,
     policy_version: typeof raw?.policy_version === 'string' ? raw.policy_version : '',
+    policy_changed: raw?.policy_changed === true,
   };
 }
 

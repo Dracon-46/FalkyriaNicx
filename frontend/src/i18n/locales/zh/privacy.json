@@ -6,7 +6,8 @@
     "notNow": "暂不",
     "accept": "接受",
     "readPolicy": "阅读隐私政策",
-    "version": "版本 {{version}}"
+    "version": "版本 {{version}}",
+    "policyChanged": "自您上次选择以来，隐私政策已更新。请阅读并再次确认：在此之前，您之前的选择继续有效。"
   },
   "legal": {
     "titles": {

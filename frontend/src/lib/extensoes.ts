@@ -82,6 +82,8 @@ export interface PackPermissions {
   ferramentas: string[];
   todas_as_ferramentas: boolean;
   rotinas_com_horario: string[];
+  /** Tem servidor MCP: entra pedindo confirmação, seja qual for o pedido do arquivo. */
+  mcp_confirma?: boolean;
 }
 
 export interface PackPreview {
