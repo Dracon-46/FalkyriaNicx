@@ -1,0 +1,47 @@
+{
+  "titulo": "Éditeur de code",
+  "abrirPasta": "Ouvrir un dossier",
+  "abrirArquivo": "Ouvrir un fichier",
+  "salvar": "Enregistrer",
+  "baixar": "Télécharger",
+  "naoSalvo": "Modifications non enregistrées",
+  "arquivos": "Fichiers",
+  "vazio": "Ouvrez un dossier ou un fichier. Sélectionnez du code et demandez à Nicx de l'expliquer, le corriger, l'améliorer ou d'écrire des tests : la correction apparaît dans un diff et n'entre que si vous l'appliquez.",
+  "semPastas": "Ce navigateur n'ouvre pas de dossiers : ouvrez un fichier à la fois (enregistrer télécharge le fichier). Edge, Chrome et l'app Nicx ouvrent le dossier entier.",
+  "painel": "Nicx",
+  "dica": "Sans sélection, tout le fichier est utilisé. Tout tourne sur votre PC ; le code n'entre pas dans la mémoire de Nicx.",
+  "perguntar": "Posez une question sur le code…",
+  "enviar": "Demander",
+  "parar": "Arrêter",
+  "pensando": "Réflexion… (le modèle tourne sur votre PC)",
+  "copiar": "Copier",
+  "copiado": "Code copié",
+  "inserir": "Insérer au curseur",
+  "salvo": "{{nome}} enregistré",
+  "baixado": "{{nome}} téléchargé",
+  "semModelo": "Choisissez d'abord un modèle.",
+  "nadaAMudar": "Nicx n'a rien trouvé à changer.",
+  "descartarMudancas": "Abandonner les modifications non enregistrées de {{nome}} ?",
+  "acoes": {
+    "explicar": "Expliquer",
+    "corrigir": "Corriger",
+    "melhorar": "Améliorer",
+    "testes": "Tests"
+  },
+  "proposta": {
+    "titulo": "Proposition de Nicx",
+    "lados": "Votre code à gauche, la proposition à droite. Rien ne change avant que vous appliquiez.",
+    "aplicar": "Appliquer",
+    "descartar": "Abandonner",
+    "aplicada": "Modification appliquée (Ctrl+Z annule).",
+    "mudou": "Le code a changé depuis la demande ; redemandez."
+  },
+  "erros": {
+    "grande": "{{nome}} est trop gros pour l'éditeur (2 Mo max).",
+    "binario": "{{nome}} n'est pas un fichier texte.",
+    "abrir": "Impossible d'ouvrir {{nome}} : {{detalhe}}",
+    "pasta": "Impossible d'ouvrir le dossier : {{detalhe}}",
+    "salvar": "Impossible d'enregistrer {{nome}} : {{detalhe}}",
+    "trechoGrande": "Sélection trop grande pour le modèle local : sélectionnez une partie plus petite."
+  }
+}

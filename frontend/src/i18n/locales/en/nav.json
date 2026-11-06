@@ -29,5 +29,6 @@
   "planner": "Planner",
   "assistants": "Assistants",
   "extensions": "Extensions",
-  "updates": "Updates"
+  "updates": "Updates",
+  "editor": "Code editor"
 }

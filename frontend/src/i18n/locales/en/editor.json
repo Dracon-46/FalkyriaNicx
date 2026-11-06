@@ -1,0 +1,47 @@
+{
+  "titulo": "Code editor",
+  "abrirPasta": "Open folder",
+  "abrirArquivo": "Open file",
+  "salvar": "Save",
+  "baixar": "Download",
+  "naoSalvo": "Unsaved changes",
+  "arquivos": "Files",
+  "vazio": "Open a folder or a file. Select some code and ask Nicx to explain, fix, improve or write tests: fixes show up in a diff and only go in if you apply them.",
+  "semPastas": "This browser can't open folders: open one file at a time (saving downloads the file). Edge, Chrome and the Nicx app can open the whole folder.",
+  "painel": "Nicx",
+  "dica": "With no selection, the whole file is used. Everything runs on your PC; the code doesn't go into Nicx's memory.",
+  "perguntar": "Ask about the code…",
+  "enviar": "Ask",
+  "parar": "Stop",
+  "pensando": "Thinking… (the model runs on your PC)",
+  "copiar": "Copy",
+  "copiado": "Code copied",
+  "inserir": "Insert at cursor",
+  "salvo": "{{nome}} saved",
+  "baixado": "{{nome}} downloaded",
+  "semModelo": "Pick a model first.",
+  "nadaAMudar": "Nicx found nothing to change.",
+  "descartarMudancas": "Discard unsaved changes in {{nome}}?",
+  "acoes": {
+    "explicar": "Explain",
+    "corrigir": "Fix",
+    "melhorar": "Improve",
+    "testes": "Tests"
+  },
+  "proposta": {
+    "titulo": "Nicx's proposal",
+    "lados": "Your code on the left, the proposal on the right. Nothing changes until you apply.",
+    "aplicar": "Apply",
+    "descartar": "Discard",
+    "aplicada": "Change applied (Ctrl+Z undoes).",
+    "mudou": "The code changed since the request; ask again."
+  },
+  "erros": {
+    "grande": "{{nome}} is too big for the editor (2 MB max).",
+    "binario": "{{nome}} isn't a text file.",
+    "abrir": "Couldn't open {{nome}}: {{detalhe}}",
+    "pasta": "Couldn't open the folder: {{detalhe}}",
+    "salvar": "Couldn't save {{nome}}: {{detalhe}}",
+    "trechoGrande": "Selection too big for the local model: select a smaller part."
+  }
+}

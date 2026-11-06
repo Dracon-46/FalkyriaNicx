@@ -13,6 +13,8 @@ export interface ChatRequest {
   voice?: boolean;
   /** Nicx: reply language; defaults to the interface language. */
   language?: string;
+  /** Nicx: pedido do editor de código (direto ao modelo, fora da memória). */
+  editor?: boolean;
 }
 
 export async function* streamChat(

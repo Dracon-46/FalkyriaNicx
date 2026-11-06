@@ -301,6 +301,22 @@ Uma mensagem que cita o nome de um servidor, de uma ferramenta dele ou de uma
 habilidade manda a lista de ferramentas ao modelo (`[agent] tools_on_demand`).
 Adicionar, mudar e remover extensões vai para o Histórico.
 
+## Editor de código
+
+A página **Editor de código** (menu ao lado) abre uma pasta (Edge, Chrome e o app;
+o navegador pede permissão) ou um arquivo por vez (outros navegadores: salvar baixa
+o arquivo). Cores por linguagem, `Ctrl+S` salva, e o ponto ao lado do nome avisa
+mudança não salva.
+
+- Selecione um trecho (ou nada, para o arquivo inteiro) e use **Explicar**,
+  **Corrigir**, **Melhorar**, **Testes** ou pergunte no campo do painel do Nicx.
+- Corrigir e Melhorar abrem a proposta lado a lado; nada muda até você clicar em
+  **Aplicar** (Ctrl+Z desfaz). Os blocos de código da resposta têm Copiar e
+  Inserir no cursor.
+- Os arquivos não passam pelo servidor do Nicx: o navegador lê e grava direto. O
+  pedido ao modelo vai com `"editor": true` (fora da memória automática). Até 2 MB
+  por arquivo; pastas como `node_modules` e `.git` não aparecem.
+
 ## VS Code
 
 Configurações → **VS Code** → **Conectar ao VS Code** instala a extensão

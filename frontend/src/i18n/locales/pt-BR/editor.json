@@ -1,0 +1,47 @@
+{
+  "titulo": "Editor de código",
+  "abrirPasta": "Abrir pasta",
+  "abrirArquivo": "Abrir arquivo",
+  "salvar": "Salvar",
+  "baixar": "Baixar",
+  "naoSalvo": "Mudanças não salvas",
+  "arquivos": "Arquivos",
+  "vazio": "Abra uma pasta ou um arquivo. Selecione um trecho e peça ao Nicx para explicar, corrigir, melhorar ou escrever testes: a correção aparece num diff e só entra se você aplicar.",
+  "semPastas": "Este navegador não abre pastas: abra um arquivo por vez (salvar baixa o arquivo). No Edge, no Chrome e no app do Nicx dá para abrir a pasta inteira.",
+  "painel": "Nicx",
+  "dica": "Sem seleção, vale o arquivo inteiro. Tudo roda no seu PC; o código não entra na memória do Nicx.",
+  "perguntar": "Pergunte sobre o código…",
+  "enviar": "Perguntar",
+  "parar": "Parar",
+  "pensando": "Pensando… (o modelo roda no seu PC)",
+  "copiar": "Copiar",
+  "copiado": "Código copiado",
+  "inserir": "Inserir no cursor",
+  "salvo": "{{nome}} salvo",
+  "baixado": "{{nome}} baixado",
+  "semModelo": "Escolha um modelo primeiro.",
+  "nadaAMudar": "O Nicx não achou nada para mudar.",
+  "descartarMudancas": "Descartar as mudanças não salvas em {{nome}}?",
+  "acoes": {
+    "explicar": "Explicar",
+    "corrigir": "Corrigir",
+    "melhorar": "Melhorar",
+    "testes": "Testes"
+  },
+  "proposta": {
+    "titulo": "Proposta do Nicx",
+    "lados": "À esquerda o seu código, à direita a proposta. Nada muda até você aplicar.",
+    "aplicar": "Aplicar",
+    "descartar": "Descartar",
+    "aplicada": "Mudança aplicada (Ctrl+Z desfaz).",
+    "mudou": "O trecho mudou desde o pedido; peça de novo."
+  },
+  "erros": {
+    "grande": "{{nome}} é grande demais para o editor (máximo de 2 MB).",
+    "binario": "{{nome}} não é um arquivo de texto.",
+    "abrir": "Não consegui abrir {{nome}}: {{detalhe}}",
+    "pasta": "Não consegui abrir a pasta: {{detalhe}}",
+    "salvar": "Não consegui salvar {{nome}}: {{detalhe}}",
+    "trechoGrande": "Trecho grande demais para o modelo local: selecione uma parte menor."
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "titulo": "代码编辑器",
+  "abrirPasta": "打开文件夹",
+  "abrirArquivo": "打开文件",
+  "salvar": "保存",
+  "baixar": "下载",
+  "naoSalvo": "有未保存的修改",
+  "arquivos": "文件",
+  "vazio": "打开一个文件夹或文件。选中代码，让 Nicx 解释、修复、改进或编写测试：修复会以差异视图显示，只有你应用后才会生效。",
+  "semPastas": "此浏览器无法打开文件夹：每次打开一个文件（保存会下载文件）。在 Edge、Chrome 和 Nicx 应用中可以打开整个文件夹。",
+  "painel": "Nicx",
+  "dica": "没有选中内容时使用整个文件。一切都在你的电脑上运行；代码不会进入 Nicx 的记忆。",
+  "perguntar": "询问关于代码的问题…",
+  "enviar": "提问",
+  "parar": "停止",
+  "pensando": "思考中…（模型在你的电脑上运行）",
+  "copiar": "复制",
+  "copiado": "代码已复制",
+  "inserir": "插入到光标处",
+  "salvo": "{{nome}} 已保存",
+  "baixado": "{{nome}} 已下载",
+  "semModelo": "请先选择模型。",
+  "nadaAMudar": "Nicx 没有发现需要修改的地方。",
+  "descartarMudancas": "放弃 {{nome}} 中未保存的修改？",
+  "acoes": {
+    "explicar": "解释",
+    "corrigir": "修复",
+    "melhorar": "改进",
+    "testes": "测试"
+  },
+  "proposta": {
+    "titulo": "Nicx 的建议",
+    "lados": "左边是你的代码，右边是建议。在你应用之前不会有任何改变。",
+    "aplicar": "应用",
+    "descartar": "放弃",
+    "aplicada": "修改已应用（Ctrl+Z 撤销）。",
+    "mudou": "提问后代码已改变；请重新提问。"
+  },
+  "erros": {
+    "grande": "{{nome}} 对编辑器来说太大了（最大 2 MB）。",
+    "binario": "{{nome}} 不是文本文件。",
+    "abrir": "无法打开 {{nome}}：{{detalhe}}",
+    "pasta": "无法打开文件夹：{{detalhe}}",
+    "salvar": "无法保存 {{nome}}：{{detalhe}}",
+    "trechoGrande": "选中内容对本地模型来说太大：请选择更小的部分。"
+  }
+}

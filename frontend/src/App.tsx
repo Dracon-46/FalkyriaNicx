@@ -31,6 +31,8 @@ import i18n from './i18n';
 
 // Loaded on demand: brings supabase-js and the charts only when opened.
 const PainelPage = lazy(() => import('./pages/PainelPage'));
+// Editor de código: traz o CodeMirror só quando aberto.
+const EditorPage = lazy(() => import('./pages/EditorPage'));
 
 export default function App() {
   const [setupDone, setSetupDone] = useState(!isTauri());
@@ -212,6 +214,14 @@ export default function App() {
           <Route path="assistentes" element={<AssistantsPage />} />
           <Route path="extensoes" element={<ExtensionsPage />} />
           <Route path="atualizacoes" element={<UpdatesPage />} />
+          <Route
+            path="editor"
+            element={
+              <Suspense fallback={null}>
+                <EditorPage />
+              </Suspense>
+            }
+          />
           <Route
             path="painel"
             element={

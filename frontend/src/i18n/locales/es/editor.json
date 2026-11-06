@@ -1,0 +1,47 @@
+{
+  "titulo": "Editor de código",
+  "abrirPasta": "Abrir carpeta",
+  "abrirArquivo": "Abrir archivo",
+  "salvar": "Guardar",
+  "baixar": "Descargar",
+  "naoSalvo": "Cambios sin guardar",
+  "arquivos": "Archivos",
+  "vazio": "Abre una carpeta o un archivo. Selecciona un fragmento y pide a Nicx que lo explique, corrija, mejore o escriba pruebas: la corrección aparece en un diff y solo entra si la aplicas.",
+  "semPastas": "Este navegador no abre carpetas: abre un archivo a la vez (guardar descarga el archivo). En Edge, Chrome y la app de Nicx se puede abrir la carpeta entera.",
+  "painel": "Nicx",
+  "dica": "Sin selección, vale el archivo entero. Todo corre en tu PC; el código no entra en la memoria de Nicx.",
+  "perguntar": "Pregunta sobre el código…",
+  "enviar": "Preguntar",
+  "parar": "Detener",
+  "pensando": "Pensando… (el modelo corre en tu PC)",
+  "copiar": "Copiar",
+  "copiado": "Código copiado",
+  "inserir": "Insertar en el cursor",
+  "salvo": "{{nome}} guardado",
+  "baixado": "{{nome}} descargado",
+  "semModelo": "Elige un modelo primero.",
+  "nadaAMudar": "Nicx no encontró nada que cambiar.",
+  "descartarMudancas": "¿Descartar los cambios sin guardar en {{nome}}?",
+  "acoes": {
+    "explicar": "Explicar",
+    "corrigir": "Corregir",
+    "melhorar": "Mejorar",
+    "testes": "Pruebas"
+  },
+  "proposta": {
+    "titulo": "Propuesta de Nicx",
+    "lados": "A la izquierda tu código, a la derecha la propuesta. Nada cambia hasta que la apliques.",
+    "aplicar": "Aplicar",
+    "descartar": "Descartar",
+    "aplicada": "Cambio aplicado (Ctrl+Z deshace).",
+    "mudou": "El fragmento cambió desde el pedido; pide de nuevo."
+  },
+  "erros": {
+    "grande": "{{nome}} es demasiado grande para el editor (máximo 2 MB).",
+    "binario": "{{nome}} no es un archivo de texto.",
+    "abrir": "No pude abrir {{nome}}: {{detalhe}}",
+    "pasta": "No pude abrir la carpeta: {{detalhe}}",
+    "salvar": "No pude guardar {{nome}}: {{detalhe}}",
+    "trechoGrande": "Fragmento demasiado grande para el modelo local: selecciona una parte menor."
+  }
+}
