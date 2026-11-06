@@ -18,7 +18,6 @@ from nicx.servidor.rotas.api import include_all_routes
 from nicx.servidor.rotas.assistentes import router as assistentes_router
 from nicx.servidor.rotas.atalho import router as atalho_router
 from nicx.servidor.rotas.atualizacao import router as atualizacao_router
-from nicx.servidor.rotas.vscode import router as vscode_router
 from nicx.servidor.rotas.briefing import create_digest_router
 from nicx.servidor.rotas.chat import router
 from nicx.servidor.rotas.comparacao import comparison_router
@@ -43,6 +42,7 @@ from nicx.servidor.rotas.projetos import router as projetos_router
 from nicx.servidor.rotas.resumo import router as resumo_router
 from nicx.servidor.rotas.rotinas import router as rotinas_router
 from nicx.servidor.rotas.upload import router as upload_router
+from nicx.servidor.rotas.vscode import router as vscode_router
 
 logger = logging.getLogger(__name__)
 _MANAGED_SHUTDOWN_GRACE_SECONDS = 0.25

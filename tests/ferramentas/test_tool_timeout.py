@@ -136,7 +136,12 @@ class TestToolTimeout:
     def test_repeated_timeouts_use_bounded_workers(self):
         """Timed-out calls must not create one live thread per invocation."""
 
-        class BrieflyStuckTool(SlowTool):
+        # Os workers ficam presos até o fim das asserções (antes dormiam 0,3 s:
+        # com o histórico gravando a cada chamada, no CI eles se soltavam antes
+        # de a fila encher e o "capacity is exhausted" nunca aparecia).
+        solta = threading.Event()
+
+        class StuckTool(SlowTool):
             @property
             def spec(self) -> ToolSpec:
                 return ToolSpec(
@@ -145,20 +150,27 @@ class TestToolTimeout:
                     timeout_seconds=0.01,
                 )
 
-        executor = ToolExecutor([BrieflyStuckTool(delay=0.3)])
-        results = [
-            executor.execute(ToolCall(id=str(i), name="slow_tool", arguments="{}"))
-            for i in range(24)
-        ]
+            def execute(self, **params) -> ToolResult:
+                solta.wait(timeout=10)
+                return ToolResult(tool_name="slow_tool", content="Done", success=True)
 
-        workers = [
-            thread
-            for thread in threading.enumerate()
-            if thread.name.startswith("nicx-tool-")
-        ]
-        assert len(workers) <= 8
-        assert all(not result.success for result in results)
-        assert any("capacity is exhausted" in result.content for result in results)
+        executor = ToolExecutor([StuckTool()])
+        try:
+            results = [
+                executor.execute(ToolCall(id=str(i), name="slow_tool", arguments="{}"))
+                for i in range(24)
+            ]
+
+            workers = [
+                thread
+                for thread in threading.enumerate()
+                if thread.name.startswith("nicx-tool-")
+            ]
+            assert len(workers) <= 8
+            assert all(not result.success for result in results)
+            assert any("capacity is exhausted" in result.content for result in results)
+        finally:
+            solta.set()
 
     def test_timed_out_tool_does_not_delay_process_exit(self):
         """A permanently blocked tool runs only on daemon workers."""
