@@ -174,8 +174,11 @@ def original_text(text: str, where: list[int], start: int, end: int) -> str:
     return text[where[start] : where[end - 1] + 1].strip(" ,.:;!?-")
 
 
+# "o volume", "meu volume", "o som do PC" ("meu volume" ia para o modelo,
+# que decidia sozinho quanto subir).
 _NOUN = (
-    r"(?:o |a )?(?:volume|som|audio)"
+    r"(?:(?:o |a )?(?:meu |minha )?|(?:esse |este |o meu |a minha ))?"
+    r"(?:volume|som|audio)"
     r"(?: do (?:computador|pc|notebook|windows|sistema))?"
 )
 # "aumento" e "aumentasse" aparecem de verdade: o Whisper troca "aumenta"
@@ -197,8 +200,44 @@ _INTENSITY = {
     "muito": STEP_BIG,
     "mais": STEP_NORMAL,
 }
-_MAX = {"no maximo", "ao maximo", "ate o maximo", "tudo"}
-_MIN = {"no minimo", "ao minimo", "ate o minimo", "no zero"}
+_MAX = {
+    "no maximo",
+    "ao maximo",
+    "ate o maximo",
+    "tudo",
+    "pro maximo",
+    "para o maximo",
+    "pra o maximo",
+    "pro talo",
+    "no talo",
+    "ate 100",
+    "para 100",
+    "pra 100",
+}
+_MIN = {
+    "no minimo",
+    "ao minimo",
+    "ate o minimo",
+    "no zero",
+    "pro minimo",
+    "para o minimo",
+    "pra o minimo",
+    "pra zero",
+    "para zero",
+    "ate zero",
+}
+_INTENSITY.update(
+    {
+        "um pouco mais": STEP_SMALL,
+        "mais um pouco": STEP_SMALL,
+        "mais um pouquinho": STEP_SMALL,
+    }
+)
+# "aumenta o volume para 80" (nível) e "aumenta o volume em 20%" (quanto mudar).
+_PARA_NIVEL = re.compile(
+    r"(?:para|pra|pro|ate|ate o|no|na)\s+(?P<n>\d{1,3})(?:\s?%|\s+por cento)?"
+)
+_EM_QUANTO = re.compile(r"(?:em\s+|mais\s+)?(?P<n>\d{1,3})(?:\s?%|\s+por cento)?")
 
 
 def _volume(t: str) -> Optional[Action]:
@@ -212,6 +251,14 @@ def _volume(t: str) -> Optional[Action]:
             return Action("volume", "set", 0)
         if rest in _INTENSITY:
             return Action("volume", "up" if up else "down", _INTENSITY[rest])
+        alvo = _PARA_NIVEL.fullmatch(rest)
+        if alvo and 0 <= int(alvo.group("n")) <= 100:
+            return Action("volume", "set", int(alvo.group("n")))
+        quanto = _EM_QUANTO.fullmatch(rest)
+        if quanto and 0 < int(quanto.group("n")) <= 100:
+            # value = toques de tecla (2% cada), como nos outros passos
+            toques = max(1, round(int(quanto.group("n")) / 2))
+            return Action("volume", "up" if up else "down", toques)
         return None
     m = re.fullmatch(rf"{_NOUN} mais (?P<d>alto|baixo)", t)
     if m:

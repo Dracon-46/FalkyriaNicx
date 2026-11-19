@@ -168,3 +168,29 @@ def test_tool_runs_same_actions(keys):
     unknown = tool.execute(acao="abrir", alvo="geladeira")
     assert not unknown.success and "Sei abrir" in unknown.content
     assert not tool.execute(acao="formatar_disco").success
+
+
+def test_volume_exato_diz_em_quanto_ficou(monkeypatch):
+    """Com o controle do Windows (Core Audio): nível exato e resposta com o número."""
+    import sys
+
+    from nicx.acoes import sistema, volume_windows
+    from nicx.acoes.intencoes import parse
+
+    estado = {"nivel": 20}
+
+    def definir(n):
+        estado["nivel"] = max(0, min(100, n))
+        return estado["nivel"]
+
+    monkeypatch.setattr(sys, "platform", "win32")
+    monkeypatch.setattr(volume_windows, "nivel", lambda: estado["nivel"])
+    monkeypatch.setattr(volume_windows, "definir", definir)
+    teclas = []
+    monkeypatch.setattr(sistema, "_press", lambda *a: teclas.append(a))
+
+    assert "30%" in sistema.run(parse("aumenta meu volume")).message
+    assert "80%" in sistema.run(parse("aumenta meu volume para 80")).message
+    assert "60%" in sistema.run(parse("abaixa o volume em 20%")).message
+    assert "100%" in sistema.run(parse("sobe o som pro máximo")).message
+    assert teclas == []  # nada de teclas às cegas

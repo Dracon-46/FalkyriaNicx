@@ -6,6 +6,7 @@ import { AssistantPicker } from './AssistantPicker';
 import { StreamingDots } from './StreamingDots';
 import { useAppStore } from '../../lib/store';
 import { shouldAutoplayFinishedReply, useTtsStore } from '../../lib/tts';
+import { pedeVoz } from '../../lib/pedir-voz';
 import { stripThinkTags } from '../../lib/message-text';
 import { PanelRightOpen, PanelRightClose, Database, MessageSquare, X } from 'lucide-react';
 import { listConnectors } from '../../lib/connectors-api';
@@ -67,7 +68,11 @@ export function ChatArea() {
     streamingConversationRef.current = isCurrentChatStreaming ? activeId : null;
 
     if (!justFinished) return;
-    if (!voiceOutputEnabled || !voiceAutoplay) return;
+    // Digitou, a resposta é texto. Fala só se a mensagem pediu ("responde
+    // falando", "lê em voz alta") ou se a pessoa ligou "falar sempre".
+    const anterior = messages[messages.length - 2];
+    const pediu = anterior?.role === 'user' && pedeVoz(anterior.content);
+    if (!pediu && (!voiceOutputEnabled || !voiceAutoplay)) return;
 
     if (!last || last.role !== 'assistant' || activeId === null) return;
 
@@ -80,7 +85,7 @@ export function ChatArea() {
       const currentTts = useTtsStore.getState();
       const currentLast = app.messages[app.messages.length - 1];
       if (app.activeId !== completedConversationId || app.streamState.isStreaming) return;
-      if (!app.settings.voiceOutputEnabled || !app.settings.voiceAutoplay) return;
+      if (!pediu && (!app.settings.voiceOutputEnabled || !app.settings.voiceAutoplay)) return;
       if (currentLast?.id !== completedMessageId || currentTts.available !== true) return;
       if (currentTts.autoSpokenId === completedMessageId) return;
 

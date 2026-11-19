@@ -139,11 +139,21 @@ function loadSettings(): Settings {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
     if (!raw) return defaults;
-    return { ...defaults, ...JSON.parse(raw) };
+    const salvas = { ...defaults, ...JSON.parse(raw) } as Settings;
+    // 2026-11: o Nicx passou a falar só quando a pessoa pede. Quem tinha
+    // "falar as respostas" ligado volta para texto uma vez; dá para religar.
+    if (!localStorage.getItem(FALA_SO_QUANDO_PEDE)) {
+      salvas.voiceAutoplay = false;
+      localStorage.setItem(FALA_SO_QUANDO_PEDE, '1');
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(salvas));
+    }
+    return salvas;
   } catch {
     return defaults;
   }
 }
+
+const FALA_SO_QUANDO_PEDE = 'nicx-fala-so-quando-pede';
 
 function saveSettings(settings: Settings): void {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));

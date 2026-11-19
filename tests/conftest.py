@@ -116,6 +116,13 @@ def _sem_avisos_reais(monkeypatch: pytest.MonkeyPatch):
 
     monkeypatch.setattr(lembretes, "show_notification", lambda *_a, **_k: None)
     monkeypatch.setattr(lembretes, "speak", lambda *_a, **_k: None)
+    # Nem o volume de verdade (Core Audio): um teste chegou a mudar o som do PC.
+    # Devolver None faz o executor cair nas teclas, que os testes já simulam.
+    from nicx.acoes import volume_windows
+
+    monkeypatch.setattr(volume_windows, "nivel", lambda: None)
+    monkeypatch.setattr(volume_windows, "definir", lambda _n: None)
+    monkeypatch.setattr(volume_windows, "alternar_mudo", lambda: None)
     yield
     lembretes.stop_alarm()
 

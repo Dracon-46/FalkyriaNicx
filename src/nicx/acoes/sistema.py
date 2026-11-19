@@ -61,6 +61,29 @@ def _windows_only() -> Outcome:
 def _volume(action: Action) -> Outcome:
     if sys.platform != "win32":
         return _windows_only()
+    # Primeiro o controle exato (Core Audio): põe o nível pedido e diz em
+    # quanto ficou. Sem ele, as teclas de volume (2% por toque, às cegas).
+    from nicx.acoes import volume_windows
+
+    if action.op == "mute":
+        mudo = volume_windows.alternar_mudo()
+        if mudo is not None:
+            return Outcome(
+                True,
+                texto("mudo" if mudo else "volume_em", n=volume_windows.nivel() or 0),
+            )
+    elif action.op == "set":
+        ficou = volume_windows.definir(action.value or 0)
+        if ficou is not None:
+            return Outcome(True, texto("volume_em", n=ficou))
+    else:
+        atual = volume_windows.nivel()
+        if atual is not None:
+            passo = 2 * (action.value or 5)  # value = toques de tecla (2% cada)
+            alvo = atual + passo if action.op == "up" else atual - passo
+            ficou = volume_windows.definir(alvo)
+            if ficou is not None:
+                return Outcome(True, texto("volume_em", n=ficou))
     if action.op == "mute":
         _press(_VK_VOLUME_MUTE)
         return Outcome(True, texto("mudo"))
