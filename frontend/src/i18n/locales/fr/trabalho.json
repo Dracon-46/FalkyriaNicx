@@ -1,0 +1,61 @@
+{
+  "title": "Travail",
+  "subtitle": "Choisissez un dossier et décrivez la tâche : Nicx prépare un plan, vous l'approuvez, et il travaille seul sur les fichiers de ce dossier pendant que vous faites autre chose.",
+  "hint": "Ex. : « regroupe les factures de ce dossier dans un tableur », « rédige un rapport Word qui résume ces PDF », « range les fichiers par type ».",
+  "loading": "Chargement...",
+  "loadFailed": "Impossible de charger les tâches. Le serveur Nicx est-il lancé ?",
+  "createFailed": "Impossible de démarrer la tâche. Réessayez.",
+  "actionFailed": "Ça n'a pas marché. Réessayez.",
+  "pickFailed": "Impossible d'ouvrir la fenêtre des dossiers. Collez le chemin du dossier.",
+  "restartServer": "Redémarrez le serveur Nicx pour utiliser le mode Travail.",
+  "planning": "Le modèle local prépare le plan… Cela peut prendre de 30 s à 1 min 30 sur ce PC.",
+  "progress": "{{done}} étape(s) sur {{total}} terminée(s)",
+  "question": "Nicx veut supprimer quelque chose et a besoin de votre confirmation :",
+  "yes": "Vous pouvez supprimer",
+  "no": "Ne supprimez pas",
+  "interrupted": "Nicx s'est fermé au milieu de cette tâche. Vous pouvez la reprendre là où elle s'est arrêtée ou annuler ce qui a été fait.",
+  "changed": "Fichiers modifiés ({{n}})",
+  "pause": "Pause",
+  "continue": "Continuer",
+  "stop": "Arrêter",
+  "resume": "Reprendre",
+  "undo": "Tout annuler",
+  "undone": "C'est fait : le dossier est revenu à son état d'avant la tâche.",
+  "showLog": "Voir ce qu'il a fait",
+  "hideLog": "Masquer le journal",
+  "form": {
+    "folder": "Dossier",
+    "folderPlaceholder": "Ex. : C:\\Users\\vous\\Documents\\Notes",
+    "pick": "Choisir un dossier",
+    "request": "Tâche",
+    "requestPlaceholder": "Que doit faire Nicx dans ce dossier ?",
+    "create": "Préparer le plan",
+    "oneAtATime": "Une tâche à la fois : attendez la fin de la tâche en cours ou arrêtez-la.",
+    "safety": "Nicx ne touche qu'au dossier choisi, garde une copie de ce qu'il modifie (pour pouvoir annuler) et demande avant de supprimer quoi que ce soit. Les fichiers de mots de passe et de clés sont exclus."
+  },
+  "plan": {
+    "hint": "Voici le plan. Modifiez, retirez ou ajoutez des étapes puis approuvez-le pour que Nicx commence.",
+    "step": "Étape",
+    "remove": "Retirer l'étape",
+    "add": "Ajouter une étape",
+    "approve": "Approuver et commencer",
+    "discard": "Abandonner",
+    "emptyStep": "Écrivez toutes les étapes ou retirez celles qui sont vides."
+  },
+  "list": {
+    "title": "Tâches",
+    "empty": "Aucune tâche pour l'instant."
+  },
+  "states": {
+    "planejando": "préparation du plan",
+    "aguardando_aprovacao": "en attente d'approbation",
+    "executando": "au travail",
+    "pausada": "en pause",
+    "aguardando_confirmacao": "vous attend",
+    "concluida": "terminée",
+    "parada": "arrêtée",
+    "erro": "erreur",
+    "desfeita": "annulée",
+    "interrompida": "interrompue"
+  }
+}

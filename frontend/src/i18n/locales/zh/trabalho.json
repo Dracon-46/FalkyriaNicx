@@ -1,0 +1,61 @@
+{
+  "title": "工作",
+  "subtitle": "选择一个文件夹并描述任务：Nicx 先拟定计划，你批准后，它会在你做别的事时自行处理该文件夹中的文件。",
+  "hint": "例如：“把这个文件夹里的发票整理成电子表格”、“用这些 PDF 的摘要写一份 Word 报告”、“按类型整理文件”。",
+  "loading": "加载中...",
+  "loadFailed": "无法加载任务。Nicx 服务器是否已启动？",
+  "createFailed": "无法开始任务，请重试。",
+  "actionFailed": "操作未成功，请重试。",
+  "pickFailed": "无法打开文件夹选择窗口，请直接粘贴文件夹路径。",
+  "restartServer": "请重启 Nicx 服务器以使用工作模式。",
+  "planning": "本地模型正在拟定计划…在这台电脑上可能需要 30 秒到 1 分半钟。",
+  "progress": "已完成 {{done}} / {{total}} 步",
+  "question": "Nicx 想要删除某些内容，需要你的确认：",
+  "yes": "可以删除",
+  "no": "不要删除",
+  "interrupted": "Nicx 在执行此任务时关闭了。你可以从中断处继续，或撤销已完成的操作。",
+  "changed": "已更改的文件（{{n}}）",
+  "pause": "暂停",
+  "continue": "继续",
+  "stop": "停止",
+  "resume": "恢复",
+  "undo": "全部撤销",
+  "undone": "完成：文件夹已恢复到任务开始前的状态。",
+  "showLog": "查看它做了什么",
+  "hideLog": "隐藏记录",
+  "form": {
+    "folder": "文件夹",
+    "folderPlaceholder": "例如：C:\\Users\\你\\Documents\\笔记",
+    "pick": "选择文件夹",
+    "request": "任务",
+    "requestPlaceholder": "Nicx 应该在这个文件夹里做什么？",
+    "create": "拟定计划",
+    "oneAtATime": "一次只能执行一个任务：请等待当前任务完成或停止它。",
+    "safety": "Nicx 只会改动所选文件夹，会保留所改内容的副本（可以撤销），删除任何内容前都会先询问。密码和密钥文件不会被处理。"
+  },
+  "plan": {
+    "hint": "这是计划。可以编辑、删除或添加步骤，批准后 Nicx 就会开始。",
+    "step": "步骤",
+    "remove": "删除步骤",
+    "add": "添加步骤",
+    "approve": "批准并开始",
+    "discard": "放弃",
+    "emptyStep": "请填写所有步骤或删除空白步骤。"
+  },
+  "list": {
+    "title": "任务",
+    "empty": "还没有任务。"
+  },
+  "states": {
+    "planejando": "拟定计划中",
+    "aguardando_aprovacao": "等待批准",
+    "executando": "工作中",
+    "pausada": "已暂停",
+    "aguardando_confirmacao": "等待你确认",
+    "concluida": "已完成",
+    "parada": "已停止",
+    "erro": "出错",
+    "desfeita": "已撤销",
+    "interrompida": "已中断"
+  }
+}

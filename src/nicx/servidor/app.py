@@ -41,6 +41,7 @@ from nicx.servidor.rotas.privacidade import (
 from nicx.servidor.rotas.projetos import router as projetos_router
 from nicx.servidor.rotas.resumo import router as resumo_router
 from nicx.servidor.rotas.rotinas import router as rotinas_router
+from nicx.servidor.rotas.trabalho import router as trabalho_router
 from nicx.servidor.rotas.upload import router as upload_router
 from nicx.servidor.rotas.vscode import router as vscode_router
 
@@ -513,6 +514,7 @@ def create_app(
     app.include_router(anexos_router)
     app.include_router(atualizacao_router)
     app.include_router(vscode_router)
+    app.include_router(trabalho_router)
     app.include_router(planejador_router)
     include_all_routes(app)
 

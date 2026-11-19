@@ -1,0 +1,61 @@
+{
+  "title": "Work",
+  "subtitle": "Pick a folder and describe the task: Nicx drafts a plan, you approve it, and it works on the files in that folder on its own while you do something else.",
+  "hint": "E.g.: \"put the invoices in this folder into a spreadsheet\", \"write a Word report summarizing these PDFs\", \"organize the files by type\".",
+  "loading": "Loading...",
+  "loadFailed": "Couldn't load the tasks. Is the Nicx server running?",
+  "createFailed": "Couldn't start the task. Try again.",
+  "actionFailed": "That didn't work. Try again.",
+  "pickFailed": "Couldn't open the folder picker. Paste the folder path instead.",
+  "restartServer": "Restart the Nicx server to use Work mode.",
+  "planning": "The local model is drafting the plan… This can take 30 s to 1.5 min on this PC.",
+  "progress": "{{done}} of {{total}} steps done",
+  "question": "Nicx wants to delete something and needs your confirmation:",
+  "yes": "Go ahead and delete",
+  "no": "Don't delete",
+  "interrupted": "Nicx closed in the middle of this task. You can resume where it stopped or undo what was done.",
+  "changed": "Changed files ({{n}})",
+  "pause": "Pause",
+  "continue": "Continue",
+  "stop": "Stop",
+  "resume": "Resume",
+  "undo": "Undo everything",
+  "undone": "Done: the folder is back to how it was before the task.",
+  "showLog": "See what it did",
+  "hideLog": "Hide the log",
+  "form": {
+    "folder": "Folder",
+    "folderPlaceholder": "E.g.: C:\\Users\\you\\Documents\\Notes",
+    "pick": "Choose folder",
+    "request": "Task",
+    "requestPlaceholder": "What should Nicx do in this folder?",
+    "create": "Draft plan",
+    "oneAtATime": "One task at a time: wait for the current one to finish or stop it.",
+    "safety": "Nicx only touches the chosen folder, keeps a copy of what it changes (so you can undo) and asks before deleting anything. Password and key files are left out."
+  },
+  "plan": {
+    "hint": "This is the plan. Edit, remove or add steps and approve it so Nicx can start.",
+    "step": "Step",
+    "remove": "Remove step",
+    "add": "Add step",
+    "approve": "Approve and start",
+    "discard": "Discard",
+    "emptyStep": "Write every step or remove the empty ones."
+  },
+  "list": {
+    "title": "Tasks",
+    "empty": "No tasks yet."
+  },
+  "states": {
+    "planejando": "drafting plan",
+    "aguardando_aprovacao": "awaiting approval",
+    "executando": "working",
+    "pausada": "paused",
+    "aguardando_confirmacao": "waiting for you",
+    "concluida": "done",
+    "parada": "stopped",
+    "erro": "error",
+    "desfeita": "undone",
+    "interrompida": "interrupted"
+  }
+}

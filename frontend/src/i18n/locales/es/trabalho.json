@@ -1,0 +1,61 @@
+{
+  "title": "Trabajo",
+  "subtitle": "Elige una carpeta y describe la tarea: Nicx arma un plan, tú lo apruebas y él trabaja solo en los archivos de esa carpeta mientras haces otra cosa.",
+  "hint": "Ej.: \"junta las facturas de esta carpeta en una hoja de cálculo\", \"escribe un informe en Word con el resumen de estos PDF\", \"organiza los archivos por tipo\".",
+  "loading": "Cargando...",
+  "loadFailed": "No pude cargar las tareas. ¿El servidor de Nicx está encendido?",
+  "createFailed": "No pude empezar la tarea. Inténtalo de nuevo.",
+  "actionFailed": "No funcionó. Inténtalo de nuevo.",
+  "pickFailed": "No pude abrir la ventana de carpetas. Pega la ruta de la carpeta.",
+  "restartServer": "Reinicia el servidor de Nicx para usar el modo Trabajo.",
+  "planning": "El modelo local está armando el plan… Puede tardar de 30 s a 1 min y medio en este PC.",
+  "progress": "{{done}} de {{total}} pasos hechos",
+  "question": "Nicx quiere borrar algo y necesita tu confirmación:",
+  "yes": "Puedes borrar",
+  "no": "No borres",
+  "interrupted": "Nicx se cerró a mitad de esta tarea. Puedes retomarla donde quedó o deshacer lo que ya se hizo.",
+  "changed": "Archivos cambiados ({{n}})",
+  "pause": "Pausar",
+  "continue": "Continuar",
+  "stop": "Detener",
+  "resume": "Retomar",
+  "undo": "Deshacer todo",
+  "undone": "Listo: la carpeta volvió a estar como antes de la tarea.",
+  "showLog": "Ver lo que hizo",
+  "hideLog": "Ocultar el registro",
+  "form": {
+    "folder": "Carpeta",
+    "folderPlaceholder": "Ej.: C:\\Users\\tu\\Documents\\Notas",
+    "pick": "Elegir carpeta",
+    "request": "Tarea",
+    "requestPlaceholder": "¿Qué debe hacer Nicx en esta carpeta?",
+    "create": "Armar plan",
+    "oneAtATime": "Una tarea a la vez: espera a que termine la actual o detenla.",
+    "safety": "Nicx solo toca la carpeta elegida, guarda una copia de lo que cambia (se puede deshacer) y pregunta antes de borrar cualquier cosa. Los archivos de contraseñas y claves quedan fuera."
+  },
+  "plan": {
+    "hint": "Este es el plan. Edita, quita o agrega pasos y apruébalo para que Nicx empiece.",
+    "step": "Paso",
+    "remove": "Quitar paso",
+    "add": "Agregar paso",
+    "approve": "Aprobar y empezar",
+    "discard": "Descartar",
+    "emptyStep": "Escribe todos los pasos o quita los vacíos."
+  },
+  "list": {
+    "title": "Tareas",
+    "empty": "Todavía no hay tareas."
+  },
+  "states": {
+    "planejando": "armando plan",
+    "aguardando_aprovacao": "esperando aprobación",
+    "executando": "trabajando",
+    "pausada": "pausada",
+    "aguardando_confirmacao": "esperándote",
+    "concluida": "terminada",
+    "parada": "detenida",
+    "erro": "error",
+    "desfeita": "deshecha",
+    "interrompida": "interrumpida"
+  }
+}

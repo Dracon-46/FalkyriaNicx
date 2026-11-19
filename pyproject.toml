@@ -108,6 +108,8 @@ server = [
     "pillow>=10",
     "av>=11,<19",
     "numpy>=1.24",
+    # Modo Trabalho: ler e criar planilhas (.xlsx).
+    "openpyxl>=3.1",
 ]
 desktop = [
     "fastapi>=0.110",

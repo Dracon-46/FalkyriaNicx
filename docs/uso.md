@@ -301,6 +301,45 @@ Uma mensagem que cita o nome de um servidor, de uma ferramenta dele ou de uma
 habilidade manda a lista de ferramentas ao modelo (`[agent] tools_on_demand`).
 Adicionar, mudar e remover extensões vai para o Histórico.
 
+## Trabalho: o Nicx trabalhando numa pasta
+
+A página **Trabalho** (menu ao lado) entrega uma tarefa maior para o Nicx fazer
+sozinho, em segundo plano, nos arquivos de uma pasta:
+
+1. Escolha a pasta (**Escolher pasta** abre a janela do Windows) e escreva a
+   tarefa. Ex.: "junta as notas fiscais desta pasta numa planilha", "escreve um
+   relatório em Word com o resumo destes PDFs", "organiza os arquivos por tipo".
+2. O modelo local monta um plano de até 7 passos. Edite, tire ou acrescente
+   passos e clique em **Aprovar e começar**. Nada muda antes disso.
+3. Ele executa passo a passo e a página mostra o andamento. Dá para **Pausar**,
+   **Continuar** e **Parar** (Parar corta o modelo na hora). Ao terminar, vem uma
+   notificação do Windows e o resumo do que foi feito.
+
+O que ele sabe fazer na pasta: listar, ler (texto, Word, PDF e Excel), escrever
+arquivos de texto, criar planilhas `.xlsx` e documentos `.docx`, criar pastas,
+mover/renomear, apagar e pesquisar na web.
+
+Segurança:
+
+- Ele só alcança a pasta escolhida: caminhos que saem dela são recusados, e
+  arquivos de senhas e chaves (`.env`, `.ssh`...) ficam de fora. Não dá para
+  escolher o disco inteiro, a pasta do usuário inteira, pastas do sistema nem a
+  pasta do próprio Nicx.
+- Antes de mudar um arquivo, ele guarda uma cópia. **Desfazer tudo** volta a
+  pasta para como estava antes da tarefa.
+- Para **apagar**, ele pergunta na página (e numa notificação) e espera você
+  responder; o arquivo apagado vai para a lixeira da tarefa, então o desfazer
+  também o traz de volta.
+- Uma tarefa por vez (o modelo roda neste PC). Se o Nicx fechar no meio, a
+  tarefa fica "interrompida" e dá para **Retomar** de onde parou ou desfazer.
+
+As tarefas ficam em `~/.nicx/trabalho/<id>/` (plano, registro do que ele fez,
+cópias para o desfazer). A tarefa concluída entra no Histórico.
+
+Rotas: `POST /v1/trabalho` (`{"pasta", "pedido"}`), `GET /v1/trabalho[/{id}]`,
+`POST /v1/trabalho/{id}/aprovar|pausar|continuar|parar|responder|desfazer` e
+`POST /v1/trabalho/escolher-pasta`.
+
 ## Editor de código
 
 A página **Editor de código** (menu ao lado) abre uma pasta (Edge, Chrome e o app;

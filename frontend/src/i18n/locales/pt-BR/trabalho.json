@@ -1,0 +1,61 @@
+{
+  "title": "Trabalho",
+  "subtitle": "Escolha uma pasta e diga a tarefa: o Nicx monta um plano, você aprova, e ele trabalha sozinho nos arquivos dessa pasta enquanto você faz outra coisa.",
+  "hint": "Ex.: \"junta as notas fiscais desta pasta numa planilha\", \"escreve um relatório em Word com o resumo destes PDFs\", \"organiza os arquivos por tipo\".",
+  "loading": "Carregando...",
+  "loadFailed": "Não consegui carregar as tarefas. O servidor do Nicx está ligado?",
+  "createFailed": "Não consegui começar a tarefa. Tente de novo.",
+  "actionFailed": "Não deu certo. Tente de novo.",
+  "pickFailed": "Não consegui abrir a janela de pastas. Cole o caminho da pasta.",
+  "restartServer": "Reinicie o servidor do Nicx para usar o modo Trabalho.",
+  "planning": "O modelo local está montando o plano… Pode levar de 30 s a 1 min e meio neste PC.",
+  "progress": "{{done}} de {{total}} passos feitos",
+  "question": "O Nicx quer apagar algo e precisa da sua confirmação:",
+  "yes": "Pode apagar",
+  "no": "Não apague",
+  "interrupted": "O Nicx fechou no meio desta tarefa. Você pode retomar de onde parou ou desfazer o que já foi feito.",
+  "changed": "Arquivos mudados ({{n}})",
+  "pause": "Pausar",
+  "continue": "Continuar",
+  "stop": "Parar",
+  "resume": "Retomar",
+  "undo": "Desfazer tudo",
+  "undone": "Pronto: a pasta voltou a ser como era antes da tarefa.",
+  "showLog": "Ver o que ele fez",
+  "hideLog": "Esconder o registro",
+  "form": {
+    "folder": "Pasta",
+    "folderPlaceholder": "Ex.: C:\\Users\\voce\\Documents\\Notas",
+    "pick": "Escolher pasta",
+    "request": "Tarefa",
+    "requestPlaceholder": "O que o Nicx deve fazer nesta pasta?",
+    "create": "Montar plano",
+    "oneAtATime": "Uma tarefa por vez: espere a atual terminar ou pare-a.",
+    "safety": "O Nicx só mexe dentro da pasta escolhida, guarda uma cópia do que muda (dá para desfazer) e pergunta antes de apagar qualquer coisa. Arquivos de senhas e chaves ficam de fora."
+  },
+  "plan": {
+    "hint": "Este é o plano. Edite, tire ou acrescente passos e aprove para o Nicx começar.",
+    "step": "Passo",
+    "remove": "Tirar passo",
+    "add": "Acrescentar passo",
+    "approve": "Aprovar e começar",
+    "discard": "Descartar",
+    "emptyStep": "Escreva todos os passos ou tire os vazios."
+  },
+  "list": {
+    "title": "Tarefas",
+    "empty": "Nenhuma tarefa ainda."
+  },
+  "states": {
+    "planejando": "montando plano",
+    "aguardando_aprovacao": "esperando aprovação",
+    "executando": "trabalhando",
+    "pausada": "pausada",
+    "aguardando_confirmacao": "esperando você",
+    "concluida": "concluída",
+    "parada": "parada",
+    "erro": "erro",
+    "desfeita": "desfeita",
+    "interrompida": "interrompida"
+  }
+}

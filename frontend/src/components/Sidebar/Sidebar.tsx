@@ -26,6 +26,7 @@ import {
   Sparkles,
   Puzzle,
   Target,
+  Briefcase,
 } from 'lucide-react';
 import { ConversationList } from './ConversationList';
 import { useAppStore } from '../../lib/store';
@@ -71,6 +72,7 @@ export function Sidebar() {
   const admin = useAdmin((s) => s.admin === true);
   const navItems = [
     { path: '/', icon: MessageSquare, label: t('nav.chat') },
+    { path: '/trabalho', icon: Briefcase, label: t('nav.work') },
     { path: '/projetos', icon: FolderKanban, label: t('nav.projects') },
     { path: '/historico', icon: History, label: t('nav.history') },
     { path: '/rotinas', icon: Repeat, label: t('nav.routines') },
