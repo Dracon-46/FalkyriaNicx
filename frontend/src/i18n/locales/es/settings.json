@@ -420,5 +420,29 @@
       "invalido": "atajo inválido",
       "erro": "error"
     }
+  },
+  "diagnostics": {
+    "title": "Diagnóstico",
+    "description": "Comprueba que todo funcione: Ollama y modelo, memoria, disco, micrófono, voz, atajos e historial. No cambia nada y nada sale del PC.",
+    "run": "Probar ahora",
+    "running": "Probando...",
+    "failed": "No pude ejecutar el diagnóstico. ¿El servidor de Nicx está encendido?",
+    "restartServer": "Reinicia el servidor de Nicx para usar el diagnóstico.",
+    "summary": "{{ok}} ok, {{aviso}} aviso(s), {{falha}} problema(s) · {{s}} s",
+    "checks": {
+      "ollama": "Ollama",
+      "modelo": "Modelo",
+      "rust": "Componente de herramientas",
+      "ram": "Memoria libre",
+      "disco": "Espacio en disco",
+      "pasta": "Carpeta de Nicx",
+      "microfone": "Micrófono",
+      "voz": "Voz",
+      "historico": "Historial",
+      "atalho_atalho": "Atajo de Nicx",
+      "atalho_ditado": "Dictado",
+      "atalho_captura": "Captura rápida",
+      "erro": "Verificación"
+    }
   }
 }

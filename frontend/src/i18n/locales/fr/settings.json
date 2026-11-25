@@ -420,5 +420,29 @@
       "invalido": "raccourci invalide",
       "erro": "erreur"
     }
+  },
+  "diagnostics": {
+    "title": "Diagnostic",
+    "description": "Vérifie que tout fonctionne : Ollama et modèle, mémoire, disque, micro, voix, raccourcis et historique. Ne change rien et rien ne quitte le PC.",
+    "run": "Tester maintenant",
+    "running": "Test en cours...",
+    "failed": "Impossible de lancer le diagnostic. Le serveur Nicx est-il lancé ?",
+    "restartServer": "Redémarrez le serveur Nicx pour utiliser le diagnostic.",
+    "summary": "{{ok}} ok, {{aviso}} avertissement(s), {{falha}} problème(s) · {{s}} s",
+    "checks": {
+      "ollama": "Ollama",
+      "modelo": "Modèle",
+      "rust": "Composant d'outils",
+      "ram": "Mémoire libre",
+      "disco": "Espace disque",
+      "pasta": "Dossier de Nicx",
+      "microfone": "Microphone",
+      "voz": "Voix",
+      "historico": "Historique",
+      "atalho_atalho": "Raccourci de Nicx",
+      "atalho_ditado": "Dictée",
+      "atalho_captura": "Capture rapide",
+      "erro": "Vérification"
+    }
   }
 }

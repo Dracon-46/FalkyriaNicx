@@ -420,5 +420,29 @@
       "invalido": "invalid shortcut",
       "erro": "error"
     }
+  },
+  "diagnostics": {
+    "title": "Diagnostics",
+    "description": "Checks that everything works: Ollama and model, memory, disk, microphone, voice, shortcuts and history. Changes nothing and nothing leaves the PC.",
+    "run": "Test now",
+    "running": "Testing...",
+    "failed": "Couldn't run the diagnostics. Is the Nicx server running?",
+    "restartServer": "Restart the Nicx server to use diagnostics.",
+    "summary": "{{ok}} ok, {{aviso}} warning(s), {{falha}} problem(s) · {{s}} s",
+    "checks": {
+      "ollama": "Ollama",
+      "modelo": "Model",
+      "rust": "Tools component",
+      "ram": "Free memory",
+      "disco": "Disk space",
+      "pasta": "Nicx folder",
+      "microfone": "Microphone",
+      "voz": "Voice",
+      "historico": "History",
+      "atalho_atalho": "Nicx shortcut",
+      "atalho_ditado": "Dictation",
+      "atalho_captura": "Quick capture",
+      "erro": "Check"
+    }
   }
 }

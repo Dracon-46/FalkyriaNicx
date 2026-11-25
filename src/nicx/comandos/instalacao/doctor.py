@@ -425,7 +425,48 @@ def _run_all_checks() -> List[CheckResult]:
     checks.append(_check_tts_backend())
     checks.append(_check_nodejs())
     checks.append(_check_security_profile())
+    checks.extend(_checks_do_diagnostico())
     return checks
+
+
+def _checks_do_diagnostico() -> List[CheckResult]:
+    """As verificações do diagnóstico do app (memória, disco, voz, histórico...)."""
+    from nicx.diagnostico import verificacoes as v
+
+    estados = {v.OK: "ok", v.AVISO: "warn", v.FALHA: "fail"}
+    nomes = {
+        "rust": "Componente nicx_rust",
+        "ram": "Memória livre",
+        "disco": "Espaço em disco",
+        "pasta": "Pasta do Nicx",
+        "microfone": "Microfone",
+        "voz": "Voz",
+        "historico": "Histórico",
+    }
+    try:
+        from nicx.nucleo.paths import get_config_dir
+
+        pasta = get_config_dir()
+        lista = [
+            v.extensao_rust(),
+            v.memoria_ram(),
+            v.disco(pasta),
+            v.pasta_gravavel(pasta),
+            v.microfone(),
+            v.voz(),
+            v.historico(),
+        ]
+    except Exception as exc:  # noqa: BLE001
+        return [CheckResult("Diagnóstico", "warn", f"Não deu para rodar: {exc}")]
+    return [
+        CheckResult(
+            nomes.get(x.id, x.id),
+            estados.get(x.estado, "warn"),
+            x.mensagem,
+            x.dica or None,
+        )
+        for x in lista
+    ]
 
 
 def _results_to_dicts(checks: List[CheckResult]) -> List[Dict[str, Any]]:

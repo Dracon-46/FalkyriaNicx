@@ -61,6 +61,7 @@ import {
 import { ShortcutRecorder } from '../components/Settings/ShortcutRecorder';
 import { DictationSettings } from '../components/Settings/DictationSettings';
 import { CaptureSettings } from '../components/Settings/CaptureSettings';
+import { DiagnosticsSettings } from '../components/Settings/DiagnosticsSettings';
 import { VSCodeSettings } from '../components/Settings/VSCodeSettings';
 
 // Os testes e outras telas importam o campo daqui.
@@ -1314,6 +1315,11 @@ export function SettingsPage() {
                 <Trash2 size={12} /> {confirmClear ? t('settings.data.confirm') : t('settings.data.clear')}
               </button>
             </SettingRow>
+          </Section>
+
+          {/* Diagnóstico: confere se está tudo funcionando */}
+          <Section title={t('settings.diagnostics.title')}>
+            <DiagnosticsSettings />
           </Section>
 
           {/* VS Code: a extensão do Nicx */}

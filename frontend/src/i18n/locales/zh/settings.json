@@ -420,5 +420,29 @@
       "invalido": "快捷键无效",
       "erro": "出错"
     }
+  },
+  "diagnostics": {
+    "title": "诊断",
+    "description": "检查一切是否正常：Ollama 和模型、内存、磁盘、麦克风、语音、快捷键和历史。不会更改任何内容，也不会把数据发出这台电脑。",
+    "run": "立即检测",
+    "running": "正在检测...",
+    "failed": "无法运行诊断。Nicx 服务器是否已启动？",
+    "restartServer": "请重启 Nicx 服务器以使用诊断。",
+    "summary": "{{ok}} 项正常，{{aviso}} 项警告，{{falha}} 项问题 · {{s}} 秒",
+    "checks": {
+      "ollama": "Ollama",
+      "modelo": "模型",
+      "rust": "工具组件",
+      "ram": "可用内存",
+      "disco": "磁盘空间",
+      "pasta": "Nicx 文件夹",
+      "microfone": "麦克风",
+      "voz": "语音",
+      "historico": "历史",
+      "atalho_atalho": "Nicx 快捷键",
+      "atalho_ditado": "听写",
+      "atalho_captura": "快速收集",
+      "erro": "检查"
+    }
   }
 }

@@ -27,6 +27,7 @@ from nicx.servidor.rotas.comparacao import comparison_router
 from nicx.servidor.rotas.conectores import create_connectors_router
 from nicx.servidor.rotas.conta import router as conta_router
 from nicx.servidor.rotas.contexto import router as contexto_router
+from nicx.servidor.rotas.diagnostico import router as diagnostico_router
 from nicx.servidor.rotas.ditado import router as ditado_router
 from nicx.servidor.rotas.escuta import router as wake_router
 from nicx.servidor.rotas.extensoes import router as extensoes_router
@@ -522,6 +523,7 @@ def create_app(
     app.include_router(caixa_router)
     app.include_router(busca_router)
     app.include_router(captura_router)
+    app.include_router(diagnostico_router)
     app.include_router(meus_dados_router)
     app.include_router(planejador_router)
     include_all_routes(app)

@@ -71,6 +71,16 @@ uv run nicx doctor
 > `uv sync` sem todos os extras **desinstala** os que faltarem. Use sempre o
 > comando completo acima.
 
+### Algo não funciona?
+
+Configurações → **Diagnóstico** → **Testar agora** (ou `nicx doctor` no terminal)
+confere em poucos segundos: Ollama (e se está antigo: a partir da 0.40.14 ele
+reaproveita a conversa e fica bem mais rápido), o modelo padrão baixado, o
+componente de ferramentas, memória livre, espaço em disco, a pasta do Nicx,
+microfone (só lista, não grava), voz, atalhos e a integridade do histórico. Cada
+problema vem com o que fazer. Não muda nada e nada sai do PC
+(`GET /v1/diagnostico`).
+
 ### Só recompilar a extensão Rust
 
 ```bash
