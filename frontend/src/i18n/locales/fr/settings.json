@@ -398,5 +398,27 @@
     "semVSCode": "VS Code introuvable sur ce PC. Installez VS Code puis revenez ici.",
     "semPacote": "L'extension n'est pas fournie avec cette installation de Nicx.",
     "erro": "Impossible : {{detail}}"
+  },
+  "capture": {
+    "title": "Capture rapide",
+    "enableLabel": "Activer la capture rapide",
+    "enableDescription": "Sélectionnez un texte dans n'importe quel programme et appuyez sur le raccourci : il va dans vos notes, avec le nom du programme. Sans sélection, il prend ce que vous avez copié. Les fenêtres de mots de passe et de banque ne sont jamais capturées.",
+    "keysLabel": "Raccourci",
+    "keysDescription": "Cliquez et appuyez sur la combinaison. Elle doit être différente du raccourci de Nicx et de celui de la dictée.",
+    "statusLabel": "État",
+    "statusDescription": "Appuyez sur {{keys}} avec un texte sélectionné.",
+    "inUseHint": "Un autre programme utilise déjà cette combinaison : choisissez-en une autre.",
+    "checking": "Vérification...",
+    "serverUnavailable": "Le serveur Nicx n'a pas répondu.",
+    "restartServer": "Redémarrez le serveur Nicx pour utiliser la capture rapide.",
+    "saveFailed": "Impossible d'enregistrer. Réessayez.",
+    "states": {
+      "desligado": "désactivée",
+      "registrado": "prête",
+      "em_uso": "raccourci utilisé",
+      "sem_suporte": "non pris en charge",
+      "invalido": "raccourci invalide",
+      "erro": "erreur"
+    }
   }
 }

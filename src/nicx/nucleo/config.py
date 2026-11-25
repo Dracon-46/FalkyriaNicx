@@ -1746,6 +1746,20 @@ class DitadoConfig:
 
 
 @dataclass(slots=True)
+class CapturaConfig:
+    """Captura rápida: aperta o atalho em qualquer programa e o texto
+    selecionado (ou o copiado) vai para as notas do Nicx (:mod:`nicx.captura`).
+
+    Desligado por padrão; só no Windows. Janelas sensíveis (senhas, bancos)
+    nunca são capturadas.
+    """
+
+    ativo: bool = False
+    # Mesmas regras do [atalho]; não pode ser igual ao do Nicx nem ao do ditado.
+    teclas: str = "ctrl+alt+k"
+
+
+@dataclass(slots=True)
 class AgendaConfig:
     """Para onde "manda pro calendário" leva os compromissos da agenda.
 
@@ -1988,6 +2002,7 @@ class NicxConfig:
     speech: SpeechConfig = field(default_factory=SpeechConfig)
     atalho: AtalhoConfig = field(default_factory=AtalhoConfig)
     ditado: DitadoConfig = field(default_factory=DitadoConfig)
+    captura: CapturaConfig = field(default_factory=CapturaConfig)
     atualizacao: AtualizacaoConfig = field(default_factory=AtualizacaoConfig)
     agenda: AgendaConfig = field(default_factory=AgendaConfig)
     contexto: ContextoConfig = field(default_factory=ContextoConfig)
@@ -2283,6 +2298,7 @@ def load_config(path: Optional[Path] = None) -> NicxConfig:
             "speech",
             "atalho",
             "ditado",
+            "captura",
             "atualizacao",
             "agenda",
             "contexto",

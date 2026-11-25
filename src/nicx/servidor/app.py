@@ -21,6 +21,7 @@ from nicx.servidor.rotas.atualizacao import router as atualizacao_router
 from nicx.servidor.rotas.briefing import create_digest_router
 from nicx.servidor.rotas.busca import router as busca_router
 from nicx.servidor.rotas.caixa import router as caixa_router
+from nicx.servidor.rotas.captura import router as captura_router
 from nicx.servidor.rotas.chat import router
 from nicx.servidor.rotas.comparacao import comparison_router
 from nicx.servidor.rotas.conectores import create_connectors_router
@@ -520,6 +521,7 @@ def create_app(
     app.include_router(trabalho_router)
     app.include_router(caixa_router)
     app.include_router(busca_router)
+    app.include_router(captura_router)
     app.include_router(meus_dados_router)
     app.include_router(planejador_router)
     include_all_routes(app)
@@ -540,9 +542,24 @@ def create_app(
 
         await asyncio.to_thread(app.state.atalho.aplicar, atalho_cfg)
 
+    # Captura rápida ([captura]): o mesmo esquema, outro atalho.
+    from nicx.captura.servico import gerenciador as gerenciador_captura
+
+    app.state.captura = gerenciador_captura()
+
+    @app.on_event("startup")
+    async def _iniciar_captura() -> None:
+        cfg = getattr(getattr(app.state, "config", None), "captura", None)
+        if cfg is None or not getattr(cfg, "ativo", False):
+            return
+        import asyncio
+
+        await asyncio.to_thread(app.state.captura.aplicar, cfg)
+
     @app.on_event("shutdown")
     async def _parar_atalho() -> None:
         app.state.atalho.parar()
+        app.state.captura.parar()
 
     # Histórico ([historico]): tira o que passou do prazo e as cópias velhas
     # do desfazer.

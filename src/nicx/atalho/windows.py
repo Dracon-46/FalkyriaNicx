@@ -36,6 +36,7 @@ MOD_NOREPEAT = 0x4000  # segurar as teclas não dispara várias vezes
 ERROR_HOTKEY_ALREADY_REGISTERED = 1409
 HOTKEY_ID = 0x4E58  # "NX"; só precisa ser único nesta thread
 HOTKEY_ID_DITADO = 0x4E44  # "ND": ditado universal
+HOTKEY_ID_CAPTURA = 0x4E4B  # "NK": captura rápida para as notas
 
 # Dois toques muito seguidos (tecla presa, mão pesada) contam como um.
 INTERVALO_MINIMO_S = 0.8
@@ -460,6 +461,7 @@ def permitir_foco_de_outros() -> None:
 __all__ = [
     "ERROR_HOTKEY_ALREADY_REGISTERED",
     "HOTKEY_ID",
+    "HOTKEY_ID_CAPTURA",
     "HOTKEY_ID_DITADO",
     "MOD_NOREPEAT",
     "WM_HOTKEY",

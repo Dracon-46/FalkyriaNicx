@@ -398,5 +398,27 @@
     "semVSCode": "No encontré VS Code en este PC. Instala VS Code y vuelve aquí.",
     "semPacote": "La extensión no vino con esta instalación de Nicx.",
     "erro": "No pude: {{detail}}"
+  },
+  "capture": {
+    "title": "Captura rápida",
+    "enableLabel": "Activar la captura rápida",
+    "enableDescription": "Selecciona un texto en cualquier programa y pulsa el atajo: va a tus notas, con el nombre del programa. Sin selección, usa lo que copiaste. Las ventanas de contraseñas y bancos nunca se capturan.",
+    "keysLabel": "Atajo",
+    "keysDescription": "Haz clic y pulsa la combinación. No puede ser la misma del atajo de Nicx ni la del dictado.",
+    "statusLabel": "Estado",
+    "statusDescription": "Pulsa {{keys}} con un texto seleccionado.",
+    "inUseHint": "Otro programa ya usa esa combinación: elige otra.",
+    "checking": "Verificando...",
+    "serverUnavailable": "El servidor de Nicx no respondió.",
+    "restartServer": "Reinicia el servidor de Nicx para usar la captura rápida.",
+    "saveFailed": "No pude guardar. Inténtalo de nuevo.",
+    "states": {
+      "desligado": "desactivada",
+      "registrado": "lista",
+      "em_uso": "atajo en uso",
+      "sem_suporte": "sin soporte",
+      "invalido": "atajo inválido",
+      "erro": "error"
+    }
   }
 }

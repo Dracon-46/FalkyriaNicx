@@ -83,12 +83,13 @@ async def atalho_update(request: Request, body: AtalhoUpdate) -> dict:
             teclas = normalizar(body.teclas)
         except CombinacaoInvalida as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
-        ditado = getattr(config, "ditado", None)
-        if ditado is not None and teclas == _forma_gravada(ditado.teclas):
-            raise HTTPException(
-                status_code=400,
-                detail=f"{rotulo_de(teclas)} já é o atalho do ditado; escolha outra.",
-            )
+        for nome, secao in (("do ditado", "ditado"), ("da captura rápida", "captura")):
+            outra = getattr(config, secao, None)
+            if outra is not None and teclas == _forma_gravada(outra.teclas):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"{rotulo_de(teclas)} já é o atalho {nome}; escolha outra.",
+                )
     if body.acao is not None and body.acao not in ACOES:
         raise HTTPException(
             status_code=400,

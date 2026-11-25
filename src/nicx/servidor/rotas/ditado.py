@@ -124,6 +124,17 @@ async def ditado_update(request: Request, body: DitadoUpdate) -> dict:
             teclas = validar_teclas(body.teclas, config.atalho.teclas).texto
         except CombinacaoInvalida as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
+        captura = getattr(config, "captura", None)
+        if captura is not None:
+            try:
+                igual = teclas == validar_teclas(captura.teclas).texto
+            except CombinacaoInvalida:
+                igual = False
+            if igual:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Essa combinação já é a da captura rápida; escolha outra.",
+                )
     if body.modo is not None and body.modo not in MODOS:
         raise HTTPException(
             status_code=400,

@@ -398,5 +398,27 @@
     "semVSCode": "在这台电脑上没有找到 VS Code。安装 VS Code 后再回来。",
     "semPacote": "此 Nicx 安装未附带该扩展。",
     "erro": "无法完成：{{detail}}"
+  },
+  "capture": {
+    "title": "快速收集",
+    "enableLabel": "开启快速收集",
+    "enableDescription": "在任何程序中选中文字后按快捷键：文字会连同程序名称存入你的笔记。没有选中时，使用你复制的内容。密码和银行窗口永远不会被收集。",
+    "keysLabel": "快捷键",
+    "keysDescription": "点击后按下组合键。不能与 Nicx 快捷键或听写快捷键相同。",
+    "statusLabel": "状态",
+    "statusDescription": "选中文字后按 {{keys}}。",
+    "inUseHint": "其他程序已在使用这个组合键：请换一个。",
+    "checking": "正在检查...",
+    "serverUnavailable": "Nicx 服务器没有响应。",
+    "restartServer": "请重启 Nicx 服务器以使用快速收集。",
+    "saveFailed": "无法保存，请重试。",
+    "states": {
+      "desligado": "已关闭",
+      "registrado": "已就绪",
+      "em_uso": "快捷键被占用",
+      "sem_suporte": "不支持",
+      "invalido": "快捷键无效",
+      "erro": "出错"
+    }
   }
 }

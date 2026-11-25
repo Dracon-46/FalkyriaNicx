@@ -60,6 +60,7 @@ import {
 } from '../lib/api';
 import { ShortcutRecorder } from '../components/Settings/ShortcutRecorder';
 import { DictationSettings } from '../components/Settings/DictationSettings';
+import { CaptureSettings } from '../components/Settings/CaptureSettings';
 import { VSCodeSettings } from '../components/Settings/VSCodeSettings';
 
 // Os testes e outras telas importam o campo daqui.
@@ -1236,6 +1237,11 @@ export function SettingsPage() {
           {/* Ditado universal: fala e o texto entra onde está o cursor */}
           <Section title={t('settings.dictation.title')}>
             <DictationSettings onSaved={showSaved} />
+          </Section>
+
+          {/* Captura rápida: o texto selecionado vai para as notas */}
+          <Section title={t('settings.capture.title')}>
+            <CaptureSettings onSaved={showSaved} />
           </Section>
 
           {/* Calendário: Windows, Google Agenda ou Outlook */}

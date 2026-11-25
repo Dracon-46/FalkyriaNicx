@@ -85,6 +85,16 @@ som = true              # bipe curto ao começar e ao terminar
   (o log mostra só o tamanho).
 - Como o atalho, vive no servidor do Nicx e só funciona no Windows.
 
+## Captura rápida
+
+Configurações → **Captura rápida** liga um atalho (padrão `Ctrl+Alt+K`). Em
+qualquer programa, selecione um texto (uma ideia, um link, um trecho) e aperte:
+ele vai para as suas notas (`~/.nicx/notas.md`) numa linha, com o nome do
+programa de onde veio, e um aviso do Windows confirma. Sem seleção, vale o que
+você copiou. O que estava na área de transferência volta para lá. Janelas de
+senhas e bancos nunca são capturadas, e o texto não vai para os logs. Depois é
+só pedir "lê minhas notas" ou procurar na página Pesquisar.
+
 ## Imagens e vídeos no chat
 
 Anexe pelo clipe ao lado do campo, cole um print (Win+Shift+S e Ctrl+V) ou

@@ -398,5 +398,27 @@
     "semVSCode": "I couldn't find VS Code on this PC. Install VS Code and come back.",
     "semPacote": "The extension didn't come with this Nicx install.",
     "erro": "Couldn't do it: {{detail}}"
+  },
+  "capture": {
+    "title": "Quick capture",
+    "enableLabel": "Turn on quick capture",
+    "enableDescription": "Select text in any program and press the shortcut: it goes to your notes, with the program's name. With no selection, it uses what you copied. Password and banking windows are never captured.",
+    "keysLabel": "Shortcut",
+    "keysDescription": "Click and press the combination. It can't be the same as the Nicx or dictation shortcut.",
+    "statusLabel": "Status",
+    "statusDescription": "Press {{keys}} with some text selected.",
+    "inUseHint": "Another program already uses this combination: pick another.",
+    "checking": "Checking...",
+    "serverUnavailable": "The Nicx server didn't respond.",
+    "restartServer": "Restart the Nicx server to use quick capture.",
+    "saveFailed": "Couldn't save. Try again.",
+    "states": {
+      "desligado": "off",
+      "registrado": "ready",
+      "em_uso": "shortcut in use",
+      "sem_suporte": "not supported",
+      "invalido": "invalid shortcut",
+      "erro": "error"
+    }
   }
 }
