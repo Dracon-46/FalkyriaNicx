@@ -278,7 +278,13 @@
     "clearAllDescription": "永久删除所有对话",
     "confirm": "再点一次以确认",
     "clear": "清除",
-    "imported": "已导入的对话：{{count}}"
+    "imported": "已导入的对话：{{count}}",
+    "exportAll": "导出我的全部数据",
+    "exportAllDescription": "一个 .zip 文件，包含 Nicx 在这台电脑上保存的全部内容：对话、记忆、历史、笔记、提醒、项目、助手和设置。密码和密钥不包括在内。",
+    "exportAllButton": "全部导出",
+    "exporting": "正在导出...",
+    "exportedAll": "完成：{{file}} 已在你的下载文件夹中。",
+    "exportFailed": "无法导出。Nicx 服务器是否已启动？"
   },
   "context": {
     "title": "屏幕上下文",

@@ -24,6 +24,7 @@ import { useAppStore, type ThemeMode } from '../lib/store';
 import { NicxMascot } from '../components/Mascot/NicxMascot';
 import { FalkyriaLogo, FALKYRIA_URL } from '../components/brand/FalkyriaLogo';
 import { PrivacySection } from '../components/Privacy/PrivacySection';
+import { exportarTudo } from '../lib/meus-dados';
 import { CalendarSettings } from '../components/Settings/CalendarSettings';
 import { ContextSettings } from '../components/Settings/ContextSettings';
 import { AccountSettings } from '../components/Settings/AccountSettings';
@@ -760,6 +761,19 @@ export function SettingsPage() {
     input.click();
   };
 
+  const [exportingAll, setExportingAll] = useState(false);
+  const handleExportAll = async () => {
+    setExportingAll(true);
+    try {
+      const nome = await exportarTudo();
+      toast.success(t('settings.data.exportedAll', { file: nome }));
+    } catch {
+      toast.error(t('settings.data.exportFailed'));
+    } finally {
+      setExportingAll(false);
+    }
+  };
+
   const [confirmClear, setConfirmClear] = useState(false);
   const handleClear = () => {
     if (!confirmClear) {
@@ -1267,6 +1281,17 @@ export function SettingsPage() {
                   <Upload size={12} /> {t('settings.data.import')}
                 </button>
               </div>
+            </SettingRow>
+            <SettingRow label={t('settings.data.exportAll')} description={t('settings.data.exportAllDescription')}>
+              <button
+                onClick={() => void handleExportAll()}
+                disabled={exportingAll}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer disabled:opacity-50"
+                style={{ background: 'var(--color-bg-secondary)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border)' }}
+                data-testid="export-all"
+              >
+                <Download size={12} /> {exportingAll ? t('settings.data.exporting') : t('settings.data.exportAllButton')}
+              </button>
             </SettingRow>
             <SettingRow label={t('settings.data.clearAll')} description={t('settings.data.clearAllDescription')}>
               <button

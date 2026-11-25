@@ -25,6 +25,13 @@ concordar, são **estatísticas de uso anônimas**.
   `[analytics] enabled` no `config.toml`.
 - **Apagar meus dados**: o botão em Configurações → Privacidade apaga tudo o
   que a sua instalação enviou e gera um identificador novo.
+- **Exportar todos os meus dados**: Configurações → Dados → **Exportar tudo** baixa
+  um `.zip` com o que o Nicx guarda neste PC (conversas, memória, histórico, notas,
+  lembretes, agenda, projetos, assistentes, rotinas, habilidades, tarefas do modo
+  Trabalho, configuração e os bancos SQLite) e um `LEIA-ME.txt` explicando cada
+  parte. O cofre da Conta Falkyria, chaves e tokens ficam de fora; chaves dentro
+  do `config.toml` e do `mcp.json` aparecem como `••••••`. Rota:
+  `POST /v1/meus-dados/exportar`.
 
 ## Textos legais
 

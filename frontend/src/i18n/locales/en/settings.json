@@ -278,7 +278,13 @@
     "clearAllDescription": "Permanently deletes all conversations",
     "confirm": "Click again to confirm",
     "clear": "Clear",
-    "imported": "Conversations imported: {{count}}"
+    "imported": "Conversations imported: {{count}}",
+    "exportAll": "Export all my data",
+    "exportAllDescription": "A .zip file with everything Nicx keeps on this PC: conversations, memory, history, notes, reminders, projects, assistants and settings. Passwords and keys are left out.",
+    "exportAllButton": "Export everything",
+    "exporting": "Exporting...",
+    "exportedAll": "Done: {{file}} is in your downloads.",
+    "exportFailed": "Couldn't export. Is the Nicx server running?"
   },
   "context": {
     "title": "Screen context",

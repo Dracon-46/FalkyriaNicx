@@ -29,6 +29,7 @@ from nicx.servidor.rotas.ditado import router as ditado_router
 from nicx.servidor.rotas.escuta import router as wake_router
 from nicx.servidor.rotas.extensoes import router as extensoes_router
 from nicx.servidor.rotas.historico import router as historico_router
+from nicx.servidor.rotas.meus_dados import router as meus_dados_router
 from nicx.servidor.rotas.painel_economia import dashboard_router
 from nicx.servidor.rotas.pesquisa import router as research_router
 from nicx.servidor.rotas.planejador import router as planejador_router
@@ -517,6 +518,7 @@ def create_app(
     app.include_router(vscode_router)
     app.include_router(trabalho_router)
     app.include_router(caixa_router)
+    app.include_router(meus_dados_router)
     app.include_router(planejador_router)
     include_all_routes(app)
 

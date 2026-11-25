@@ -278,7 +278,13 @@
     "clearAllDescription": "Supprime définitivement toutes les conversations",
     "confirm": "Cliquez à nouveau pour confirmer",
     "clear": "Effacer",
-    "imported": "Conversations importées : {{count}}"
+    "imported": "Conversations importées : {{count}}",
+    "exportAll": "Exporter toutes mes données",
+    "exportAllDescription": "Un fichier .zip avec tout ce que Nicx garde sur ce PC : conversations, mémoire, historique, notes, rappels, projets, assistants et réglages. Les mots de passe et les clés sont exclus.",
+    "exportAllButton": "Tout exporter",
+    "exporting": "Exportation...",
+    "exportedAll": "C'est fait : {{file}} est dans vos téléchargements.",
+    "exportFailed": "Impossible d'exporter. Le serveur Nicx est-il lancé ?"
   },
   "context": {
     "title": "Contexte de l'écran",
