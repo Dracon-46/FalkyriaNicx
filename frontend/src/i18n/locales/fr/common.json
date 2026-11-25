@@ -92,7 +92,9 @@
       "thinking": "réfléchit",
       "speaking": "parle",
       "happy": "content",
-      "error": "un problème est survenu"
+      "error": "un problème est survenu",
+      "working": "au travail",
+      "waiting": "vous attend"
     }
   }
 }

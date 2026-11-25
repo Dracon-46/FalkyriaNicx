@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Task } from '../lib/trabalho';
 
@@ -51,7 +52,11 @@ describe('TrabalhoPage', () => {
   it('monta o plano, deixa editar e aprova com os passos editados', async () => {
     api.criarTarefa.mockResolvedValue(task({}));
     api.aprovarTarefa.mockResolvedValue(task({ estado: 'executando' }));
-    render(<TrabalhoPage />);
+    render(
+      <MemoryRouter>
+        <TrabalhoPage />
+      </MemoryRouter>,
+    );
 
     const create = screen.getByTestId('work-create');
     expect(create).toHaveProperty('disabled', true);
@@ -71,7 +76,11 @@ describe('TrabalhoPage', () => {
     api.listarTarefas.mockResolvedValue([waiting]);
     api.verTarefa.mockResolvedValue(waiting);
     api.responderTarefa.mockResolvedValue(task({ estado: 'executando' }));
-    render(<TrabalhoPage />);
+    render(
+      <MemoryRouter>
+        <TrabalhoPage />
+      </MemoryRouter>,
+    );
 
     expect((await screen.findByTestId('work-question')).textContent).toContain('velho.txt');
     fireEvent.click(screen.getByTestId('work-confirm-no'));
@@ -88,7 +97,11 @@ describe('TrabalhoPage', () => {
     api.listarTarefas.mockResolvedValue([done]);
     api.verTarefa.mockResolvedValue(done);
     api.acaoTarefa.mockResolvedValue({ ...done, estado: 'desfeita', arquivos_mudados: [] });
-    render(<TrabalhoPage />);
+    render(
+      <MemoryRouter>
+        <TrabalhoPage />
+      </MemoryRouter>,
+    );
 
     fireEvent.click(await screen.findByText(done.pedido));
     expect((await screen.findByTestId('work-summary')).textContent).toBe('Criei notas.xlsx.');

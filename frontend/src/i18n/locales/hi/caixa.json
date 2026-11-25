@@ -1,0 +1,25 @@
+{
+  "title": "इनबॉक्स",
+  "titleWaiting": "इनबॉक्स: {{n}} आपका इंतज़ार कर रहे हैं",
+  "empty": "कुछ भी आपका इंतज़ार नहीं कर रहा",
+  "needsYou": "आपकी ज़रूरत है ({{n}})",
+  "notices": "सूचनाएँ",
+  "clearNotices": "सूचनाएँ साफ़ करें",
+  "dismiss": "हटाएँ",
+  "yes": "हाँ, कर दो",
+  "no": "नहीं",
+  "open": "देखें",
+  "reviewPlan": "योजना देखें",
+  "failed": "यह नहीं हो पाया। फिर से कोशिश करें।",
+  "kinds": {
+    "aprovacao": "एजेंट की मंज़ूरी",
+    "trabalho_pergunta": "Nicx पूछ रहा है",
+    "trabalho_plano": "योजना मंज़ूरी का इंतज़ार कर रही है",
+    "trabalho_concluida": "काम पूरा हुआ",
+    "trabalho_erro": "काम में त्रुटि",
+    "trabalho_interrompida": "काम बाधित हुआ",
+    "agente_erro": "एजेंट में त्रुटि",
+    "agente_atencao": "एजेंट को ध्यान चाहिए",
+    "agente_orcamento": "एजेंट ने सीमा पार की"
+  }
+}

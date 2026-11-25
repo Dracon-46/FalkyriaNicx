@@ -92,7 +92,9 @@
       "thinking": "يفكّر",
       "speaking": "يتحدث",
       "happy": "سعيد",
-      "error": "حدث خطأ ما"
+      "error": "حدث خطأ ما",
+      "working": "يعمل",
+      "waiting": "بانتظارك"
     }
   }
 }

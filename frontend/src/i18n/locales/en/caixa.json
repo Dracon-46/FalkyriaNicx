@@ -1,0 +1,25 @@
+{
+  "title": "Inbox",
+  "titleWaiting": "Inbox: {{n}} waiting for you",
+  "empty": "Nothing waiting for you",
+  "needsYou": "Needs you ({{n}})",
+  "notices": "Updates",
+  "clearNotices": "Clear updates",
+  "dismiss": "Dismiss",
+  "yes": "Yes, go ahead",
+  "no": "No",
+  "open": "View",
+  "reviewPlan": "Review the plan",
+  "failed": "That didn't work. Try again.",
+  "kinds": {
+    "aprovacao": "Agent approval",
+    "trabalho_pergunta": "Nicx is asking",
+    "trabalho_plano": "Plan awaiting approval",
+    "trabalho_concluida": "Task done",
+    "trabalho_erro": "Task failed",
+    "trabalho_interrompida": "Task interrupted",
+    "agente_erro": "Agent error",
+    "agente_atencao": "Agent needs attention",
+    "agente_orcamento": "Agent went over its limit"
+  }
+}

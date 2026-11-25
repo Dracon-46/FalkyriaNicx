@@ -340,6 +340,29 @@ Rotas: `POST /v1/trabalho` (`{"pasta", "pedido"}`), `GET /v1/trabalho[/{id}]`,
 `POST /v1/trabalho/{id}/aprovar|pausar|continuar|parar|responder|desfazer` e
 `POST /v1/trabalho/escolher-pasta`.
 
+## Caixa de entrada
+
+O sininho no canto de cima junta o que precisa de você e o que aconteceu
+enquanto você fazia outra coisa:
+
+- **Precisa de você** (número vermelho no sininho): aprovações dos agentes, as
+  perguntas do modo Trabalho ("posso apagar velho.txt?") e os planos esperando
+  aprovação. Aprovar, negar e responder dá para fazer ali mesmo; o plano abre na
+  página Trabalho.
+- **Avisos** (ponto azul): tarefas concluídas, com erro ou interrompidas e
+  agentes que pararam com erro ou passaram do limite. **Ver** abre a página certa;
+  o X dispensa um aviso e **Limpar avisos** dispensa todos. Avisos somem sozinhos
+  depois de 7 dias.
+
+O mascote acompanha: fica **trabalhando** (olhos baixos, como quem lê, núcleo
+girando) enquanto uma tarefa roda em segundo plano, **esperando você** (olhos
+grandes, pulsando) quando há uma decisão pendente, comemora quando uma tarefa
+termina e fica triste por um instante quando algo falha. A conversa e a voz têm
+prioridade: enquanto ele pensa ou fala, o humor de fundo espera.
+
+Rotas: `GET /v1/caixa` e `POST /v1/caixa/dispensar` (`{"ids": [...]}` ou
+`{"todos": true}`). Os avisos dispensados ficam em `~/.nicx/caixa_vistos.json`.
+
 ## Editor de código
 
 A página **Editor de código** (menu ao lado) abre uma pasta (Edge, Chrome e o app;

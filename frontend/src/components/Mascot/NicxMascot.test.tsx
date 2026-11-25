@@ -5,7 +5,7 @@ import { computeFrame, phasesAt, POSES, STILL_INPUT } from './mascot-geometry';
 import { mascotStillSvg } from './mascot-still';
 import { mascotMoodLabel, MASCOT_SIZES, NicxMascot } from './NicxMascot';
 
-const MOODS: MascotMood[] = ['idle', 'listening', 'thinking', 'speaking', 'happy', 'error'];
+const MOODS: MascotMood[] = ['idle', 'listening', 'thinking', 'speaking', 'happy', 'error', 'working', 'waiting'];
 
 const numbersIn = (s: string) => (s.match(/-?\d+(\.\d+)?(e-?\d+)?/g) ?? []).map(Number);
 

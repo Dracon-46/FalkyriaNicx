@@ -1,0 +1,25 @@
+{
+  "title": "صندوق الوارد",
+  "titleWaiting": "صندوق الوارد: {{n}} بانتظارك",
+  "empty": "لا شيء بانتظارك",
+  "needsYou": "يحتاج إليك ({{n}})",
+  "notices": "إشعارات",
+  "clearNotices": "مسح الإشعارات",
+  "dismiss": "تجاهل",
+  "yes": "نعم، تفضّل",
+  "no": "لا",
+  "open": "عرض",
+  "reviewPlan": "مراجعة الخطة",
+  "failed": "لم ينجح ذلك. حاول مرة أخرى.",
+  "kinds": {
+    "aprovacao": "موافقة وكيل",
+    "trabalho_pergunta": "Nicx يسأل",
+    "trabalho_plano": "خطة بانتظار الموافقة",
+    "trabalho_concluida": "اكتملت المهمة",
+    "trabalho_erro": "خطأ في المهمة",
+    "trabalho_interrompida": "توقفت المهمة",
+    "agente_erro": "خطأ في الوكيل",
+    "agente_atencao": "الوكيل يحتاج إلى انتباه",
+    "agente_orcamento": "تجاوز الوكيل حدّه"
+  }
+}

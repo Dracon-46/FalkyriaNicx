@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import {
   AlertTriangle,
@@ -429,12 +430,19 @@ export function TrabalhoPage() {
     void loadList();
   }, [loadList]);
 
+  // Veio da caixa de entrada para uma tarefa: abre essa.
+  const location = useLocation();
+  const requested = (location.state as { tarefa?: string } | null)?.tarefa;
+  useEffect(() => {
+    if (requested) void verTarefa(requested).then(setCurrent).catch(() => undefined);
+  }, [requested]);
+
   // Abre sozinha a tarefa que está rodando (ex.: voltou para a página).
   useEffect(() => {
-    if (current || tasks.length === 0) return;
+    if (current || requested || tasks.length === 0) return;
     const active = tasks.find((x) => ACTIVE_STATES.includes(x.estado) || x.estado === 'aguardando_aprovacao');
     if (active) void verTarefa(active.id).then(setCurrent).catch(() => undefined);
-  }, [tasks, current]);
+  }, [tasks, current, requested]);
 
   // Acompanha a tarefa aberta enquanto ela trabalha.
   const currentId = current?.id;

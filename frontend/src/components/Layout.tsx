@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router';
-import { ApprovalBell } from './ApprovalBell';
+import { InboxBell } from './InboxBell';
+import { iniciarCaixa } from '../lib/caixa';
+import { bindMascotToCaixa } from '../lib/mascot-caixa';
 import { Sidebar } from './Sidebar/Sidebar';
 import { SystemPulse } from './SystemPulse';
 import { useAppStore } from '../lib/store';
@@ -26,11 +28,21 @@ export function Layout() {
 
   const navigate = useNavigate();
 
+  // Caixa de entrada: um consultor só para o sininho e o humor de fundo do mascote.
+  useEffect(() => {
+    const unbind = bindMascotToCaixa();
+    const stop = iniciarCaixa();
+    return () => {
+      stop();
+      unbind();
+    };
+  }, []);
+
   return (
     <div className="flex flex-col h-full w-full overflow-hidden relative" style={{ paddingTop: '3px' }}>
       <div className="hud-backdrop" aria-hidden="true" />
       <SystemPulse apiReachable={apiReachable} />
-      <ApprovalBell />
+      <InboxBell />
 
       {/* Health check banner */}
       {apiReachable === false && (

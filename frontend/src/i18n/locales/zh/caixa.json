@@ -1,0 +1,25 @@
+{
+  "title": "收件箱",
+  "titleWaiting": "收件箱：{{n}} 项等你处理",
+  "empty": "没有需要你处理的事项",
+  "needsYou": "需要你处理（{{n}}）",
+  "notices": "通知",
+  "clearNotices": "清除通知",
+  "dismiss": "忽略",
+  "yes": "可以",
+  "no": "不要",
+  "open": "查看",
+  "reviewPlan": "查看计划",
+  "failed": "操作未成功，请重试。",
+  "kinds": {
+    "aprovacao": "代理审批",
+    "trabalho_pergunta": "Nicx 在询问",
+    "trabalho_plano": "计划等待批准",
+    "trabalho_concluida": "任务已完成",
+    "trabalho_erro": "任务出错",
+    "trabalho_interrompida": "任务已中断",
+    "agente_erro": "代理出错",
+    "agente_atencao": "代理需要关注",
+    "agente_orcamento": "代理超出限额"
+  }
+}

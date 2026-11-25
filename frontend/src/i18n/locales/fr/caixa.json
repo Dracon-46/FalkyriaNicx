@@ -1,0 +1,25 @@
+{
+  "title": "Boîte de réception",
+  "titleWaiting": "Boîte de réception : {{n}} vous attend",
+  "empty": "Rien ne vous attend",
+  "needsYou": "Vous attend ({{n}})",
+  "notices": "Avis",
+  "clearNotices": "Effacer les avis",
+  "dismiss": "Ignorer",
+  "yes": "Oui, allez-y",
+  "no": "Non",
+  "open": "Voir",
+  "reviewPlan": "Revoir le plan",
+  "failed": "Ça n'a pas marché. Réessayez.",
+  "kinds": {
+    "aprovacao": "Approbation d'agent",
+    "trabalho_pergunta": "Nicx demande",
+    "trabalho_plano": "Plan en attente d'approbation",
+    "trabalho_concluida": "Tâche terminée",
+    "trabalho_erro": "Tâche en erreur",
+    "trabalho_interrompida": "Tâche interrompue",
+    "agente_erro": "Agent en erreur",
+    "agente_atencao": "L'agent a besoin d'attention",
+    "agente_orcamento": "L'agent a dépassé sa limite"
+  }
+}

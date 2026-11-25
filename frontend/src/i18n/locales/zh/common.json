@@ -92,7 +92,9 @@
       "thinking": "思考中",
       "speaking": "说话中",
       "happy": "开心",
-      "error": "出了点问题"
+      "error": "出了点问题",
+      "working": "工作中",
+      "waiting": "等你处理"
     }
   }
 }

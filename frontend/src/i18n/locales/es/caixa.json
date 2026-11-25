@@ -1,0 +1,25 @@
+{
+  "title": "Bandeja de entrada",
+  "titleWaiting": "Bandeja de entrada: {{n}} esperándote",
+  "empty": "Nada te está esperando",
+  "needsYou": "Te necesita ({{n}})",
+  "notices": "Avisos",
+  "clearNotices": "Borrar avisos",
+  "dismiss": "Descartar",
+  "yes": "Sí, adelante",
+  "no": "No",
+  "open": "Ver",
+  "reviewPlan": "Revisar el plan",
+  "failed": "No funcionó. Inténtalo de nuevo.",
+  "kinds": {
+    "aprovacao": "Aprobación de agente",
+    "trabalho_pergunta": "Nicx pregunta",
+    "trabalho_plano": "Plan esperando aprobación",
+    "trabalho_concluida": "Tarea terminada",
+    "trabalho_erro": "Tarea con error",
+    "trabalho_interrompida": "Tarea interrumpida",
+    "agente_erro": "Agente con error",
+    "agente_atencao": "El agente necesita atención",
+    "agente_orcamento": "El agente superó su límite"
+  }
+}

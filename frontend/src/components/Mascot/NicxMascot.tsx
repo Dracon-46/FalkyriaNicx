@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { useMascot, type MascotMood } from '../../lib/mascot';
+import { useMascot, visibleMood, type MascotMood } from '../../lib/mascot';
 import { MascotAnimator } from './mascot-animator';
 import {
   BODY_OFFSETS,
@@ -65,7 +65,7 @@ export function NicxMascot({
   style,
 }: NicxMascotProps) {
   const px = typeof size === 'number' ? size : MASCOT_SIZES[size];
-  const storeMood = useMascot((s) => s.mood);
+  const storeMood = useMascot(visibleMood);
   const mood = moodProp ?? storeMood;
   const small = px < 44;
   const live = animated && !still;

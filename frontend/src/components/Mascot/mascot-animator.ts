@@ -394,6 +394,8 @@ export class MascotAnimator {
       mood === 'thinking' ||
       mood === 'listening' ||
       mood === 'speaking' ||
+      mood === 'working' ||
+      mood === 'waiting' ||
       Math.abs(this.pose.eyeScale - target.eyeScale) +
         Math.abs(this.pose.stretch - target.stretch) +
         Math.abs(this.pose.happyEyes - target.happyEyes) +
@@ -476,6 +478,17 @@ export class MascotAnimator {
       k = 4;
     } else if (mood === 'happy') {
       this.gazeTarget = { x: 0, y: -0.15 };
+    } else if (mood === 'working') {
+      // Reading down a page: eyes low, sweeping left to right, back to the start.
+      const line = (t * 0.45) % 1;
+      this.gazeTarget = { x: -0.55 + line * 1.1, y: 0.35 + Math.floor(t * 0.45) % 3 * 0.08 };
+      k = line < 0.08 ? 12 : 5;
+    } else if (mood === 'waiting') {
+      // Looking at the person, with a small hopeful glance up now and then.
+      const p = this.pointerGaze();
+      const up = Math.sin(t * 1.3) > 0.85 ? -0.25 : 0;
+      this.gazeTarget = { x: (p?.x ?? 0) * 0.3, y: (p?.y ?? 0) * 0.2 + up };
+      k = 6;
     } else {
       const p = this.pointerGaze();
       if (mood === 'listening') {

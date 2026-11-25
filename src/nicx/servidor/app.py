@@ -19,6 +19,7 @@ from nicx.servidor.rotas.assistentes import router as assistentes_router
 from nicx.servidor.rotas.atalho import router as atalho_router
 from nicx.servidor.rotas.atualizacao import router as atualizacao_router
 from nicx.servidor.rotas.briefing import create_digest_router
+from nicx.servidor.rotas.caixa import router as caixa_router
 from nicx.servidor.rotas.chat import router
 from nicx.servidor.rotas.comparacao import comparison_router
 from nicx.servidor.rotas.conectores import create_connectors_router
@@ -515,6 +516,7 @@ def create_app(
     app.include_router(atualizacao_router)
     app.include_router(vscode_router)
     app.include_router(trabalho_router)
+    app.include_router(caixa_router)
     app.include_router(planejador_router)
     include_all_routes(app)
 

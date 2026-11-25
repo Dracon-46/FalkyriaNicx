@@ -1,0 +1,25 @@
+{
+  "title": "Caixa de entrada",
+  "titleWaiting": "Caixa de entrada: {{n}} esperando você",
+  "empty": "Nada esperando você",
+  "needsYou": "Precisa de você ({{n}})",
+  "notices": "Avisos",
+  "clearNotices": "Limpar avisos",
+  "dismiss": "Dispensar",
+  "yes": "Sim, pode",
+  "no": "Não",
+  "open": "Ver",
+  "reviewPlan": "Revisar o plano",
+  "failed": "Não deu certo. Tente de novo.",
+  "kinds": {
+    "aprovacao": "Aprovação de agente",
+    "trabalho_pergunta": "O Nicx pergunta",
+    "trabalho_plano": "Plano esperando aprovação",
+    "trabalho_concluida": "Tarefa concluída",
+    "trabalho_erro": "Tarefa com erro",
+    "trabalho_interrompida": "Tarefa interrompida",
+    "agente_erro": "Agente com erro",
+    "agente_atencao": "Agente precisa de atenção",
+    "agente_orcamento": "Agente passou do limite"
+  }
+}

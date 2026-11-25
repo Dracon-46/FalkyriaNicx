@@ -92,7 +92,9 @@
       "thinking": "thinking",
       "speaking": "speaking",
       "happy": "happy",
-      "error": "something went wrong"
+      "error": "something went wrong",
+      "working": "working",
+      "waiting": "waiting for you"
     }
   }
 }

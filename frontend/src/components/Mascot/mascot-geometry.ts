@@ -106,6 +106,20 @@ export const POSES: Record<MascotMood, Pose> = {
     eyeSad: 1, happyEyes: 0, eyeDrop: 2.2, coreGlow: 0.3, coreSize: 0.88, coreDrift: 0.4,
     coreSpeed: 0.3, coreDrop: 7, swirl: 0, dim: 0.65, blush: 0,
   },
+  // Focused on a task: eyes a little narrowed and low, nucleus turning steadily.
+  working: {
+    breathe: 0.018, breatheSpeed: 1.8, wobble: 0.7, wobbleSpeed: 1.5, sway: 0.014, bob: 0,
+    ripple: 0, pulse: 0.25, stretch: 0.01, lift: 0, bounce: 0, eyeScale: 0.98, eyeOpen: 0.78,
+    eyeSad: 0, happyEyes: 0, eyeDrop: 0.6, coreGlow: 1.15, coreSize: 1.04, coreDrift: 0.9,
+    coreSpeed: 1.25, coreDrop: 0, swirl: 0.55, dim: 0, blush: 0,
+  },
+  // Needs the person: perked up, big eyes, a slow pulse calling attention.
+  waiting: {
+    breathe: 0.02, breatheSpeed: 2.2, wobble: 0.6, wobbleSpeed: 1.9, sway: 0.01, bob: 0,
+    ripple: 0.6, pulse: 0.8, stretch: 0.045, lift: -0.4, bounce: 0, eyeScale: 1.12, eyeOpen: 1,
+    eyeSad: 0, happyEyes: 0, eyeDrop: -0.4, coreGlow: 1.2, coreSize: 1.06, coreDrift: 0.5,
+    coreSpeed: 0.7, coreDrop: -0.6, swirl: 0, dim: 0, blush: 0,
+  },
 };
 
 const POSE_KEYS = Object.keys(POSES.idle) as (keyof Pose)[];
