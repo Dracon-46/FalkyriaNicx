@@ -160,6 +160,17 @@ class TestWebSearchTool:
 
         monkeypatch.setattr(builtins, "__import__", _mock_import)
 
+        # O DuckDuckGo também é de mentira. Real, o fallback ia à internet: quando a
+        # busca voltava vazia ("No results found"), o teste falhava sem nada ter
+        # mudado no código — foi o CI agendado de 23/11/2026.
+        mock_ddgs = MagicMock()
+        mock_ddgs.text.return_value = [
+            {"title": "DDG", "href": "https://example.com", "body": "Content"}
+        ]
+        mock_ddgs_module = MagicMock()
+        mock_ddgs_module.DDGS.return_value = mock_ddgs
+        monkeypatch.setitem(sys.modules, "ddgs", mock_ddgs_module)
+
         tool = WebSearchTool(api_key="test-key")
         result = tool.execute(query="test query")
         assert result.success is True
