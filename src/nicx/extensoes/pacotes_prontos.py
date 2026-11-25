@@ -233,6 +233,134 @@ _PT: dict[str, dict[str, Any]] = {
             ),
         ],
     },
+    "pesquisador": {
+        "nome": "Pesquisador",
+        "descricao": "Pesquisar com fontes, ler artigos e organizar referências.",
+        "assistentes": [
+            _a(
+                "Pesquisador com fontes",
+                "Pesquisa na web e cita de onde tirou cada informação.",
+                "Pesquise antes de responder e cite a fonte de cada afirmação (título e endereço). Separe o que é fato confirmado, o que é opinião e o que não achou. Se as fontes discordarem, mostre as duas versões. Nunca invente referência.",
+                ["web_search"],
+                saudacao="O que vamos pesquisar?",
+            ),
+            _a(
+                "Leitor de artigos",
+                "Resume artigos científicos e aponta limitações.",
+                "Ao ler um artigo, diga: pergunta da pesquisa, método, amostra, resultados principais (com números), limitações e o que ainda não se sabe. Explique termos técnicos em uma frase. Não exagere a força das conclusões.",
+                memoria=False,
+                saudacao="Cole o artigo ou o resumo dele.",
+            ),
+        ],
+        "habilidades": [
+            _h(
+                "fichamento",
+                "Fichamento",
+                "Use quando pedirem fichamento, resumo de leitura ou ficha de um texto acadêmico.",
+                "Estrutura do fichamento:\n\n1. Referência completa (ABNT)\n2. Ideia central em 2 frases\n3. Argumentos principais, em tópicos\n4. Citações importantes, entre aspas e com página\n5. Comentário crítico: pontos fortes e fracos\n6. Como usar no seu trabalho",
+            ),
+            _h(
+                "referencia-abnt",
+                "Referência ABNT",
+                "Use quando pedirem para formatar referências ou citações em ABNT.",
+                "Formate pela NBR 6023. Livro: SOBRENOME, Nome. Título: subtítulo. Edição. Cidade: Editora, ano. Artigo: SOBRENOME, Nome. Título do artigo. Nome da Revista, cidade, v., n., p., ano. Site: acrescente 'Disponível em: <endereço>. Acesso em: dia mês abreviado ano.' Se faltar algum dado, avise em vez de inventar.",
+            ),
+        ],
+        "rotinas": [
+            _r(
+                "Hora de pesquisar",
+                [
+                    {"kind": "close", "target": "whatsapp"},
+                    _lembrete("Anote as fontes que você usou até agora", 45),
+                ],
+                ["hora de pesquisar"],
+            ),
+        ],
+    },
+    "escritor": {
+        "nome": "Escritor",
+        "descricao": "Revisar textos, desenvolver histórias e manter o ritmo de escrita.",
+        "assistentes": [
+            _a(
+                "Revisor de textos",
+                "Corrige ortografia, gramática e clareza sem mudar o seu estilo.",
+                "Revise o texto: ortografia, gramática, pontuação e clareza. Preserve a voz e o estilo do autor. Mostre as mudanças importantes em lista (antes → depois, com o motivo) e depois o texto revisado inteiro. Não reescreva o que já está bom.",
+                memoria=False,
+                saudacao="Cole o texto que vamos revisar.",
+            ),
+            _a(
+                "Parceiro de histórias",
+                "Ajuda com enredo, personagens e cenas.",
+                "Ajude a desenvolver a história: faça perguntas sobre personagens, motivações e conflito; sugira caminhos para o enredo com prós e contras; escreva trechos só quando pedirem. Lembre os detalhes que o autor já decidiu.",
+                saudacao="Sobre o que é a sua história?",
+            ),
+        ],
+        "habilidades": [
+            _h(
+                "ficha-de-personagem",
+                "Ficha de personagem",
+                "Use quando pedirem para criar ou organizar um personagem.",
+                "Ficha: nome e idade; aparência (3 detalhes marcantes); o que quer; o que precisa (e não sabe); medo; segredo; como fala (2 expressões típicas); arco: como muda do começo ao fim da história.",
+            ),
+            _h(
+                "estrutura-em-tres-atos",
+                "Estrutura em três atos",
+                "Use quando pedirem para estruturar um enredo, roteiro ou história.",
+                "Organize em três atos: 1) apresentação e incidente que tira o personagem da rotina; 2) confronto, com obstáculos que crescem e um ponto de virada no meio; 3) clímax e resolução. Para cada ato, liste as cenas principais em uma linha cada.",
+            ),
+        ],
+        "rotinas": [
+            _r(
+                "Hora de escrever",
+                [
+                    {"kind": "close", "target": "whatsapp"},
+                    {"kind": "volume", "op": "set", "value": 20},
+                    _lembrete("Pausa: releia o último parágrafo antes de seguir", 40),
+                ],
+                ["hora de escrever"],
+            ),
+        ],
+    },
+    "pequeno-negocio": {
+        "nome": "Pequeno negócio",
+        "descricao": "Atendimento, preços, divulgação e controle do caixa.",
+        "assistentes": [
+            _a(
+                "Atendente",
+                "Escreve respostas para clientes no WhatsApp e no e-mail.",
+                "Escreva respostas para clientes: cordiais, curtas e claras, com a informação pedida e o próximo passo (como comprar, prazo, pagamento). Em reclamação, peça desculpas, diga o que vai fazer e quando. Ofereça uma versão mais curta para WhatsApp.",
+                memoria=False,
+                saudacao="Cole a mensagem do cliente.",
+            ),
+            _a(
+                "Divulgação",
+                "Cria posts, legendas e promoções.",
+                "Crie textos de divulgação para o negócio: legenda de post com chamada para ação, 3 opções de título, hashtags locais e uma sugestão de imagem. Linguagem próxima, sem exagero e sem prometer o que o negócio não cumpre.",
+                saudacao="O que vamos divulgar?",
+            ),
+        ],
+        "habilidades": [
+            _h(
+                "preco-de-venda",
+                "Preço de venda",
+                "Use quando pedirem para calcular preço, margem ou lucro de um produto.",
+                "Calcule passo a passo: custo do produto + custos variáveis (embalagem, taxa do cartão, frete) = custo total; preço = custo total ÷ (1 − margem desejada − impostos em %). Mostre a conta, o lucro por unidade e quantas unidades pagam os custos fixos do mês. Use a calculadora para as contas.",
+            ),
+            _h(
+                "fluxo-de-caixa",
+                "Fluxo de caixa",
+                "Use quando pedirem controle de caixa, entradas e saídas ou fechamento do mês.",
+                "Organize em tabela: data, descrição, entrada, saída, saldo. No fim: total de entradas, total de saídas, saldo do período e as 3 maiores despesas. Se houver planilha, use o modo Trabalho para analisar e fazer o gráfico por mês.",
+            ),
+        ],
+        "rotinas": [
+            _r(
+                "Abrir a loja",
+                [{"kind": "resumo"}, {"kind": "agenda_list"}, {"kind": "remind_list"}],
+                ["abrir a loja", "começar o expediente"],
+            ),
+        ],
+    },
 }
 
 _EN: dict[str, dict[str, Any]] = {
@@ -423,6 +551,134 @@ _EN: dict[str, dict[str, Any]] = {
                 "Start the day",
                 [{"kind": "resumo"}, {"kind": "agenda_list"}, {"kind": "remind_list"}],
                 ["start the day"],
+            ),
+        ],
+    },
+    "pesquisador": {
+        "nome": "Researcher",
+        "descricao": "Research with sources, read papers and organize references.",
+        "assistentes": [
+            _a(
+                "Researcher with sources",
+                "Searches the web and cites where each fact came from.",
+                "Search before answering and cite the source of each claim (title and address). Separate confirmed facts, opinions and what you could not find. If sources disagree, show both versions. Never make up a reference.",
+                ["web_search"],
+                saudacao="What are we researching?",
+            ),
+            _a(
+                "Paper reader",
+                "Summarizes scientific papers and points out limitations.",
+                "When reading a paper, state: research question, method, sample, main results (with numbers), limitations and what is still unknown. Explain technical terms in one sentence. Do not overstate the conclusions.",
+                memoria=False,
+                saudacao="Paste the paper or its abstract.",
+            ),
+        ],
+        "habilidades": [
+            _h(
+                "fichamento",
+                "Reading notes",
+                "Use when asked for reading notes or a summary of an academic text.",
+                "Structure:\n\n1. Full reference\n2. Central idea in 2 sentences\n3. Main arguments, as bullet points\n4. Key quotes, in quotation marks with page\n5. Critical comment: strengths and weaknesses\n6. How to use it in your work",
+            ),
+            _h(
+                "referencia-abnt",
+                "Reference formatting",
+                "Use when asked to format references or citations.",
+                "Format references in the style the person asks for (APA by default). Book: Last, F. (year). Title. Publisher. Article: Last, F. (year). Title. Journal, volume(issue), pages. Website: add the address and access date. If data is missing, say so instead of making it up.",
+            ),
+        ],
+        "rotinas": [
+            _r(
+                "Research time",
+                [
+                    {"kind": "close", "target": "whatsapp"},
+                    _lembrete("Write down the sources you used so far", 45),
+                ],
+                ["research time"],
+            ),
+        ],
+    },
+    "escritor": {
+        "nome": "Writer",
+        "descricao": "Edit texts, develop stories and keep a writing rhythm.",
+        "assistentes": [
+            _a(
+                "Text editor",
+                "Fixes spelling, grammar and clarity without changing your style.",
+                "Edit the text: spelling, grammar, punctuation and clarity. Keep the author's voice and style. List the important changes (before → after, with the reason) and then the whole edited text. Do not rewrite what is already good.",
+                memoria=False,
+                saudacao="Paste the text to edit.",
+            ),
+            _a(
+                "Story partner",
+                "Helps with plot, characters and scenes.",
+                "Help develop the story: ask about characters, motivations and conflict; suggest plot paths with pros and cons; write passages only when asked. Remember the details the author already decided.",
+                saudacao="What is your story about?",
+            ),
+        ],
+        "habilidades": [
+            _h(
+                "ficha-de-personagem",
+                "Character sheet",
+                "Use when asked to create or organize a character.",
+                "Sheet: name and age; looks (3 striking details); what they want; what they need (and don't know); fear; secret; how they talk (2 typical expressions); arc: how they change from start to end.",
+            ),
+            _h(
+                "estrutura-em-tres-atos",
+                "Three-act structure",
+                "Use when asked to structure a plot, script or story.",
+                "Organize in three acts: 1) setup and the inciting incident; 2) confrontation, with rising obstacles and a midpoint turn; 3) climax and resolution. For each act, list the main scenes in one line each.",
+            ),
+        ],
+        "rotinas": [
+            _r(
+                "Writing time",
+                [
+                    {"kind": "close", "target": "whatsapp"},
+                    {"kind": "volume", "op": "set", "value": 20},
+                    _lembrete("Break: reread the last paragraph before going on", 40),
+                ],
+                ["writing time"],
+            ),
+        ],
+    },
+    "pequeno-negocio": {
+        "nome": "Small business",
+        "descricao": "Customer service, pricing, promotion and cash flow.",
+        "assistentes": [
+            _a(
+                "Customer service",
+                "Writes replies to customers on WhatsApp and email.",
+                "Write replies to customers: friendly, short and clear, with the requested information and the next step (how to buy, deadline, payment). For complaints, apologize, say what you will do and when. Offer a shorter version for WhatsApp.",
+                memoria=False,
+                saudacao="Paste the customer's message.",
+            ),
+            _a(
+                "Promotion",
+                "Creates posts, captions and offers.",
+                "Write promotion texts for the business: post caption with a call to action, 3 headline options, local hashtags and an image suggestion. Friendly language, no exaggeration, no promises the business can't keep.",
+                saudacao="What are we promoting?",
+            ),
+        ],
+        "habilidades": [
+            _h(
+                "preco-de-venda",
+                "Selling price",
+                "Use when asked to calculate price, margin or profit for a product.",
+                "Calculate step by step: product cost + variable costs (packaging, card fee, shipping) = total cost; price = total cost ÷ (1 − desired margin − taxes in %). Show the math, profit per unit and how many units cover the month's fixed costs. Use the calculator for the math.",
+            ),
+            _h(
+                "fluxo-de-caixa",
+                "Cash flow",
+                "Use when asked for cash control, income and expenses or month closing.",
+                "Organize in a table: date, description, income, expense, balance. At the end: total income, total expenses, period balance and the 3 largest expenses. If there is a spreadsheet, use Work mode to analyze it and chart it by month.",
+            ),
+        ],
+        "rotinas": [
+            _r(
+                "Open the shop",
+                [{"kind": "resumo"}, {"kind": "agenda_list"}, {"kind": "remind_list"}],
+                ["open the shop", "start the workday"],
             ),
         ],
     },
