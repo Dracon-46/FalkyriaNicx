@@ -16,6 +16,7 @@ import { AssistantsPage } from './pages/AssistantsPage';
 import { ExtensionsPage } from './pages/ExtensionsPage';
 import { UpdatesPage } from './pages/UpdatesPage';
 import { TrabalhoPage } from './pages/TrabalhoPage';
+import { SearchPage } from './pages/SearchPage';
 import { CommandPalette } from './components/CommandPalette';
 import { SetupScreen } from './components/SetupScreen';
 import { Toaster } from './components/ui/sonner';
@@ -213,6 +214,7 @@ export default function App() {
           <Route path="rotinas" element={<RoutinesPage />} />
           <Route path="planejador" element={<PlannerPage />} />
           <Route path="trabalho" element={<TrabalhoPage />} />
+          <Route path="busca" element={<SearchPage />} />
           <Route path="assistentes" element={<AssistantsPage />} />
           <Route path="extensoes" element={<ExtensionsPage />} />
           <Route path="atualizacoes" element={<UpdatesPage />} />

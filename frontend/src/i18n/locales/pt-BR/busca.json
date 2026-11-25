@@ -1,0 +1,20 @@
+{
+  "title": "Pesquisar em tudo",
+  "subtitle": "Uma busca só por conversas, projetos, tarefas, notas, agenda, lembretes, memória e histórico. Tudo neste PC.",
+  "placeholder": "O que você procura?",
+  "hint": "Digite pelo menos uma palavra. Acentos e maiúsculas não importam; todas as palavras precisam aparecer.",
+  "empty": "Nada encontrado para \"{{query}}\".",
+  "failed": "A busca no servidor falhou; mostrando só as conversas.",
+  "restartServer": "Reinicie o servidor do Nicx para pesquisar além das conversas.",
+  "partial": "Não deu para buscar em: {{sources}}.",
+  "sources": {
+    "conversa": "Conversas",
+    "projeto": "Projetos",
+    "trabalho": "Tarefas do modo Trabalho",
+    "nota": "Notas",
+    "compromisso": "Agenda",
+    "lembrete": "Lembretes",
+    "memoria": "Memória",
+    "historico": "Histórico"
+  }
+}

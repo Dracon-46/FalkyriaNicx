@@ -72,6 +72,7 @@ export function Sidebar() {
   const admin = useAdmin((s) => s.admin === true);
   const navItems = [
     { path: '/', icon: MessageSquare, label: t('nav.chat') },
+    { path: '/busca', icon: Search, label: t('nav.search') },
     { path: '/trabalho', icon: Briefcase, label: t('nav.work') },
     { path: '/projetos', icon: FolderKanban, label: t('nav.projects') },
     { path: '/historico', icon: History, label: t('nav.history') },

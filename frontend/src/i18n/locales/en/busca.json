@@ -1,0 +1,20 @@
+{
+  "title": "Search everything",
+  "subtitle": "One search across conversations, projects, tasks, notes, calendar, reminders, memory and history. All on this PC.",
+  "placeholder": "What are you looking for?",
+  "hint": "Type at least one word. Accents and case don't matter; every word must appear.",
+  "empty": "Nothing found for \"{{query}}\".",
+  "failed": "The server search failed; showing conversations only.",
+  "restartServer": "Restart the Nicx server to search beyond conversations.",
+  "partial": "Couldn't search in: {{sources}}.",
+  "sources": {
+    "conversa": "Conversations",
+    "projeto": "Projects",
+    "trabalho": "Work tasks",
+    "nota": "Notes",
+    "compromisso": "Calendar",
+    "lembrete": "Reminders",
+    "memoria": "Memory",
+    "historico": "History"
+  }
+}

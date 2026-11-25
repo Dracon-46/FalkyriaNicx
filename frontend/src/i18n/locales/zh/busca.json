@@ -1,0 +1,20 @@
+{
+  "title": "全部搜索",
+  "subtitle": "一次搜索对话、项目、任务、笔记、日程、提醒、记忆和历史。全部在这台电脑上。",
+  "placeholder": "你在找什么？",
+  "hint": "至少输入一个词。不区分重音和大小写；所有词都必须出现。",
+  "empty": "没有找到与“{{query}}”相关的内容。",
+  "failed": "服务器搜索失败；仅显示对话。",
+  "restartServer": "请重启 Nicx 服务器以搜索对话以外的内容。",
+  "partial": "无法搜索：{{sources}}。",
+  "sources": {
+    "conversa": "对话",
+    "projeto": "项目",
+    "trabalho": "工作模式任务",
+    "nota": "笔记",
+    "compromisso": "日程",
+    "lembrete": "提醒",
+    "memoria": "记忆",
+    "historico": "历史"
+  }
+}

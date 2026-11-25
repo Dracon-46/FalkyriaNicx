@@ -374,6 +374,15 @@ prioridade: enquanto ele pensa ou fala, o humor de fundo espera.
 Rotas: `GET /v1/caixa` e `POST /v1/caixa/dispensar` (`{"ids": [...]}` ou
 `{"todos": true}`). Os avisos dispensados ficam em `~/.nicx/caixa_vistos.json`.
 
+## Pesquisar em tudo
+
+A página **Pesquisar** (menu ao lado) procura numa busca só em conversas,
+projetos, tarefas do modo Trabalho, notas, agenda, lembretes, memória e
+histórico. Acentos e maiúsculas não importam, e todas as palavras precisam
+aparecer, em qualquer ordem. Os resultados vêm agrupados por tipo; clicar abre a
+conversa, o projeto ou a tarefa. As conversas são buscadas no próprio app; o
+resto, no servidor (`GET /v1/busca?q=...`). Nada sai do PC.
+
 ## Editor de código
 
 A página **Editor de código** (menu ao lado) abre uma pasta (Edge, Chrome e o app;
