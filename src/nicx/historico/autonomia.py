@@ -39,6 +39,7 @@ _LIBERADO = {
 # ações rápidas (nicx.acoes.intencoes.Action.kind)
 _RISCO_ACAO = {
     "time": "leitura",
+    "calc": "leitura",
     "date": "leitura",
     "battery": "leitura",
     "status": "leitura",

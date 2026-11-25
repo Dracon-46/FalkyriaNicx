@@ -313,6 +313,8 @@ def _run(action: Action) -> Outcome:
             return _open_url(action)
         if action.kind == "search":
             return _search(action)
+        if action.kind == "calc":
+            return Outcome(True, action.target)
         if action.kind == "time":
             return _time()
         if action.kind == "date":

@@ -380,14 +380,17 @@ def parse(text: str, idioma: Optional[str] = None) -> Optional[Action]:
     t, where = clean_with_map(text)
     if not t or len(t) > 200:
         return None
+    # "Resumo do dia", "como foi meu dia?" (pt, en, es, fr); "clica em Salvar";
+    # "fala com o assistente de estudos".
+    from nicx.acoes import calculos
     from nicx.assistentes import pedidos as pedidos_assistentes
     from nicx.controle import pedidos as pedidos_controle
     from nicx.resumo import pedidos as pedidos_resumo
 
-    # "Resumo do dia", "como foi meu dia?" (pt, en, es, fr); "clica em Salvar";
-    # "fala com o assistente de estudos".
+    # "15% de 230", "quantos dias faltam pro Natal": contas sem o modelo.
     action = (
         pedidos_resumo.parse(t)
+        or calculos.parse(text)
         or pedidos_controle.parse(text, t, where)
         or pedidos_assistentes.parse(text, t, where)
         or rotinas.parse(text, t, where)

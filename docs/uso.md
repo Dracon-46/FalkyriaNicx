@@ -524,6 +524,8 @@ Frases que o Nicx executa na hora, sem passar pelo modelo (texto ou voz):
 | Abrir | "abre o YouTube", "abre o bloco de notas", "abre o VS Code", "abre as configurações" |
 | Pesquisar | "pesquisa receita de bolo no YouTube", "pesquisa X no Google" |
 | Informações | "que horas são", "que dia é hoje", "quanto de bateria tem" |
+| Contas | "quanto é 15% de 230", "230 com 15% de desconto", "30 é quantos por cento de 120", "quanto é 3 x 45,90", "dividir 350 entre 4 pessoas" |
+| Datas | "quantos dias faltam pro Natal", "quantos dias faltam para 10 de janeiro", "quantos dias entre 01/03 e 15/04", "que dia cai daqui a 45 dias", "que dia foi há 30 dias" |
 | Lembretes | "me lembra de tirar o bolo em 20 minutos", "me lembra amanhã às 8 de pagar a conta", "timer de 5 minutos", "alarme para as 7 da manhã", "quais meus lembretes", "cancela os lembretes" |
 | Anotações | "anota: comprar pão", "lê minhas anotações", "apaga minhas anotações" |
 | Agenda | "marca reunião com o João sexta às 15h", "agenda dentista dia 30", "o que eu tenho amanhã?", "minha agenda da semana", "desmarca a reunião de sexta", "manda pro calendário do Windows" |
