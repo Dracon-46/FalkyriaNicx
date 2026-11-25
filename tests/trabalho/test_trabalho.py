@@ -346,3 +346,26 @@ def test_passo_sem_plano_legivel_vira_tarefa_inteira(pasta):
     tarefa = Tarefa(id=modelo.novo_id(), pasta=str(pasta), pedido="faça X")
     passos = executor.planejar(tarefa, MotorFalso([{"content": "não sei"}]), "m", f)
     assert passos == [Passo(descricao="faça X")]
+
+
+@pytest.mark.parametrize("limite, continua", [(None, True), (0, False)])
+def test_passos_continuam_a_conversa_ate_o_limite(pasta, monkeypatch, limite, continua):
+    if limite is not None:
+        monkeypatch.setattr(executor, "LIMITE_CONVERSA", limite)
+    motor = MotorFalso(
+        [
+            {"content": '{"passos": ["ver os arquivos", "escrever o resumo"]}'},
+            _chamada("listar_arquivos"),
+            {"content": "Vi notas.txt e a pasta sub."},
+            {"content": "Resumo pronto."},
+        ]
+    )
+    t = servico.criar(str(pasta), "faz um resumo das notas", motor, "m")
+    _esperar(t["id"], {modelo.AGUARDANDO_APROVACAO})
+    servico.aprovar(t["id"], None, motor, "m")
+    _esperar(t["id"], {modelo.CONCLUIDA})
+    passo2 = motor.pedidos[3][0]
+    textos = [m.content for m in passo2]
+    assert ("Vi notas.txt e a pasta sub." in textos) is continua
+    assert any(x.endswith("passo 2: escrever o resumo") for x in textos)
+    assert textos[-1] == "Resumo pronto."  # a resposta fica para o próximo passo

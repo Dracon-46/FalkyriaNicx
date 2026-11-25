@@ -20,7 +20,7 @@ import json
 import logging
 import re
 import threading
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from nicx.nucleo import cancelamento
 from nicx.nucleo.types import Message, Role, ToolCall
@@ -33,6 +33,11 @@ logger = logging.getLogger(__name__)
 MAX_PASSOS = 7
 MAX_CHAMADAS_POR_PASSO = 8
 MAX_RESULTADO = 4000
+#: Até quanto (em caracteres) os passos continuam a mesma conversa. Continuar
+#: deixa o Ollama reaproveitar o prompt já lido (~1,5 s em vez de ~40 s por
+#: passo neste PC, medido no 0.40.18) e o modelo ainda vê o que leu antes;
+#: passou disso, o passo recomeça com o plano e o resumo, para caber em 8k tokens.
+LIMITE_CONVERSA = 14000
 
 SISTEMA = (
     "Você é o Nicx, a IA da Falkyria, fazendo uma tarefa numa pasta do computador da "
@@ -152,7 +157,42 @@ def executar_passo(
     parar: cancelamento.Cancelamento,
     pausa: Pausa,
     salvar: Callable[[], None],
+    conversa: Optional[list[Message]] = None,
 ) -> str:
+    """Faz um passo com as ferramentas e devolve a frase do que foi feito.
+
+    ``conversa`` (opcional) é a conversa dos passos anteriores: o passo a
+    continua enquanto ela for pequena e a deixa pronta para o próximo.
+    """
+    passo = tarefa.plano[indice]
+    if conversa and _tamanho(conversa) <= LIMITE_CONVERSA:
+        conversa.append(
+            Message(
+                role=Role.USER,
+                content=f"Agora faça só o passo {indice + 1}: {passo.descricao}",
+            )
+        )
+        mensagens = conversa
+    else:
+        mensagens = _inicio_do_passo(tarefa, indice)
+        if conversa is not None:
+            conversa[:] = mensagens
+            mensagens = conversa
+    return _laco_do_passo(
+        tarefa, mensagens, engine, modelo_nome, ferramentas, parar, pausa, salvar
+    )
+
+
+def _tamanho(mensagens: list[Message]) -> int:
+    total = 0
+    for m in mensagens:
+        total += len(m.content or "")
+        for c in m.tool_calls or []:
+            total += len(c.arguments or "") + len(c.name or "")
+    return total
+
+
+def _inicio_do_passo(tarefa: Tarefa, indice: int) -> list[Message]:
     passo = tarefa.plano[indice]
     plano = "\n".join(f"{i + 1}. {p.descricao}" for i, p in enumerate(tarefa.plano))
     feitos = "\n".join(
@@ -160,7 +200,7 @@ def executar_passo(
         for i, p in enumerate(tarefa.plano[:indice])
         if p.resultado
     )
-    mensagens = [
+    return [
         Message(role=Role.SYSTEM, content=SISTEMA),
         Message(
             role=Role.USER,
@@ -171,6 +211,18 @@ def executar_passo(
             ),
         ),
     ]
+
+
+def _laco_do_passo(
+    tarefa: Tarefa,
+    mensagens: list[Message],
+    engine: Any,
+    modelo_nome: str,
+    ferramentas: Ferramentas,
+    parar: cancelamento.Cancelamento,
+    pausa: Pausa,
+    salvar: Callable[[], None],
+) -> str:
     for chamada in range(MAX_CHAMADAS_POR_PASSO + 1):
         cancelamento.verificar()
         pausa.esperar(parar)
@@ -189,10 +241,12 @@ def executar_passo(
         brutas = resposta.get("tool_calls") or []
         texto = (resposta.get("content") or "").strip()
         if not brutas or ultima:
-            return (
+            final = (
                 re.sub(r"<think>.*?</think>", "", texto, flags=re.DOTALL).strip()
                 or "passo concluído"
             )
+            mensagens.append(Message(role=Role.ASSISTANT, content=final))
+            return final
         chamadas = [
             ToolCall(
                 id=c.get("id") or f"c{chamada}_{i}",
@@ -269,6 +323,7 @@ def rodar(
                 return
         tarefa.estado = modelo.EXECUTANDO
         salvar()
+        conversa: list[Message] = []
         for i, passo in enumerate(tarefa.plano):
             if passo.estado in ("feito", "pulado"):
                 continue
@@ -277,7 +332,15 @@ def rodar(
             salvar()
             try:
                 passo.resultado = executar_passo(
-                    tarefa, i, engine, modelo_nome, ferramentas, parar, pausa, salvar
+                    tarefa,
+                    i,
+                    engine,
+                    modelo_nome,
+                    ferramentas,
+                    parar,
+                    pausa,
+                    salvar,
+                    conversa,
                 )
                 passo.estado = "feito"
             except cancelamento.Cancelado:
@@ -289,6 +352,7 @@ def rodar(
                 )
                 passo.estado = "falhou"
                 passo.resultado = f"falhou: {exc}"[:500]
+                conversa.clear()  # o próximo passo recomeça do plano e do resumo
                 tarefa.anotar("erro", f"passo {i + 1} falhou: {exc}"[:500])
             salvar()
         tarefa.resumo = resumir(tarefa)
