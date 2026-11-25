@@ -1,7 +1,7 @@
 {
   "title": "Trabalho",
   "subtitle": "Escolha uma pasta e diga a tarefa: o Nicx monta um plano, você aprova, e ele trabalha sozinho nos arquivos dessa pasta enquanto você faz outra coisa.",
-  "hint": "Ex.: \"junta as notas fiscais desta pasta numa planilha\", \"escreve um relatório em Word com o resumo destes PDFs\", \"organiza os arquivos por tipo\".",
+  "hint": "Ex.: \"junta as notas fiscais desta pasta numa planilha\", \"faz um gráfico dos gastos por mês\", \"o que mudou entre o contrato v1 e o v2?\", \"organiza os arquivos por tipo\".",
   "loading": "Carregando...",
   "loadFailed": "Não consegui carregar as tarefas. O servidor do Nicx está ligado?",
   "createFailed": "Não consegui começar a tarefa. Tente de novo.",

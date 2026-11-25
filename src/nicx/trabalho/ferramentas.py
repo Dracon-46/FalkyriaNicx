@@ -178,6 +178,54 @@ DEFINICOES = [
         {"consulta": {"type": "string"}},
         ["consulta"],
     ),
+    _f(
+        "analisar_dados",
+        "Resume uma tabela .csv/.xlsx (colunas, somas, médias, datas). Com "
+        "agrupar_por, faz a conta por grupo; por_mes agrupa uma coluna de datas "
+        "por mês. Use isto para contas: não some de cabeça.",
+        {
+            "caminho": _CAMINHO,
+            "aba": {"type": "string"},
+            "agrupar_por": {"type": "string", "description": "nome da coluna"},
+            "valor": {"type": "string", "description": "coluna com os números"},
+            "operacao": {
+                "type": "string",
+                "enum": ["soma", "media", "contagem", "maximo", "minimo"],
+            },
+            "por_mes": {"type": "boolean", "default": False},
+        },
+        ["caminho"],
+    ),
+    _f(
+        "criar_grafico",
+        "Cria um gráfico do Excel (.xlsx): numa planilha nova ou numa aba nova de uma "
+        "que existe. linhas: a 1ª é o cabeçalho; a 1ª coluna são os rótulos e as "
+        "outras, os valores.",
+        {
+            "caminho": _CAMINHO,
+            "titulo": {"type": "string"},
+            "tipo": {
+                "type": "string",
+                "enum": ["colunas", "barras", "linhas", "pizza"],
+            },
+            "linhas": {"type": "array", "items": {"type": "array", "items": {}}},
+        },
+        ["caminho", "linhas"],
+    ),
+    _f(
+        "converter",
+        "Converte um arquivo: csv/json→xlsx, xlsx/json→csv, docx/pdf→txt/md, "
+        "tabelas de PDF→xlsx, txt/md→docx.",
+        {"origem": _CAMINHO, "destino": _CAMINHO},
+        ["origem", "destino"],
+    ),
+    _f(
+        "comparar",
+        "Compara dois arquivos (texto, Word, PDF ou Excel) e mostra o que entrou e o "
+        "que saiu de um para o outro.",
+        {"a": _CAMINHO, "b": _CAMINHO},
+        ["a", "b"],
+    ),
 ]
 NOMES = {d["function"]["name"] for d in DEFINICOES}
 
@@ -471,6 +519,90 @@ class Ferramentas:
         if not resultado.success:
             raise ErroFerramenta(resultado.content or "a pesquisa falhou")
         return _cortar(resultado.content)
+
+    # dados ----------------------------------------------------------------
+    def _arquivo(self, caminho: str) -> Path:
+        p = self.pasta.caminho(caminho)
+        if not p.is_file():
+            raise ErroFerramenta(f"'{caminho}' não existe ou não é um arquivo")
+        if p.stat().st_size > MAX_ARQUIVO_LIDO:
+            raise ErroFerramenta(
+                f"arquivo grande demais ({_tamanho(p.stat().st_size)})"
+            )
+        return p
+
+    def analisar_dados(
+        self,
+        caminho: str,
+        aba: str = "",
+        agrupar_por: str = "",
+        valor: str = "",
+        operacao: str = "soma",
+        por_mes: bool = False,
+    ) -> str:
+        from nicx.trabalho import dados
+
+        try:
+            cab, linhas = dados.ler_tabela(self._arquivo(caminho), aba or "")
+            return _cortar(
+                dados.analisar(
+                    cab,
+                    linhas,
+                    agrupar_por=agrupar_por or "",
+                    valor=valor or "",
+                    operacao=operacao or "soma",
+                    por_mes=bool(por_mes),
+                )
+            )
+        except dados.ErroDados as exc:
+            raise ErroFerramenta(str(exc)) from exc
+
+    def criar_grafico(
+        self, caminho: str, linhas: list, titulo: str = "", tipo: str = "colunas"
+    ) -> str:
+        from nicx.trabalho import dados
+
+        p = self._alvo_de_escrita(caminho, {".xlsx"})
+        self._antes_de_escrever(p)
+        try:
+            n = dados.grafico_xlsx(
+                p, linhas, tipo=tipo or "colunas", titulo=titulo or ""
+            )
+        except dados.ErroDados as exc:
+            raise ErroFerramenta(str(exc)) from exc
+        return (
+            f"criei o gráfico ({tipo or 'colunas'}, {n} itens) "
+            f"em {self.pasta.relativo(p)}"
+        )
+
+    def converter(self, origem: str, destino: str) -> str:
+        from nicx.trabalho import dados
+
+        de = self._arquivo(origem)
+        para = self._alvo_de_escrita(destino)
+        if para == de:
+            raise ErroFerramenta("o destino precisa ser outro arquivo")
+        self._antes_de_escrever(para)
+        try:
+            detalhe = dados.converter(de, para, ler_conteudo)
+        except dados.ErroDados as exc:
+            raise ErroFerramenta(str(exc)) from exc
+        return (
+            f"converti {self.pasta.relativo(de)} em {self.pasta.relativo(para)} "
+            f"({detalhe})"
+        )
+
+    def comparar(self, a: str, b: str) -> str:
+        from nicx.trabalho import dados
+
+        pa, pb = self._arquivo(a), self._arquivo(b)
+        return dados.comparar(
+            ler_conteudo(pa),
+            ler_conteudo(pb),
+            self.pasta.relativo(pa),
+            self.pasta.relativo(pb),
+            limite=MAX_LER,
+        )
 
     # despacho ------------------------------------------------------------
     def executar(self, nome: str, argumentos: str | dict) -> tuple[bool, str]:

@@ -317,7 +317,18 @@ sozinho, em segundo plano, nos arquivos de uma pasta:
 
 O que ele sabe fazer na pasta: listar, ler (texto, Word, PDF e Excel), escrever
 arquivos de texto, criar planilhas `.xlsx` e documentos `.docx`, criar pastas,
-mover/renomear, apagar e pesquisar na web.
+mover/renomear, apagar e pesquisar na web. E também:
+
+- **Analisar dados** de `.csv`/`.xlsx`: somas, médias, mínimo e máximo por coluna e
+  contas por grupo ou por mês ("quanto gastei por mês nesta planilha?"). As contas
+  são feitas pelo programa, não de cabeça pelo modelo; entende `R$ 1.234,56` e
+  datas `25/11/2026`.
+- **Gráficos do Excel** (colunas, barras, linhas, pizza), numa planilha nova ou numa
+  aba nova de uma que já existe. É um gráfico de verdade do Excel, editável.
+- **Converter**: CSV/JSON → Excel, Excel/JSON → CSV (com `;`, abre no Excel com
+  acentos), Word/PDF → texto, tabelas de PDF → Excel, texto/Markdown → Word.
+- **Comparar** dois arquivos (texto, Word, PDF ou Excel): o que entrou e o que saiu
+  de uma versão para a outra ("o que mudou entre o contrato v1 e o v2?").
 
 Segurança:
 
