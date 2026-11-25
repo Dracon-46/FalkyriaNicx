@@ -154,6 +154,24 @@ class TestToolTimeout:
                 solta.wait(timeout=10)
                 return ToolResult(tool_name="slow_tool", content="Done", success=True)
 
+        # Ocupa os 8 workers antes e confere que estão presos. Sem isso, numa
+        # máquina lenta a chamada vencia os 10 ms antes de um worker pegá-la,
+        # era cancelada, o worker a descartava e seguia livre: a fila nunca
+        # enchia (falhou no CI de 25/11/2026).
+        from nicx.ferramentas import _stubs
+
+        presos = threading.Semaphore(0)
+
+        def prende() -> ToolResult:
+            presos.release()
+            solta.wait(timeout=10)
+            return ToolResult(tool_name="prende", content="", success=True)
+
+        for _ in range(_stubs._MAX_TOOL_WORKERS):
+            assert _stubs._TOOL_RUNNER.submit(prende) is not None
+        for _ in range(_stubs._MAX_TOOL_WORKERS):
+            assert presos.acquire(timeout=10), "os workers não ficaram ocupados"
+
         executor = ToolExecutor([StuckTool()])
         try:
             results = [
